@@ -14,7 +14,8 @@ Steps:
 4. **Build host** — on PRs, filtered to packages diverging from PR base SHA
 5. **Typecheck** — on PRs, filtered to affected packages with `--continue`
 6. **Syncpack** — always runs full `pnpm turbo run syncpack`
-7. Save Turborepo cache
+7. **Test packages** — on PRs, filtered to affected packages with `--continue`
+8. Save Turborepo cache
 
 ESLint and Stylelint steps are commented out (planned via OXlint/OXfmt).
 
@@ -76,6 +77,12 @@ Steps:
 **Maintenance**: When adding a new Storybook or changing domain package names, update the `StorybookDependencies` map in `getAffectedStorybooks.ts`.
 
 **Known issue**: `@packages/components` is referenced in `StorybookDependencies` but does not exist yet.
+
+## CI coverage gaps
+
+What CI does **not** catch currently:
+- Linting — OXlint/OXfmt is planned but not yet configured (ESLint/Stylelint steps are commented out)
+- Smoke tests — not yet configured
 
 ## Turbo cache strategy
 

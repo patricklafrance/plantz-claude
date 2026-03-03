@@ -28,7 +28,6 @@ Never guess about architecture, tooling, or conventions — always load the rele
 
 ### Quality
 
-- [quality/pre-commit-validation.md](agent-docs/quality/pre-commit-validation.md) — required checks before committing
 - [quality/README.md](agent-docs/quality/README.md) — conventions for test and validation docs
 
 ### Decisions

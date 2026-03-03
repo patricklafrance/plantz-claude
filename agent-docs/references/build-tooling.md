@@ -24,9 +24,9 @@ Configuration in `turbo.json`. UI mode: `tui`.
 
 - `$TURBO_DEFAULT$` — Turborepo's default input heuristic (all tracked files minus outputs).
 - Root-level tasks use `//#taskname` syntax.
-- `MODULES` is declared as task-level `env` on the `build` task (not `globalEnv`). sg-next-architecture uses `globalEnv` instead — plantz-claude's approach scopes cache invalidation to build only.
-- `transit` is a plantz-claude addition for dependency graph propagation before typecheck/test. sg-next-architecture does not have this task.
-- ESLint/Stylelint tasks are commented out. sg-next-architecture uses ESLint + Stylelint actively; plantz-claude plans to adopt OXlint/OXfmt instead.
+- `MODULES` is declared as task-level `env` on the `build` task (not `globalEnv`), scoping cache invalidation to build only.
+- `transit` is a dependency graph propagation task that runs before typecheck/test.
+- ESLint/Stylelint tasks are commented out; OXlint/OXfmt adoption is planned instead.
 
 ## Syncpack
 

@@ -75,7 +75,7 @@ Steps:
 
 **Maintenance**: When adding a new Storybook or changing domain package names, update the `StorybookDependencies` map in `getAffectedStorybooks.ts`.
 
-**Known issue**: `@packages/components` is referenced in `StorybookDependencies` but does not exist in plantz-claude (carried over from sg-next-architecture).
+**Known issue**: `@packages/components` is referenced in `StorybookDependencies` but does not exist yet.
 
 ## Turbo cache strategy
 

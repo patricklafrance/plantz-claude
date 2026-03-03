@@ -76,12 +76,3 @@ cross-env MODULES=today/landing-page pnpm dev-host   # only today/landing-page
 
 Omit `MODULES` to load all modules. The value maps to the module's path under `apps/`.
 
-## Lineage from sg-next-architecture
-
-This repo is inspired by [patricklafrance/sg-next-architecture](https://github.com/patricklafrance/sg-next-architecture). Key differences:
-
-- **Domains**: sg-next has `home` (management, migration) and `protect`; plantz-claude has `management` and `today`.
-- **Linting**: sg-next uses ESLint + Stylelint; plantz-claude plans OXlint/OXfmt.
-- **MSW**: sg-next supports Mock Service Worker via `USE_MSW=true` dev scripts; plantz-claude does not yet.
-- **Agent infra**: sg-next has no agent docs or Claude Code integration; plantz-claude adds `CLAUDE.md`, `agent-docs/`, `.agents/skills/`, and Claude/code-review workflows.
-- **`transit` task**: plantz-claude adds a Turborepo task for dependency graph propagation before typecheck/test; sg-next does not have this.

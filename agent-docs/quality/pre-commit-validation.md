@@ -23,8 +23,8 @@ Commit messages must follow the Conventional Commits format. Use the git-commit 
 ## What CI does not catch currently
 
 - Individual package tests — `test` task exists in `turbo.json` but is not run in `ci.yml`
-- Linting — OXlint/OXfmt is planned but not yet configured (ESLint/Stylelint steps are commented out; sg-next-architecture uses ESLint + Stylelint actively)
-- Smoke tests — sg-next-architecture has Playwright smoke tests; plantz-claude does not yet
+- Linting — OXlint/OXfmt is planned but not yet configured (ESLint/Stylelint steps are commented out)
+- Smoke tests — not yet configured
 
 ---
 *See [CLAUDE.md](../../CLAUDE.md) for navigation.*

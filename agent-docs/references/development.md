@@ -17,55 +17,18 @@ packages:
 
 ## Commands
 
-All commands are defined in the root `package.json`.
+All commands are defined in the root `package.json` under `scripts`. Read that file to discover available commands — never duplicate the script list here, as it drifts from the source of truth.
 
-### Development
+Scripts follow a naming convention:
 
-| Command | Description |
-|---|---|
-| `pnpm dev-host` | Start the Squide host (all modules) |
-| `pnpm dev-management-plants` | Start host with only `management/plants` module |
-| `pnpm dev-today-landing-page` | Start host with only `today/landing-page` module |
-| `pnpm dev-management-storybook` | Start management domain Storybook |
-| `pnpm dev-today-storybook` | Start today domain Storybook |
-| `pnpm dev-packages-storybook` | Start packages Storybook |
-| `pnpm dev-storybook` | Start combined Storybook (all domains) |
-
-### Build and serve
-
-| Command | Description |
-|---|---|
-| `pnpm build-host` | Production build of the host app |
-| `pnpm build-storybook` | Build all Storybooks |
-| `pnpm serve-host` | Serve the built host app |
-| `pnpm serve-storybook` | Serve the built Storybooks |
-
-### Quality
-
-| Command | Description |
-|---|---|
-| `pnpm lint` | Run all linting (typecheck + syncpack) |
-| `pnpm typecheck` | Run tsgo type checking |
-| `pnpm syncpack` | Run syncpack lint for dependency version consistency |
-
-### Maintenance
-
-| Command | Description |
-|---|---|
-| `pnpm clean` | Remove dist, storybook-static, .turbo, and caches |
-| `pnpm reset` | Full reset: clean + delete node_modules + pnpm-lock.yaml |
-| `pnpm list-outdated-deps` | List outdated dependencies across the workspace |
-| `pnpm update-outdated-deps` | Update all deps to latest + fix peer versions via syncpack |
+- `dev-*` — local development servers
+- `build-*` / `serve-*` — production builds and serving
+- `lint`, `typecheck`, `syncpack` — quality checks
+- `clean`, `reset`, `*-outdated-*` — maintenance
 
 ## MODULES env var
 
-Controls selective module loading during development. Set to a module's path under `apps/`:
-
-```bash
-cross-env MODULES=management/plants pnpm dev-host
-```
-
-Omit to load all modules.
+See [ARCHITECTURE.md](../ARCHITECTURE.md#modules-env-var) for selective module loading via the `MODULES` env var.
 
 ## onlyBuiltDependencies
 

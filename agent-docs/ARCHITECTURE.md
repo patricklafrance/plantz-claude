@@ -42,6 +42,8 @@ plantz-claude/
 - **Modules**: Each feature area registers via `ModuleRegisterFunction`. Modules are isolated — they never import from each other.
 - **Shared packages**: Cross-cutting utilities live in `packages/` and are consumed by both host and modules.
 
+See [ADR-0001](adr/0001-squide-federated-modules.md) for rationale.
+
 ## Domain isolation
 
 Two domain areas, each with independent Storybooks and Chromatic tokens:
@@ -50,6 +52,8 @@ Two domain areas, each with independent Storybooks and Chromatic tokens:
 - **today** — Daily watering view (`apps/today/`)
 
 A third Storybook (`apps/storybook/`) covers shared packages.
+
+See [ADR-0002](adr/0002-domain-scoped-storybooks.md) for rationale.
 
 ## Technology stack
 

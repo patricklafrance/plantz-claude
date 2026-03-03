@@ -1,6 +1,6 @@
 # CI/CD Reference
 
-Four GitHub Actions workflows in `.github/workflows/`.
+Five GitHub Actions workflows in `.github/workflows/`.
 
 ## ci.yml — Continuous Integration
 
@@ -62,8 +62,24 @@ Steps:
 Steps:
 1. Checkout (full history)
 2. Run `anthropics/claude-code-action@v1` with:
-   - Restricted tools: `Read`, `Glob`, `Grep`, `Skill`, `Task`, `Bash(gh:*)`, `mcp__github_inline_comment__*`
+   - Restricted tools (passed via `claude_args` to the action): `Read`, `Glob`, `Grep`, `Skill`, `Task`, `Bash(gh:*)`, `mcp__github_inline_comment__*`
    - Prompt reads `.github/prompts/code-review.md`
+
+## audit-agent-docs.yml — Weekly Documentation Audit
+
+**Triggers**: weekly cron (Sunday midnight UTC), manual `workflow_dispatch`
+**Concurrency**: `audit-agent-docs-${{ github.ref }}`, cancel in-progress
+**Timeout**: 30 minutes
+
+Steps:
+1. Checkout (full history)
+2. Install pnpm + Node.js + dependencies
+3. Run `anthropics/claude-code-action@v1` with:
+   - Prompt reads `.github/prompts/audit-agent-docs.md`
+   - Allowed tools: `Read`, `Write`, `Edit`, `Glob`, `Grep`, `Skill`, `Bash(git:*)`, `Bash(gh:*)`, `Bash(date:*)`
+   - Loads the `audit-agent-docs` skill and runs the 3-pass audit procedure
+4. If Critical/High findings: fixes them, creates a PR against `main`
+5. If no Critical/High findings: creates and closes a GitHub issue with the report
 
 ## Affected Storybook detection
 
@@ -76,8 +92,6 @@ Steps:
 
 **Maintenance**: When adding a new Storybook or changing domain package names, update the `StorybookDependencies` map in `getAffectedStorybooks.ts`.
 
-**Known issue**: `@packages/components` is referenced in `StorybookDependencies` but does not exist yet.
-
 ## CI coverage gaps
 
 What CI does **not** catch currently:
@@ -86,7 +100,7 @@ What CI does **not** catch currently:
 
 ## Turbo cache strategy
 
-All workflows share the same pattern:
+Three of the five workflows (ci, chromatic, claude) share the same pattern. `code-review.yml` and `audit-agent-docs.yml` do not use Turbo cache.
 - **Key**: `${{ runner.os }}-turbo-<workflow>-${{ github.sha }}`
 - **Restore keys**: `${{ runner.os }}-turbo-<workflow>-`, `${{ runner.os }}-turbo-`
 - **Path**: `.turbo`

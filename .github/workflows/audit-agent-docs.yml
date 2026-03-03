@@ -1,0 +1,60 @@
+name: Audit Agent Docs
+
+on:
+  schedule:
+    - cron: "0 0 * * 0" # Every Sunday at midnight UTC
+  workflow_dispatch: # Allow manual trigger
+
+env:
+  CI: true
+
+concurrency:
+  group: audit-agent-docs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ">=24.0.0"
+          check-latest: true
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run audit
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Read and follow the instructions in .github/prompts/audit-agent-docs.md
+
+            Today's date is ${{ github.event.repository.updated_at || 'unknown' }}.
+            Repository: ${{ github.repository }}
+          claude_args: >-
+            --allowedTools Read,Write,Edit,Glob,Grep,Skill,Bash(git:*),Bash(gh:*),Bash(date:*)
+        env:
+          GH_TOKEN: ${{ github.token }}

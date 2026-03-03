@@ -8,7 +8,7 @@ Never guess about architecture, tooling, or conventions — always load the rele
 2. Before changing a module API or architectural pattern, check `agent-docs/adr/index.md`.
 3. Before changing build tooling, CI, or dev workflows, check `agent-docs/odr/index.md`.
 4. Before writing code, load any applicable agent skill from `.agents/skills/` or `.claude/skills/`.
-5. After completing a task, update any `agent-docs/` file whose topic was affected — match your changes against the index descriptions below.
+5. Never report a task as complete without running `git status --short` and checking every changed or new file against the index below. If a file touches a topic listed in the index, open that doc and fix any line that no longer matches reality. Stale docs cause the next agent to generate code that contradicts the actual codebase.
 
 ## Index
 
@@ -16,19 +16,12 @@ Never guess about architecture, tooling, or conventions — always load the rele
 
 - [ARCHITECTURE.md](agent-docs/ARCHITECTURE.md) — repo structure, package naming, Squide topology, tech stack, MODULES env var
 
-### Design
-
-- [design/README.md](agent-docs/design/README.md) — conventions for cross-cutting design docs
-
 ### References
 
-- [references/development.md](agent-docs/references/development.md) — pnpm workspace, Node version, all dev/build/serve commands, MODULES
+- [references/development.md](agent-docs/references/development.md) — pnpm workspace, Node version, script naming conventions
 - [references/build-tooling.md](agent-docs/references/build-tooling.md) — Turborepo tasks, caching, syncpack semver groups, TypeScript config
-- [references/ci-cd.md](agent-docs/references/ci-cd.md) — CI, Chromatic, Claude, and code-review GitHub Actions workflows
-
-### Quality
-
-- [quality/README.md](agent-docs/quality/README.md) — conventions for test and validation docs
+- [references/ci-cd.md](agent-docs/references/ci-cd.md) — CI, Chromatic, Claude, code-review, and audit-agent-docs GitHub Actions workflows
+- [references/writing-agent-instructions.md](agent-docs/references/writing-agent-instructions.md) — principles for writing instructions agents actually follow
 
 ### Decisions
 

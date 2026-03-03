@@ -106,7 +106,7 @@ jobs:
         uses: chromaui/action@latest
         with:
           projectToken: ${{ secrets.MANAGEMENT_CHROMATIC_PROJECT_TOKEN }}
-          workingDir: apps/managewment/storybook
+          workingDir: apps/management/storybook
           onlyChanged: true
           exitOnceUploaded: true
           autoAcceptChanges: main

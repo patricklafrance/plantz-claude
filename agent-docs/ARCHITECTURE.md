@@ -76,3 +76,8 @@ cross-env MODULES=today/landing-page pnpm dev-host   # only today/landing-page
 
 Omit `MODULES` to load all modules. The value maps to the module's path under `apps/`.
 
+## Maintaining this doc
+
+- When a section exceeds ~40 lines, extract it to its own file in the appropriate `agent-docs/` subfolder.
+- Cross-package contracts (e.g., "modules never import each other") belong here. Let the code (TypeScript types, barrel exports) document its own public API.
+

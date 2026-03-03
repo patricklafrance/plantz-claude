@@ -37,8 +37,5 @@ Never guess about architecture, tooling, or conventions — always load the rele
 
 ## Growth Conventions
 
-- Every new file in `agent-docs/` gets an index entry above. To add a line, shorten or remove another to stay under ~55 lines.
-- Only document what is currently true — no aspirational content.
-- Never edit the Decision section of an accepted ADR/ODR. Create a new superseding record.
-- When an ARCHITECTURE.md section exceeds ~40 lines, extract it to its own file.
-- Cross-package contracts (e.g., "modules never import each other") belong in ARCHITECTURE.md, not in per-package files. Let the code (TypeScript types, barrel exports) document its own public API.
+- New `agent-docs/` files get an index entry above; keep this file under ~55 lines. Only document what is currently true.
+- Domain-specific patterns belong in a scoped `CLAUDE.md` near the code (e.g., `apps/management/CLAUDE.md`), not in `agent-docs/`.

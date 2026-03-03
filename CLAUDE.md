@@ -18,7 +18,7 @@ Never guess about architecture, tooling, or conventions — always load the rele
 
 ### References
 
-- [references/development.md](agent-docs/references/development.md) — pnpm workspace, Node version, script naming conventions
+- [references/development.md](agent-docs/references/development.md) — pnpm workspace, Node version, script naming conventions, MODULES
 - [references/build-tooling.md](agent-docs/references/build-tooling.md) — Turborepo tasks, caching, syncpack semver groups, TypeScript config
 - [references/ci-cd.md](agent-docs/references/ci-cd.md) — CI, Chromatic, Claude, code-review, and audit-agent-docs GitHub Actions workflows
 - [references/writing-agent-instructions.md](agent-docs/references/writing-agent-instructions.md) — principles for writing instructions agents actually follow

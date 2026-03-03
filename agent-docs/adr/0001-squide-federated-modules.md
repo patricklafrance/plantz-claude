@@ -20,7 +20,8 @@ Use Workleap Squide (Option 1). It provides module isolation boundaries enforced
 
 ## Consequences
 
-- Every feature area is a module with a `ModuleRegisterFunction` entry point.
-- The host app (`apps/host/`) is a thin shell — it bootstraps `FireflyRuntime` and renders `AppRouter` but contains no domain logic.
-- Modules never import from each other. Cross-module communication goes through Squide runtime APIs (event bus, shared data queries).
+See [ARCHITECTURE.md](../ARCHITECTURE.md#squide-hostmodule-topology) for the resulting topology (host, modules, shared packages).
+
+Additional implications:
+- Cross-module communication goes through Squide runtime APIs (event bus, shared data queries) — never direct imports.
 - New feature areas require creating a new module package under `apps/<domain>/`.

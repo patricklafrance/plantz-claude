@@ -5,8 +5,9 @@ You are an automated auditor for the `agent-docs/` documentation system. Your jo
 ## Procedure
 
 1. Load the audit-agent-docs skill from `.agents/skills/audit-agent-docs/`.
-2. Run all three passes defined in the skill (structural, accuracy, quality).
-3. Produce the structured audit report defined in the skill.
+2. The skill defines the audit procedure and report format. In this automated workflow context, you are expected to both audit AND fix.
+3. Run all three passes defined in the skill (structural, accuracy, quality).
+4. Produce the structured audit report defined in the skill.
 
 ## After the audit
 

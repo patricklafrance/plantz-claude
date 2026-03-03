@@ -16,7 +16,7 @@ Configuration in `turbo.json`. UI mode: `tui`.
 | `serve-storybook` | `build-storybook` | — | — | Persistent, no cache |
 | `lint` | `typecheck`, `//#typecheck`, `//#syncpack` | — | — | Orchestrator task |
 | `//#typecheck` | — | `src/**/*.ts(x)`, `test/**/*.ts(x)`, `tsconfig.json`, `!apps`, `!packages`, `!agent-docs` | `node_modules/.cache/tsbuildinfo.json` | Root-level |
-| `typecheck` | `transit` | `src/**/*.ts(x)`, `tsconfig.json`, `tsconfig.build.json` | `node_modules/.cache/tsbuildinfo.json` | Per-package |
+| `typecheck` | `transit` | `src/**/*.ts(x)`, `test/**/*.ts(x)`, `tsconfig.json`, `tsconfig.build.json` | `node_modules/.cache/tsbuildinfo.json` | Per-package |
 | `//#syncpack` | — | `.syncpackrc.js`, `**/package.json` | — | Root-level |
 | `test` | `transit` | — | `node_modules/.cache/vitest/**` | Per-package |
 

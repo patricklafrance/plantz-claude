@@ -5,9 +5,6 @@ on:
     - cron: "0 0 * * 0" # Every Sunday at midnight UTC
   workflow_dispatch: # Allow manual trigger
 
-env:
-  CI: true
-
 concurrency:
   group: audit-agent-docs-${{ github.ref }}
   cancel-in-progress: true
@@ -15,36 +12,27 @@ concurrency:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     permissions:
       contents: write
       pull-requests: write
       issues: write
       id-token: write
+      actions: read
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          run_install: false
+      - name: Get current date
+        id: date
+        run: echo "today=$(date +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
 
-      - name: Install Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: ">=24.0.0"
-          check-latest: true
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
+      # Note: claude-code-action OIDC token exchange may fail on cron triggers
+      # (see https://github.com/anthropics/claude-code-action/issues/814).
+      # If this happens, use workflow_dispatch as a workaround until the
+      # upstream fix lands, or pass a custom GitHub App token via github_token.
       - name: Run audit
         uses: anthropics/claude-code-action@v1
         with:
@@ -52,9 +40,19 @@ jobs:
           prompt: |
             Read and follow the instructions in .github/prompts/audit-agent-docs.md
 
-            Today's date is ${{ github.event.repository.updated_at || 'unknown' }}.
+            Today's date is ${{ steps.date.outputs.today }}.
             Repository: ${{ github.repository }}
           claude_args: >-
             --allowedTools Read,Write,Edit,Glob,Grep,Skill,Bash(git:*),Bash(gh:*),Bash(date:*)
         env:
           GH_TOKEN: ${{ github.token }}
+
+      - name: Create failure issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "Audit agent-docs failed — ${{ steps.date.outputs.today }}" \
+            --body "The weekly \`audit-agent-docs\` workflow failed on ${{ steps.date.outputs.today }}. Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details." \
+            --label "documentation"

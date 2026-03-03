@@ -69,17 +69,18 @@ Steps:
 
 **Triggers**: weekly cron (Sunday midnight UTC), manual `workflow_dispatch`
 **Concurrency**: `audit-agent-docs-${{ github.ref }}`, cancel in-progress
-**Timeout**: 30 minutes
+**Timeout**: 60 minutes
 
 Steps:
-1. Checkout (full history)
-2. Install pnpm + Node.js + dependencies
+1. Checkout
+2. Get current date (used in branch names, PR titles, and issue titles)
 3. Run `anthropics/claude-code-action@v1` with:
    - Prompt reads `.github/prompts/audit-agent-docs.md`
    - Allowed tools: `Read`, `Write`, `Edit`, `Glob`, `Grep`, `Skill`, `Bash(git:*)`, `Bash(gh:*)`, `Bash(date:*)`
    - Loads the `audit-agent-docs` skill and runs the 3-pass audit procedure
 4. If Critical/High findings: fixes them, creates a PR against `main`
 5. If no Critical/High findings: creates and closes a GitHub issue with the report
+6. On failure: creates a GitHub issue with a link to the failed workflow run
 
 ## Affected Storybook detection
 

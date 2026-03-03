@@ -19,7 +19,8 @@ Use per-domain Storybooks (Option 1). Each domain area has a Storybook at `apps/
 
 ## Consequences
 
+See [ARCHITECTURE.md](../ARCHITECTURE.md#domain-isolation) for the resulting Storybook structure.
+
+Additional implications:
 - Separate Chromatic project tokens per domain (`MANAGEMENT_CHROMATIC_PROJECT_TOKEN`, `TODAY_CHROMATIC_PROJECT_TOKEN`, `PACKAGES_CHROMATIC_PROJECT_TOKEN`).
-- The `tooling/getAffectedStorybooks.ts` script detects which Storybooks are affected by a change.
-- Adding a new domain requires creating a new Storybook package and Chromatic token.
-- Each Storybook can be developed independently (`pnpm dev-management-storybook`, `pnpm dev-today-storybook`, `pnpm dev-packages-storybook`).
+- Adding a new domain requires a new Storybook package, Chromatic token, and an update to `StorybookDependencies` in `tooling/getAffectedStorybooks.ts`.

@@ -1,0 +1,12 @@
+node_modules
+dist
+storybook-static
+build-storybook.log
+chromatic.log
+chromatic-diagnostics.json
+.pnpm-debug.log*
+.turbo
+.rslib
+.netlify
+*.env.local
+

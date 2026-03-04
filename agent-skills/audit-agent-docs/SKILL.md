@@ -30,6 +30,7 @@ Each doc has specific codebase sources. Check these files for accuracy:
 | `odr/0001-pnpm-turborepo-monorepo.md` | `pnpm-workspace.yaml`, `turbo.json` |
 | `odr/0002-dependency-versioning-syncpack.md` | `.syncpackrc.js`, `references/build-tooling.md` (syncpack section) |
 | `odr/0003-selective-chromatic-runs.md` | `.github/workflows/chromatic.yml`, `tooling/getAffectedStorybooks.ts` |
+| `../../agent-skills/scaffold-domain-storybook/SKILL.md` | `apps/management/storybook/` (all files — reference storybook the skill clones from), `tooling/getAffectedStorybooks.ts`, `.github/workflows/chromatic.yml` |
 
 ## Audit Procedure
 

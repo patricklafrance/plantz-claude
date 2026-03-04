@@ -16,12 +16,17 @@ Never guess about architecture, tooling, or conventions — always load the rele
 
 - [ARCHITECTURE.md](agent-docs/ARCHITECTURE.md) — repo structure, package naming, Squide topology, tech stack, MODULES env var
 
+### Design
+
+- [design/README.md](agent-docs/design/README.md) — conventions for cross-cutting design docs
+
 ### References
 
 - [references/development.md](agent-docs/references/development.md) — pnpm workspace, Node version, script naming conventions, MODULES
 - [references/build-tooling.md](agent-docs/references/build-tooling.md) — Turborepo tasks, caching, syncpack semver groups, TypeScript config
 - [references/ci-cd.md](agent-docs/references/ci-cd.md) — CI, Chromatic, Claude, code-review, and audit-agent-docs GitHub Actions workflows
 - [references/writing-agent-instructions.md](agent-docs/references/writing-agent-instructions.md) — principles for writing instructions agents actually follow
+- [references/agent-skills.md](agent-docs/references/agent-skills.md) — skill directories, project-specific skills, reference modules
 
 ### Decisions
 

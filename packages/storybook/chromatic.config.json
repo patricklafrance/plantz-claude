@@ -1,0 +1,5 @@
+{
+    "$schema": "https://www.chromatic.com/config-file.schema.json",
+    "storybookBaseDir": "packages/storybook",
+    "zip": true
+}

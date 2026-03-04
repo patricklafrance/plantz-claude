@@ -22,8 +22,9 @@ plantz-claude/
     storybook/                     # Shared Storybook config (@packages/storybook)
   tooling/                         # Build scripts (getAffectedStorybooks.ts)
   agent-docs/                      # Agent documentation (this folder)
-  .agents/skills/                  # Agent skills (git-commit, etc.)
-  .claude/skills/                  # Claude Code skills
+  agent-skills/                    # Project-specific skills (scaffold-domain-module, etc.)
+  .agents/skills/                  # Shared agent skills (git-commit, etc.)
+  .claude/skills/                  # Claude Code discovery layer (symlinks)
   .github/workflows/               # CI, Chromatic, Claude, code-review
 ```
 
@@ -40,6 +41,7 @@ plantz-claude/
 
 - **Host** (`apps/host/`): Thin shell that bootstraps Squide via `FireflyRuntime` and renders `AppRouter`. Contains no domain logic.
 - **Modules**: Each feature area registers via `ModuleRegisterFunction`. Modules are isolated — they never import from each other.
+- **Module registry**: `apps/host/src/getActiveModules.tsx` maps module path keys to their register functions. The host loads only modules present in this map.
 - **Shared packages**: Cross-cutting utilities live in `packages/` and are consumed by both host and modules.
 
 See [ADR-0001](adr/0001-squide-federated-modules.md) for rationale.

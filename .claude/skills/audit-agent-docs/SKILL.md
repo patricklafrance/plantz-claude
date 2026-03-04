@@ -10,7 +10,7 @@ license: MIT
 
 # Audit Agent Documentation
 
-Audit `CLAUDE.md` and `agent-docs/` against the live codebase. This skill defines the audit **procedure** — whether findings are fixed or only reported depends on the caller's instructions.
+Audit `CLAUDE.md`, `agent-docs/`, and `agent-skills/` against the live codebase. This skill defines the audit **procedure** — whether findings are fixed or only reported depends on the caller's instructions.
 
 ## Cross-Reference Map
 
@@ -30,6 +30,9 @@ Each doc has specific codebase sources. Check these files for accuracy:
 | `odr/0001-pnpm-turborepo-monorepo.md` | `pnpm-workspace.yaml`, `turbo.json` |
 | `odr/0002-dependency-versioning-syncpack.md` | `.syncpackrc.js`, `references/build-tooling.md` (syncpack section) |
 | `odr/0003-selective-chromatic-runs.md` | `.github/workflows/chromatic.yml`, `tooling/getAffectedStorybooks.ts` |
+| `references/agent-skills.md` | `agent-skills/*/SKILL.md`, `.agents/skills/`, `.claude/skills/` directory listings |
+| `agent-skills/scaffold-domain-module/SKILL.md` | Reference module (`apps/management/plants/**`), `apps/host/src/getActiveModules.tsx`, `apps/host/package.json`, `tooling/getAffectedStorybooks.ts`, root `package.json` |
+| `agent-skills/scaffold-domain-storybook/SKILL.md` | Reference storybook (`apps/management/storybook/**`), `.github/workflows/chromatic.yml`, `apps/storybook/.storybook/main.ts`, `tooling/getAffectedStorybooks.ts`, root `package.json` |
 
 ## Audit Procedure
 

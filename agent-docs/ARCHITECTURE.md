@@ -18,6 +18,7 @@ plantz-claude/
       storybook/                   # Today domain Storybook (@apps/today-storybook)
     storybook/                     # Packages-layer Storybook (@apps/packages-storybook)
   packages/
+    components/                    # Shared UI components — shadcn/ui + Tailwind v4 (@packages/components)
     squide-core/                   # Shared Squide utilities (@packages/squide-core)
     storybook/                     # Shared Storybook config (@packages/storybook)
   tooling/                         # Build scripts (getAffectedStorybooks.ts)
@@ -67,6 +68,8 @@ See [ADR-0002](adr/0002-domain-scoped-storybooks.md) for rationale.
 | Squide | — | Federated module shell |
 | Storybook | — | Component development |
 | Chromatic | — | Visual regression testing |
+| Tailwind CSS | 4.x | Utility-first CSS framework (via `@tailwindcss/postcss`) |
+| shadcn/ui | — | UI component library (lives in `@packages/components`) |
 | Turborepo | 2.8.12 | Task orchestration and caching |
 | Vitest | — | Unit testing |
 | Syncpack | 14.0.0 | Dependency version enforcement |

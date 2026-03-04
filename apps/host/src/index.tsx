@@ -1,3 +1,4 @@
+import "./styles/globals.css";
 import { createRoot } from "react-dom/client";
 import { FireflyProvider, initializeFirefly } from "@squide/firefly";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

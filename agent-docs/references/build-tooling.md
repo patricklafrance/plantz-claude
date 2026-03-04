@@ -51,5 +51,38 @@ Root `tsconfig.json` extends `@workleap/typescript-configs/monorepo-workspace.js
 
 Type checking runs via `tsgo` (native TypeScript compiler).
 
+## Tailwind CSS / PostCSS
+
+Tailwind v4 is integrated via `@tailwindcss/postcss`. Both library packages (`@packages/components`) and app packages (`@apps/host`) add it through a config transformer:
+
+```ts
+const tailwindPostCss: RsbuildConfigTransformer = config => {
+    config.tools ??= {};
+    config.tools.postcss ??= {};
+    const postcss = config.tools.postcss as Record<string, unknown>;
+    postcss.postcssOptions ??= {};
+    const postcssOptions = postcss.postcssOptions as Record<string, unknown>;
+    postcssOptions.plugins ??= [];
+    (postcssOptions.plugins as unknown[]).push(["@tailwindcss/postcss", {}]);
+    return config;
+};
+```
+
+For Rslib (library) configs, import `RslibConfigTransformer` from `@workleap/rslib-configs`. For Rsbuild (app) configs, import `RsbuildConfigTransformer` from `@workleap/rsbuild-configs`.
+
+### Cross-package class scanning
+
+Consuming apps use `@source` directives in their CSS to tell Tailwind where to find utility classes used in `@packages/components`:
+
+```css
+@import "tailwindcss";
+@import "@packages/components/globals.css";
+@source "../../../../packages/components/src/**/*.{ts,tsx}";
+```
+
+### Adding shadcn components
+
+Run `pnpm dlx shadcn@latest add <component>` from within `packages/components/`. After adding, move files from the `@/` directory to `src/` and replace `@/lib/utils` imports with relative paths (e.g., `../../lib/utils.ts`), because the project uses `moduleResolution: "nodenext"` which requires explicit extensions.
+
 ---
 *See [CLAUDE.md](../../CLAUDE.md) for navigation.*

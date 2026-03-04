@@ -13,6 +13,7 @@
     "dependencies": {
         "@modules/management-plants": "workspace:*",
         "@modules/today-landing-page": "workspace:*",
+        "@packages/components": "workspace:*",
         "@squide/firefly": "16.1.12",
         "@tanstack/react-query": "5.90.21",
         "react": "19.2.3",
@@ -21,6 +22,7 @@
     },
     "devDependencies": {
         "@rsbuild/core": "1.7.2",
+        "@tailwindcss/postcss": "4.2.1",
         "@types/react": "19.2.9",
         "@types/react-dom": "19.2.3",
         "@typescript/native-preview": "7.0.0-dev.20260303.1",
@@ -28,6 +30,7 @@
         "@workleap/rsbuild-configs": "3.2.0",
         "@workleap/typescript-configs": "3.0.7",
         "http-server": "14.1.1",
+        "tailwindcss": "4.2.1",
         "typescript": "5.9.3"
     }
 }

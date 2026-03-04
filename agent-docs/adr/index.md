@@ -4,3 +4,5 @@
 
 | Decision | ADR |
 |---|---|
+| Squide is the application shell; every feature area is a module with `ModuleRegisterFunction` | [ADR-0001](0001-squide-federated-modules.md) |
+| Each domain area and shared packages layer has its own Storybook instance | [ADR-0002](0002-domain-scoped-storybooks.md) |

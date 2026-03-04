@@ -4,4 +4,7 @@
 
 | Decision | ODR |
 |---|---|
+| pnpm workspaces + Turborepo for package management and task orchestration | [ODR-0001](0001-pnpm-turborepo-monorepo.md) |
+| Apps pin all deps; packages use `^` for prod/peer; enforced by syncpack | [ODR-0002](0002-dependency-versioning-syncpack.md) |
+| Chromatic runs are label-gated and skip unaffected Storybooks via `getAffectedStorybooks.ts` | [ODR-0003](0003-selective-chromatic-runs.md) |
 

@@ -20,6 +20,7 @@
     "serve-storybook": "turbo run serve-storybook --filter=@apps/storybook",
     "lint": "turbo run lint --continue",
     "typecheck": "tsgo",
+    "oxlint": "oxlint",
     "syncpack": "syncpack lint",
     "clean": "pnpm -r --parallel --include-workspace-root exec pnpm dlx rimraf dist storybook-static .turbo .rslib node_modules/.cache",
     "reset": "pnpm run --sequential \"/^reset:.*/\"",
@@ -37,6 +38,7 @@
     "cross-env": "10.1.0",
     "syncpack": "14.0.0",
     "tsx": "4.21.0",
+    "oxlint": "1.51.0",
     "turbo": "2.8.12"
   },
   "engines": {

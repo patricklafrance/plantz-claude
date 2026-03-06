@@ -70,8 +70,9 @@ See [ADR-0002](adr/0002-domain-scoped-storybooks.md) for rationale.
 | Storybook | — | Component development |
 | Chromatic | — | Visual regression testing |
 | Tailwind CSS | 4.x | Utility-first CSS framework (via `@tailwindcss/postcss`) |
-| shadcn/ui | — | UI component library (lives in `@packages/components`) |
+| shadcn/ui (Base UI) | — | UI component library, base-nova preset (lives in `@packages/components`) |
 | Turborepo | 2.8.12 | Task orchestration and caching |
+| oxlint | 1.51.0 | Fast JS/TS linter (zero config) |
 | Vitest | — | Unit testing |
 | Syncpack | 14.0.0 | Dependency version enforcement |
 

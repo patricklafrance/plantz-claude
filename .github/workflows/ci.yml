@@ -63,21 +63,13 @@ jobs:
               pnpm build-host
           fi
 
-      # - name: ESLint
-      #   run: |
-      #     if [ "${{ github.event_name }}" == "pull_request" ]; then
-      #         pnpm turbo run eslint --continue --filter=...[${{ github.event.pull_request.base.sha }}]
-      #     else
-      #         pnpm turbo run eslint
-      #     fi
-
-      # - name: Stylelint
-      #   run: |
-      #     if [ "${{ github.event_name }}" == "pull_request" ]; then
-      #         pnpm turbo run stylelint --continue --filter=...[${{ github.event.pull_request.base.sha }}]
-      #     else
-      #         pnpm turbo run stylelint
-      #     fi
+      - name: Oxlint
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+              pnpm turbo run oxlint --continue --filter=...[${{ github.event.pull_request.base.sha }}]
+          else
+              pnpm turbo run oxlint
+          fi
 
       - name: Typecheck
         run: |

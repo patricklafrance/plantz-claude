@@ -125,17 +125,17 @@ jobs:
           skip: ${{ steps.affected-storybooks.outputs['@apps/today-storybook'] == 'false' }}
           debug: true
 
-    #   - name: Chromatic - Packages
-    #     id: chromatic-packages
-    #     uses: chromaui/action@latest
-    #     with:
-    #       projectToken: ${{ secrets.PACKAGES_CHROMATIC_PROJECT_TOKEN }}
-    #       workingDir: packages/storybook
-    #       onlyChanged: true
-    #       exitOnceUploaded: true
-    #       autoAcceptChanges: main
-    #       skip: ${{ steps.affected-storybooks.outputs['@apps/packages-storybook'] == 'false' }}
-    #       debug: true
+      - name: Chromatic - Packages
+        id: chromatic-packages
+        uses: chromaui/action@latest
+        with:
+          projectToken: ${{ secrets.PACKAGES_CHROMATIC_PROJECT_TOKEN }}
+          workingDir: packages/storybook
+          onlyChanged: true
+          exitOnceUploaded: true
+          autoAcceptChanges: main
+          skip: ${{ steps.affected-storybooks.outputs['@apps/packages-storybook'] == 'false' }}
+          debug: true
 
       - name: Remove "run chromatic" label after Chromatic completion
         if: github.event_name == 'pull_request'

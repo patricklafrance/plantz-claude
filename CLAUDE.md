@@ -23,7 +23,11 @@ Never guess about architecture, tooling, or conventions — always load the rele
 ### References
 
 - [references/development.md](agent-docs/references/development.md) — pnpm workspace, Node version, script naming conventions, MODULES
-- [references/build-tooling.md](agent-docs/references/build-tooling.md) — Turborepo tasks, caching, syncpack semver groups, TypeScript config
+- [references/turborepo.md](agent-docs/references/turborepo.md) — task definitions, dependsOn, caching, conventions
+- [references/syncpack.md](agent-docs/references/syncpack.md) — semver groups, version groups
+- [references/typescript.md](agent-docs/references/typescript.md) — tsconfig, tsgo
+- [references/tailwind-postcss.md](agent-docs/references/tailwind-postcss.md) — PostCSS transformer, cross-package class scanning
+- [references/shadcn.md](agent-docs/references/shadcn.md) — Base UI preset, CLI bug explanations, Tailwind v4 source detection
 - [references/ci-cd.md](agent-docs/references/ci-cd.md) — CI, Chromatic, Claude, code-review, and audit-agent-docs GitHub Actions workflows
 - [references/writing-agent-instructions.md](agent-docs/references/writing-agent-instructions.md) — principles for writing instructions agents actually follow
 - [references/agent-skills.md](agent-docs/references/agent-skills.md) — skill directories, project-specific skills, reference modules

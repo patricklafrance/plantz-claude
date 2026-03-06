@@ -1,3 +1,4 @@
+import "@packages/components/globals.css";
 import { Suspense } from "react";
 import type { Preview } from "storybook-react-rsbuild";
 

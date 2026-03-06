@@ -36,9 +36,9 @@ Watch stdout for the local URL (typically `http://localhost:<port>`). Wait for t
 3. Check the browser console for errors. Warnings are acceptable — errors are not.
 4. Take a screenshot and save it to `.claude/verify-apps/{app-name}.png` (create the directory if needed).
 
-### Step 4 — Stop the dev server
+### Step 4 — Stop the dev server and kill orphan processes
 
-Stop the background task started in step 1. Confirm it terminated before proceeding to the next app.
+Stop the background task started in step 1. Then verify the port is actually free — `TaskStop` kills the turbo wrapper but child processes (the actual node dev server) can survive. Run `netstat -ano | grep -E "LISTENING" | grep ":<port>"` to check. If the port is still occupied, kill the orphan process with `taskkill //PID <pid> //F` (Windows) or `kill <pid>` (Unix). Do not proceed to the next app until the port is confirmed free.
 
 ### Step 5 — Record result
 

@@ -17,6 +17,7 @@ Skills are automatically discovered by Claude Code from `.claude/skills/` based 
 | `scaffold-domain-module` | `agent-skills/scaffold-domain-module/SKILL.md` | `apps/management/plants/` |
 | `scaffold-domain-storybook` | `agent-skills/scaffold-domain-storybook/SKILL.md` | `apps/management/storybook/` |
 | `audit-agent-docs` | `agent-skills/audit-agent-docs/SKILL.md` | — |
+| `verify-apps` | `agent-skills/verify-apps/SKILL.md` | — |
 
 ### Reference modules
 

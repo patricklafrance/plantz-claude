@@ -10,7 +10,7 @@ const storybookConfig: StorybookConfig = {
         getAbsolutePath("@storybook/addon-a11y")
     ],
     stories: [
-        "../../squide-core/src/**/*.stories.tsx"
+        "../../components/src/**/*.stories.tsx"
     ]
 };
 

@@ -30,22 +30,16 @@
             "persistent": true
         },
         "lint": {
-            "dependsOn": ["typecheck", "//#typecheck", "//#syncpack"]
-            // "dependsOn": ["eslint", "//#eslint", "stylelint", "typecheck", "//#typecheck", "//#syncpack"]
+            "dependsOn": ["oxlint", "//#oxlint", "typecheck", "//#typecheck", "//#syncpack"]
         },
-        // "//#eslint": {
-        //     "inputs": ["$TURBO_DEFAULT$", "!apps", "!packages", "!agent-docs", "!README.md", "!**/*.css"],
-        //     "outputs": ["node_modules/.cache/eslint"]
-        // },
-        // "eslint": {
-        //     "dependsOn": ["transit"],
-        //     "inputs": ["$TURBO_DEFAULT$", "!README.md", "!src/**/*.css"],
-        //     "outputs": ["node_modules/.cache/eslint"]
-        // },
-        // "stylelint": {
-        //     "inputs": ["src/**/*.css", ".stylelintignore", ".stylelintrc.json"],
-        //     "outputs": ["node_modules/.cache/stylelint"]
-        // },
+        "//#oxlint": {
+            "inputs": ["$TURBO_DEFAULT$", "!apps", "!packages", "!agent-docs", "!README.md"],
+            "outputs": []
+        },
+        "oxlint": {
+            "inputs": ["$TURBO_DEFAULT$", "!README.md"],
+            "outputs": []
+        },
         "//#typecheck": {
             "inputs": ["src/**/*.ts", "src/**/*.tsx", "test/**/*.ts", "test/**/*.tsx", "tsconfig.json", "!apps", "!packages", "!agent-docs"],
             "outputs": ["node_modules/.cache/tsbuildinfo.json"]

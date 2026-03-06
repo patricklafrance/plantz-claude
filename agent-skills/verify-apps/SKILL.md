@@ -1,3 +1,12 @@
+---
+name: verify-apps
+description: |
+  Smoke-test every application by starting dev servers and verifying pages load.
+  Use when asked to "verify apps", "test all apps", "smoke test", "check dev servers".
+  Triggers: /verify-apps, "verify apps", "test all apps", "smoke test"
+license: MIT
+---
+
 # Verify Apps
 
 Smoke-test every application in the repository by starting each dev server and verifying the page loads without errors.
@@ -8,30 +17,30 @@ Smoke-test every application in the repository by starting each dev server and v
 2. Filter out module-specific scripts — those that use `cross-env MODULES=` are filtered host instances, not standalone apps. Keep only scripts that start a distinct application (the host and each storybook).
 3. Build an ordered list of apps to test. Test the host first, then storybooks.
 
-## Test each app
+## Procedure
 
 For each app in the list, run these steps sequentially:
 
-### 1. Start the dev server
+### Step 1 — Start the dev server
 
 Run the dev script in the background (e.g., `pnpm dev-host`). Capture the task ID so you can stop it later.
 
-### 2. Wait for ready
+### Step 2 — Wait for ready
 
 Watch stdout for the local URL (typically `http://localhost:<port>`). Wait for the server to emit it — this confirms the build succeeded and the server is listening. If the server fails to start within 60 seconds, record a failure and move to the next app.
 
-### 3. Verify in browser
+### Step 3 — Verify in browser
 
 1. Navigate to the local URL.
 2. Take a page snapshot and confirm meaningful content loaded (not a blank page or error screen).
 3. Check the browser console for errors. Warnings are acceptable — errors are not.
 4. Take a screenshot and save it to `.claude/verify-apps/{app-name}.png` (create the directory if needed).
 
-### 4. Stop the dev server
+### Step 4 — Stop the dev server
 
 Stop the background task started in step 1. Confirm it terminated before proceeding to the next app.
 
-### 5. Record result
+### Step 5 — Record result
 
 Record the app name, URL, status (pass/fail), and any errors found.
 
@@ -49,7 +58,7 @@ After all apps are tested, output a markdown table:
 
 If any app failed, list the failure details below the table.
 
-## Rules
+## Prohibitions
 
 - Never hardcode app names or ports — discover them from `package.json` and server output.
 - Never leave a dev server running — always stop it before starting the next one.

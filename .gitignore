@@ -9,5 +9,6 @@ chromatic-diagnostics.json
 .rslib
 .netlify
 .claude/worktrees
+tmp
 *.env.local
 

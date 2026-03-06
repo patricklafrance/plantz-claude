@@ -19,6 +19,8 @@ Smoke-test every application in the repository by starting each dev server and v
 
 ## Procedure
 
+Before testing any app, delete `tmp/verify-apps/` if it exists — this clears stale artifacts from prior failed runs. Then recreate the directory.
+
 For each app in the list, run these steps sequentially:
 
 ### Step 1 — Start the dev server
@@ -34,7 +36,7 @@ Watch stdout for the local URL (typically `http://localhost:<port>`). Wait for t
 1. Navigate to the local URL.
 2. Take a page snapshot and confirm meaningful content loaded (not a blank page or error screen).
 3. Check the browser console for errors. Warnings are acceptable — errors are not.
-4. Take a screenshot and save it to `.claude/verify-apps/{app-name}.png` (create the directory if needed).
+4. Take a screenshot and save it to `tmp/verify-apps/{app-name}.png`.
 
 ### Step 4 — Stop the dev server and kill orphan processes
 

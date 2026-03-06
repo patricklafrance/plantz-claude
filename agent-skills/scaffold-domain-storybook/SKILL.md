@@ -5,6 +5,7 @@ description: |
   Use when asked to "add a storybook", "create a domain storybook", "scaffold storybook for {domain}".
   Triggers: /scaffold-domain-storybook, "add storybook", "new domain storybook"
 license: MIT
+disable-model-invocation: true
 ---
 
 # Add Domain Storybook

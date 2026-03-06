@@ -9,7 +9,7 @@ Configuration in `turbo.json`. UI mode: `tui`.
 | Task | dependsOn | Inputs | Outputs | Notes |
 |---|---|---|---|---|
 | `transit` | `^transit` | — | — | Dependency graph propagation |
-| `dev` | `^dev` | — | — | Persistent, no cache |
+| `dev` | — | — | — | Persistent, no cache |
 | `build` | `^build` | `$TURBO_DEFAULT$`, `!README.md` | `dist/**` | env: `MODULES` |
 | `build-storybook` | — | — | — | No cache |
 | `serve-build` | `build` | — | — | Persistent, no cache |
@@ -26,6 +26,7 @@ Configuration in `turbo.json`. UI mode: `tui`.
 - Root-level tasks use `//#taskname` syntax.
 - `MODULES` is declared as task-level `env` on the `build` task (not `globalEnv`), scoping cache invalidation to build only.
 - `transit` is a dependency graph propagation task that runs before typecheck/test.
+- `dev` has no `^dev` dependency because packages are JIT — consumers compile package source directly, so no dependency build step is needed before starting a dev server. See [ODR-0004](../odr/0004-jit-packages.md).
 - ESLint/Stylelint tasks are commented out; OXlint/OXfmt adoption is planned instead.
 
 ## Syncpack

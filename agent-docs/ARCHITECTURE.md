@@ -44,6 +44,7 @@ plantz-claude/
 - **Modules**: Each feature area registers via `ModuleRegisterFunction`. Modules are isolated — they never import from each other.
 - **Module registry**: `apps/host/src/getActiveModules.tsx` maps module path keys to their register functions. The host loads only modules present in this map.
 - **Shared packages**: Cross-cutting utilities live in `packages/` and are consumed by both host and modules.
+- **JIT packages**: Packages under `packages/` expose source directly via `exports` fields (e.g., `"./": "./src/index.ts"`). Consumers compile them at build time through their own bundler — no pre-build step is required. This means the Turborepo `dev` task has no `^dev` dependency; persistent watch builds in packages run in parallel, not as prerequisites. See [ODR-0004](odr/0004-jit-packages.md) for rationale.
 
 See [ADR-0001](adr/0001-squide-federated-modules.md) for rationale.
 

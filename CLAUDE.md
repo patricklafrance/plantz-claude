@@ -1,5 +1,3 @@
-`plantz-claude` — Plants watering app. pnpm monorepo, Turborepo, Squide federated modules.
-
 ## Agent Memory
 
 Never guess about architecture, tooling, or conventions — always load the relevant doc first.

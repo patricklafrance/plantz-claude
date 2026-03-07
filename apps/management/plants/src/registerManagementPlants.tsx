@@ -7,18 +7,18 @@ function registerRoutes(runtime: FireflyRuntime) {
             const { PlantsPage } = await import("./PlantsPage.tsx");
 
             return {
-                element: <PlantsPage />
+                element: <PlantsPage />,
             };
-        }
+        },
     });
 
     runtime.registerNavigationItem({
         $id: "management-plants",
         $label: "Plants",
-        to: "/management/plants"
+        to: "/management/plants",
     });
 }
 
-export const registerManagementPlants: ModuleRegisterFunction<FireflyRuntime> = runtime => {
+export const registerManagementPlants: ModuleRegisterFunction<FireflyRuntime> = (runtime) => {
     registerRoutes(runtime);
 };

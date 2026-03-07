@@ -14,7 +14,7 @@ root.render(
         <QueryClientProvider client={queryClient}>
             <App />
         </QueryClientProvider>
-    </FireflyProvider>
+    </FireflyProvider>,
 );
 ```
 
@@ -29,7 +29,7 @@ root.render(
             <App />
             <ReactQueryDevtools />
         </QueryClientProvider>
-    </FireflyProvider>
+    </FireflyProvider>,
 );
 ```
 
@@ -57,7 +57,7 @@ function Page() {
         queryFn: async () => {
             const response = await fetch("/api/data");
             return response.json();
-        }
+        },
     });
 
     return <div>{data.content}</div>;
@@ -91,9 +91,9 @@ export async function startMsw(handlers: RequestHandler[]) {
 const runtime = initializeFirefly({
     useMsw: !!process.env.USE_MSW,
     localModules: [registerHost],
-    startMsw: async x => {
+    startMsw: async (x) => {
         return (await import("./mocks/browser.ts")).startMsw(x.requestHandlers);
-    }
+    },
 });
 ```
 
@@ -101,7 +101,7 @@ const runtime = initializeFirefly({
 
 ```tsx
 // Always use dynamic import
-export const register: ModuleRegisterFunction<FireflyRuntime> = async runtime => {
+export const register: ModuleRegisterFunction<FireflyRuntime> = async (runtime) => {
     if (runtime.isMswEnabled) {
         const { requestHandlers } = await import("./mocks/handlers.ts");
         runtime.registerRequestHandlers(requestHandlers);
@@ -114,9 +114,11 @@ import { HttpResponse, http, type HttpHandler } from "msw";
 export const requestHandlers: HttpHandler[] = [
     http.get("/api/data", () => {
         return HttpResponse.json({ message: "Hello" });
-    })
+    }),
 ];
 ```
+
+> For more module registration patterns including higher-order registration and deferred registration with MSW, see `references/patterns.md`.
 
 ## LaunchDarkly
 
@@ -128,7 +130,7 @@ import { initialize as initializeLaunchDarkly } from "launchdarkly-js-client-sdk
 const ldClient = initializeLaunchDarkly(
     "your-client-id",
     { kind: "user", anonymous: true },
-    { streaming: true }  // Important for real-time updates
+    { streaming: true }, // Important for real-time updates
 );
 
 await ldClient.waitForInitialization(5);
@@ -142,7 +144,7 @@ Pass the LaunchDarkly client directly to `initializeFirefly` (or `FireflyRuntime
 import { initializeFirefly } from "@squide/firefly";
 
 const runtime = initializeFirefly({
-    launchDarklyClient: ldClient
+    launchDarklyClient: ldClient,
 });
 ```
 
@@ -152,7 +154,7 @@ Alternatively, using the `LaunchDarklyPlugin` directly (lower-level approach, us
 import { FireflyRuntime, LaunchDarklyPlugin } from "@squide/firefly";
 
 const runtime = new FireflyRuntime({
-    plugins: [x => new LaunchDarklyPlugin(x, ldClient)]
+    plugins: [(x) => new LaunchDarklyPlugin(x, ldClient)],
 });
 ```
 
@@ -240,19 +242,19 @@ import { FireflyRuntime } from "@squide/firefly";
 
 const featureFlags = {
     "feature-key": true,
-    "another-feature": "value"
+    "another-feature": "value",
 };
 
 const ldClient = new InMemoryLaunchDarklyClient(featureFlags);
 
 const runtime = new FireflyRuntime({
-    plugins: [x => new LaunchDarklyPlugin(x, ldClient)]
+    plugins: [(x) => new LaunchDarklyPlugin(x, ldClient)],
 });
 
 // Update flags at runtime
 ldClient.setFeatureFlags({
     "feature-key": false,
-    "another-feature": "new-value"
+    "another-feature": "new-value",
 });
 ```
 
@@ -263,8 +265,8 @@ const ldClient = new InMemoryLaunchDarklyClient(featureFlags, {
     context: {
         kind: "multi",
         user: { key: "user-123", name: "Sandy" },
-        org: { key: "org-456", name: "Acme Inc" }
-    }
+        org: { key: "org-456", name: "Acme Inc" },
+    },
 });
 ```
 
@@ -277,18 +279,18 @@ import { createLocalStorageLaunchDarklyClient, LaunchDarklyPlugin, FireflyRuntim
 
 const defaultFeatureFlags = {
     "feature-key": true,
-    "another-feature": "default"
+    "another-feature": "default",
 };
 
 const ldClient = createLocalStorageLaunchDarklyClient(defaultFeatureFlags);
 
 const runtime = new FireflyRuntime({
-    plugins: [x => new LaunchDarklyPlugin(x, ldClient)]
+    plugins: [(x) => new LaunchDarklyPlugin(x, ldClient)],
 });
 
 // Update flags (persisted to localStorage)
 ldClient.setFeatureFlags({
-    "feature-key": false
+    "feature-key": false,
 });
 ```
 
@@ -296,7 +298,7 @@ With custom storage key:
 
 ```ts
 const ldClient = createLocalStorageLaunchDarklyClient(defaultFeatureFlags, {
-    localStorageKey: "my-app-flags"
+    localStorageKey: "my-app-flags",
 });
 ```
 
@@ -315,7 +317,7 @@ function FeatureFlagToggle() {
     const handleToggle = useCallback(() => {
         if (isEditableLaunchDarklyClient(ldClient)) {
             ldClient.setFeatureFlags({
-                "show-characters": !enabled
+                "show-characters": !enabled,
             });
         }
     }, [enabled, ldClient]);
@@ -341,13 +343,13 @@ const telemetryClient = initializeTelemetry({
         serviceName: "my-service",
         apiServiceUrls: [/.+/g],
         options: {
-            proxy: "https://my-proxy.com"
-        }
-    }
+            proxy: "https://my-proxy.com",
+        },
+    },
 });
 
 const runtime = initializeFirefly({
-    honeycombInstrumentationClient: telemetryClient.honeycomb
+    honeycombInstrumentationClient: telemetryClient.honeycomb,
 });
 ```
 
@@ -380,11 +382,13 @@ import { i18nextPlugin } from "@squide/i18next";
 import { FireflyRuntime } from "@squide/firefly";
 
 const runtime = new FireflyRuntime({
-    plugins: [x => {
-        const plugin = new i18nextPlugin(x, ["en-US", "fr-CA"], "en-US", "language");
-        plugin.detectUserLanguage();
-        return plugin;
-    }]
+    plugins: [
+        (x) => {
+            const plugin = new i18nextPlugin(x, ["en-US", "fr-CA"], "en-US", "language");
+            plugin.detectUserLanguage();
+            return plugin;
+        },
+    ],
 });
 ```
 
@@ -397,16 +401,14 @@ import { initReactI18next } from "react-i18next";
 
 const plugin = getI18nextPlugin(runtime);
 
-const instance = i18n
-    .createInstance()
-    .use(initReactI18next);
+const instance = i18n.createInstance().use(initReactI18next);
 
 instance.init({
     lng: plugin.currentLanguage,
     resources: {
         "en-US": resourcesEn,
-        "fr-CA": resourcesFr
-    }
+        "fr-CA": resourcesFr,
+    },
 });
 
 plugin.registerInstance("an-instance-key", instance);
@@ -422,10 +424,7 @@ function LanguageSwitcher() {
     const changeLanguage = useChangeLanguage();
 
     return (
-        <select
-            value={currentLanguage}
-            onChange={e => changeLanguage(e.target.value)}
-        >
+        <select value={currentLanguage} onChange={(e) => changeLanguage(e.target.value)}>
             <option value="en-US">English</option>
             <option value="fr-CA">French</option>
         </select>
@@ -441,11 +440,13 @@ import { I18nextNavigationItemLabel } from "@squide/i18next";
 runtime.registerNavigationItem({
     $id: "home",
     $label: <I18nextNavigationItemLabel i18next={i18nextInstance} resourceKey="nav.home" />,
-    to: "/"
+    to: "/",
 });
 ```
 
 ## Storybook
+
+> For component API signatures (`FireflyDecorator`, `withFireflyDecorator`, `withFeatureFlagsOverrideDecorator`, `initializeFireflyForStorybook`), see `references/components.md`.
 
 ### Setup Decorator
 
@@ -454,20 +455,18 @@ runtime.registerNavigationItem({
 import { withFireflyDecorator, initializeFireflyForStorybook } from "@squide/firefly-rsbuild-storybook";
 
 const runtime = await initializeFireflyForStorybook({
-    localModules: [registerModule]
+    localModules: [registerModule],
 });
 
 const meta = {
     title: "Page",
     component: Page,
-    decorators: [
-        withFireflyDecorator(runtime)
-    ],
+    decorators: [withFireflyDecorator(runtime)],
     parameters: {
         msw: {
-            handlers: [...runtime.requestHandlers]
-        }
-    }
+            handlers: [...runtime.requestHandlers],
+        },
+    },
 };
 ```
 
@@ -478,21 +477,17 @@ import { initializeFireflyForStorybook, withFireflyDecorator, withFeatureFlagsOv
 
 const runtime = await initializeFireflyForStorybook({
     featureFlags: {
-        "feature-key": true
-    }
+        "feature-key": true,
+    },
 });
 
 const meta = {
-    decorators: [
-        withFireflyDecorator(runtime)
-    ]
+    decorators: [withFireflyDecorator(runtime)],
 };
 
 // Override per-story
 export const WithFeatureDisabled = {
-    decorators: [
-        withFeatureFlagsOverrideDecorator({ "feature-key": false })
-    ]
+    decorators: [withFeatureFlagsOverrideDecorator({ "feature-key": false })],
 };
 ```
 
@@ -503,8 +498,8 @@ import { initializeFireflyForStorybook } from "@squide/firefly-rsbuild-storybook
 
 const runtime = await initializeFireflyForStorybook({
     environmentVariables: {
-        apiBaseUrl: "https://mock-api.example.com"
-    }
+        apiBaseUrl: "https://mock-api.example.com",
+    },
 });
 ```
 
@@ -514,7 +509,7 @@ const runtime = await initializeFireflyForStorybook({
 import { initializeFireflyForStorybook } from "@squide/firefly-rsbuild-storybook";
 
 const runtime = await initializeFireflyForStorybook({
-    useMsw: false
+    useMsw: false,
 });
 ```
 
@@ -526,7 +521,7 @@ const runtime = await initializeFireflyForStorybook({
 import { BrowserConsoleLogger } from "@workleap/logging";
 
 const runtime = initializeFirefly({
-    loggers: [new BrowserConsoleLogger()]
+    loggers: [new BrowserConsoleLogger()],
 });
 ```
 
@@ -537,10 +532,7 @@ import { BrowserConsoleLogger } from "@workleap/logging";
 import { LogRocketLogger } from "@workleap/telemetry/react"; // or from "@workleap/logrocket/react"
 
 const runtime = initializeFirefly({
-    loggers: [
-        new BrowserConsoleLogger(),
-        new LogRocketLogger()
-    ]
+    loggers: [new BrowserConsoleLogger(), new LogRocketLogger()],
 });
 ```
 
@@ -563,18 +555,14 @@ function Component() {
 ### Log Levels
 
 ```ts
-logger.debug("Debug message");      // Verbose debugging
+logger.debug("Debug message"); // Verbose debugging
 logger.information("Info message"); // General information
-logger.warn("Warning message");     // Potential issues
-logger.error("Error message");      // Errors
+logger.warn("Warning message"); // Potential issues
+logger.error("Error message"); // Errors
 logger.critical("Critical message"); // Criticals
 
 // With structured data
-logger
-    .withText("Operation failed")
-    .withError(error)
-    .withObject({ userId, action })
-    .error();
+logger.withText("Operation failed").withError(error).withObject({ userId, action }).error();
 ```
 
 **Warning:** Never log Personally Identifiable Information (PII). API responses often contain sensitive data that will appear in session replays.

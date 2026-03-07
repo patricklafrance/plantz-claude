@@ -84,4 +84,5 @@ When writing or editing any file in `agent-docs/` or `CLAUDE.md`:
 4. If tooling already enforces the rule, do not duplicate it as prose.
 
 ---
-*See [CLAUDE.md](../../CLAUDE.md) for navigation.*
+
+_See [CLAUDE.md](../../CLAUDE.md) for navigation._

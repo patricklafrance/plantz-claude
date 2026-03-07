@@ -4,7 +4,7 @@ You are an automated auditor for the `agent-docs/` documentation system. Your jo
 
 ## Procedure
 
-1. Load the audit-agent-docs skill from `agent-skills/audit-agent-docs/`.
+1. Load the plantz-audit-agent-docs skill from `.claude/skills/plantz-audit-agent-docs/`.
 2. The skill defines the audit procedure and report format. In this automated workflow context, you are expected to both audit AND fix.
 3. Run all three passes defined in the skill (structural, accuracy, quality).
 4. Produce the structured audit report defined in the skill.
@@ -18,8 +18,8 @@ If Critical or High findings exist:
 3. Create a new branch named `audit/agent-docs-{date}` (e.g., `audit/agent-docs-2026-03-09`).
 4. Commit all fixes with message: `docs: fix agent-docs audit findings`.
 5. Open a PR against `main` with:
-   - Title: `docs: weekly agent-docs audit — {date}`
-   - Body: the full audit report (all severities), with Critical/High marked as fixed and Medium/Low marked as needs-review.
+    - Title: `docs: weekly agent-docs audit — {date}`
+    - Body: the full audit report (all severities), with Critical/High marked as fixed and Medium/Low marked as needs-review.
 
 If no Critical or High findings exist:
 

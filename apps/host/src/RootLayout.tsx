@@ -1,11 +1,5 @@
+import { useNavigationItems, useRenderedNavigationItems, isNavigationLink, type RenderItemFunction, type RenderSectionFunction } from "@squide/firefly";
 import { Link, Outlet } from "react-router";
-import {
-    useNavigationItems,
-    useRenderedNavigationItems,
-    isNavigationLink,
-    type RenderItemFunction,
-    type RenderSectionFunction
-} from "@squide/firefly";
 
 const renderItem: RenderItemFunction = (item, key) => {
     if (!isNavigationLink(item)) {
@@ -16,14 +10,14 @@ const renderItem: RenderItemFunction = (item, key) => {
 
     return (
         <li key={key}>
-            <Link {...linkProps} {...additionalProps}>{label}</Link>
+            <Link {...linkProps} {...additionalProps}>
+                {label}
+            </Link>
         </li>
     );
 };
 
-const renderSection: RenderSectionFunction = (elements, key) => (
-    <ul key={key}>{elements}</ul>
-);
+const renderSection: RenderSectionFunction = (elements, key) => <ul key={key}>{elements}</ul>;
 
 export function RootLayout() {
     const navigationItems = useNavigationItems();

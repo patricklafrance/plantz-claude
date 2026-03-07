@@ -28,6 +28,7 @@ strict-peer-dependencies=true
 ```
 
 When strict, pnpm will fail if:
+
 - Peer dependency is missing
 - Installed version doesn't match required range
 
@@ -37,15 +38,15 @@ Configure peer dependency behavior in `package.json`:
 
 ```json
 {
-  "pnpm": {
-    "peerDependencyRules": {
-      "ignoreMissing": ["@babel/*", "eslint"],
-      "allowedVersions": {
-        "react": "17 || 18"
-      },
-      "allowAny": ["@types/*"]
+    "pnpm": {
+        "peerDependencyRules": {
+            "ignoreMissing": ["@babel/*", "eslint"],
+            "allowedVersions": {
+                "react": "17 || 18"
+            },
+            "allowAny": ["@types/*"]
+        }
     }
-  }
 }
 ```
 
@@ -55,19 +56,16 @@ Suppress warnings for missing peer dependencies:
 
 ```json
 {
-  "pnpm": {
-    "peerDependencyRules": {
-      "ignoreMissing": [
-        "@babel/*",
-        "eslint",
-        "webpack"
-      ]
+    "pnpm": {
+        "peerDependencyRules": {
+            "ignoreMissing": ["@babel/*", "eslint", "webpack"]
+        }
     }
-  }
 }
 ```
 
 Use patterns:
+
 - `"react"` - exact package name
 - `"@babel/*"` - all packages in scope
 - `"*"` - all packages (not recommended)
@@ -78,15 +76,15 @@ Allow specific versions that would otherwise cause warnings:
 
 ```json
 {
-  "pnpm": {
-    "peerDependencyRules": {
-      "allowedVersions": {
-        "react": "17 || 18",
-        "webpack": "4 || 5",
-        "@types/react": "*"
-      }
+    "pnpm": {
+        "peerDependencyRules": {
+            "allowedVersions": {
+                "react": "17 || 18",
+                "webpack": "4 || 5",
+                "@types/react": "*"
+            }
+        }
     }
-  }
 }
 ```
 
@@ -96,11 +94,11 @@ Allow any version for specified peer dependencies:
 
 ```json
 {
-  "pnpm": {
-    "peerDependencyRules": {
-      "allowAny": ["@types/*", "eslint"]
+    "pnpm": {
+        "peerDependencyRules": {
+            "allowAny": ["@types/*", "eslint"]
+        }
     }
-  }
 }
 ```
 
@@ -111,21 +109,21 @@ Use `.pnpmfile.cjs` to add missing peer dependencies:
 ```js
 // .pnpmfile.cjs
 function readPackage(pkg, context) {
-  // Add missing peer dependency
-  if (pkg.name === 'problematic-package') {
-    pkg.peerDependencies = {
-      ...pkg.peerDependencies,
-      react: '*'
+    // Add missing peer dependency
+    if (pkg.name === "problematic-package") {
+        pkg.peerDependencies = {
+            ...pkg.peerDependencies,
+            react: "*",
+        };
     }
-  }
-  return pkg
+    return pkg;
 }
 
 module.exports = {
-  hooks: {
-    readPackage
-  }
-}
+    hooks: {
+        readPackage,
+    },
+};
 ```
 
 ## Peer Dependencies in Workspaces
@@ -141,7 +139,7 @@ Workspace packages can satisfy peer dependencies:
   }
 }
 
-// packages/components/package.json  
+// packages/components/package.json
 {
   "peerDependencies": {
     "react": "^17.0.0 || ^18.0.0"
@@ -158,8 +156,8 @@ The workspace `app` provides `react` which satisfies `components`' peer dependen
 ```yaml
 # pnpm-workspace.yaml
 catalog:
-  react: ^18.2.0
-  react-dom: ^18.2.0
+    react: ^18.2.0
+    react-dom: ^18.2.0
 ```
 
 ```json
@@ -185,14 +183,11 @@ catalog:
 
 ```json
 {
-  "pnpm": {
-    "peerDependencyRules": {
-      "ignoreMissing": [
-        "eslint",
-        "@typescript-eslint/parser"
-      ]
+    "pnpm": {
+        "peerDependencyRules": {
+            "ignoreMissing": ["eslint", "@typescript-eslint/parser"]
+        }
     }
-  }
 }
 ```
 
@@ -200,14 +195,14 @@ catalog:
 
 ```json
 {
-  "pnpm": {
-    "peerDependencyRules": {
-      "allowedVersions": {
-        "webpack": "4 || 5",
-        "postcss": "7 || 8"
-      }
+    "pnpm": {
+        "peerDependencyRules": {
+            "allowedVersions": {
+                "webpack": "4 || 5",
+                "postcss": "7 || 8"
+            }
+        }
     }
-  }
 }
 ```
 
@@ -233,17 +228,18 @@ pnpm list --depth=Infinity
 3. **Document suppressed warnings** explaining why they're safe
 
 4. **Keep peer deps ranges wide** in libraries:
-   ```json
-   {
-     "peerDependencies": {
-       "react": "^17.0.0 || ^18.0.0"
-     }
-   }
-   ```
+
+    ```json
+    {
+        "peerDependencies": {
+            "react": "^17.0.0 || ^18.0.0"
+        }
+    }
+    ```
 
 5. **Test with different peer versions** if you support multiple majors
 
-<!-- 
+<!--
 Source references:
 - https://pnpm.io/package_json#pnpmpeerdependencyrules
 - https://pnpm.io/npmrc#auto-install-peers

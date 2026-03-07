@@ -13,13 +13,13 @@ Move `await` operations into the branches where they're actually used to avoid b
 
 ```typescript
 async function handleRequest(userId: string, skipProcessing: boolean) {
-  const userData = await fetchUserData(userId)
+    const userData = await fetchUserData(userId);
 
-  if (skipProcessing) {
-    return { skipped: true }
-  }
+    if (skipProcessing) {
+        return { skipped: true };
+    }
 
-  return processUserData(userData)
+    return processUserData(userData);
 }
 ```
 
@@ -27,12 +27,12 @@ async function handleRequest(userId: string, skipProcessing: boolean) {
 
 ```typescript
 async function handleRequest(userId: string, skipProcessing: boolean) {
-  if (skipProcessing) {
-    return { skipped: true }
-  }
+    if (skipProcessing) {
+        return { skipped: true };
+    }
 
-  const userData = await fetchUserData(userId)
-  return processUserData(userData)
+    const userData = await fetchUserData(userId);
+    return processUserData(userData);
 }
 ```
 
@@ -41,35 +41,35 @@ async function handleRequest(userId: string, skipProcessing: boolean) {
 ```typescript
 // Incorrect: always fetches permissions
 async function updateResource(resourceId: string, userId: string) {
-  const permissions = await fetchPermissions(userId)
-  const resource = await getResource(resourceId)
+    const permissions = await fetchPermissions(userId);
+    const resource = await getResource(resourceId);
 
-  if (!resource) {
-    return { error: 'Not found' }
-  }
+    if (!resource) {
+        return { error: "Not found" };
+    }
 
-  if (!permissions.canEdit) {
-    return { error: 'Forbidden' }
-  }
+    if (!permissions.canEdit) {
+        return { error: "Forbidden" };
+    }
 
-  return await updateResourceData(resource, permissions)
+    return await updateResourceData(resource, permissions);
 }
 
 // Correct: fetches only when needed
 async function updateResource(resourceId: string, userId: string) {
-  const resource = await getResource(resourceId)
+    const resource = await getResource(resourceId);
 
-  if (!resource) {
-    return { error: 'Not found' }
-  }
+    if (!resource) {
+        return { error: "Not found" };
+    }
 
-  const permissions = await fetchPermissions(userId)
+    const permissions = await fetchPermissions(userId);
 
-  if (!permissions.canEdit) {
-    return { error: 'Forbidden' }
-  }
+    if (!permissions.canEdit) {
+        return { error: "Forbidden" };
+    }
 
-  return await updateResourceData(resource, permissions)
+    return await updateResourceData(resource, permissions);
 }
 ```
 
@@ -84,19 +84,15 @@ When async operations have no interdependencies, execute them concurrently using
 **Incorrect (sequential execution, 3 round trips):**
 
 ```typescript
-const user = await fetchUser()
-const posts = await fetchPosts()
-const comments = await fetchComments()
+const user = await fetchUser();
+const posts = await fetchPosts();
+const comments = await fetchComments();
 ```
 
 **Correct (parallel execution, 1 round trip):**
 
 ```typescript
-const [user, posts, comments] = await Promise.all([
-  fetchUser(),
-  fetchPosts(),
-  fetchComments()
-])
+const [user, posts, comments] = await Promise.all([fetchUser(), fetchPosts(), fetchComments()]);
 ```
 
 ---
@@ -108,28 +104,20 @@ For operations with partial dependencies, create all promises upfront and use `P
 **Incorrect (profile waits for config unnecessarily):**
 
 ```typescript
-const [user, config] = await Promise.all([
-  fetchUser(),
-  fetchConfig()
-])
-const profile = await fetchProfile(user.id)
+const [user, config] = await Promise.all([fetchUser(), fetchConfig()]);
+const profile = await fetchProfile(user.id);
 ```
 
 **Correct (config and profile run in parallel):**
 
 ```typescript
-const userPromise = fetchUser()
-const profilePromise = userPromise.then(user => fetchProfile(user.id))
+const userPromise = fetchUser();
+const profilePromise = userPromise.then((user) => fetchProfile(user.id));
 
-const [user, config, profile] = await Promise.all([
-  userPromise,
-  fetchConfig(),
-  profilePromise
-])
+const [user, config, profile] = await Promise.all([userPromise, fetchConfig(), profilePromise]);
 ```
 
 `config` and `profile` fetch concurrently. `profile` starts as soon as `user` resolves, without waiting for `config`.
-
 
 ---
 
@@ -141,10 +129,10 @@ In async functions that perform multiple operations, start independent operation
 
 ```typescript
 async function loadDashboard() {
-  const session = await auth()
-  const config = await fetchConfig()
-  const data = await fetchData(session.user.id)
-  return { data, config }
+    const session = await auth();
+    const config = await fetchConfig();
+    const data = await fetchData(session.user.id);
+    return { data, config };
 }
 ```
 
@@ -152,14 +140,11 @@ async function loadDashboard() {
 
 ```typescript
 async function loadDashboard() {
-  const sessionPromise = auth()
-  const configPromise = fetchConfig()
-  const session = await sessionPromise
-  const [config, data] = await Promise.all([
-    configPromise,
-    fetchData(session.user.id)
-  ])
-  return { data, config }
+    const sessionPromise = auth();
+    const configPromise = fetchConfig();
+    const session = await sessionPromise;
+    const [config, data] = await Promise.all([configPromise, fetchData(session.user.id)]);
+    return { data, config };
 }
 ```
 

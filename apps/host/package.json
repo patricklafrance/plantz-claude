@@ -1,8 +1,8 @@
 {
     "name": "@apps/host",
-    "description": "Squide host application for the plantz application.",
-    "private": true,
     "version": "0.0.0",
+    "private": true,
+    "description": "Squide host application for the plantz application.",
     "type": "module",
     "scripts": {
         "dev": "rsbuild dev --config rsbuild.dev.ts",
@@ -16,8 +16,8 @@
         "@packages/components": "workspace:*",
         "@squide/firefly": "16.1.12",
         "@tanstack/react-query": "5.90.21",
-        "react": "19.2.3",
-        "react-dom": "19.2.3",
+        "react": "19.2.4",
+        "react-dom": "19.2.4",
         "react-router": "7.12.0"
     },
     "devDependencies": {

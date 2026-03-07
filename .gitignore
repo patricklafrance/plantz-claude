@@ -8,5 +8,7 @@ chromatic-diagnostics.json
 .turbo
 .rslib
 .netlify
+.claude/worktrees
+tmp
 *.env.local
 

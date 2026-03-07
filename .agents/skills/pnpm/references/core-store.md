@@ -138,7 +138,7 @@ For CI/CD, you can share the store:
 # GitHub Actions example
 - uses: pnpm/action-setup@v4
   with:
-    run_install: false
+      run_install: false
 
 - name: Get pnpm store directory
   shell: bash
@@ -146,13 +146,14 @@ For CI/CD, you can share the store:
 
 - uses: actions/cache@v4
   with:
-    path: ${{ env.STORE_PATH }}
-    key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+      path: ${{ env.STORE_PATH }}
+      key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
 ```
 
 ## Troubleshooting
 
 ### Store corruption
+
 ```bash
 # Verify and fix store
 pnpm store status
@@ -160,18 +161,20 @@ pnpm store prune
 ```
 
 ### Hard link issues (network drives, Docker)
+
 ```ini
 # Use copying instead of hard links
 package-import-method=copy
 ```
 
 ### Permission issues
+
 ```bash
 # Fix store permissions
 chmod -R u+w ~/.pnpm-store
 ```
 
-<!-- 
+<!--
 Source references:
 - https://pnpm.io/symlinked-node-modules-structure
 - https://pnpm.io/cli/store

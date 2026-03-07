@@ -2,13 +2,9 @@ import { execSync } from "node:child_process";
 import { appendFileSync } from "node:fs";
 
 const StorybookDependencies = {
-    "@apps/packages-storybook": [],
-    "@apps/management-storybook": [
-        "@modules/management-plants"
-    ],
-    "@apps/today-storybook": [
-        "@modules/today-landing-page"
-    ]
+    "@apps/packages-storybook": ["@packages/components"],
+    "@apps/management-storybook": ["@modules/management-plants"],
+    "@apps/today-storybook": ["@modules/today-landing-page"],
 } as const;
 
 interface TurborepoAffectedItem {
@@ -20,32 +16,32 @@ let affectedPackages: string[];
 let affectedStorybooks: Record<keyof typeof StorybookDependencies, boolean>;
 
 function createAffectedStorybooksRecordFromBooleanValue(value: boolean) {
-    return (Object.keys(StorybookDependencies) as (keyof typeof StorybookDependencies)[]).reduce((acc, x) => {
-        acc[x] = value;
+    return (Object.keys(StorybookDependencies) as (keyof typeof StorybookDependencies)[]).reduce(
+        (acc, x) => {
+            acc[x] = value;
 
-        return acc;
-    }, {} as Record<keyof typeof StorybookDependencies, boolean>);
+            return acc;
+        },
+        {} as Record<keyof typeof StorybookDependencies, boolean>,
+    );
 }
 
 try {
     const baseSha = process.env.BASE_SHA;
 
     if (!baseSha) {
-        throw new Error("[getAffectedStorybooks] The \"BASE_SHA\" environment variable is not set.");
+        throw new Error('[getAffectedStorybooks] The "BASE_SHA" environment variable is not set.');
     }
 
     // Find packages diverging from the main branch.
     const command = `pnpm turbo ls --filter=...[${baseSha}] --output=json`;
 
-    const rawResult = execSync(
-        command,
-        {
-            cwd: process.cwd(),
-            encoding: "utf8",
-            // Suppress stderr to avoid outputting Turborepo logs.
-            stdio: ["ignore", "pipe", "ignore"]
-        }
-    );
+    const rawResult = execSync(command, {
+        cwd: process.cwd(),
+        encoding: "utf8",
+        // Suppress stderr to avoid outputting Turborepo logs.
+        stdio: ["ignore", "pipe", "ignore"],
+    });
 
     const parsedResult = JSON.parse(rawResult);
 
@@ -55,24 +51,30 @@ try {
         console.info(`[getAffectedStorybooks] Found ${affectedPackages.length} affected packages:`, affectedPackages);
 
         // Find the affected Storybook applications based on the affected packages.
-        affectedStorybooks = (Object.keys(StorybookDependencies) as (keyof typeof StorybookDependencies)[]).reduce((acc, x) => {
-            acc[x] =
-                // If the package is the actual Storybook application package, add the Storybook package name to the list.
-                affectedPackages.includes(x) ||
-                // If the package is a dependency of a Storybook application package, add the Storybook package name to the list.
-                StorybookDependencies[x].some((y: string) => affectedPackages.includes(y));
+        affectedStorybooks = (Object.keys(StorybookDependencies) as (keyof typeof StorybookDependencies)[]).reduce(
+            (acc, x) => {
+                acc[x] =
+                    // If the package is the actual Storybook application package, add the Storybook package name to the list.
+                    affectedPackages.includes(x) ||
+                    // If the package is a dependency of a Storybook application package, add the Storybook package name to the list.
+                    StorybookDependencies[x].some((y: string) => affectedPackages.includes(y));
 
-            return acc;
-        }, {} as Record<keyof typeof StorybookDependencies, boolean>);
+                return acc;
+            },
+            {} as Record<keyof typeof StorybookDependencies, boolean>,
+        );
 
         // Get the package name of only the affected Storybook applications.
-        const packageNames = (Object.keys(affectedStorybooks) as (keyof typeof StorybookDependencies)[]).reduce((acc, x) => {
-            if (affectedStorybooks[x]) {
-                acc.push(x);
-            }
+        const packageNames = (Object.keys(affectedStorybooks) as (keyof typeof StorybookDependencies)[]).reduce(
+            (acc, x) => {
+                if (affectedStorybooks[x]) {
+                    acc.push(x);
+                }
 
-            return acc;
-        }, [] as (keyof typeof StorybookDependencies)[]);
+                return acc;
+            },
+            [] as (keyof typeof StorybookDependencies)[],
+        );
 
         if (packageNames.length > 0) {
             console.info(`[getAffectedStorybooks] Found ${packageNames.length} affected Storybook applications:`, packageNames);
@@ -94,7 +96,7 @@ try {
 const gitHubOutputPath = process.env.GITHUB_OUTPUT;
 
 if (!gitHubOutputPath) {
-    throw new Error("[getAffectedStorybooks] The \"GITHUB_OUTPUT\" environment variable is not set.");
+    throw new Error('[getAffectedStorybooks] The "GITHUB_OUTPUT" environment variable is not set.');
 }
 
 // Values will be available in the GitHub action using syntax like: "steps.affected.outputs['@apps/packages-storybook']"".
@@ -103,4 +105,3 @@ for (const [key, value] of Object.entries(affectedStorybooks)) {
 }
 
 process.exit(0);
-

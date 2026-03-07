@@ -23,5 +23,6 @@ Use Workleap Squide (Option 1). It provides module isolation boundaries enforced
 See [ARCHITECTURE.md](../ARCHITECTURE.md#squide-hostmodule-topology) for the resulting topology (host, modules, shared packages).
 
 Additional implications:
+
 - Cross-module communication goes through Squide runtime APIs (event bus, shared data queries) — never direct imports.
 - New feature areas require creating a new module package under `apps/<domain>/`.

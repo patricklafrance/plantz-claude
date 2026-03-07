@@ -1,24 +1,35 @@
 # Squide Components Reference
 
+## Table of Contents
+
+- [AppRouter](#approuter)
+- [FireflyProvider](#fireflyprovider)
+- [PublicRoutes](#publicroutes)
+- [ProtectedRoutes](#protectedroutes)
+- [I18nextNavigationItemLabel](#i18nextnavigationitemlabel-from-squidei18next)
+- [Storybook Components](#storybook-components-from-squidefirefly-rsbuild-storybook)
+- [Helper Functions](#helper-functions)
+
 ## AppRouter
 
 The main router component that sets up Squide's primitives with React Router.
 
 ### Props
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `waitForPublicData` | `boolean` | `false` | Delay rendering until public data queries complete |
-| `waitForProtectedData` | `boolean` | `false` | Delay rendering until protected data queries complete |
-| `children` | `function` | required | Render function for router setup |
+| Prop                   | Type       | Default  | Description                                           |
+| ---------------------- | ---------- | -------- | ----------------------------------------------------- |
+| `waitForPublicData`    | `boolean`  | `false`  | Delay rendering until public data queries complete    |
+| `waitForProtectedData` | `boolean`  | `false`  | Delay rendering until protected data queries complete |
+| `children`             | `function` | required | Render function for router setup                      |
 
 ### Render Function Arguments
 
 ```ts
 {
-    rootRoute: ReactElement;      // Root route element (must wrap registeredRoutes)
-    registeredRoutes: Route[];    // All registered routes
-    routerProviderProps: object;  // Props for RouterProvider
+    rootRoute: ReactElement;           // Root route element (must wrap registeredRoutes)
+    registeredRoutes: Route[];         // All registered routes
+    routerProps: DOMRouterOpts;        // Options for createBrowserRouter (e.g., dataStrategy for MSW)
+    routerProviderProps: object;       // Props for RouterProvider
 }
 ```
 
@@ -32,12 +43,17 @@ import { RouterProvider } from "react-router/dom";
 export function App() {
     return (
         <AppRouter>
-            {({ rootRoute, registeredRoutes, routerProviderProps }) => (
+            {({ rootRoute, registeredRoutes, routerProps, routerProviderProps }) => (
                 <RouterProvider
-                    router={createBrowserRouter([{
-                        element: rootRoute,
-                        children: registeredRoutes
-                    }])}
+                    router={createBrowserRouter(
+                        [
+                            {
+                                element: rootRoute,
+                                children: registeredRoutes,
+                            },
+                        ],
+                        routerProps,
+                    )}
                     {...routerProviderProps}
                 />
             )}
@@ -59,15 +75,22 @@ function BootstrappingRoute() {
 export function App() {
     return (
         <AppRouter>
-            {({ rootRoute, registeredRoutes, routerProviderProps }) => (
+            {({ rootRoute, registeredRoutes, routerProps, routerProviderProps }) => (
                 <RouterProvider
-                    router={createBrowserRouter([{
-                        element: rootRoute,
-                        children: [{
-                            element: <BootstrappingRoute />,
-                            children: registeredRoutes
-                        }]
-                    }])}
+                    router={createBrowserRouter(
+                        [
+                            {
+                                element: rootRoute,
+                                children: [
+                                    {
+                                        element: <BootstrappingRoute />,
+                                        children: registeredRoutes,
+                                    },
+                                ],
+                            },
+                        ],
+                        routerProps,
+                    )}
                     {...routerProviderProps}
                 />
             )}
@@ -96,15 +119,22 @@ function BootstrappingRoute() {
 export function App() {
     return (
         <AppRouter waitForProtectedData>
-            {({ rootRoute, registeredRoutes, routerProviderProps }) => (
+            {({ rootRoute, registeredRoutes, routerProps, routerProviderProps }) => (
                 <RouterProvider
-                    router={createBrowserRouter([{
-                        element: rootRoute,
-                        children: [{
-                            element: <BootstrappingRoute />,
-                            children: registeredRoutes
-                        }]
-                    }])}
+                    router={createBrowserRouter(
+                        [
+                            {
+                                element: rootRoute,
+                                children: [
+                                    {
+                                        element: <BootstrappingRoute />,
+                                        children: registeredRoutes,
+                                    },
+                                ],
+                            },
+                        ],
+                        routerProps,
+                    )}
                     {...routerProviderProps}
                 />
             )}
@@ -119,10 +149,10 @@ Context provider for the FireflyRuntime instance.
 
 ### Props
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `runtime` | `FireflyRuntime` | The runtime instance |
-| `children` | `ReactNode` | Child components |
+| Prop       | Type             | Description          |
+| ---------- | ---------------- | -------------------- |
+| `runtime`  | `FireflyRuntime` | The runtime instance |
+| `children` | `ReactNode`      | Child components     |
 
 ### Usage
 
@@ -147,13 +177,16 @@ Placeholder component indicating where public routes will be rendered.
 ```tsx
 import { PublicRoutes, ProtectedRoutes } from "@squide/firefly";
 
-runtime.registerRoute({
-    element: <RootLayout />,
-    children: [
-        PublicRoutes,      // Public routes render here
-        ProtectedRoutes    // Protected routes render here
-    ]
-}, { hoist: true });
+runtime.registerRoute(
+    {
+        element: <RootLayout />,
+        children: [
+            PublicRoutes, // Public routes render here
+            ProtectedRoutes, // Protected routes render here
+        ],
+    },
+    { hoist: true },
+);
 ```
 
 ## ProtectedRoutes
@@ -170,11 +203,11 @@ Component for rendering localized navigation item labels.
 
 ### Props
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `i18next` | `i18n` | i18next instance |
-| `namespace` | `string` | Optional namespace (default: `"navigationItems"`) |
-| `resourceKey` | `string` | Translation key |
+| Prop          | Type     | Description                                       |
+| ------------- | -------- | ------------------------------------------------- |
+| `i18next`     | `i18n`   | i18next instance                                  |
+| `namespace`   | `string` | Optional namespace (default: `"navigationItems"`) |
+| `resourceKey` | `string` | Translation key                                   |
 
 ### Usage
 
@@ -184,7 +217,7 @@ import { I18nextNavigationItemLabel } from "@squide/i18next";
 runtime.registerNavigationItem({
     $id: "home",
     $label: <I18nextNavigationItemLabel i18next={i18nextInstance} resourceKey="nav.home" />,
-    to: "/"
+    to: "/",
 });
 ```
 
@@ -194,7 +227,7 @@ With a custom namespace:
 runtime.registerNavigationItem({
     $id: "about",
     $label: <I18nextNavigationItemLabel i18next={i18nextInstance} namespace="another-namespace" resourceKey="aboutPage" />,
-    to: "/about"
+    to: "/about",
 });
 ```
 
@@ -208,22 +241,16 @@ Decorator for wrapping Storybook stories with Squide context, including a Router
 import { FireflyDecorator, initializeFireflyForStorybook } from "@squide/firefly-rsbuild-storybook";
 
 const runtime = await initializeFireflyForStorybook({
-    localModules: [registerModule]
+    localModules: [registerModule],
 });
 
 const meta = {
-    decorators: [
-        story => (
-            <FireflyDecorator runtime={runtime}>
-                {story()}
-            </FireflyDecorator>
-        )
-    ],
+    decorators: [(story) => <FireflyDecorator runtime={runtime}>{story()}</FireflyDecorator>],
     parameters: {
         msw: {
-            handlers: [...runtime.requestHandlers]
-        }
-    }
+            handlers: [...runtime.requestHandlers],
+        },
+    },
 };
 ```
 
@@ -235,18 +262,16 @@ Factory function for creating the FireflyDecorator.
 import { withFireflyDecorator, initializeFireflyForStorybook } from "@squide/firefly-rsbuild-storybook";
 
 const runtime = await initializeFireflyForStorybook({
-    localModules: [registerModule]
+    localModules: [registerModule],
 });
 
 const meta = {
-    decorators: [
-        withFireflyDecorator(runtime)
-    ],
+    decorators: [withFireflyDecorator(runtime)],
     parameters: {
         msw: {
-            handlers: [...runtime.requestHandlers]
-        }
-    }
+            handlers: [...runtime.requestHandlers],
+        },
+    },
 };
 ```
 
@@ -259,21 +284,17 @@ import { withFeatureFlagsOverrideDecorator, initializeFireflyForStorybook, withF
 
 const runtime = await initializeFireflyForStorybook({
     featureFlags: {
-        "feature-key": true
-    }
+        "feature-key": true,
+    },
 });
 
 const meta = {
-    decorators: [
-        withFireflyDecorator(runtime)
-    ]
+    decorators: [withFireflyDecorator(runtime)],
 };
 
 // Per-story override
 export const WithFeatureDisabled = {
-    decorators: [
-        withFeatureFlagsOverrideDecorator({ "feature-key": false })
-    ]
+    decorators: [withFeatureFlagsOverrideDecorator({ "feature-key": false })],
 };
 ```
 
@@ -324,7 +345,7 @@ import { resolveRouteSegments } from "@squide/firefly";
 // Pattern: /users/:userId/posts/:postId
 const path = resolveRouteSegments("/users/:userId/posts/:postId", {
     userId: "123",
-    postId: "456"
+    postId: "456",
 });
 // Result: /users/123/posts/456
 ```
@@ -351,6 +372,28 @@ const runtime = await initializeFireflyForStorybook({
     localModules: [registerModule],
     environmentVariables: { apiUrl: "https://mock.api" },
     featureFlags: { "my-feature": true },
-    useMsw: true  // Default is true
+    useMsw: true, // Default is true
 });
 ```
+
+### mergeDeferredRegistrations
+
+Merge multiple deferred registration functions into a single function. Useful when a module's registration function is split across multiple files or needs to combine results from several setup steps.
+
+```tsx
+import { mergeDeferredRegistrations } from "@squide/firefly";
+
+export const register: ModuleRegisterFunction<FireflyRuntime> = (runtime) => {
+    runtime.registerRoute({ path: "/page-a", element: <PageA /> });
+    runtime.registerRoute({ path: "/page-b", element: <PageB /> });
+
+    // Merge multiple deferred registration functions into one
+    return mergeDeferredRegistrations([registerPageANavigation(runtime), registerPageBNavigation(runtime)]);
+};
+```
+
+**Parameters:**
+
+- `candidates`: Array of deferred registration functions (or `void`). Non-function entries are filtered out.
+
+**Returns:** A single merged `DeferredRegistrationFunction`, or `undefined` if no valid functions were provided.

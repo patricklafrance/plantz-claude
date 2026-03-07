@@ -22,5 +22,6 @@ Use per-domain Storybooks (Option 1). Each domain area has a Storybook at `apps/
 See [ARCHITECTURE.md](../ARCHITECTURE.md#domain-isolation) for the resulting Storybook structure.
 
 Additional implications:
+
 - Separate Chromatic project tokens per domain (`MANAGEMENT_CHROMATIC_PROJECT_TOKEN`, `TODAY_CHROMATIC_PROJECT_TOKEN`, `PACKAGES_CHROMATIC_PROJECT_TOKEN`).
 - Adding a new domain requires a new Storybook package, Chromatic token, and an update to `StorybookDependencies` in `tooling/getAffectedStorybooks.ts`.

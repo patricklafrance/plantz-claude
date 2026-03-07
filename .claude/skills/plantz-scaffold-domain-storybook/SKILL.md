@@ -1,10 +1,11 @@
 ---
-name: scaffold-domain-storybook
+name: plantz-scaffold-domain-storybook
 description: |
-  Scaffold a domain-scoped Storybook with Chromatic CI integration.
-  Use when asked to "add a storybook", "create a domain storybook", "scaffold storybook for {domain}".
-  Triggers: /scaffold-domain-storybook, "add storybook", "new domain storybook"
+    [Plantz] Scaffold a domain-scoped Storybook with Chromatic CI integration.
+    Use when asked to "add a storybook", "create a domain storybook", "scaffold storybook for {domain}".
+    Triggers: /plantz-scaffold-domain-storybook, "add storybook", "new domain storybook"
 license: MIT
+disable-model-invocation: true
 ---
 
 # Add Domain Storybook
@@ -15,29 +16,29 @@ Scaffold a complete domain-scoped Storybook application with Chromatic CI and af
 
 One required input; everything else is derived.
 
-| Input | Required | Description |
-|---|---|---|
-| `domain` | Yes | Domain directory under `apps/` (e.g., `management`, `today`) |
+| Input    | Required | Description                                                  |
+| -------- | -------- | ------------------------------------------------------------ |
+| `domain` | Yes      | Domain directory under `apps/` (e.g., `management`, `today`) |
 
 ## Naming Derivation
 
-| Derived value | Formula | Example (`management`) |
-|---|---|---|
-| Storybook path | `apps/{domain}/storybook/` | `apps/management/storybook/` |
-| Package name | `@apps/{domain}-storybook` | `@apps/management-storybook` |
-| Dev script | `dev-{domain}-storybook` | `dev-management-storybook` |
-| Chromatic token | `{DOMAIN_UPPER}_CHROMATIC_PROJECT_TOKEN` | `MANAGEMENT_CHROMATIC_PROJECT_TOKEN` |
-| Chromatic step id | `chromatic-{domain}` | `chromatic-management` |
-| Domain title | Capitalize first letter of `{domain}` | `Management` |
+| Derived value     | Formula                                  | Example (`management`)               |
+| ----------------- | ---------------------------------------- | ------------------------------------ |
+| Storybook path    | `apps/{domain}/storybook/`               | `apps/management/storybook/`         |
+| Package name      | `@apps/{domain}-storybook`               | `@apps/management-storybook`         |
+| Dev script        | `dev-{domain}-storybook`                 | `dev-management-storybook`           |
+| Chromatic token   | `{DOMAIN_UPPER}_CHROMATIC_PROJECT_TOKEN` | `MANAGEMENT_CHROMATIC_PROJECT_TOKEN` |
+| Chromatic step id | `chromatic-{domain}`                     | `chromatic-management`               |
+| Domain title      | Capitalize first letter of `{domain}`    | `Management`                         |
 
 Module-level values are discovered at runtime:
 
-| Derived value | How |
-|---|---|
-| Module directories | `ls apps/{domain}/` minus `storybook/` |
-| Story globs (domain storybook) | `../../{module_dir}/src/**/*.stories.tsx` per module |
-| Story globs (unified storybook) | `../{domain}/{module_dir}/src/**/*.stories.tsx` per module |
-| Module package names | Read `apps/{domain}/{module_dir}/package.json` -> `name` field |
+| Derived value                   | How                                                            |
+| ------------------------------- | -------------------------------------------------------------- |
+| Module directories              | `ls apps/{domain}/` minus `storybook/`                         |
+| Story globs (domain storybook)  | `../../{module_dir}/src/**/*.stories.tsx` per module           |
+| Story globs (unified storybook) | `../{domain}/{module_dir}/src/**/*.stories.tsx` per module     |
+| Module package names            | Read `apps/{domain}/{module_dir}/package.json` -> `name` field |
 
 ## Reference Storybook
 
@@ -68,6 +69,7 @@ Read all 6 reference files listed above, then create 6 files under `apps/{domain
 #### `package.json`
 
 Clone the entire reference `package.json`. Change only:
+
 - `name` -> `@apps/{domain}-storybook`
 - `description` -> `Storybook application for the {domain} domain.`
 
@@ -78,10 +80,7 @@ Copy `scripts`, `dependencies`, and `devDependencies` verbatim — do not add, r
 Clone the structure from the reference. Replace the `stories` array with one glob per discovered module:
 
 ```ts
-stories: [
-    "../../{module_dir_1}/src/**/*.stories.tsx",
-    "../../{module_dir_2}/src/**/*.stories.tsx"
-]
+stories: ["../../{module_dir_1}/src/**/*.stories.tsx", "../../{module_dir_2}/src/**/*.stories.tsx"];
 ```
 
 Preserve the `framework`, `addons`, and `getAbsolutePath` helper exactly as they appear in the reference.
@@ -93,6 +92,7 @@ Clone entirely from the reference. No substitutions.
 #### `chromatic.config.json`
 
 Clone from the reference. Change only:
+
 - `storybookBaseDir` -> `apps/{domain}/storybook`
 
 The `projectId` field must be removed — it is specific to the reference project. The user will set it after creating the Chromatic project.
@@ -119,8 +119,7 @@ In `apps/storybook/.storybook/main.ts`, add story globs for each module under a 
 
 ```ts
 // {DomainTitle}
-"../{domain}/{module_dir_1}/src/**/*.stories.tsx",
-"../{domain}/{module_dir_2}/src/**/*.stories.tsx"
+("../{domain}/{module_dir_1}/src/**/*.stories.tsx", "../{domain}/{module_dir_2}/src/**/*.stories.tsx");
 ```
 
 Follow the existing comment-section pattern visible in the file.
@@ -147,13 +146,13 @@ In `.github/workflows/chromatic.yml`, add a new step after the existing Chromati
   id: chromatic-{domain}
   uses: chromaui/action@latest
   with:
-    projectToken: ${{ secrets.{DOMAIN_UPPER}_CHROMATIC_PROJECT_TOKEN }}
-    workingDir: apps/{domain}/storybook
-    onlyChanged: true
-    exitOnceUploaded: true
-    autoAcceptChanges: main
-    skip: ${{ steps.affected-storybooks.outputs['@apps/{domain}-storybook'] == 'false' }}
-    debug: true
+      projectToken: ${{ secrets.{DOMAIN_UPPER}_CHROMATIC_PROJECT_TOKEN }}
+      workingDir: apps/{domain}/storybook
+      onlyChanged: true
+      exitOnceUploaded: true
+      autoAcceptChanges: main
+      skip: ${{ steps.affected-storybooks.outputs['@apps/{domain}-storybook'] == 'false' }}
+      debug: true
 ```
 
 Copy the `uses` action reference and all `with` properties from an existing Chromatic step — never guess the action version or property names.

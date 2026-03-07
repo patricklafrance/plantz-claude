@@ -7,8 +7,7 @@ Never guess about architecture, tooling, or conventions — always load the rele
 1. Read this index before every task to find the right doc.
 2. Before changing a module API or architectural pattern, check `agent-docs/adr/index.md`.
 3. Before changing build tooling, CI, or dev workflows, check `agent-docs/odr/index.md`.
-4. Before writing code, load any applicable agent skill from `.agents/skills/` or `.claude/skills/`.
-5. Never report a task as complete without running `git status --short` and checking every changed or new file against the index below. If a file touches a topic listed in the index, open that doc and fix any line that no longer matches reality. Stale docs cause the next agent to generate code that contradicts the actual codebase.
+4. Never report a task as complete without running `git status --short` and checking every changed or new file against the index below. If a file touches a topic listed in the index, open that doc and fix any line that no longer matches reality. Stale docs cause the next agent to generate code that contradicts the actual codebase.
 
 ## Index
 

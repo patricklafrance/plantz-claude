@@ -3,7 +3,7 @@
 Tailwind v4 is integrated via `@tailwindcss/postcss`. Both library packages (`@packages/components`) and app packages (`@apps/host`) add it through a config transformer:
 
 ```ts
-const tailwindPostCss: RsbuildConfigTransformer = config => {
+const tailwindPostCss: RsbuildConfigTransformer = (config) => {
     config.tools ??= {};
     config.tools.postcss ??= {};
     const postcss = config.tools.postcss as Record<string, unknown>;
@@ -28,4 +28,5 @@ Consuming apps use `@source` directives in their CSS to tell Tailwind where to f
 ```
 
 ---
-*See [CLAUDE.md](../../CLAUDE.md) for navigation.*
+
+_See [CLAUDE.md](../../CLAUDE.md) for navigation._

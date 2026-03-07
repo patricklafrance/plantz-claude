@@ -8,6 +8,7 @@ Five GitHub Actions workflows in `.github/workflows/`.
 **Concurrency**: `ci-${{ github.ref }}`, cancel in-progress
 
 Steps:
+
 1. Checkout (full history)
 2. Install pnpm + Node.js + dependencies
 3. Restore Turborepo cache (`${{ runner.os }}-turbo-ci-${{ github.sha }}`, prefix fallbacks)
@@ -25,6 +26,7 @@ Steps:
 **Gate**: PRs require the `run chromatic` label — exits early without it
 
 Steps:
+
 1. Label gate check
 2. Checkout (full history, PR head ref)
 3. Install pnpm + Node.js + dependencies
@@ -46,6 +48,7 @@ All Chromatic steps use `onlyChanged: true` and `autoAcceptChanges: main`.
 **Permissions**: contents write, pull-requests write, issues write, id-token write, actions read
 
 Steps:
+
 1. Checkout
 2. Install pnpm + Node.js + dependencies
 3. Restore Turborepo cache
@@ -59,10 +62,11 @@ Steps:
 **Skip**: draft PRs
 
 Steps:
+
 1. Checkout (full history)
 2. Run `anthropics/claude-code-action@v1` with:
-   - Restricted tools (passed via `claude_args` to the action): `Read`, `Glob`, `Grep`, `Skill`, `Task`, `Bash(gh:*)`, `mcp__github_inline_comment__*`
-   - Prompt reads `.github/prompts/code-review.md`
+    - Restricted tools (passed via `claude_args` to the action): `Read`, `Glob`, `Grep`, `Skill`, `Task`, `Bash(gh:*)`, `mcp__github_inline_comment__*`
+    - Prompt reads `.github/prompts/code-review.md`
 
 ## audit-agent-docs.yml — Weekly Documentation Audit
 
@@ -71,12 +75,13 @@ Steps:
 **Timeout**: 60 minutes
 
 Steps:
+
 1. Checkout
 2. Get current date (used in branch names, PR titles, and issue titles)
 3. Run `anthropics/claude-code-action@v1` with:
-   - Prompt reads `.github/prompts/audit-agent-docs.md`
-   - Allowed tools: `Read`, `Write`, `Edit`, `Glob`, `Grep`, `Skill`, `Bash(git:*)`, `Bash(gh:*)`, `Bash(date:*)`
-   - Loads the `audit-agent-docs` skill and runs the 3-pass audit procedure
+    - Prompt reads `.github/prompts/audit-agent-docs.md`
+    - Allowed tools: `Read`, `Write`, `Edit`, `Glob`, `Grep`, `Skill`, `Bash(git:*)`, `Bash(gh:*)`, `Bash(date:*)`
+    - Loads the `audit-agent-docs` skill and runs the 3-pass audit procedure
 4. If Critical/High findings: fixes them, creates a PR against `main`
 5. If no Critical/High findings: creates and closes a GitHub issue with the report
 6. On failure: creates a GitHub issue with a link to the failed workflow run
@@ -95,15 +100,18 @@ Steps:
 ## CI coverage gaps
 
 What CI does **not** catch currently:
+
 - Smoke tests — not yet configured
 
 ## Turbo cache strategy
 
 Three of the five workflows (ci, chromatic, claude) share the same pattern. `code-review.yml` and `audit-agent-docs.yml` do not use Turbo cache.
+
 - **Key**: `${{ runner.os }}-turbo-<workflow>-${{ github.sha }}`
 - **Restore keys**: `${{ runner.os }}-turbo-<workflow>-`, `${{ runner.os }}-turbo-`
 - **Path**: `.turbo`
 - Save only on cache miss (`cache-hit != 'true'`)
 
 ---
-*See [CLAUDE.md](../../CLAUDE.md) for navigation.*
+
+_See [CLAUDE.md](../../CLAUDE.md) for navigation._

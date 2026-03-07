@@ -30,12 +30,12 @@ plantz-claude/
 
 ## Package naming conventions
 
-| Workspace path | Package scope | Example |
-|---|---|---|
-| `apps/host` | `@apps/*` | `@apps/host` |
-| `apps/<domain>/storybook` | `@apps/*` | `@apps/management-storybook` |
-| `apps/<domain>/<feature>` | `@modules/*` | `@modules/management-plants` |
-| `packages/*` | `@packages/*` | `@packages/squide-core` |
+| Workspace path            | Package scope | Example                      |
+| ------------------------- | ------------- | ---------------------------- |
+| `apps/host`               | `@apps/*`     | `@apps/host`                 |
+| `apps/<domain>/storybook` | `@apps/*`     | `@apps/management-storybook` |
+| `apps/<domain>/<feature>` | `@modules/*`  | `@modules/management-plants` |
+| `packages/*`              | `@packages/*` | `@packages/squide-core`      |
 
 ## Squide host/module topology
 
@@ -60,20 +60,21 @@ See [ADR-0002](adr/0002-domain-scoped-storybooks.md) for rationale.
 
 ## Technology stack
 
-| Tool | Version | Purpose |
-|---|---|---|
-| Node.js | >= 24.0.0 | Runtime |
-| pnpm | 10.30.1 | Package manager |
-| TypeScript | 7.0.0-dev (tsgo, `@typescript/native-preview`) | Type checking |
-| Squide | — | Federated module shell |
-| Storybook | — | Component development |
-| Chromatic | — | Visual regression testing |
-| Tailwind CSS | 4.x | Utility-first CSS framework (via `@tailwindcss/postcss`) |
-| shadcn/ui (Base UI) | — | UI component library, base-nova preset (lives in `@packages/components`) |
-| Turborepo | 2.8.12 | Task orchestration and caching |
-| oxlint | 1.51.0 | Fast JS/TS linter (zero config) |
-| Vitest | — | Unit testing |
-| Syncpack | 14.0.0 | Dependency version enforcement |
+| Tool                | Version                                        | Purpose                                                                  |
+| ------------------- | ---------------------------------------------- | ------------------------------------------------------------------------ |
+| Node.js             | >= 24.0.0                                      | Runtime                                                                  |
+| pnpm                | 10.30.1                                        | Package manager                                                          |
+| TypeScript          | 7.0.0-dev (tsgo, `@typescript/native-preview`) | Type checking                                                            |
+| Squide              | —                                              | Federated module shell                                                   |
+| Storybook           | —                                              | Component development                                                    |
+| Chromatic           | —                                              | Visual regression testing                                                |
+| Tailwind CSS        | 4.x                                            | Utility-first CSS framework (via `@tailwindcss/postcss`)                 |
+| shadcn/ui (Base UI) | —                                              | UI component library, base-nova preset (lives in `@packages/components`) |
+| Turborepo           | 2.8.12                                         | Task orchestration and caching                                           |
+| oxlint              | 1.51.0                                         | Fast JS/TS linter (zero config)                                          |
+| oxfmt               | 0.36.0                                         | Fast code formatter (Prettier-compatible, import sorting, Tailwind sort) |
+| Vitest              | —                                              | Unit testing                                                             |
+| Syncpack            | 14.0.0                                         | Dependency version enforcement                                           |
 
 ## MODULES env var
 
@@ -90,4 +91,3 @@ Omit `MODULES` to load all modules. The value maps to the module's path under `a
 
 - When a section exceeds ~40 lines, extract it to its own file in the appropriate `agent-docs/` subfolder.
 - Cross-package contracts (e.g., "modules never import each other") belong here. Let the code (TypeScript types, barrel exports) document its own public API.
-

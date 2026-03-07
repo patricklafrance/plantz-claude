@@ -18,4 +18,5 @@ Examples of future design docs: Squide module registration flow, data-fetching p
 - Every new file here gets a CLAUDE.md index entry.
 
 ---
-*See [CLAUDE.md](../../CLAUDE.md) for navigation.*
+
+_See [CLAUDE.md](../../CLAUDE.md) for navigation._

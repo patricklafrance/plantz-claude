@@ -4,14 +4,14 @@ import type { Preview } from "storybook-react-rsbuild";
 
 const preview: Preview = {
     decorators: [
-        Story => {
+        (Story) => {
             return (
                 <Suspense fallback="Loading...">
                     <Story />
                 </Suspense>
             );
-        }
-    ]
+        },
+    ],
 };
 
 export default preview;

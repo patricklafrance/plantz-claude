@@ -18,15 +18,13 @@ const logger = new BrowserConsoleLogger({ logLevel: LogLevel.information });
 import { BrowserConsoleLogger, CompositeLogger } from "@workleap/logging";
 import { LogRocketLogger } from "@workleap/telemetry"; // or from "@workleap/logrocket"
 
-const logger = new CompositeLogger([
-    new BrowserConsoleLogger(),
-    new LogRocketLogger()
-]);
+const logger = new CompositeLogger([new BrowserConsoleLogger(), new LogRocketLogger()]);
 ```
 
 ## Logger Methods
 
 **Simple logging:**
+
 ```ts
 logger.debug("message");
 logger.information("message");
@@ -36,28 +34,25 @@ logger.critical("message");
 ```
 
 **Chained segments (complete chain with log method):**
+
 ```ts
-logger
-    .withText("Processing order")
-    .withObject({ orderId: 123 })
-    .withError(new Error("Failed"))
-    .error();
+logger.withText("Processing order").withObject({ orderId: 123 }).withError(new Error("Failed")).error();
 ```
 
 **Styled text:**
+
 ```ts
-logger.withText("Success", {
-    style: { color: "green", fontWeight: "bold" }
-}).information();
+logger
+    .withText("Success", {
+        style: { color: "green", fontWeight: "bold" },
+    })
+    .information();
 ```
 
 **Line breaks:**
+
 ```ts
-logger
-    .withText("Line 1")
-    .withLineChange()
-    .withText("Line 2")
-    .debug();
+logger.withText("Line 1").withLineChange().withText("Line 2").debug();
 ```
 
 ## Scopes
@@ -77,15 +72,16 @@ scope.end({ dismiss: true });
 ```
 
 **Styled scope labels:**
+
 ```ts
 // At creation
 const scope = logger.startScope("Label", {
-    labelStyle: { backgroundColor: "purple", color: "white" }
+    labelStyle: { backgroundColor: "purple", color: "white" },
 });
 
 // At end (useful for status-based styling)
 scope.end({
-    labelStyle: { backgroundColor: "green", color: "white" }
+    labelStyle: { backgroundColor: "green", color: "white" },
 });
 ```
 
@@ -101,12 +97,13 @@ const logger = createCompositeLogger(false, [new BrowserConsoleLogger(), new Log
 ```
 
 **Parameters:**
+
 - `verbose`: Whether debug information should be logged. If no loggers are provided, creates with a `BrowserConsoleLogger` by default.
 - `loggers`: Array of loggers to create the `CompositeLogger` with.
 
 ## Log Level Guidelines
 
 | Environment | Recommended Level |
-|-------------|-------------------|
-| Development | `debug` |
-| Production  | `information` |
+| ----------- | ----------------- |
+| Development | `debug`           |
+| Production  | `information`     |

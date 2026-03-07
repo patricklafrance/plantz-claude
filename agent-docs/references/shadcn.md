@@ -33,4 +33,5 @@ For the complete post-CLI workflow (fixups, semicolons, stories, exports, visual
 The globals CSS theme variables (oklch neutral palette) are independent of the style preset — the "nova" visual differences are in the component code itself, not the CSS variables.
 
 ---
-*See [CLAUDE.md](../../CLAUDE.md) for navigation.*
+
+_See [CLAUDE.md](../../CLAUDE.md) for navigation._

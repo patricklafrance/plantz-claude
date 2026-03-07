@@ -11,8 +11,8 @@ Defined in `pnpm-workspace.yaml`:
 
 ```yaml
 packages:
-  - apps/**
-  - packages/**
+    - apps/**
+    - packages/**
 ```
 
 ## Commands
@@ -35,4 +35,5 @@ See [ARCHITECTURE.md](../ARCHITECTURE.md#modules-env-var) for selective module l
 The `pnpm-workspace.yaml` allowlists native packages that require build steps: `@parcel/watcher`, `core-js`, `esbuild`, `netlify-cli`, `protobufjs`, `sharp`, `unix-dgram`.
 
 ---
-*See [CLAUDE.md](../../CLAUDE.md) for navigation.*
+
+_See [CLAUDE.md](../../CLAUDE.md) for navigation._

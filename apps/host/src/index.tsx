@@ -1,13 +1,14 @@
 import "./styles/globals.css";
-import { createRoot } from "react-dom/client";
 import { FireflyProvider, initializeFirefly } from "@squide/firefly";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { createRoot } from "react-dom/client";
+
 import { App } from "./App.tsx";
-import { registerHost } from "./register.tsx";
 import { getActiveModules } from "./getActiveModules.tsx";
+import { registerHost } from "./register.tsx";
 
 const runtime = initializeFirefly({
-    localModules: [registerHost, ...getActiveModules(process.env.MODULES)]
+    localModules: [registerHost, ...getActiveModules(process.env.MODULES)],
 });
 
 const queryClient = new QueryClient();
@@ -18,5 +19,5 @@ root.render(
         <QueryClientProvider client={queryClient}>
             <App />
         </QueryClientProvider>
-    </FireflyProvider>
+    </FireflyProvider>,
 );

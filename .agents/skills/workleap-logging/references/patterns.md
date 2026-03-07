@@ -8,7 +8,7 @@ import { BrowserConsoleLogger, LogLevel } from "@workleap/logging";
 const isDev = process.env.NODE_ENV === "development";
 
 const logger = new BrowserConsoleLogger({
-    logLevel: isDev ? LogLevel.debug : LogLevel.information
+    logLevel: isDev ? LogLevel.debug : LogLevel.information,
 });
 ```
 
@@ -43,7 +43,10 @@ async function registerModule(moduleName: string) {
 
         scope.end({ labelStyle: { color: "green" } });
     } catch (error) {
-        scope.withText("Registration failed").withError(error as Error).error();
+        scope
+            .withText("Registration failed")
+            .withError(error as Error)
+            .error();
         scope.end({ labelStyle: { color: "red" } });
         throw error;
     }
@@ -58,11 +61,11 @@ import { LogRocketLogger } from "@workleap/telemetry"; // or from "@workleap/log
 
 const logger = new CompositeLogger([
     new BrowserConsoleLogger({
-        logLevel: LogLevel.error
+        logLevel: LogLevel.error,
     }),
     new LogRocketLogger({
-        logLevel: LogLevel.debug
-    })
+        logLevel: LogLevel.debug,
+    }),
 ]);
 ```
 
@@ -83,10 +86,7 @@ Use `CompositeLogger` to send logs to both browser console and LogRocket:
 import { BrowserConsoleLogger, CompositeLogger } from "@workleap/logging";
 import { LogRocketLogger } from "@workleap/telemetry"; // or from "@workleap/logrocket"
 
-const logger = new CompositeLogger([
-    new BrowserConsoleLogger(),
-    new LogRocketLogger()
-]);
+const logger = new CompositeLogger([new BrowserConsoleLogger(), new LogRocketLogger()]);
 
 logger.debug("Application started!"); // Processed by both loggers
 ```
@@ -94,6 +94,7 @@ logger.debug("Application started!"); // Processed by both loggers
 ## PR Review Checklist
 
 When reviewing logging changes:
+
 - Verify appropriate log levels (debug for diagnostics, error for failures)
 - Check that errors include context (withObject) and stack traces (withError)
 - Ensure scopes are properly ended (end() or end({ dismiss: true }))

@@ -1,9 +1,9 @@
 ---
-name: verify-apps
+name: plantz-verify-apps
 description: |
-  Smoke-test every application by starting dev servers and verifying pages load.
-  Use when asked to "verify apps", "test all apps", "smoke test", "check dev servers".
-  Triggers: /verify-apps, "verify apps", "test all apps", "smoke test"
+    [Plantz] Smoke-test every application by starting dev servers and verifying pages load.
+    Use when asked to "verify apps", "test all apps", "smoke test", "check dev servers".
+    Triggers: /plantz-verify-apps, "verify apps", "test all apps", "smoke test"
 license: MIT
 ---
 

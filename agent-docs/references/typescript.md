@@ -15,4 +15,5 @@ declare module "*.css" {}
 Current locations: `apps/host/src/css.d.ts`, `packages/storybook/css.d.ts`.
 
 ---
-*See [CLAUDE.md](../../CLAUDE.md) for navigation.*
+
+_See [CLAUDE.md](../../CLAUDE.md) for navigation._

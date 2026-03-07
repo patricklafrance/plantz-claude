@@ -1,60 +1,59 @@
-import * as React from "react"
-import type { Meta, StoryObj } from "storybook-react-rsbuild"
-import { DatePicker } from "./date-picker.tsx"
+import * as React from "react";
+import type { Meta, StoryObj } from "storybook-react-rsbuild";
+
+import { DatePicker } from "./date-picker.tsx";
 
 const meta = {
     title: "Components/DatePicker",
     component: DatePicker,
     args: {
-        placeholder: "Pick a date"
-    }
-} satisfies Meta<typeof DatePicker>
+        placeholder: "Pick a date",
+    },
+} satisfies Meta<typeof DatePicker>;
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof meta>;
 
-export const Default = {} satisfies Story
+export const Default = {} satisfies Story;
 
 export const WithPreselectedDate: Story = {
     args: {
-        value: new Date(2026, 2, 6)
-    }
-}
+        value: new Date(2026, 2, 6),
+    },
+};
 
 export const WithCustomPlaceholder: Story = {
     args: {
-        placeholder: "Select watering date"
-    }
-}
+        placeholder: "Select watering date",
+    },
+};
 
 export const Disabled: Story = {
     args: {
-        disabled: true
-    }
-}
+        disabled: true,
+    },
+};
 
 export const DisabledWithValue: Story = {
     args: {
         value: new Date(2026, 2, 6),
-        disabled: true
-    }
-}
+        disabled: true,
+    },
+};
 
 export const Controlled: Story = {
     render: () => {
-        const [date, setDate] = React.useState<Date | undefined>(new Date(2026, 2, 6))
+        const [date, setDate] = React.useState<Date | undefined>(new Date(2026, 2, 6));
 
         return (
             <div className="flex flex-col gap-4">
                 <DatePicker value={date} onChange={setDate} />
-                <p className="text-sm text-muted-foreground">
-                    Selected: {date ? date.toLocaleDateString() : "none"}
-                </p>
+                <p className="text-sm text-muted-foreground">Selected: {date ? date.toLocaleDateString() : "none"}</p>
             </div>
-        )
-    }
-}
+        );
+    },
+};
 
 export const AllVariants: Story = {
     render: () => (
@@ -80,5 +79,5 @@ export const AllVariants: Story = {
                 <DatePicker value={new Date(2026, 2, 6)} disabled />
             </div>
         </div>
-    )
-}
+    ),
+};

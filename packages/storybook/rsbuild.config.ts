@@ -1,6 +1,6 @@
 import { defineStorybookConfig, type RsbuildConfigTransformer } from "@workleap/rsbuild-configs";
 
-const tailwindPostCss: RsbuildConfigTransformer = config => {
+const tailwindPostCss: RsbuildConfigTransformer = (config) => {
     config.tools ??= {};
     config.tools.postcss ??= {};
     const postcss = config.tools.postcss as Record<string, unknown>;
@@ -13,5 +13,5 @@ const tailwindPostCss: RsbuildConfigTransformer = config => {
 };
 
 export default defineStorybookConfig({
-    transformers: [tailwindPostCss]
+    transformers: [tailwindPostCss],
 });

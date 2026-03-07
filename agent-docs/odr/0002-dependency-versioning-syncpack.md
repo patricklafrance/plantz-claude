@@ -23,5 +23,6 @@ Use syncpack with differentiated policies (Option 1). The split between apps (pi
 See [build-tooling.md](../references/build-tooling.md#syncpack) for the full semver groups table and version group configuration.
 
 Additional implications:
+
 - `syncpack lint` runs in CI via Turborepo (`//#syncpack` root-level task) — violations block merge.
 - Version range changes are visible in `package.json` diffs and caught by syncpack before merge.

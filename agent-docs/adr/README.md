@@ -38,4 +38,5 @@ For build tooling, CI, or agent workflow decisions, write an [ODR](../odr/) inst
 See [index.md](./index.md) for the full list of decisions.
 
 ---
-*See [CLAUDE.md](../../CLAUDE.md) for navigation.*
+
+_See [CLAUDE.md](../../CLAUDE.md) for navigation._

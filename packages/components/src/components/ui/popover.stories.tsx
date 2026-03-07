@@ -1,89 +1,67 @@
-import type { Meta, StoryObj } from "storybook-react-rsbuild"
-import { Button } from "./button.tsx"
-import {
-    Popover,
-    PopoverContent,
-    PopoverDescription,
-    PopoverHeader,
-    PopoverTitle,
-    PopoverTrigger,
-} from "./popover.tsx"
+import type { Meta, StoryObj } from "storybook-react-rsbuild";
+
+import { Button } from "./button.tsx";
+import { Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger } from "./popover.tsx";
 
 const meta = {
     title: "Components/Popover",
-    component: Popover
-} satisfies Meta<typeof Popover>
+    component: Popover,
+} satisfies Meta<typeof Popover>;
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof meta>
+type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
     render: () => (
         <Popover>
-            <PopoverTrigger render={<Button variant="outline" />}>
-                Open popover
-            </PopoverTrigger>
+            <PopoverTrigger render={<Button variant="outline" />}>Open popover</PopoverTrigger>
             <PopoverContent>
                 <PopoverHeader>
                     <PopoverTitle>Popover title</PopoverTitle>
-                    <PopoverDescription>
-                        This is a simple popover with a title and description.
-                    </PopoverDescription>
+                    <PopoverDescription>This is a simple popover with a title and description.</PopoverDescription>
                 </PopoverHeader>
             </PopoverContent>
         </Popover>
-    )
-}
+    ),
+};
 
 export const AlignStart: Story = {
     render: () => (
         <Popover>
-            <PopoverTrigger render={<Button variant="outline" />}>
-                Align start
-            </PopoverTrigger>
+            <PopoverTrigger render={<Button variant="outline" />}>Align start</PopoverTrigger>
             <PopoverContent align="start">
                 <PopoverHeader>
                     <PopoverTitle>Start aligned</PopoverTitle>
-                    <PopoverDescription>
-                        This popover is aligned to the start of the trigger.
-                    </PopoverDescription>
+                    <PopoverDescription>This popover is aligned to the start of the trigger.</PopoverDescription>
                 </PopoverHeader>
             </PopoverContent>
         </Popover>
-    )
-}
+    ),
+};
 
 export const AlignEnd: Story = {
     render: () => (
         <Popover>
-            <PopoverTrigger render={<Button variant="outline" />}>
-                Align end
-            </PopoverTrigger>
+            <PopoverTrigger render={<Button variant="outline" />}>Align end</PopoverTrigger>
             <PopoverContent align="end">
                 <PopoverHeader>
                     <PopoverTitle>End aligned</PopoverTitle>
-                    <PopoverDescription>
-                        This popover is aligned to the end of the trigger.
-                    </PopoverDescription>
+                    <PopoverDescription>This popover is aligned to the end of the trigger.</PopoverDescription>
                 </PopoverHeader>
             </PopoverContent>
         </Popover>
-    )
-}
+    ),
+};
 
 export const WithCustomContent: Story = {
     render: () => (
         <Popover>
-            <PopoverTrigger render={<Button variant="outline" />}>
-                Settings
-            </PopoverTrigger>
+            <PopoverTrigger render={<Button variant="outline" />}>Settings</PopoverTrigger>
             <PopoverContent>
                 <PopoverHeader>
                     <PopoverTitle>Dimensions</PopoverTitle>
-                    <PopoverDescription>
-                        Set the dimensions for the layer.
-                    </PopoverDescription>
+                    <PopoverDescription>Set the dimensions for the layer.</PopoverDescription>
                 </PopoverHeader>
                 <div className="grid gap-2">
                     <div className="grid grid-cols-3 items-center gap-4">
@@ -97,16 +75,14 @@ export const WithCustomContent: Story = {
                 </div>
             </PopoverContent>
         </Popover>
-    )
-}
+    ),
+};
 
 export const AllVariants: Story = {
     render: () => (
         <div className="flex items-center gap-4">
             <Popover>
-                <PopoverTrigger render={<Button variant="outline" />}>
-                    Center
-                </PopoverTrigger>
+                <PopoverTrigger render={<Button variant="outline" />}>Center</PopoverTrigger>
                 <PopoverContent align="center">
                     <PopoverHeader>
                         <PopoverTitle>Center aligned</PopoverTitle>
@@ -115,9 +91,7 @@ export const AllVariants: Story = {
                 </PopoverContent>
             </Popover>
             <Popover>
-                <PopoverTrigger render={<Button variant="outline" />}>
-                    Start
-                </PopoverTrigger>
+                <PopoverTrigger render={<Button variant="outline" />}>Start</PopoverTrigger>
                 <PopoverContent align="start">
                     <PopoverHeader>
                         <PopoverTitle>Start aligned</PopoverTitle>
@@ -126,9 +100,7 @@ export const AllVariants: Story = {
                 </PopoverContent>
             </Popover>
             <Popover>
-                <PopoverTrigger render={<Button variant="outline" />}>
-                    End
-                </PopoverTrigger>
+                <PopoverTrigger render={<Button variant="outline" />}>End</PopoverTrigger>
                 <PopoverContent align="end">
                     <PopoverHeader>
                         <PopoverTitle>End aligned</PopoverTitle>
@@ -137,5 +109,5 @@ export const AllVariants: Story = {
                 </PopoverContent>
             </Popover>
         </div>
-    )
-}
+    ),
+};

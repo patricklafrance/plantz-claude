@@ -18,10 +18,12 @@ Detailed procedures for each check in the audit workflow. Each check includes wh
 **Trade-off:** Adding `package.json` to `untraced` reduces snapshot costs but may cause missed visual regressions when updating NPM packages that include breaking visual changes (e.g., UI library updates like Hopper).
 
 **When to use `untraced`:**
+
 - Projects where dependency updates rarely affect visuals
 - Teams that manually verify visual changes after dependency updates
 
 **When to avoid `untraced`:**
+
 - Projects heavily dependent on UI libraries (Hopper, design systems)
 - When visual regression detection for dependency updates is critical
 
@@ -49,6 +51,7 @@ import { I18nProvider } from "@app/providers/I18nProvider";
 ```
 
 **Detection patterns:**
+
 - Imports from paths ending in `/index` (explicit or implicit)
 - Imports from package-level paths like `@app/utils` or `../src`
 - Multiple named imports from a single module (often indicates barrel)
@@ -63,11 +66,11 @@ import { I18nProvider } from "@app/providers/I18nProvider";
 
 ```json
 {
-  "scripts": {
-    "chromatic": "chromatic",
-    "test:visual": "chromatic --project-token=...",
-    "storybook:test": "chromatic"
-  }
+    "scripts": {
+        "chromatic": "chromatic",
+        "test:visual": "chromatic --project-token=...",
+        "storybook:test": "chromatic"
+    }
 }
 ```
 
@@ -83,25 +86,25 @@ import { I18nProvider } from "@app/providers/I18nProvider";
 
 ```yaml
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-    types:
-      - opened
-      - labeled
-  workflow_dispatch:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+        types:
+            - opened
+            - labeled
+    workflow_dispatch:
 
 jobs:
-  chromatic:
-    steps:
-      - name: Early exit if "run chromatic" label is not present
-        if: github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'run chromatic')
-        run: |
-          echo "No \"run chromatic\" label present. Skipping Chromatic workflow."
-          exit 78
+    chromatic:
+        steps:
+            - name: Early exit if "run chromatic" label is not present
+              if: github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'run chromatic')
+              run: |
+                  echo "No \"run chromatic\" label present. Skipping Chromatic workflow."
+                  exit 78
 ```
 
 **Bad patterns:**
@@ -109,11 +112,11 @@ jobs:
 ```yaml
 # BAD - runs on every PR without label check
 on:
-  pull_request:
+    pull_request:
 
 jobs:
-  chromatic:
-    # No label check
+    chromatic:
+        # No label check
 ```
 
 **Why:** Without label gating, every PR push triggers a full Chromatic run, burning through the monthly snapshot budget on routine changes that don't affect visuals.
@@ -130,13 +133,14 @@ jobs:
 - name: Chromatic
   uses: chromaui/action@latest
   with:
-    projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
-    onlyChanged: true        # Enables TurboSnap
-    exitOnceUploaded: true   # Faster CI, doesn't wait for build
-    autoAcceptChanges: main  # Auto-accept on main branch
+      projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+      onlyChanged: true # Enables TurboSnap
+      exitOnceUploaded: true # Faster CI, doesn't wait for build
+      autoAcceptChanges: main # Auto-accept on main branch
 ```
 
 **Check for:**
+
 - `onlyChanged: true` - Required for TurboSnap
 - `exitOnceUploaded: true` - Recommended for faster CI
 - `autoAcceptChanges: main` - Recommended to auto-accept baseline on main
@@ -155,12 +159,12 @@ jobs:
 - name: Checkout
   uses: actions/checkout@v6
   with:
-    fetch-depth: 0  # Required for TurboSnap
-    ref: ${{ github.event.pull_request.head.ref }}
+      fetch-depth: 0 # Required for TurboSnap
+      ref: ${{ github.event.pull_request.head.ref }}
   env:
-    CHROMATIC_BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
-    CHROMATIC_SHA: ${{ github.event.pull_request.head.sha || github.ref }}
-    CHROMATIC_SLUG: ${{ github.repository }}
+      CHROMATIC_BRANCH: ${{ github.event.pull_request.head.ref || github.ref_name }}
+      CHROMATIC_SHA: ${{ github.event.pull_request.head.sha || github.ref }}
+      CHROMATIC_SLUG: ${{ github.repository }}
 ```
 
 **Critical check:** `fetch-depth: 0` is required for TurboSnap to work properly.
@@ -195,6 +199,7 @@ npx chromatic --browsers chrome,firefox
 **Why:** Bot-generated branches (dependency updates, version bumps) rarely introduce visual regressions, and requiring Chromatic runs on them wastes snapshots and slows down automated workflows.
 
 **Action:** Document recommendation to configure branch ruleset to exclude:
+
 - `renovate/*` branches
 - `changeset-release/*` branches
 
@@ -203,6 +208,7 @@ npx chromatic --browsers chrome,firefox
 **Scan files imported by `.storybook/preview.ts[x]`** for problematic patterns:
 
 **Problematic file types:**
+
 - Localization files (`**/resources.json`, `**/translations/*.json`)
 - Route definitions (large route config objects)
 - Environment configs
@@ -253,24 +259,26 @@ After completing the audit, provide a summary using this format:
 
 ### Findings
 
-| Practice | Status | Action Required |
-|----------|--------|-----------------|
+| Practice                     | Status        | Action Required           |
+| ---------------------------- | ------------- | ------------------------- |
 | `untraced` config (optional) | pass/fail/N/A | [action or user declined] |
-| Preview barrel imports | pass/fail | [action] |
-| No local Chromatic scripts | pass/fail | [action] |
-| CI label-based triggering | pass/fail | [action] |
-| CI `onlyChanged: true` flag | pass/fail | [action] |
-| CI `fetch-depth: 0` | pass/fail | [action] |
-| CI Chromatic env vars | pass/fail | [action] |
-| Chrome-only snapshots | pass/fail | [action] |
-| CI concurrency settings | pass/fail | [action] |
-| CI label auto-removal | pass/fail | [action] |
-| Large file dependencies | pass/fail | [action] |
+| Preview barrel imports       | pass/fail     | [action]                  |
+| No local Chromatic scripts   | pass/fail     | [action]                  |
+| CI label-based triggering    | pass/fail     | [action]                  |
+| CI `onlyChanged: true` flag  | pass/fail     | [action]                  |
+| CI `fetch-depth: 0`          | pass/fail     | [action]                  |
+| CI Chromatic env vars        | pass/fail     | [action]                  |
+| Chrome-only snapshots        | pass/fail     | [action]                  |
+| CI concurrency settings      | pass/fail     | [action]                  |
+| CI label auto-removal        | pass/fail     | [action]                  |
+| Large file dependencies      | pass/fail     | [action]                  |
 
 ### Changes Made
+
 - [list of files modified]
 
 ### Recommendations
+
 - [list of suggested improvements that require user decision]
 - Consider adding `untraced` for package.json (trade-off: may miss UI library regressions)
 - Configure branch ruleset to exclude Renovate/Changesets branches

@@ -1,9 +1,9 @@
 ---
 name: workleap-web-configs
 description: |
-  Workleap's shared web configuration packages (@workleap/eslint-configs, @workleap/typescript-configs, @workleap/rsbuild-configs, @workleap/rslib-configs, @workleap/stylelint-configs, @workleap/browserslist-config). Use when setting up, customizing, extending, or troubleshooting shared web tooling configs in a Workleap project — including ESLint, TypeScript, Rsbuild, Rslib, Stylelint, Browserslist, and monorepo (Turborepo) strategies. Activate even if only one tool is mentioned, as the packages are designed to work together.
+    Workleap's shared web configuration packages (@workleap/eslint-configs, @workleap/typescript-configs, @workleap/rsbuild-configs, @workleap/rslib-configs, @workleap/stylelint-configs, @workleap/browserslist-config). Use when setting up, customizing, extending, or troubleshooting shared web tooling configs in a Workleap project — including ESLint, TypeScript, Rsbuild, Rslib, Stylelint, Browserslist, and monorepo (Turborepo) strategies. Activate even if only one tool is mentioned, as the packages are designed to work together.
 metadata:
-  version: 1.3
+    version: 1.3
 ---
 
 # wl-web-configs
@@ -19,14 +19,14 @@ Workleap's shared configuration library for web tooling. Provides pre-configured
 
 ## Supported Tools (Active)
 
-| Tool | Package | Purpose |
-|------|---------|---------|
-| Browserslist | `@workleap/browserslist-config` | Browser targets for apps |
-| ESLint | `@workleap/eslint-configs` | Code linting |
-| Stylelint | `@workleap/stylelint-configs` | CSS linting |
-| TypeScript | `@workleap/typescript-configs` | Type checking (linting only) |
-| Rsbuild | `@workleap/rsbuild-configs` | Web application bundling |
-| Rslib | `@workleap/rslib-configs` | Library bundling |
+| Tool         | Package                         | Purpose                      |
+| ------------ | ------------------------------- | ---------------------------- |
+| Browserslist | `@workleap/browserslist-config` | Browser targets for apps     |
+| ESLint       | `@workleap/eslint-configs`      | Code linting                 |
+| Stylelint    | `@workleap/stylelint-configs`   | CSS linting                  |
+| TypeScript   | `@workleap/typescript-configs`  | Type checking (linting only) |
+| Rsbuild      | `@workleap/rsbuild-configs`     | Web application bundling     |
+| Rslib        | `@workleap/rslib-configs`       | Library bundling             |
 
 **In maintenance mode** (do not recommend): PostCSS, SWC, webpack, tsup
 
@@ -34,12 +34,12 @@ Workleap's shared configuration library for web tooling. Provides pre-configured
 
 ### Which Configuration to Use?
 
-| Project Type | ESLint | TypeScript | Bundler |
-|--------------|--------|------------|---------|
-| Web app with React | `defineWebApplicationConfig` | `web-application.json` | `@workleap/rsbuild-configs` |
-| React library | `defineReactLibraryConfig` | `library.json` | `@workleap/rslib-configs` |
-| TypeScript library (no React) | `defineTypeScriptLibraryConfig` | `library.json` | `@workleap/rslib-configs` |
-| Monorepo workspace root | `defineMonorepoWorkspaceConfig` | `monorepo-workspace.json` | N/A |
+| Project Type                  | ESLint                          | TypeScript                | Bundler                     |
+| ----------------------------- | ------------------------------- | ------------------------- | --------------------------- |
+| Web app with React            | `defineWebApplicationConfig`    | `web-application.json`    | `@workleap/rsbuild-configs` |
+| React library                 | `defineReactLibraryConfig`      | `library.json`            | `@workleap/rslib-configs`   |
+| TypeScript library (no React) | `defineTypeScriptLibraryConfig` | `library.json`            | `@workleap/rslib-configs`   |
+| Monorepo workspace root       | `defineMonorepoWorkspaceConfig` | `monorepo-workspace.json` | N/A                         |
 
 ### Browserslist (Apps Only)
 

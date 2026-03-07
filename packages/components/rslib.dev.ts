@@ -1,6 +1,7 @@
-import { defineDevConfig, type RslibConfigTransformer } from "@workleap/rslib-configs";
-import type { RslibConfig } from "@rslib/core";
 import path from "node:path";
+
+import type { RslibConfig } from "@rslib/core";
+import { defineDevConfig, type RslibConfigTransformer } from "@workleap/rslib-configs";
 
 const tailwindPostCss: RslibConfigTransformer = (config: RslibConfig) => {
     config.tools ??= {};
@@ -20,5 +21,5 @@ const tailwindPostCss: RslibConfigTransformer = (config: RslibConfig) => {
 export default defineDevConfig({
     tsconfigPath: path.resolve("./tsconfig.build.json"),
     react: true,
-    transformers: [tailwindPostCss]
+    transformers: [tailwindPostCss],
 });

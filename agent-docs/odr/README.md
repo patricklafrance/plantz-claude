@@ -37,4 +37,5 @@ Write an ODR when you are about to:
 See [index.md](./index.md) for the full list of decisions.
 
 ---
-*See [CLAUDE.md](../../CLAUDE.md) for navigation.*
+
+_See [CLAUDE.md](../../CLAUDE.md) for navigation._

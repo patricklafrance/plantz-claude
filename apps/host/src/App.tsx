@@ -15,13 +15,17 @@ export function App() {
         <AppRouter>
             {({ rootRoute, registeredRoutes, routerProviderProps }) => (
                 <RouterProvider
-                    router={createBrowserRouter([{
-                        element: rootRoute,
-                        children: [{
-                            element: <BootstrappingRoute />,
-                            children: registeredRoutes
-                        }]
-                    }])}
+                    router={createBrowserRouter([
+                        {
+                            element: rootRoute,
+                            children: [
+                                {
+                                    element: <BootstrappingRoute />,
+                                    children: registeredRoutes,
+                                },
+                            ],
+                        },
+                    ])}
                     {...routerProviderProps}
                 />
             )}

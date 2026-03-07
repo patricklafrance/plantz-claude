@@ -14,11 +14,12 @@ pnpm add <alias>@npm:<package>@<version>
 ```
 
 In `package.json`:
+
 ```json
 {
-  "dependencies": {
-    "<alias>": "npm:<package>@<version>"
-  }
+    "dependencies": {
+        "<alias>": "npm:<package>@<version>"
+    }
 }
 ```
 
@@ -30,17 +31,18 @@ Install different versions side by side:
 
 ```json
 {
-  "dependencies": {
-    "lodash3": "npm:lodash@3",
-    "lodash4": "npm:lodash@4"
-  }
+    "dependencies": {
+        "lodash3": "npm:lodash@3",
+        "lodash4": "npm:lodash@4"
+    }
 }
 ```
 
 Usage:
+
 ```js
-import lodash3 from 'lodash3'
-import lodash4 from 'lodash4'
+import lodash3 from "lodash3";
+import lodash4 from "lodash4";
 ```
 
 ### Replace Package with Fork
@@ -49,9 +51,9 @@ Substitute a package with a fork or alternative:
 
 ```json
 {
-  "dependencies": {
-    "original-pkg": "npm:my-fork@^1.0.0"
-  }
+    "dependencies": {
+        "original-pkg": "npm:my-fork@^1.0.0"
+    }
 }
 ```
 
@@ -61,9 +63,9 @@ All imports of `original-pkg` will resolve to `my-fork`.
 
 ```json
 {
-  "dependencies": {
-    "request": "npm:@cypress/request@^3.0.0"
-  }
+    "dependencies": {
+        "request": "npm:@cypress/request@^3.0.0"
+    }
 }
 ```
 
@@ -71,10 +73,10 @@ All imports of `original-pkg` will resolve to `my-fork`.
 
 ```json
 {
-  "dependencies": {
-    "vue": "npm:@anthropic/vue@^3.0.0",
-    "@myorg/utils": "npm:lodash@^4.17.21"
-  }
+    "dependencies": {
+        "vue": "npm:@anthropic/vue@^3.0.0",
+        "@myorg/utils": "npm:lodash@^4.17.21"
+    }
 }
 ```
 
@@ -103,12 +105,12 @@ For type resolution with aliases, you may need to configure TypeScript:
 ```json
 // tsconfig.json
 {
-  "compilerOptions": {
-    "paths": {
-      "lodash3": ["node_modules/lodash3"],
-      "lodash4": ["node_modules/lodash4"]
+    "compilerOptions": {
+        "paths": {
+            "lodash3": ["node_modules/lodash3"],
+            "lodash4": ["node_modules/lodash4"]
+        }
     }
-  }
 }
 ```
 
@@ -116,10 +118,10 @@ Or use `@types` packages with aliases:
 
 ```json
 {
-  "devDependencies": {
-    "@types/lodash3": "npm:@types/lodash@3",
-    "@types/lodash4": "npm:@types/lodash@4"
-  }
+    "devDependencies": {
+        "@types/lodash3": "npm:@types/lodash@3",
+        "@types/lodash4": "npm:@types/lodash@4"
+    }
 }
 ```
 
@@ -130,7 +132,7 @@ Force all transitive dependencies to use an alias:
 ```yaml
 # pnpm-workspace.yaml
 overrides:
-  "underscore": "npm:lodash@^4.17.21"
+    "underscore": "npm:lodash@^4.17.21"
 ```
 
 This replaces all `underscore` imports (including in dependencies) with lodash.
@@ -141,20 +143,21 @@ Aliases work with any valid pnpm specifier:
 
 ```json
 {
-  "dependencies": {
-    "my-fork": "npm:user/repo#commit",
-    "local-pkg": "file:../local-package"
-  }
+    "dependencies": {
+        "my-fork": "npm:user/repo#commit",
+        "local-pkg": "file:../local-package"
+    }
 }
 ```
 
 ## Best Practices
 
 1. **Clear naming**: Use descriptive alias names that indicate purpose
-   ```json
-   "lodash-legacy": "npm:lodash@3"
-   "lodash-modern": "npm:lodash@4"
-   ```
+
+    ```json
+    "lodash-legacy": "npm:lodash@3"
+    "lodash-modern": "npm:lodash@4"
+    ```
 
 2. **Document aliases**: Add comments or documentation explaining why aliases exist
 
@@ -162,7 +165,7 @@ Aliases work with any valid pnpm specifier:
 
 4. **Test thoroughly**: Aliased packages may have subtle differences in behavior
 
-<!-- 
+<!--
 Source references:
 - https://pnpm.io/aliases
 -->

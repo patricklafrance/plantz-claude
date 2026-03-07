@@ -30,14 +30,10 @@
             "persistent": true
         },
         "lint": {
-            "dependsOn": ["oxlint", "//#oxlint", "typecheck", "//#typecheck", "//#syncpack"]
+            "dependsOn": ["//#oxlint", "//#oxfmt", "typecheck", "//#typecheck", "//#syncpack"]
         },
         "//#oxlint": {
-            "inputs": ["$TURBO_DEFAULT$", "!apps", "!packages", "!agent-docs", "!README.md"],
-            "outputs": []
-        },
-        "oxlint": {
-            "inputs": ["$TURBO_DEFAULT$", "!README.md"],
+            "inputs": ["$TURBO_DEFAULT$", "!agent-docs", "!README.md"],
             "outputs": []
         },
         "//#typecheck": {
@@ -48,6 +44,10 @@
             "dependsOn": ["transit"],
             "inputs": ["src/**/*.ts", "src/**/*.tsx", "test/**/*.ts", "test/**/*.tsx", "tsconfig.json", "tsconfig.build.json"],
             "outputs": ["node_modules/.cache/tsbuildinfo.json"]
+        },
+        "//#oxfmt": {
+            "inputs": ["$TURBO_DEFAULT$", "!agent-docs", "!README.md"],
+            "outputs": []
         },
         "//#syncpack": {
             "inputs": [".syncpackrc.js", "package.json", "packages/**/package.json", "apps/**/package.json"]

@@ -28,10 +28,10 @@ Avoid interleaving style writes with layout reads. When you read a layout proper
 
 ```typescript
 function layoutThrashing(element: HTMLElement) {
-  element.style.width = '100px'
-  const width = element.offsetWidth  // Forces reflow
-  element.style.height = '200px'
-  const height = element.offsetHeight  // Forces another reflow
+    element.style.width = "100px";
+    const width = element.offsetWidth; // Forces reflow
+    element.style.height = "200px";
+    const height = element.offsetHeight; // Forces another reflow
 }
 ```
 
@@ -39,10 +39,10 @@ function layoutThrashing(element: HTMLElement) {
 
 ```typescript
 function updateElementStyles(element: HTMLElement) {
-  element.style.width = '100px'
-  element.style.height = '200px'
+    element.style.width = "100px";
+    element.style.height = "200px";
 
-  const { width, height } = element.getBoundingClientRect()
+    const { width, height } = element.getBoundingClientRect();
 }
 ```
 
@@ -50,17 +50,17 @@ function updateElementStyles(element: HTMLElement) {
 
 ```css
 .highlighted-box {
-  width: 100px;
-  height: 200px;
-  background-color: blue;
-  border: 1px solid black;
+    width: 100px;
+    height: 200px;
+    background-color: blue;
+    border: 1px solid black;
 }
 ```
 
 ```typescript
 function updateElementStyles(element: HTMLElement) {
-  element.classList.add('highlighted-box')
-  const { width, height } = element.getBoundingClientRect()
+    element.classList.add("highlighted-box");
+    const { width, height } = element.getBoundingClientRect();
 }
 ```
 
@@ -69,26 +69,22 @@ function updateElementStyles(element: HTMLElement) {
 ```tsx
 // Incorrect: interleaving style changes with layout queries
 function Box({ isHighlighted }: { isHighlighted: boolean }) {
-  const ref = useRef<HTMLDivElement>(null)
+    const ref = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (ref.current && isHighlighted) {
-      ref.current.style.width = '100px'
-      const width = ref.current.offsetWidth // Forces layout
-      ref.current.style.height = '200px'
-    }
-  }, [isHighlighted])
+    useEffect(() => {
+        if (ref.current && isHighlighted) {
+            ref.current.style.width = "100px";
+            const width = ref.current.offsetWidth; // Forces layout
+            ref.current.style.height = "200px";
+        }
+    }, [isHighlighted]);
 
-  return <div ref={ref}>Content</div>
+    return <div ref={ref}>Content</div>;
 }
 
 // Correct: toggle class
 function Box({ isHighlighted }: { isHighlighted: boolean }) {
-  return (
-    <div className={isHighlighted ? 'highlighted-box' : ''}>
-      Content
-    </div>
-  )
+    return <div className={isHighlighted ? "highlighted-box" : ""}>Content</div>;
 }
 ```
 
@@ -104,10 +100,10 @@ Multiple `.find()` calls by the same key should use a Map.
 
 ```typescript
 function processOrders(orders: Order[], users: User[]) {
-  return orders.map(order => ({
-    ...order,
-    user: users.find(u => u.id === order.userId)
-  }))
+    return orders.map((order) => ({
+        ...order,
+        user: users.find((u) => u.id === order.userId),
+    }));
 }
 ```
 
@@ -115,12 +111,12 @@ function processOrders(orders: Order[], users: User[]) {
 
 ```typescript
 function processOrders(orders: Order[], users: User[]) {
-  const userById = new Map(users.map(u => [u.id, u]))
+    const userById = new Map(users.map((u) => [u.id, u]));
 
-  return orders.map(order => ({
-    ...order,
-    user: userById.get(order.userId)
-  }))
+    return orders.map((order) => ({
+        ...order,
+        user: userById.get(order.userId),
+    }));
 }
 ```
 
@@ -136,17 +132,17 @@ Cache object property lookups in hot paths.
 
 ```typescript
 for (let i = 0; i < arr.length; i++) {
-  process(obj.config.settings.value)
+    process(obj.config.settings.value);
 }
 ```
 
 **Correct (1 lookup total):**
 
 ```typescript
-const value = obj.config.settings.value
-const len = arr.length
+const value = obj.config.settings.value;
+const len = arr.length;
 for (let i = 0; i < len; i++) {
-  process(value)
+    process(value);
 }
 ```
 
@@ -209,40 +205,40 @@ Use a Map (not a hook) so it works everywhere: utilities, event handlers, not ju
 
 ```typescript
 function getTheme() {
-  return localStorage.getItem('theme') ?? 'light'
+    return localStorage.getItem("theme") ?? "light";
 }
 ```
 
 **Correct (Map cache):**
 
 ```typescript
-const storageCache = new Map<string, string | null>()
+const storageCache = new Map<string, string | null>();
 
 function getLocalStorage(key: string) {
-  if (!storageCache.has(key)) {
-    storageCache.set(key, localStorage.getItem(key))
-  }
-  return storageCache.get(key)
+    if (!storageCache.has(key)) {
+        storageCache.set(key, localStorage.getItem(key));
+    }
+    return storageCache.get(key);
 }
 
 function setLocalStorage(key: string, value: string) {
-  localStorage.setItem(key, value)
-  storageCache.set(key, value)
+    localStorage.setItem(key, value);
+    storageCache.set(key, value);
 }
 ```
 
 **Important (invalidate on external changes):**
 
 ```typescript
-window.addEventListener('storage', (e) => {
-  if (e.key) storageCache.delete(e.key)
-})
+window.addEventListener("storage", (e) => {
+    if (e.key) storageCache.delete(e.key);
+});
 
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') {
-    storageCache.clear()
-  }
-})
+document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+        storageCache.clear();
+    }
+});
 ```
 
 ---
@@ -254,22 +250,22 @@ Multiple `.filter()` or `.map()` calls iterate the array multiple times. Combine
 **Incorrect (3 iterations):**
 
 ```typescript
-const admins = users.filter(u => u.isAdmin)
-const testers = users.filter(u => u.isTester)
-const inactive = users.filter(u => !u.isActive)
+const admins = users.filter((u) => u.isAdmin);
+const testers = users.filter((u) => u.isTester);
+const inactive = users.filter((u) => !u.isActive);
 ```
 
 **Correct (1 iteration):**
 
 ```typescript
-const admins: User[] = []
-const testers: User[] = []
-const inactive: User[] = []
+const admins: User[] = [];
+const testers: User[] = [];
+const inactive: User[] = [];
 
 for (const user of users) {
-  if (user.isAdmin) admins.push(user)
-  if (user.isTester) testers.push(user)
-  if (!user.isActive) inactive.push(user)
+    if (user.isAdmin) admins.push(user);
+    if (user.isTester) testers.push(user);
+    if (!user.isActive) inactive.push(user);
 }
 ```
 
@@ -283,7 +279,7 @@ When comparing arrays with expensive operations, check lengths first.
 
 ```typescript
 function hasChanges(current: string[], original: string[]) {
-  return current.sort().join() !== original.sort().join()
+    return current.sort().join() !== original.sort().join();
 }
 ```
 
@@ -291,17 +287,17 @@ function hasChanges(current: string[], original: string[]) {
 
 ```typescript
 function hasChanges(current: string[], original: string[]) {
-  if (current.length !== original.length) {
-    return true
-  }
-  const currentSorted = current.toSorted()
-  const originalSorted = original.toSorted()
-  for (let i = 0; i < currentSorted.length; i++) {
-    if (currentSorted[i] !== originalSorted[i]) {
-      return true
+    if (current.length !== original.length) {
+        return true;
     }
-  }
-  return false
+    const currentSorted = current.toSorted();
+    const originalSorted = original.toSorted();
+    for (let i = 0; i < currentSorted.length; i++) {
+        if (currentSorted[i] !== originalSorted[i]) {
+            return true;
+        }
+    }
+    return false;
 }
 ```
 
@@ -315,21 +311,21 @@ Return early when result is determined to skip unnecessary processing.
 
 ```typescript
 function validateUsers(users: User[]) {
-  let hasError = false
-  let errorMessage = ''
+    let hasError = false;
+    let errorMessage = "";
 
-  for (const user of users) {
-    if (!user.email) {
-      hasError = true
-      errorMessage = 'Email required'
+    for (const user of users) {
+        if (!user.email) {
+            hasError = true;
+            errorMessage = "Email required";
+        }
+        if (!user.name) {
+            hasError = true;
+            errorMessage = "Name required";
+        }
     }
-    if (!user.name) {
-      hasError = true
-      errorMessage = 'Name required'
-    }
-  }
 
-  return hasError ? { valid: false, error: errorMessage } : { valid: true }
+    return hasError ? { valid: false, error: errorMessage } : { valid: true };
 }
 ```
 
@@ -337,16 +333,16 @@ function validateUsers(users: User[]) {
 
 ```typescript
 function validateUsers(users: User[]) {
-  for (const user of users) {
-    if (!user.email) {
-      return { valid: false, error: 'Email required' }
+    for (const user of users) {
+        if (!user.email) {
+            return { valid: false, error: "Email required" };
+        }
+        if (!user.name) {
+            return { valid: false, error: "Name required" };
+        }
     }
-    if (!user.name) {
-      return { valid: false, error: 'Name required' }
-    }
-  }
 
-  return { valid: true }
+    return { valid: true };
 }
 ```
 
@@ -384,9 +380,9 @@ function Highlighter({ text, query }: Props) {
 **Warning:** Global regex (`/g`) has mutable `lastIndex` state:
 
 ```typescript
-const regex = /foo/g
-regex.test('foo')  // true, lastIndex = 3
-regex.test('foo')  // false, lastIndex = 0
+const regex = /foo/g;
+regex.test("foo"); // true, lastIndex = 3
+regex.test("foo"); // false, lastIndex = 0
 ```
 
 ---
@@ -399,8 +395,8 @@ Finding the smallest or largest element only requires a single pass.
 
 ```typescript
 function getLatestProject(projects: Project[]) {
-  const sorted = [...projects].sort((a, b) => b.updatedAt - a.updatedAt)
-  return sorted[0]
+    const sorted = [...projects].sort((a, b) => b.updatedAt - a.updatedAt);
+    return sorted[0];
 }
 ```
 
@@ -408,17 +404,17 @@ function getLatestProject(projects: Project[]) {
 
 ```typescript
 function getLatestProject(projects: Project[]) {
-  if (projects.length === 0) return null
+    if (projects.length === 0) return null;
 
-  let latest = projects[0]
+    let latest = projects[0];
 
-  for (let i = 1; i < projects.length; i++) {
-    if (projects[i].updatedAt > latest.updatedAt) {
-      latest = projects[i]
+    for (let i = 1; i < projects.length; i++) {
+        if (projects[i].updatedAt > latest.updatedAt) {
+            latest = projects[i];
+        }
     }
-  }
 
-  return latest
+    return latest;
 }
 ```
 

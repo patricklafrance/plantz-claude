@@ -17,23 +17,23 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-      
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
-      
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm test
-      - run: pnpm build
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: pnpm/action-setup@v4
+              with:
+                  version: 9
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: "pnpm"
+
+            - run: pnpm install --frozen-lockfile
+            - run: pnpm test
+            - run: pnpm build
 ```
 
 ### With Store Caching
@@ -43,20 +43,20 @@ For larger projects, cache the pnpm store:
 ```yaml
 - uses: pnpm/action-setup@v4
   with:
-    version: 9
+      version: 9
 
 - name: Get pnpm store directory
   shell: bash
   run: |
-    echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
 - uses: actions/cache@v4
   name: Setup pnpm cache
   with:
-    path: ${{ env.STORE_PATH }}
-    key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-    restore-keys: |
-      ${{ runner.os }}-pnpm-store-
+      path: ${{ env.STORE_PATH }}
+      key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+      restore-keys: |
+          ${{ runner.os }}-pnpm-store-
 
 - run: pnpm install --frozen-lockfile
 ```
@@ -65,21 +65,21 @@ For larger projects, cache the pnpm store:
 
 ```yaml
 jobs:
-  test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        node: [18, 20, 22]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node }}
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm test
+    test:
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [ubuntu-latest, windows-latest, macos-latest]
+                node: [18, 20, 22]
+        steps:
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node }}
+                  cache: "pnpm"
+            - run: pnpm install --frozen-lockfile
+            - run: pnpm test
 ```
 
 ## GitLab CI
@@ -88,38 +88,38 @@ jobs:
 image: node:20
 
 stages:
-  - install
-  - test
-  - build
+    - install
+    - test
+    - build
 
 variables:
-  PNPM_HOME: /root/.local/share/pnpm
-  PATH: $PNPM_HOME:$PATH
+    PNPM_HOME: /root/.local/share/pnpm
+    PATH: $PNPM_HOME:$PATH
 
 before_script:
-  - corepack enable
-  - corepack prepare pnpm@latest --activate
+    - corepack enable
+    - corepack prepare pnpm@latest --activate
 
 cache:
-  key: ${CI_COMMIT_REF_SLUG}
-  paths:
-    - .pnpm-store
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+        - .pnpm-store
 
 install:
-  stage: install
-  script:
-    - pnpm config set store-dir .pnpm-store
-    - pnpm install --frozen-lockfile
+    stage: install
+    script:
+        - pnpm config set store-dir .pnpm-store
+        - pnpm install --frozen-lockfile
 
 test:
-  stage: test
-  script:
-    - pnpm test
+    stage: test
+    script:
+        - pnpm test
 
 build:
-  stage: build
-  script:
-    - pnpm build
+    stage: build
+    script:
+        - pnpm build
 ```
 
 ## Docker
@@ -219,7 +219,7 @@ Use Corepack to manage pnpm version:
 ```json
 // package.json
 {
-  "packageManager": "pnpm@9.0.0"
+    "packageManager": "pnpm@9.0.0"
 }
 ```
 
@@ -236,37 +236,37 @@ Use Corepack to manage pnpm version:
 ```yaml
 - name: Build changed packages
   run: |
-    pnpm --filter "...[origin/main]" build
+      pnpm --filter "...[origin/main]" build
 ```
 
 ### Parallel Jobs per Package
 
 ```yaml
 jobs:
-  detect-changes:
-    runs-on: ubuntu-latest
-    outputs:
-      packages: ${{ steps.changes.outputs.packages }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - id: changes
-        run: |
-          echo "packages=$(pnpm --filter '...[origin/main]' list --json | jq -c '[.[].name]')" >> $GITHUB_OUTPUT
+    detect-changes:
+        runs-on: ubuntu-latest
+        outputs:
+            packages: ${{ steps.changes.outputs.packages }}
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+            - id: changes
+              run: |
+                  echo "packages=$(pnpm --filter '...[origin/main]' list --json | jq -c '[.[].name]')" >> $GITHUB_OUTPUT
 
-  test:
-    needs: detect-changes
-    if: needs.detect-changes.outputs.packages != '[]'
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        package: ${{ fromJson(needs.detect-changes.outputs.packages) }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter ${{ matrix.package }} test
+    test:
+        needs: detect-changes
+        if: needs.detect-changes.outputs.packages != '[]'
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                package: ${{ fromJson(needs.detect-changes.outputs.packages) }}
+        steps:
+            - uses: actions/checkout@v4
+            - uses: pnpm/action-setup@v4
+            - run: pnpm install --frozen-lockfile
+            - run: pnpm --filter ${{ matrix.package }} test
 ```
 
 ## Best Practices Summary
@@ -278,7 +278,7 @@ jobs:
 5. **Use `--filter`** in monorepos to build only what changed
 6. **Multi-stage Docker builds** for smaller images
 
-<!-- 
+<!--
 Source references:
 - https://pnpm.io/continuous-integration
 - https://github.com/pnpm/action-setup

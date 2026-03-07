@@ -25,11 +25,11 @@
 
 ## Available Functions
 
-| Function | Use Case |
-|----------|----------|
-| `defineDevConfig` | Watch mode for development |
-| `defineBuildConfig` | Production build for publication |
-| `defineStorybookConfig` | Storybook integration |
+| Function                | Use Case                         |
+| ----------------------- | -------------------------------- |
+| `defineDevConfig`       | Watch mode for development       |
+| `defineBuildConfig`     | Production build for publication |
+| `defineStorybookConfig` | Storybook integration            |
 
 ## Installation
 
@@ -78,7 +78,7 @@ import { defineBuildConfig } from "@workleap/rslib-configs";
 import path from "node:path";
 
 export default defineBuildConfig({
-    tsconfigPath: path.resolve("./tsconfig.build.json")
+    tsconfigPath: path.resolve("./tsconfig.build.json"),
 });
 ```
 
@@ -86,19 +86,19 @@ export default defineBuildConfig({
 
 ### Predefined Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `entry` | object | `{ index: "./src/**" }` (bundleless) or `{ index: ["./src/index.ts", "./src/index.js"] }` (bundle) | Entry points |
-| `syntax` | string | `esnext` | Output syntax target |
-| `bundle` | boolean | `false` | Single bundle vs bundleless |
-| `tsconfigPath` | string | undefined | Path to tsconfig (required for bundleless) |
-| `dts` | object/false | `true` | Generate .d.ts files |
-| `target` | string | `web` | Output target |
-| `distPath` | string | `dist` | Output directory |
-| `plugins` | array | `[]` | Rsbuild plugins |
-| `sourceMap` | false/object | `{ js: "source-map", css: true }` | Source maps |
-| `react` | true/function | disabled | React transformation |
-| `svgr` | true/function | disabled | SVG as React components |
+| Option         | Type          | Default                                                                                            | Description                                |
+| -------------- | ------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| `entry`        | object        | `{ index: "./src/**" }` (bundleless) or `{ index: ["./src/index.ts", "./src/index.js"] }` (bundle) | Entry points                               |
+| `syntax`       | string        | `esnext`                                                                                           | Output syntax target                       |
+| `bundle`       | boolean       | `false`                                                                                            | Single bundle vs bundleless                |
+| `tsconfigPath` | string        | undefined                                                                                          | Path to tsconfig (required for bundleless) |
+| `dts`          | object/false  | `true`                                                                                             | Generate .d.ts files                       |
+| `target`       | string        | `web`                                                                                              | Output target                              |
+| `distPath`     | string        | `dist`                                                                                             | Output directory                           |
+| `plugins`      | array         | `[]`                                                                                               | Rsbuild plugins                            |
+| `sourceMap`    | false/object  | `{ js: "source-map", css: true }`                                                                  | Source maps                                |
+| `react`        | true/function | disabled                                                                                           | React transformation                       |
+| `svgr`         | true/function | disabled                                                                                           | SVG as React components                    |
 
 ### Examples
 
@@ -111,7 +111,7 @@ import path from "node:path";
 export default defineBuildConfig({
     tsconfigPath: path.resolve("./tsconfig.build.json"),
     react: true,
-    svgr: true
+    svgr: true,
 });
 ```
 
@@ -120,7 +120,7 @@ Bundled output:
 ```ts
 export default defineBuildConfig({
     bundle: true,
-    react: true
+    react: true,
 });
 ```
 
@@ -129,7 +129,7 @@ Node target:
 ```ts
 export default defineBuildConfig({
     target: "node",
-    tsconfigPath: path.resolve("./tsconfig.build.json")
+    tsconfigPath: path.resolve("./tsconfig.build.json"),
 });
 ```
 
@@ -138,7 +138,7 @@ Custom syntax:
 ```ts
 export default defineBuildConfig({
     syntax: "es2024",
-    tsconfigPath: path.resolve("./tsconfig.build.json")
+    tsconfigPath: path.resolve("./tsconfig.build.json"),
 });
 ```
 
@@ -147,7 +147,7 @@ Disable declaration files:
 ```ts
 export default defineBuildConfig({
     dts: false,
-    tsconfigPath: path.resolve("./tsconfig.build.json")
+    tsconfigPath: path.resolve("./tsconfig.build.json"),
 });
 ```
 
@@ -161,7 +161,7 @@ import { defineDevConfig } from "@workleap/rslib-configs";
 import path from "node:path";
 
 export default defineDevConfig({
-    tsconfigPath: path.resolve("./tsconfig.build.json")
+    tsconfigPath: path.resolve("./tsconfig.build.json"),
 });
 ```
 
@@ -171,9 +171,9 @@ export default defineDevConfig({
 
 Same as build config, except:
 
-| Option | Default Difference |
-|--------|-------------------|
-| `dts` | `false` (disabled in dev) |
+| Option      | Default Difference                             |
+| ----------- | ---------------------------------------------- |
+| `dts`       | `false` (disabled in dev)                      |
 | `sourceMap` | `{ js: "cheap-module-source-map", css: true }` |
 
 ### Example
@@ -184,7 +184,7 @@ import path from "node:path";
 
 export default defineDevConfig({
     tsconfigPath: path.resolve("./tsconfig.build.json"),
-    react: true
+    react: true,
 });
 ```
 
@@ -206,7 +206,7 @@ import type { StorybookConfig } from "storybook-react-rsbuild";
 const storybookConfig: StorybookConfig = {
     framework: "storybook-react-rsbuild",
     addons: ["storybook-addon-rslib"],
-    stories: ["../../src/**/*.stories.(tsx|mdx)"]
+    stories: ["../../src/**/*.stories.(tsx|mdx)"],
 };
 
 export default storybookConfig;
@@ -214,12 +214,12 @@ export default storybookConfig;
 
 ### Predefined Options
 
-| Option | Type | Default |
-|--------|------|---------|
-| `plugins` | array | `[]` |
-| `sourceMap` | false/object | `{ js: "cheap-module-source-map", css: true }` |
-| `react` | false/function | enabled |
-| `svgr` | false/function | enabled |
+| Option      | Type           | Default                                        |
+| ----------- | -------------- | ---------------------------------------------- |
+| `plugins`   | array          | `[]`                                           |
+| `sourceMap` | false/object   | `{ js: "cheap-module-source-map", css: true }` |
+| `react`     | false/function | enabled                                        |
+| `svgr`      | false/function | enabled                                        |
 
 ## Configuration Transformers
 
@@ -235,7 +235,7 @@ const customTransformer: RslibConfigTransformer = (config: RslibConfig, context)
 };
 
 export default defineBuildConfig({
-    transformers: [customTransformer]
+    transformers: [customTransformer],
 });
 ```
 
@@ -270,12 +270,12 @@ Context: `environment` ("dev" | "build" | "storybook")
 
 ```ts
 // src/env.d.ts
-declare module '*.svg' {
-  export const ReactComponent: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
+declare module "*.svg" {
+    export const ReactComponent: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
 }
-declare module '*.svg?react' {
-  const ReactComponent: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
-  export default ReactComponent;
+declare module "*.svg?react" {
+    const ReactComponent: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
+    export default ReactComponent;
 }
 ```
 
@@ -298,12 +298,12 @@ Note: Reference `@rsbuild/core`, not `@rslib/core`.
 // Bundleless (default)
 export default defineBuildConfig({
     bundle: false, // default
-    tsconfigPath: path.resolve("./tsconfig.build.json")
+    tsconfigPath: path.resolve("./tsconfig.build.json"),
 });
 
 // Bundle
 export default defineBuildConfig({
-    bundle: true
+    bundle: true,
 });
 ```
 

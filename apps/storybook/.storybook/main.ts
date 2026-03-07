@@ -1,22 +1,21 @@
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
+
 import type { StorybookConfig } from "storybook-react-rsbuild";
 
 const require = createRequire(import.meta.url);
 
 const storybookConfig: StorybookConfig = {
     framework: getAbsolutePath("storybook-react-rsbuild"),
-    addons: [
-        getAbsolutePath("@storybook/addon-a11y")
-    ],
+    addons: [getAbsolutePath("@storybook/addon-a11y")],
     stories: [
         // Packages
         "../../packages/squide-core/src/**/*.stories.tsx",
         // Management
         "../management/plants/src/**/*.stories.tsx",
         // Today
-        "../today/landing-page/src/**/*.stories.tsx"
-    ]
+        "../today/landing-page/src/**/*.stories.tsx",
+    ],
 };
 
 export default storybookConfig;

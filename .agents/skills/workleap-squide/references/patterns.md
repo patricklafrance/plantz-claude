@@ -1,6 +1,7 @@
 # Squide Patterns and Best Practices
 
 ## Table of Contents
+
 - [Application Structure](#application-structure)
 - [Module Registration Patterns](#module-registration-patterns)
 - [Navigation Patterns](#navigation-patterns)
@@ -65,16 +66,16 @@ module-name/
 import type { ModuleRegisterFunction, FireflyRuntime } from "@squide/firefly";
 import { Page } from "./Page.tsx";
 
-export const register: ModuleRegisterFunction<FireflyRuntime> = runtime => {
+export const register: ModuleRegisterFunction<FireflyRuntime> = (runtime) => {
     runtime.registerRoute({
         path: "/feature",
-        element: <Page />
+        element: <Page />,
     });
 
     runtime.registerNavigationItem({
         $id: "feature",
         $label: "Feature",
-        to: "/feature"
+        to: "/feature",
     });
 };
 ```
@@ -82,10 +83,10 @@ export const register: ModuleRegisterFunction<FireflyRuntime> = runtime => {
 ### With MSW Handlers
 
 ```tsx
-export const register: ModuleRegisterFunction<FireflyRuntime> = async runtime => {
+export const register: ModuleRegisterFunction<FireflyRuntime> = async (runtime) => {
     runtime.registerRoute({
         path: "/feature",
-        element: <Page />
+        element: <Page />,
     });
 
     // Dynamic import to avoid bundling MSW in production
@@ -106,11 +107,11 @@ export interface RegisterOptions {
 }
 
 export function register(options: RegisterOptions) {
-    const fct: ModuleRegisterFunction<FireflyRuntime> = runtime => {
+    const fct: ModuleRegisterFunction<FireflyRuntime> = (runtime) => {
         if (options.env !== "production") {
             runtime.registerRoute({
                 path: "/debug",
-                element: <DebugPage />
+                element: <DebugPage />,
             });
         }
     };
@@ -125,11 +126,11 @@ interface DeferredData {
     user: { isAdmin: boolean };
 }
 
-export const register: ModuleRegisterFunction<FireflyRuntime, unknown, DeferredData> = runtime => {
+export const register: ModuleRegisterFunction<FireflyRuntime, unknown, DeferredData> = (runtime) => {
     // Always register routes
     runtime.registerRoute({
         path: "/admin",
-        element: <AdminPage />
+        element: <AdminPage />,
     });
 
     // Defer navigation item registration
@@ -138,7 +139,7 @@ export const register: ModuleRegisterFunction<FireflyRuntime, unknown, DeferredD
             deferredRuntime.registerNavigationItem({
                 $id: "admin",
                 $label: "Admin",
-                to: "/admin"
+                to: "/admin",
             });
         }
     };
@@ -164,14 +165,14 @@ runtime.registerNavigationItem({
         {
             $id: "settings-profile",
             $label: "Profile",
-            to: "/settings/profile"
+            to: "/settings/profile",
         },
         {
             $id: "settings-security",
             $label: "Security",
-            to: "/settings/security"
-        }
-    ]
+            to: "/settings/security",
+        },
+    ],
 });
 ```
 
@@ -181,17 +182,20 @@ runtime.registerNavigationItem({
 // Module A registers section
 runtime.registerNavigationItem({
     $id: "admin-section",
-    $label: "Administration"
+    $label: "Administration",
 });
 
 // Module B nests under section
-runtime.registerNavigationItem({
-    $id: "users",
-    $label: "Users",
-    to: "/admin/users"
-}, {
-    sectionId: "admin-section"
-});
+runtime.registerNavigationItem(
+    {
+        $id: "users",
+        $label: "Users",
+        to: "/admin/users",
+    },
+    {
+        sectionId: "admin-section",
+    },
+);
 ```
 
 ### Multiple Menus
@@ -201,13 +205,16 @@ runtime.registerNavigationItem({
 const sidebarItems = useNavigationItems({ menuId: "sidebar" });
 
 // Register to specific menu
-runtime.registerNavigationItem({
-    $id: "help",
-    $label: "Help",
-    to: "/help"
-}, {
-    menuId: "sidebar"
-});
+runtime.registerNavigationItem(
+    {
+        $id: "help",
+        $label: "Help",
+        to: "/help",
+    },
+    {
+        menuId: "sidebar",
+    },
+);
 ```
 
 ### Sorting with Priority
@@ -217,15 +224,15 @@ runtime.registerNavigationItem({
 runtime.registerNavigationItem({
     $id: "home",
     $label: "Home",
-    $priority: 100,  // Will appear first
-    to: "/"
+    $priority: 100, // Will appear first
+    to: "/",
 });
 
 runtime.registerNavigationItem({
     $id: "about",
     $label: "About",
-    $priority: 10,   // Will appear after home
-    to: "/about"
+    $priority: 10, // Will appear after home
+    to: "/about",
 });
 ```
 
@@ -235,13 +242,7 @@ Use React Router's `NavLink` component for automatic active state handling:
 
 ```tsx
 import { NavLink } from "react-router";
-import {
-    useNavigationItems,
-    useRenderedNavigationItems,
-    isNavigationLink,
-    type RenderItemFunction,
-    type RenderSectionFunction
-} from "@squide/firefly";
+import { useNavigationItems, useRenderedNavigationItems, isNavigationLink, type RenderItemFunction, type RenderSectionFunction } from "@squide/firefly";
 
 const renderItem: RenderItemFunction = (item, key, index, level) => {
     if (!isNavigationLink(item)) return null;
@@ -249,28 +250,20 @@ const renderItem: RenderItemFunction = (item, key, index, level) => {
 
     return (
         <li key={key}>
-            <NavLink
-                {...linkProps}
-                {...additionalProps}
-                className={({ isActive }) => isActive ? "nav-active" : "nav-link"}
-            >
+            <NavLink {...linkProps} {...additionalProps} className={({ isActive }) => (isActive ? "nav-active" : "nav-link")}>
                 {label}
             </NavLink>
         </li>
     );
 };
 
-const renderSection: RenderSectionFunction = (elements, key, index, level) => (
-    <ul key={key}>{elements}</ul>
-);
+const renderSection: RenderSectionFunction = (elements, key, index, level) => <ul key={key}>{elements}</ul>;
 
 export function RootLayout() {
     const navigationItems = useNavigationItems();
     const navigationElements = useRenderedNavigationItems(navigationItems, renderItem, renderSection);
 
-    return (
-        <nav>{navigationElements}</nav>
-    );
+    return <nav>{navigationElements}</nav>;
 }
 ```
 
@@ -280,24 +273,20 @@ The `to` option can include dynamic segments (`/users/:userId/profile`). Use a c
 
 ```tsx
 // Register with dynamic segment
-runtime.registerNavigationItem({
-    $id: "user-profile",
-    $label: "Profile",
-    to: "/users/:userId/profile"
-}, { menuId: "user-menu" });
+runtime.registerNavigationItem(
+    {
+        $id: "user-profile",
+        $label: "Profile",
+        to: "/users/:userId/profile",
+    },
+    { menuId: "user-menu" },
+);
 ```
 
 ```tsx
 // Resolve in renderer using a closure to capture userId
 import { useParams, Link } from "react-router";
-import {
-    useNavigationItems,
-    useRenderedNavigationItems,
-    isNavigationLink,
-    resolveRouteSegments,
-    type RenderItemFunction,
-    type RenderSectionFunction
-} from "@squide/firefly";
+import { useNavigationItems, useRenderedNavigationItems, isNavigationLink, resolveRouteSegments, type RenderItemFunction, type RenderSectionFunction } from "@squide/firefly";
 
 // Higher-order function creates a RenderItemFunction with access to userId
 function createRenderItem(userId: string): RenderItemFunction {
@@ -316,9 +305,7 @@ function createRenderItem(userId: string): RenderItemFunction {
     };
 }
 
-const renderSection: RenderSectionFunction = (elements, key, index, level) => (
-    <ul key={key}>{elements}</ul>
-);
+const renderSection: RenderSectionFunction = (elements, key, index, level) => <ul key={key}>{elements}</ul>;
 
 export function UserProfileLayout() {
     const { userId } = useParams();
@@ -381,7 +368,7 @@ function ProductPage() {
     const { productId } = useParams();
     const { data } = useSuspenseQuery({
         queryKey: ["product", productId],
-        queryFn: () => fetchProduct(productId)
+        queryFn: () => fetchProduct(productId),
     });
 
     return <ProductDetails product={data} />;
@@ -424,18 +411,25 @@ function BootstrappingRoute() {
 
 ```tsx
 // 1. Root error boundary - catches everything
-runtime.registerRoute({
-    errorElement: <RootErrorBoundary />,
-    children: [{
-        // 2. Layout preserving boundary
-        element: <RootLayout />,
-        children: [{
-            // 3. Module-level boundary - preserves layout
-            errorElement: <ModuleErrorBoundary />,
-            children: [PublicRoutes, ProtectedRoutes]
-        }]
-    }]
-}, { hoist: true });
+runtime.registerRoute(
+    {
+        errorElement: <RootErrorBoundary />,
+        children: [
+            {
+                // 2. Layout preserving boundary
+                element: <RootLayout />,
+                children: [
+                    {
+                        // 3. Module-level boundary - preserves layout
+                        errorElement: <ModuleErrorBoundary />,
+                        children: [PublicRoutes, ProtectedRoutes],
+                    },
+                ],
+            },
+        ],
+    },
+    { hoist: true },
+);
 ```
 
 ### Error Boundary Implementation
@@ -480,17 +474,16 @@ import { renderHook } from "@testing-library/react";
 
 test("hook uses environment variable", () => {
     const runtime = new FireflyRuntime({
-        plugins: [x => new EnvironmentVariablesPlugin(x, {
-            variables: { apiUrl: "https://test.api" }
-        })]
+        plugins: [
+            (x) =>
+                new EnvironmentVariablesPlugin(x, {
+                    variables: { apiUrl: "https://test.api" },
+                }),
+        ],
     });
 
     const { result } = renderHook(() => useMyHook(), {
-        wrapper: ({ children }) => (
-            <FireflyProvider runtime={runtime}>
-                {children}
-            </FireflyProvider>
-        )
+        wrapper: ({ children }) => <FireflyProvider runtime={runtime}>{children}</FireflyProvider>,
     });
 
     expect(result.current.apiUrl).toBe("https://test.api");
@@ -507,13 +500,13 @@ test("feature is hidden when flag is off", () => {
     const ldClient = new InMemoryLaunchDarklyClient(featureFlags);
 
     const runtime = new FireflyRuntime({
-        plugins: [x => new LaunchDarklyPlugin(x, ldClient)]
+        plugins: [(x) => new LaunchDarklyPlugin(x, ldClient)],
     });
 
     render(
         <FireflyProvider runtime={runtime}>
             <FeatureComponent />
-        </FireflyProvider>
+        </FireflyProvider>,
     );
 
     expect(screen.queryByTestId("feature")).not.toBeInTheDocument();
@@ -574,14 +567,14 @@ if (runtime.isMswEnabled) {
 // WRONG - no $id causes flickering on updates
 runtime.registerNavigationItem({
     $label: "Page",
-    to: "/page"
+    to: "/page",
 });
 
 // CORRECT - stable $id
 runtime.registerNavigationItem({
     $id: "page",
     $label: "Page",
-    to: "/page"
+    to: "/page",
 });
 ```
 
@@ -592,41 +585,50 @@ runtime.registerNavigationItem({
 const [session] = useProtectedDataQueries([sessionQuery]);
 
 // CORRECT - handle 401 for redirect
-const [session] = useProtectedDataQueries(
-    [sessionQuery],
-    error => isApiError(error) && error.status === 401
-);
+const [session] = useProtectedDataQueries([sessionQuery], (error) => isApiError(error) && error.status === 401);
 ```
 
 ### 6. Relative paths in nested routes
 
 ```tsx
 // WRONG - relative path with parentPath
-runtime.registerRoute({
-    path: "page",  // Relative
-    element: <Page />
-}, { parentPath: "/layout" });
+runtime.registerRoute(
+    {
+        path: "page", // Relative
+        element: <Page />,
+    },
+    { parentPath: "/layout" },
+);
 
 // CORRECT - absolute path
-runtime.registerRoute({
-    path: "/layout/page",  // Absolute
-    element: <Page />
-}, { parentPath: "/layout" });
+runtime.registerRoute(
+    {
+        path: "/layout/page", // Absolute
+        element: <Page />,
+    },
+    { parentPath: "/layout" },
+);
 ```
 
 ### 7. Hoisted routes without error boundaries
 
 ```tsx
 // WRONG - hoisted route can break entire app
-runtime.registerRoute({
-    path: "/standalone",
-    element: <StandalonePage />
-}, { hoist: true });
+runtime.registerRoute(
+    {
+        path: "/standalone",
+        element: <StandalonePage />,
+    },
+    { hoist: true },
+);
 
 // CORRECT - includes error boundary
-runtime.registerRoute({
-    path: "/standalone",
-    element: <StandalonePage />,
-    errorElement: <StandaloneErrorBoundary />
-}, { hoist: true });
+runtime.registerRoute(
+    {
+        path: "/standalone",
+        element: <StandalonePage />,
+        errorElement: <StandaloneErrorBoundary />,
+    },
+    { hoist: true },
+);
 ```

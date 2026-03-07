@@ -1,15 +1,14 @@
 {
     "name": "@apps/host",
-    "description": "Squide host application for the plantz application.",
-    "private": true,
     "version": "0.0.0",
+    "private": true,
+    "description": "Squide host application for the plantz application.",
     "type": "module",
     "scripts": {
         "dev": "rsbuild dev --config rsbuild.dev.ts",
         "build": "rsbuild build --config rsbuild.build.ts",
         "serve-build": "pnpm http-server dist -p 8080 -P http://localhost:8080? -c-1",
-        "typecheck": "tsgo",
-        "oxlint": "oxlint"
+        "typecheck": "tsgo"
     },
     "dependencies": {
         "@modules/management-plants": "workspace:*",
@@ -31,7 +30,6 @@
         "@workleap/rsbuild-configs": "3.2.0",
         "@workleap/typescript-configs": "3.0.7",
         "http-server": "14.1.1",
-        "oxlint": "1.51.0",
         "tailwindcss": "4.2.1",
         "typescript": "5.9.3"
     }

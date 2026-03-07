@@ -30,7 +30,6 @@ Never guess about architecture, tooling, or conventions — always load the rele
 - [references/shadcn.md](agent-docs/references/shadcn.md) — Base UI preset, CLI bug explanations, Tailwind v4 source detection
 - [references/ci-cd.md](agent-docs/references/ci-cd.md) — CI, Chromatic, Claude, code-review, and audit-agent-docs GitHub Actions workflows
 - [references/writing-agent-instructions.md](agent-docs/references/writing-agent-instructions.md) — principles for writing instructions agents actually follow
-- [references/agent-skills.md](agent-docs/references/agent-skills.md) — skill directories, project-specific skills, reference modules
 
 ### Decisions
 

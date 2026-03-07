@@ -23,9 +23,8 @@ plantz-claude/
     storybook/                     # Shared Storybook config (@packages/storybook)
   tooling/                         # Build scripts (getAffectedStorybooks.ts)
   agent-docs/                      # Agent documentation (this folder)
-  agent-skills/                    # Project-specific skills (scaffold-domain-module, etc.)
   .agents/skills/                  # Shared agent skills (git-commit, etc.)
-  .claude/skills/                  # Claude Code discovery layer (symlinks)
+  .claude/skills/                  # Claude Code discovery layer — symlinks to .agents/skills/ plus project-specific skills
   .github/workflows/               # CI, Chromatic, Claude, code-review
 ```
 

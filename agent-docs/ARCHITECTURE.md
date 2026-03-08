@@ -16,11 +16,11 @@ plantz-claude/
     today/
       landing-page/                # Today domain — landing page module (@modules/today-landing-page)
       storybook/                   # Today domain Storybook (@apps/today-storybook)
-    storybook/                     # Packages-layer Storybook (@apps/packages-storybook)
+    storybook/                     # Unified Storybook (@apps/storybook)
   packages/
     components/                    # Shared UI components — shadcn/ui + Tailwind v4 (@packages/components)
     squide-core/                   # Shared Squide utilities (@packages/squide-core)
-    storybook/                     # Shared Storybook config (@packages/storybook)
+    storybook/                     # Packages-layer Storybook (@apps/packages-storybook)
   tooling/                         # Build scripts (getAffectedStorybooks.ts)
   agent-docs/                      # Agent documentation (this folder)
   .agents/skills/                  # Shared agent skills (git-commit, etc.)

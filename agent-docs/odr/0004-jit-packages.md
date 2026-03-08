@@ -20,7 +20,7 @@ Use JIT packages (Option 1). Packages under `packages/` expose source via `expor
 
 ## Consequences
 
-- The Turborepo `dev` task has no `^dev` dependency — persistent tasks run in parallel, not sequentially. See `references/build-tooling.md` for the task table.
+- The Turborepo `dev` task has no `^dev` dependency — persistent tasks run in parallel, not sequentially. See [turborepo.md](../references/turborepo.md) for the task conventions.
 - Packages that need a production build (e.g., `@packages/components`) still define `build` scripts using Rslib, but these are only needed for production output, not for local development.
 - Never add `"dependsOn": ["^dev"]` to the `dev` task in `turbo.json` — it will fail because package dev tasks are persistent and cannot be depended on.
 - Package `exports` fields must point to source (`./src/...`), not `dist/`. Pointing to `dist/` would break JIT consumption and require pre-build steps.

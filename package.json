@@ -23,6 +23,7 @@
         "oxlint": "oxlint",
         "oxfmt": "oxfmt --check",
         "syncpack": "syncpack lint",
+        "seed-plants": "tsx scripts/seed-plants.ts",
         "clean": "pnpm -r --parallel --include-workspace-root exec pnpm dlx rimraf dist storybook-static .turbo .rslib node_modules/.cache",
         "reset": "pnpm run --sequential \"/^reset:.*/\"",
         "reset:clean": "pnpm clean",

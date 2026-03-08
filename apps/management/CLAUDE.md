@@ -4,23 +4,21 @@ Federated modules for plant management features.
 
 ## Stories
 
-Every page and component in this domain must have a co-located `.stories.tsx` file (e.g., `PlantsPage.tsx` → `PlantsPage.stories.tsx`). A feature without stories is not complete — visual regression testing via Chromatic only works when stories exist.
+Never write stories without first reading [storybook.md](../../agent-docs/references/storybook.md) — it contains the story conventions that apply to all domains.
 
-### Requirements
+Every page and component must have a co-located `.stories.tsx` file. A feature without stories is not complete.
 
-- Use CSF3 format with types from `storybook-react-rsbuild`.
-- Title convention: `Management/{ModulePascalCase}/Pages/{PageName}` (e.g., `Management/Plants/Pages/PlantsPage`).
-- Reference: `apps/management/plants/src/PlantsPage.stories.tsx`.
+### Domain-Specific
 
-### Verification
-
-Start the domain storybook (`pnpm dev-management-storybook`), open it in a browser, and confirm every new story renders without errors. Never report a task as complete based on `typecheck` alone — type-checking does not catch runtime rendering failures or broken imports that only surface in the browser.
+- Title prefix: `Management/` (e.g., `Management/Plants/Pages/PlantsPage`, `Management/Plants/Components/PlantListItem`).
+- Reference: `apps/management/plants/src/PlantListItem.stories.tsx` (component with full variants), `apps/management/plants/src/PlantsPage.stories.tsx` (page).
+- Storybook dev command: `pnpm dev-management-storybook`.
 
 ## Storybook Wiring
 
 Domain storybook: `@apps/management-storybook` (`apps/management/storybook/`).
 
-Story globs in `.storybook/main.ts` must include every module in this domain. When adding a module, add its glob: `../../{module}/src/**/*.stories.tsx`.
+Story globs in `.storybook/main.ts` must include every module in this domain. When adding a module, add its glob: `../../{module}/src/**/*.stories.tsx` (where `{module}` is the directory name under `apps/management/`, e.g., `plants`).
 
 ## Adding a Module
 

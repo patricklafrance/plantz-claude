@@ -4,23 +4,21 @@ Federated modules for the daily plant care view.
 
 ## Stories
 
-Every page and component in this domain must have a co-located `.stories.tsx` file (e.g., `LandingPage.tsx` → `LandingPage.stories.tsx`). A feature without stories is not complete — visual regression testing via Chromatic only works when stories exist.
+Never write stories without first reading [storybook.md](../../agent-docs/references/storybook.md) — it contains the story conventions that apply to all domains.
 
-### Requirements
+Every page and component must have a co-located `.stories.tsx` file. A feature without stories is not complete.
 
-- Use CSF3 format with types from `storybook-react-rsbuild`.
-- Title convention: `Today/{ModulePascalCase}/Pages/{PageName}` (e.g., `Today/LandingPage/Pages/LandingPage`).
+### Domain-Specific
+
+- Title prefix: `Today/` (e.g., `Today/LandingPage/Pages/LandingPage`).
 - Reference: `apps/today/landing-page/src/LandingPage.stories.tsx`.
-
-### Verification
-
-Start the domain storybook (`pnpm dev-today-storybook`), open it in a browser, and confirm every new story renders without errors. Never report a task as complete based on `typecheck` alone — type-checking does not catch runtime rendering failures or broken imports that only surface in the browser.
+- Storybook dev command: `pnpm dev-today-storybook`.
 
 ## Storybook Wiring
 
 Domain storybook: `@apps/today-storybook` (`apps/today/storybook/`).
 
-Story globs in `.storybook/main.ts` must include every module in this domain. When adding a module, add its glob: `../../{module}/src/**/*.stories.tsx`.
+Story globs in `.storybook/main.ts` must include every module in this domain. When adding a module, add its glob: `../../{module}/src/**/*.stories.tsx` (where `{module}` is the directory name under `apps/today/`, e.g., `landing-page`).
 
 ## Adding a Module
 

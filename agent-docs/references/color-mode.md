@@ -37,10 +37,26 @@ Do not duplicate the list elsewhere — open that file to see what is available.
 
 ## Verification
 
-Before completing a UI task, open the component's stories in the relevant domain
-Storybook, toggle the color mode switcher to light and dark, and confirm no elements
-disappear, lose contrast, or show raw white/black backgrounds. `typecheck` alone does
-not catch color regressions — visual confirmation is required for new or changed UI.
+Never declare a color-mode-related task complete without visual confirmation in **both
+light and dark mode**. `typecheck` alone does not catch color regressions.
+
+**Where to verify:**
+
+- Components with stories — open the relevant domain Storybook and toggle the color
+  mode switcher.
+- Host-level features (layout shell, nav, color mode toggle itself) — start the dev
+  server (`pnpm dev`) and verify in the browser. The host app has no Storybook.
+
+**What to check (both modes):**
+
+- Text contrast against its background — never invisible or near-invisible text.
+- Logo visibility — never a logo that vanishes or becomes unreadable.
+- Border visibility — never borders that disappear into the background.
+- Input fields — never input text or placeholders that blend into the field background.
+- Dialog/sheet backdrops — never a raw white or raw black backdrop.
+- No hardcoded `white`, `black`, `gray-*` classes leaking through.
+
+Never skip any item above. If a single check fails, the task is not done.
 
 ---
 

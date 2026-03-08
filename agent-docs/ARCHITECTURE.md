@@ -76,6 +76,9 @@ For exact versions, read the root `package.json` (`engines`, `packageManager`, `
 | oxlint              | Fast JS/TS linter (zero config)                                          |
 | oxfmt               | Fast code formatter (Prettier-compatible, import sorting, Tailwind sort) |
 | Syncpack            | Dependency version enforcement                                           |
+| TanStack DB         | Client-side data layer with localStorage persistence (`@tanstack/react-db`) |
+| TanStack Virtual    | List virtualization (`@tanstack/react-virtual`)                          |
+| Zod                 | Schema validation                                                        |
 
 ## MODULES env var
 

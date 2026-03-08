@@ -29,7 +29,17 @@ fi
 
 # Lint the file. Use the binary directly to avoid pnpm exec startup overhead.
 # Report only — do not auto-fix. The agent decides how to address issues.
-# Never block — linting is informational, the pre-commit hook is the gate.
-./node_modules/.bin/oxlint "$FILE_PATH" 2>/dev/null || true
+# Exit non-zero on warnings or errors so the agent is forced to fix them immediately.
+OUTPUT=$(./node_modules/.bin/oxlint "$FILE_PATH" 2>/dev/null)
+EXIT_CODE=$?
+
+if echo "$OUTPUT" | grep -qP 'Found \d+ warnings? and \d+ errors?'; then
+    WARNINGS=$(echo "$OUTPUT" | grep -oP 'Found \K\d+(?= warning)')
+    ERRORS=$(echo "$OUTPUT" | grep -oP 'and \K\d+(?= error)')
+    if [[ "${WARNINGS:-0}" -gt 0 || "${ERRORS:-0}" -gt 0 ]]; then
+        echo "$OUTPUT"
+        exit 1
+    fi
+fi
 
 exit 0

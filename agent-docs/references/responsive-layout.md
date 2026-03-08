@@ -11,11 +11,11 @@ If the repo customizes them, the `@theme` block in
 
 Minimum layout tiers:
 
-| Tier    | Tailwind prefix | Behavior                              |
-| ------- | --------------- | ------------------------------------- |
-| Phone   | _(default)_     | Single-column, stacked layout         |
-| Tablet  | `md:`           | Intermediate — adapt where needed     |
-| Desktop | `lg:`           | Multi-column or expanded layout       |
+| Tier    | Tailwind prefix | Behavior                          |
+| ------- | --------------- | --------------------------------- |
+| Phone   | _(default)_     | Single-column, stacked layout     |
+| Tablet  | `md:`           | Intermediate — adapt where needed |
+| Desktop | `lg:`           | Multi-column or expanded layout   |
 
 Design mobile-first: the base (unprefixed) styles target the narrowest viewport,
 then layer on `md:` and `lg:` overrides for wider screens.

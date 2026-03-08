@@ -19,7 +19,7 @@ Never guess about architecture, tooling, or conventions — always load the rele
 - [references/responsive-layout.md](agent-docs/references/responsive-layout.md) — phone/tablet/desktop responsive layout (mobile-first, Tailwind breakpoints)
 - [references/development.md](agent-docs/references/development.md) — pnpm workspace, Node version, script naming conventions, MODULES
 - [references/turborepo.md](agent-docs/references/turborepo.md) — task definitions, dependsOn, caching, conventions
-- [references/syncpack.md](agent-docs/references/syncpack.md) — semver groups, version groups
+- [references/syncpack.md](agent-docs/references/syncpack.md) — dependency version enforcement (config in `.syncpackrc.js`)
 - [references/typescript.md](agent-docs/references/typescript.md) — tsconfig, tsgo
 - [references/tailwind-postcss.md](agent-docs/references/tailwind-postcss.md) — PostCSS transformer, cross-package class scanning
 - [references/shadcn.md](agent-docs/references/shadcn.md) — Base UI preset, CLI bug explanations, Tailwind v4 source detection

@@ -110,6 +110,7 @@ Shell scripts that run automatically before or after agent tool calls, enforcing
 | `protect-files.sh`       | Before Edit/Write | Prevents modification of sensitive files                            |
 | `module-import-guard.sh` | Before Edit/Write | Prevents cross-module imports (`@modules/*` packages stay isolated) |
 | `auto-format.sh`         | After Edit/Write  | Auto-formats with oxfmt                                             |
+| `auto-lint.sh`           | After Edit/Write  | Lints with oxlint — reports issues immediately                      |
 | `pre-commit.sh`          | Before Bash       | Validates commits before they happen                                |
 
 **Files:** [`.claude/hooks/`](.claude/hooks/), [`.claude/settings.json`](.claude/settings.json)

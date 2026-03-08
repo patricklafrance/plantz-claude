@@ -1,10 +1,5 @@
 # Development Reference
 
-## Runtime requirements
-
-- **Node.js** >= 24.0.0 (enforced via `engines` in root `package.json`)
-- **pnpm** 10.30.1 (enforced via `packageManager` in root `package.json`)
-
 ## Workspace topology
 
 Defined in `pnpm-workspace.yaml`:
@@ -29,10 +24,6 @@ Scripts follow a naming convention:
 ## MODULES env var
 
 See [ARCHITECTURE.md](../ARCHITECTURE.md#modules-env-var) for selective module loading via the `MODULES` env var.
-
-## onlyBuiltDependencies
-
-The `pnpm-workspace.yaml` allowlists native packages that require build steps: `@parcel/watcher`, `core-js`, `esbuild`, `netlify-cli`, `protobufjs`, `sharp`, `unix-dgram`.
 
 ---
 

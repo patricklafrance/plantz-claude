@@ -25,22 +25,22 @@ Data is client-side only, persisted in localStorage via TanStack DB.
 
 Define a Zod schema for the persisted plant record. `firstWateringDate` is a form-only field — it is NOT persisted.
 
-| Field             | Type     | Required | Persisted |
-| ----------------- | -------- | -------- | --------- |
-| id                | string   | Yes      | Yes       |
-| name              | string   | Yes      | Yes       |
-| description       | string   | No       | Yes       |
-| family            | string   | No       | Yes       |
-| location          | string   | Yes      | Yes       |
-| luminosity        | string   | Yes      | Yes       |
-| mistLeaves        | boolean  | Yes      | Yes       |
-| soilType          | string   | No       | Yes       |
-| wateringFrequency | string   | Yes      | Yes       |
-| wateringQuantity  | string   | Yes      | Yes       |
-| wateringType      | string   | Yes      | Yes       |
-| nextWateringDate  | Date     | Yes      | Yes       |
-| creationDate      | Date     | Yes      | Yes       |
-| lastUpdateDate    | Date     | Yes      | Yes       |
+| Field             | Type    | Required | Persisted |
+| ----------------- | ------- | -------- | --------- |
+| id                | string  | Yes      | Yes       |
+| name              | string  | Yes      | Yes       |
+| description       | string  | No       | Yes       |
+| family            | string  | No       | Yes       |
+| location          | string  | Yes      | Yes       |
+| luminosity        | string  | Yes      | Yes       |
+| mistLeaves        | boolean | Yes      | Yes       |
+| soilType          | string  | No       | Yes       |
+| wateringFrequency | string  | Yes      | Yes       |
+| wateringQuantity  | string  | Yes      | Yes       |
+| wateringType      | string  | Yes      | Yes       |
+| nextWateringDate  | Date    | Yes      | Yes       |
+| creationDate      | Date    | Yes      | Yes       |
+| lastUpdateDate    | Date    | Yes      | Yes       |
 
 ### TanStack DB setup
 
@@ -63,7 +63,7 @@ export const plantsCollection = createCollection(
         storageKey: "plantz-plants",
         getKey: (item: Plant) => item.id,
         schema: plantSchema,
-    })
+    }),
 );
 ```
 
@@ -91,9 +91,10 @@ plantsCollection.delete(plantId);
 import { useLiveQuery, eq, and } from "@tanstack/react-db";
 
 const { data: plants } = useLiveQuery((q) =>
-    q.from({ plant: plantsCollection })
-     .where(({ plant }) => eq(plant.location, "kitchen"))
-     .orderBy(({ plant }) => plant.name, "asc")
+    q
+        .from({ plant: plantsCollection })
+        .where(({ plant }) => eq(plant.location, "kitchen"))
+        .orderBy(({ plant }) => plant.name, "asc"),
 );
 ```
 
@@ -110,7 +111,7 @@ const { data } = useLiveQuery(
         }
         return query;
     },
-    [location]
+    [location],
 );
 ```
 
@@ -121,7 +122,7 @@ Available filter operators: `eq`, `gt`, `gte`, `lt`, `lte`, `like`, `ilike`, `in
 localStorage serializes Date objects as JSON strings. Define date fields in the Zod schema using a coerce or transform so dates round-trip correctly:
 
 ```typescript
-nextWateringDate: z.coerce.date()
+nextWateringDate: z.coerce.date();
 ```
 
 Without this, `collection.update()` will fail because the draft contains a string but the schema expects a Date.
@@ -231,19 +232,19 @@ The modal also has a "Delete" button (triggers the same delete confirmation as t
 
 Fields displayed:
 
-| Field             | Display text        | UI component                       | Required | Editable |
-| ----------------- | ------------------- | ---------------------------------- | -------- | -------- |
-| name              | Name                | TextInput                          | Yes      | Yes      |
-| description       | Description         | TextArea                           | No       | Yes      |
-| family            | Family              | TextInput                          | No       | Yes      |
-| location          | Location            | Select (Location values)           | Yes      | Yes      |
-| luminosity        | Luminosity          | Select (Luminosity values)         | Yes      | Yes      |
-| mistLeaves        | Mist leaves         | Switch                             | Yes      | Yes      |
-| soilType          | Soil type           | TextInput                          | No       | Yes      |
-| wateringFrequency | Watering frequency  | Select (Watering frequency values) | Yes      | Yes      |
-| wateringQuantity  | Watering quantity   | TextInput                          | Yes      | Yes      |
-| wateringType      | Watering type       | Select (Watering type values)      | Yes      | Yes      |
-| nextWateringDate  | Next watering date  | DatePicker                         | Yes      | No       |
+| Field             | Display text       | UI component                       | Required | Editable |
+| ----------------- | ------------------ | ---------------------------------- | -------- | -------- |
+| name              | Name               | TextInput                          | Yes      | Yes      |
+| description       | Description        | TextArea                           | No       | Yes      |
+| family            | Family             | TextInput                          | No       | Yes      |
+| location          | Location           | Select (Location values)           | Yes      | Yes      |
+| luminosity        | Luminosity         | Select (Luminosity values)         | Yes      | Yes      |
+| mistLeaves        | Mist leaves        | Switch                             | Yes      | Yes      |
+| soilType          | Soil type          | TextInput                          | No       | Yes      |
+| wateringFrequency | Watering frequency | Select (Watering frequency values) | Yes      | Yes      |
+| wateringQuantity  | Watering quantity  | TextInput                          | Yes      | Yes      |
+| wateringType      | Watering type      | Select (Watering type values)      | Yes      | Yes      |
+| nextWateringDate  | Next watering date | DatePicker                         | Yes      | No       |
 
 ### Delete (single)
 

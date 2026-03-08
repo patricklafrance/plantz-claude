@@ -1,50 +1,257 @@
-## Requirements
+# Plant CRUD & List — Feature Prompt
 
-I want to generate the first features of this plants watering application.
+## Pre-work
 
-The features are:
+Before writing any code:
 
-- A CRUD for a plant
-- A list of plants
+1. Read the `CLAUDE.md` index and load `agent-docs/ARCHITECTURE.md` — the plant CRUD lives in `apps/management/plants/`, not a new top-level directory.
+2. Load these agent skills: `frontend-design`, `shadcn`, `workleap-squide`.
+3. Read `packages/components/CLAUDE.md` for the component authoring workflow — every new shadcn component must follow that checklist.
 
-Here's the details for each features...
+## Overview
 
-### A CRUD for a plant
+Implement two features for the plants watering application:
 
-This feature is about adding functionalities to Create, Read, Update and Delete a plant.
+- **Plant CRUD** — Create, Read/Update, and Delete plants via modals opened from the list page.
+- **Plant list** — A virtualized, filterable, sortable list of all plants.
 
-#### Create
+Data is client-side only, persisted in localStorage via TanStack DB.
 
-There should be a button to create a new plant from the page listing the existing plants. When clicked, the button should open a modal allowing a user to create a new plant. Once created, the plant should be added to the list and the modal should be closed. The list should be refreshed.
+---
 
-The fields to create a plant are:
+## Phase 1: Data layer + seed
 
-| Name              | Display text        | Type    | UI component                       | Required | Default value |
-| ----------------- | ------------------- | ------- | ---------------------------------- | -------- | ------------- |
-| description       | Description         | String  | TextArea                           | No       | -             |
-| family            | Family              | String  | TextInput                          | No       | -             |
-| location          | Location            | String  | Select (Location values)           | Yes      | living-room   |
-| luminosity        | Luminosity          | String  | Select (Luminosity values)         | Yes      | medium        |
-| mistLeaves        | Mist leaves         | Boolean | Switch                             | Yes      | True          |
-| soilType          | Soil type           | String  | TextInput                          | No       | -             |
-| wateringFrequency | Watering frequency  | String  | Select (Watering frequency values) | Yes      | 1-week        |
-| wateringQuantity  | Watering quantity   | String  | TextInput                          | Yes      | -             |
-| wateringType      | Watering type       | String  | Select (Watering type values)      | Yes      | surface       |
-| firstWateringDate | First watering date | Date    | DatePicker                         | Yes      | Tomorrow      |
+### Plant record schema
 
-When creating a new plant record, the following fields should always be added to the record:
+Define a Zod schema for the persisted plant record. `firstWateringDate` is a form-only field — it is NOT persisted.
 
-| Name             | Type | Required |
-| ---------------- | ---- | -------- |
-| creationDate     | Date | Yes      |
-| lastUpdateDate   | Date | Yes      |
-| nextWateringDate | Date | Yes      |
+| Field             | Type     | Required | Persisted |
+| ----------------- | -------- | -------- | --------- |
+| id                | string   | Yes      | Yes       |
+| name              | string   | Yes      | Yes       |
+| description       | string   | No       | Yes       |
+| family            | string   | No       | Yes       |
+| location          | string   | Yes      | Yes       |
+| luminosity        | string   | Yes      | Yes       |
+| mistLeaves        | boolean  | Yes      | Yes       |
+| soilType          | string   | No       | Yes       |
+| wateringFrequency | string   | Yes      | Yes       |
+| wateringQuantity  | string   | Yes      | Yes       |
+| wateringType      | string   | Yes      | Yes       |
+| nextWateringDate  | Date     | Yes      | Yes       |
+| creationDate      | Date     | Yes      | Yes       |
+| lastUpdateDate    | Date     | Yes      | Yes       |
 
-"firstWateringDate" should not be persisted to the database, but rather use to compute the initial `nextWateringDate` value.
+### TanStack DB setup
 
-##### Location values
+Use `@tanstack/react-db` for data queries and mutations. This package re-exports everything from `@tanstack/db` — no additional collection packages are needed.
 
-The following location values are possible:
+Install in the plants module:
+
+```
+pnpm add @tanstack/react-db
+```
+
+#### Creating a collection
+
+```typescript
+import { createCollection, localStorageCollectionOptions } from "@tanstack/react-db";
+
+export const plantsCollection = createCollection(
+    localStorageCollectionOptions({
+        id: "plants",
+        storageKey: "plantz-plants",
+        getKey: (item: Plant) => item.id,
+        schema: plantSchema,
+    })
+);
+```
+
+#### CRUD mutations
+
+LocalStorage collections use direct mutations — no server sync handlers needed.
+
+```typescript
+// Insert
+plantsCollection.insert({ id: crypto.randomUUID(), name: "Monstera", ... });
+
+// Update (Immer-style draft)
+plantsCollection.update(plantId, (draft) => {
+    draft.name = "Updated Name";
+    draft.lastUpdateDate = new Date();
+});
+
+// Delete
+plantsCollection.delete(plantId);
+```
+
+#### Querying with useLiveQuery
+
+```typescript
+import { useLiveQuery, eq, and } from "@tanstack/react-db";
+
+const { data: plants } = useLiveQuery((q) =>
+    q.from({ plant: plantsCollection })
+     .where(({ plant }) => eq(plant.location, "kitchen"))
+     .orderBy(({ plant }) => plant.name, "asc")
+);
+```
+
+When filter values come from React state, pass a dependency array so the query re-executes:
+
+```typescript
+const [location, setLocation] = useState<string | null>(null);
+
+const { data } = useLiveQuery(
+    (q) => {
+        let query = q.from({ plant: plantsCollection });
+        if (location) {
+            query = query.where(({ plant }) => eq(plant.location, location));
+        }
+        return query;
+    },
+    [location]
+);
+```
+
+Available filter operators: `eq`, `gt`, `gte`, `lt`, `lte`, `like`, `ilike`, `inArray`, `and`, `or`, `not`, `isNull`, `isUndefined`.
+
+#### Date serialization warning
+
+localStorage serializes Date objects as JSON strings. Define date fields in the Zod schema using a coerce or transform so dates round-trip correctly:
+
+```typescript
+nextWateringDate: z.coerce.date()
+```
+
+Without this, `collection.update()` will fail because the draft contains a string but the schema expects a Date.
+
+### Business rules
+
+- **nextWateringDate computation:** On create, `nextWateringDate = firstWateringDate`. When `wateringFrequency` is updated on an existing plant, do NOT recompute `nextWateringDate` — it stays as-is until a future "mark as watered" feature changes it.
+- **Due for watering:** A plant is due for watering when `nextWateringDate <= today` (comparing date only, ignoring time).
+
+### Seed
+
+Create a seed function at `apps/management/plants/src/seed.ts` that:
+
+- Inserts 200–300 plants using `plantsCollection.insert()`.
+- Uses real plant species names (e.g., Monstera Deliciosa, Fiddle Leaf Fig, Snake Plant, Pothos, etc.) as the `name` field and real family names (e.g., Araceae, Moraceae, Asparagaceae).
+- Distributes plants across all locations, luminosities, watering frequencies, and watering types.
+- Generates `nextWateringDate` values so that ~20% of plants are due for watering today or earlier.
+- Runs automatically on app startup only when the collection is empty.
+- Provide a "Reseed" button somewhere in the UI that clears the collection and re-runs the seed.
+
+### Phase 1 verification
+
+- `pnpm typecheck` passes.
+- Run `pnpm dev-host` with `MODULES=management/plants` — the app loads without console errors.
+- Seed runs on first load; 200+ plants appear in localStorage under the `plantz-plants` key.
+- Data persists across page reloads.
+
+---
+
+## Phase 2: Plant list
+
+### List page
+
+The existing `PlantsPage.tsx` at `apps/management/plants/src/` becomes the list page. It should display all plants in a **virtualized list** using `@tanstack/react-virtual`. Do NOT implement infinite scrolling — all data is local, so virtualization alone handles smooth rendering of 200+ items.
+
+Each list item should display:
+
+- Plant name
+- Watering quantity and watering type
+- Location
+- A visual indicator if the plant is due for watering
+- An "Edit" button (opens the Read/Update modal — Phase 3)
+- A checkbox for bulk selection
+
+### Filtering
+
+Display a horizontal filter bar above the list with these filters:
+
+| Filter            | Display text       | UI component                       |
+| ----------------- | ------------------ | ---------------------------------- |
+| location          | Location           | Select (Location values)           |
+| luminosity        | Luminosity         | Select (Luminosity values)         |
+| mistLeaves        | Mist leaves        | Switch                             |
+| soilType          | Soil type          | TextInput                          |
+| wateringFrequency | Watering frequency | Select (Watering frequency values) |
+| wateringType      | Watering type      | Select (Watering type values)      |
+| dueForWatering    | Due for watering   | Switch                             |
+
+Filters are AND-ed. The `soilType` text filter uses case-insensitive substring match. Include a "Clear filters" action.
+
+### Sorting
+
+Default sort: ascending by `name`, then ascending by `family`, then descending by `lastUpdateDate`.
+
+### Bulk delete
+
+Each list item has a checkbox. When one or more items are checked, show a bulk action bar with a "Delete selected" button. Include a "Select all" checkbox in the list header. Deleting shows a confirmation dialog (use shadcn AlertDialog) listing the names of selected plants. On confirm, delete all selected plants and refresh the list.
+
+### Phase 2 verification
+
+- The list renders 200+ seeded plants.
+- DOM contains fewer than 50 row elements at any time (virtualization is active).
+- Each filter narrows the list correctly; "Clear filters" resets to full list.
+- Bulk select + delete removes plants and they stay gone after page reload.
+
+---
+
+## Phase 3: Create, Read/Update, Delete
+
+### Create
+
+A "New plant" button on the list page opens a modal (use shadcn Dialog) with a form to create a plant.
+
+Form fields:
+
+| Field             | Display text        | UI component                       | Required | Default value |
+| ----------------- | ------------------- | ---------------------------------- | -------- | ------------- |
+| name              | Name                | TextInput                          | Yes      | -             |
+| description       | Description         | TextArea                           | No       | -             |
+| family            | Family              | TextInput                          | No       | -             |
+| location          | Location            | Select (Location values)           | Yes      | living-room   |
+| luminosity        | Luminosity          | Select (Luminosity values)         | Yes      | medium        |
+| mistLeaves        | Mist leaves         | Switch                             | Yes      | true          |
+| soilType          | Soil type           | TextInput                          | No       | -             |
+| wateringFrequency | Watering frequency  | Select (Watering frequency values) | Yes      | 1-week        |
+| wateringQuantity  | Watering quantity   | TextInput                          | Yes      | -             |
+| wateringType      | Watering type       | Select (Watering type values)      | Yes      | surface       |
+| firstWateringDate | First watering date | DatePicker                         | Yes      | Tomorrow      |
+
+On submit: validate all required fields (show inline field errors, keep submit button disabled until valid). Create the plant record with `creationDate = now`, `lastUpdateDate = now`, `nextWateringDate = firstWateringDate`. Close the modal and refresh the list.
+
+### Read / Update
+
+Each list item's "Edit" button opens a modal showing the plant's details. All fields are editable except `nextWateringDate` (read-only). Auto-save each field change with a 500ms debounce. Show a subtle "Saved" indicator on successful save. Update `lastUpdateDate` on every save.
+
+The modal also has a "Delete" button (triggers the same delete confirmation as the list).
+
+Fields displayed:
+
+| Field             | Display text        | UI component                       | Required | Editable |
+| ----------------- | ------------------- | ---------------------------------- | -------- | -------- |
+| name              | Name                | TextInput                          | Yes      | Yes      |
+| description       | Description         | TextArea                           | No       | Yes      |
+| family            | Family              | TextInput                          | No       | Yes      |
+| location          | Location            | Select (Location values)           | Yes      | Yes      |
+| luminosity        | Luminosity          | Select (Luminosity values)         | Yes      | Yes      |
+| mistLeaves        | Mist leaves         | Switch                             | Yes      | Yes      |
+| soilType          | Soil type           | TextInput                          | No       | Yes      |
+| wateringFrequency | Watering frequency  | Select (Watering frequency values) | Yes      | Yes      |
+| wateringQuantity  | Watering quantity   | TextInput                          | Yes      | Yes      |
+| wateringType      | Watering type       | Select (Watering type values)      | Yes      | Yes      |
+| nextWateringDate  | Next watering date  | DatePicker                         | Yes      | No       |
+
+### Delete (single)
+
+Each list item also has a delete button (in addition to the edit button). Clicking it shows a confirmation dialog (shadcn AlertDialog) with the plant's name. On confirm, delete and refresh the list.
+
+### Select option values
+
+#### Location
 
 | Id          | Display text |
 | ----------- | ------------ |
@@ -55,114 +262,72 @@ The following location values are possible:
 | living-room | Living room  |
 | kitchen     | Kitchen      |
 
-##### Luminosity values
-
-The following luminosity values are possible:
+#### Luminosity
 
 | Id     | Display text |
 | ------ | ------------ |
 | low    | Low          |
-| medium | medium       |
-| high   | high         |
+| medium | Medium       |
+| high   | High         |
 
-##### Watering frequency values
-
-The following watering frequency values are possible:
+#### Watering frequency
 
 | Id        | Display text |
 | --------- | ------------ |
 | 0.5-week  | 0.5 week     |
-| 1.5-weeks | 1.5 weeks    |
 | 1-week    | 1 week       |
-| 2.5-weeks | 2.5 weeks    |
+| 1.5-weeks | 1.5 weeks    |
 | 2-weeks   | 2 weeks      |
+| 2.5-weeks | 2.5 weeks    |
 
-##### Watering type values
-
-The following watering type values are possible:
+#### Watering type
 
 | Id      | Display text |
 | ------- | ------------ |
 | deep    | Deep         |
 | surface | Surface      |
 
-#### Read and Update
+### Phase 3 verification
 
-There should be a button to view and edit the information of an existing plant from the page listing the existing plants. Every listed plants should have an inline button allowing the user view or edit the plant. When clicked, the button should open a modal showing the information of the selected plant. The information can be updated as well (except when specified otherwise in the table below). Every inputs should auto-saved when updated. This modal should have buttons to close the modal and delete the plant.
+- Create a plant → it appears in the list and persists across reload.
+- Edit a plant → changes auto-save and persist across reload.
+- Delete a single plant via list button → confirmation dialog → plant removed.
+- Delete a single plant via edit modal → confirmation dialog → plant removed, modal closes.
 
-The following information should be shown:
+---
 
-| Name              | Display text        | Type    | UI component                       | Required | Editable |
-| ----------------- | ------------------- | ------- | ---------------------------------- | -------- | -------- |
-| description       | Description         | String  | TextArea                           | No       | Yes      |
-| family            | Family              | String  | TextInput                          | No       | Yes      |
-| location          | Location            | String  | Select (Location values)           | Yes      | Yes      |
-| luminosity        | Luminosity          | String  | Select (Luminosity values)         | Yes      | Yes      |
-| mistLeaves        | Mist leaves         | Boolean | Switch                             | Yes      | Yes      |
-| soilType          | Soil type           | String  | TextInput                          | No       | Yes      |
-| wateringFrequency | Watering frequency  | String  | Select (Watering frequency values) | Yes      | Yes      |
-| wateringQuantity  | Watering quantity   | String  | TextInput                          | Yes      | Yes      |
-| wateringType      | Watering type       | String  | Select (Watering type values)      | Yes      | Yes      |
-| nextWateringDate  | First watering date | Date    | DatePicker                         | Yes      | No       |
-
-Whenever a plant is updated, the `lastUpdateDate` field must be updated as well.
-
-For the values of the Select UI component, view the previous "Create" section.
-
-#### Delete
-
-There should be a button to delete an existing plant from the page listing the existing plants. Every listed plant should have an inline button allowing the user view to delete the plant. The user should also be able to bulk delete plants from the list. Whever a plant is to be deleted, there should be a confirmation popup first actually deleting the plant. The popup should show the name of the plan to be deleted. If it's a bulk delete operation, there should still be a single popup listing the name of every selected plants. Once completed, the list should be refreshed.
-
-### A list of plants
-
-This page is a list of all the existing plants. The list should use React virtualization to offer a smooth experience and should offer an infinite scrolling experience.
-
-Every item of the list should include:
-
-- The name of the plant
-- The watering quantity of the plant
-- The watering type of the plant
-- The location of the plan
-- If the plant is due for watering, it should be mentionned
-- The "view or edit" button
-- The "delete" button or something for bulk deletes
-
-The should be filterable with the following filters:
-
-| Name              | Display text       | Type    | UI component                       |
-| ----------------- | ------------------ | ------- | ---------------------------------- |
-| location          | Location           | String  | Select (Location values)           |
-| luminosity        | Luminosity         | String  | Select (Luminosity values)         |
-| mistLeaves        | Mist leaves        | Boolean | Switch                             |
-| soilType          | Soil type          | String  | TextInput                          |
-| wateringFrequency | Watering frequency | String  | Select (Watering frequency values) |
-| wateringType      | Watering type      | String  | Select (Watering type values)      |
-| dueForWatering    | Due for watering   | Boolean | Switch                             |
-
-For the values of the Select UI component, view the previous "Create" section.
-
-The plants should be sorted ascending first by `name`, then `family`, and finally descending by `lastUpdateDate`.
-
-## Technical specifications
-
-### Tanstack DB
-
-The data should queryed and mutated using Tanstack DB (https://tanstack.com/db/latest, https://www.npmjs.com/package/@tanstack/db). The data should be persisted in local storage using https://tanstack.com/db/latest/docs/collections/local-storage-collection.
-
-IMPORTANT: Write meaningful agent instructions about the Tanstack DB setup that future agents should be aware of.
-
-### Shared components
-
-Shared components should be added to `./packages/components`, even if they are not related to shadcn.
+## Phase 4: Polish
 
 ### Logo
 
-Create a logo for the app and use it in the layout of the app.
+Create an inline SVG logo (a simple plant/leaf icon with the text "Plantz") and add it to the app layout header.
 
-### Seed
+### Shared components
 
-Create a reusable seed that creates between 200 and 300 plants using real data.
+Any reusable UI components created during this work (e.g., TextArea, Select, Switch, TextInput, AlertDialog, Dialog) should be added to `packages/components/` following the workflow in `packages/components/CLAUDE.md`. Components already there: Button, Calendar, DatePicker, Popover.
 
-## Agent skills
+### Agent documentation
 
-Load the `frontend-design` agent skill to help you design the application.
+Create `agent-docs/references/tanstack-db.md` documenting:
+
+- The package used and its version.
+- Where the collection is defined (file path).
+- The localStorage key (`plantz-plants`).
+- The Zod schema with date coercion pattern.
+- CRUD mutation patterns (insert, update with draft, delete).
+- Query patterns with `useLiveQuery` including dynamic filters with dependency arrays.
+- How the seed function works and how to re-trigger it.
+
+Add an index entry in root `CLAUDE.md` under References:
+
+```
+- [references/tanstack-db.md](agent-docs/references/tanstack-db.md) — TanStack DB collection setup, CRUD patterns, localStorage persistence
+```
+
+### Phase 4 verification
+
+- Logo renders in the layout header.
+- All new components in `packages/components/` have `.stories.tsx` files and are exported from `src/index.ts`.
+- `pnpm typecheck` passes from repo root.
+- `agent-docs/references/tanstack-db.md` exists and is indexed in `CLAUDE.md`.
+- `git status --short` — verify every changed file is intentional and no unrelated files were modified.

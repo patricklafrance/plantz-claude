@@ -13,12 +13,10 @@ Never guess about architecture, tooling, or conventions — always load the rele
 
 - [ARCHITECTURE.md](agent-docs/ARCHITECTURE.md) — repo structure, package naming, Squide topology, tech stack, MODULES env var
 
-### Design
-
-- [design/README.md](agent-docs/design/README.md) — conventions for cross-cutting design docs
-
 ### References
 
+- [references/color-mode.md](agent-docs/references/color-mode.md) — light/dark/system color mode (theme tokens, `dark:` variant, class-based toggle)
+- [references/responsive-layout.md](agent-docs/references/responsive-layout.md) — phone/tablet/desktop responsive layout (mobile-first, Tailwind breakpoints)
 - [references/development.md](agent-docs/references/development.md) — pnpm workspace, Node version, script naming conventions, MODULES
 - [references/turborepo.md](agent-docs/references/turborepo.md) — task definitions, dependsOn, caching, conventions
 - [references/syncpack.md](agent-docs/references/syncpack.md) — semver groups, version groups

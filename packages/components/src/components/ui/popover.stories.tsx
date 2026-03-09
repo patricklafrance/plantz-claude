@@ -1,4 +1,3 @@
-/* oxlint-disable react-perf/jsx-no-jsx-as-prop -- Stories are dev-only; perf optimization is not applicable */
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
 import { Button } from "./button.tsx";

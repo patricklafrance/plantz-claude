@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-# PreToolUse hook: intercept git commit to run lint.
-# Registered in .claude/settings.json with matcher "Bash" (matches all Bash calls).
-# The matcher is a regex on tool_name only — it cannot filter by command content.
-# Filtering for "git commit" is done below via grep on the stdin JSON.
+# PreToolUse/Bash: run lint before git commit.
+# Filters for "git commit" in the stdin JSON; skips all other Bash calls.
 
 INPUT=$(cat)
 

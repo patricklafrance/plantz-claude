@@ -105,14 +105,17 @@ Principles:
 
 Shell scripts that run automatically before or after agent tool calls, enforcing architectural guardrails in real time.
 
-| Hook                     | Trigger           | What it does                                                        |
-| ------------------------ | ----------------- | ------------------------------------------------------------------- |
-| `enforce-pnpm.sh`        | Before Bash       | Blocks npm usage — only pnpm allowed                                |
-| `protect-files.sh`       | Before Edit/Write | Prevents modification of sensitive files                            |
-| `module-import-guard.sh` | Before Edit/Write | Prevents cross-module imports (`@modules/*` packages stay isolated) |
-| `auto-format.sh`         | After Edit/Write  | Auto-formats with oxfmt                                             |
-| `auto-lint.sh`           | After Edit/Write  | Lints with oxlint — reports issues immediately                      |
-| `pre-commit.sh`          | Before Bash       | Validates commits before they happen                                |
+Hook names follow the `{event}--{what}.sh` convention so it's clear at a glance when a hook fires and what it does.
+
+| Hook                                           | Trigger           | What it does                                                        |
+| ---------------------------------------------- | ----------------- | ------------------------------------------------------------------- |
+| `pre-bash--enforce-pnpm.sh`                    | Before Bash       | Blocks npm/npx — only pnpm allowed                                  |
+| `pre-bash--lint-on-commit.sh`                  | Before Bash       | Runs oxlint on staged files before git commit                       |
+| `pre-bash--no-file-level-disable-on-commit.sh` | Before Bash       | Rejects file-level `/* oxlint-disable */` comments on commit        |
+| `pre-edit--protect-files.sh`                   | Before Edit/Write | Prevents modification of sensitive files                            |
+| `pre-edit--module-import-guard.sh`             | Before Edit/Write | Prevents cross-module imports (`@modules/*` packages stay isolated) |
+| `post-edit--format.sh`                         | After Edit/Write  | Formats with oxfmt                                                  |
+| `post-edit--lint.sh`                           | After Edit/Write  | Lints with oxlint — reports issues immediately                      |
 
 **Files:** [`.claude/hooks/`](.claude/hooks/), [`.claude/settings.json`](.claude/settings.json)
 
@@ -170,7 +173,7 @@ pnpm seed-plants      # Generates apps/host/public/seed-plants.json
 Then start the dev server, open DevTools in the browser, and run:
 
 ```js
-const data = await fetch("/seed-plants.json").then(r => r.text());
+const data = await fetch("/seed-plants.json").then((r) => r.text());
 localStorage.setItem("plantz-plants", data);
 location.reload();
 ```

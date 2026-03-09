@@ -1,9 +1,10 @@
-import { useCallback } from "react";
+import { memo, useCallback } from "react";
 
 import { Button, Checkbox } from "@packages/components";
 import { Droplets, Pencil, Trash2 } from "lucide-react";
 import type { Plant } from "./plantSchema.ts";
 import { locations, wateringTypes } from "./constants.ts";
+import { isDueForWatering } from "./plantUtils.ts";
 
 interface PlantListItemProps {
     plant: Plant;
@@ -13,19 +14,11 @@ interface PlantListItemProps {
     onDelete: (plant: Plant) => void;
 }
 
-function isDueForWatering(plant: Plant): boolean {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const next = new Date(plant.nextWateringDate);
-    next.setHours(0, 0, 0, 0);
-    return next <= today;
-}
-
 function getLabel(options: readonly { id: string; label: string }[], id: string): string {
     return options.find(o => o.id === id)?.label ?? id;
 }
 
-export function PlantListItem({ plant, selected, onToggleSelect, onEdit, onDelete }: PlantListItemProps) {
+export const PlantListItem = memo(function PlantListItem({ plant, selected, onToggleSelect, onEdit, onDelete }: PlantListItemProps) {
     const due = isDueForWatering(plant);
 
     const handleToggleSelect = useCallback(() => onToggleSelect(plant.id), [onToggleSelect, plant.id]);
@@ -65,4 +58,4 @@ export function PlantListItem({ plant, selected, onToggleSelect, onEdit, onDelet
             </div>
         </div>
     );
-}
+});

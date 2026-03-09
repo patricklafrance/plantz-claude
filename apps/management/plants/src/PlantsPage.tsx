@@ -12,15 +12,8 @@ import { FilterBar } from "./FilterBar.tsx";
 import { PlantListItem } from "./PlantListItem.tsx";
 import type { Plant } from "./plantSchema.ts";
 import { plantsCollection } from "./plantsCollection.ts";
+import { isDueForWatering } from "./plantUtils.ts";
 import { usePlantFilters } from "./usePlantFilters.ts";
-
-function isDueForWatering(plant: Plant): boolean {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const next = new Date(plant.nextWateringDate);
-    next.setHours(0, 0, 0, 0);
-    return next <= today;
-}
 
 const scrollContainerStyle = { height: "calc(100vh - 340px)" };
 
@@ -147,7 +140,7 @@ export function PlantsPage() {
 
     const selectedCount = plants.filter((p) => selectedIds.has(p.id)).length;
 
-    const deleteTargetNames = useMemo(() => deleteTarget?.map((p) => p.name) ?? [], [deleteTarget]);
+    const deleteTargetNames = deleteTarget?.map((p) => p.name) ?? [];
 
     const totalSize = virtualizer.getTotalSize();
     const virtualizerContainerStyle = useMemo(() => ({

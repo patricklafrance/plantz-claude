@@ -1,4 +1,3 @@
-/* oxlint-disable react-perf/jsx-no-jsx-as-prop -- Stories are dev-only; perf optimization is not applicable */
 import { TriangleAlertIcon } from "lucide-react";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 

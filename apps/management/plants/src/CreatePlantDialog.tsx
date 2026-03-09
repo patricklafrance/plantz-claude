@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button, Input, Textarea, Label, Switch, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, DatePicker } from "@packages/components";
-import { useState, useCallback, type ChangeEvent, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 
 import { locations, luminosities, wateringFrequencies, wateringTypes } from "./constants.ts";
 import { plantsCollection } from "./plantsCollection.ts";
@@ -45,7 +45,7 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
         setFirstWateringDate(tomorrow());
     }
 
-    const handleSubmit = useCallback((e: FormEvent) => {
+    function handleSubmit(e: FormEvent) {
         e.preventDefault();
         if (!isValid) return;
 
@@ -69,24 +69,14 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
 
         resetForm();
         onOpenChange(false);
-    }, [isValid, name, description, family, location, luminosity, mistLeaves, soilType, wateringFrequency, wateringQuantity, wateringType, firstWateringDate, onOpenChange]);
+    }
 
-    const handleOpenChange = useCallback((nextOpen: boolean) => {
+    function handleOpenChange(nextOpen: boolean) {
         if (!nextOpen) {
             resetForm();
         }
         onOpenChange(nextOpen);
-    }, [onOpenChange]);
-
-    const handleNameChange = useCallback((e: ChangeEvent<HTMLInputElement>) => setName(e.target.value), []);
-    const handleDescriptionChange = useCallback((e: ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value), []);
-    const handleFamilyChange = useCallback((e: ChangeEvent<HTMLInputElement>) => setFamily(e.target.value), []);
-    const handleLocationChange = useCallback((v: string | null) => { if (v) setLocation(v); }, []);
-    const handleLuminosityChange = useCallback((v: string | null) => { if (v) setLuminosity(v); }, []);
-    const handleSoilTypeChange = useCallback((e: ChangeEvent<HTMLInputElement>) => setSoilType(e.target.value), []);
-    const handleWateringFrequencyChange = useCallback((v: string | null) => { if (v) setWateringFrequency(v); }, []);
-    const handleWateringTypeChange = useCallback((v: string | null) => { if (v) setWateringType(v); }, []);
-    const handleWateringQuantityChange = useCallback((e: ChangeEvent<HTMLInputElement>) => setWateringQuantity(e.target.value), []);
+    }
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -97,21 +87,21 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="create-name">Name *</Label>
-                        <Input id="create-name" value={name} onChange={handleNameChange} placeholder="Plant name" aria-required="true" aria-invalid={name.trim() === "" && name !== ""} aria-describedby={name.trim() === "" && name !== "" ? "create-name-error" : undefined} />
+                        <Input id="create-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Plant name" aria-required="true" aria-invalid={name.trim() === "" && name !== ""} aria-describedby={name.trim() === "" && name !== "" ? "create-name-error" : undefined} />
                         {name.trim() === "" && name !== "" && <p id="create-name-error" role="alert" className="text-xs text-destructive">Name is required.</p>}
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="create-description">Description</Label>
-                        <Textarea id="create-description" value={description} onChange={handleDescriptionChange} placeholder="Optional description" />
+                        <Textarea id="create-description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Optional description" />
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="create-family">Family</Label>
-                        <Input id="create-family" value={family} onChange={handleFamilyChange} placeholder="Plant family" />
+                        <Input id="create-family" value={family} onChange={(e) => setFamily(e.target.value)} placeholder="Plant family" />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
                             <Label>Location *</Label>
-                            <Select value={location} onValueChange={handleLocationChange}>
+                            <Select value={location} onValueChange={(v) => { if (v) setLocation(v); }}>
                                 <SelectTrigger className="w-full" aria-label="Location">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -128,7 +118,7 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <Label>Luminosity *</Label>
-                            <Select value={luminosity} onValueChange={handleLuminosityChange}>
+                            <Select value={luminosity} onValueChange={(v) => { if (v) setLuminosity(v); }}>
                                 <SelectTrigger className="w-full" aria-label="Luminosity">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -150,12 +140,12 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="create-soil">Soil type</Label>
-                        <Input id="create-soil" value={soilType} onChange={handleSoilTypeChange} placeholder="Soil type" />
+                        <Input id="create-soil" value={soilType} onChange={(e) => setSoilType(e.target.value)} placeholder="Soil type" />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
                             <Label>Watering frequency *</Label>
-                            <Select value={wateringFrequency} onValueChange={handleWateringFrequencyChange}>
+                            <Select value={wateringFrequency} onValueChange={(v) => { if (v) setWateringFrequency(v); }}>
                                 <SelectTrigger className="w-full" aria-label="Watering frequency">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -172,7 +162,7 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <Label>Watering type *</Label>
-                            <Select value={wateringType} onValueChange={handleWateringTypeChange}>
+                            <Select value={wateringType} onValueChange={(v) => { if (v) setWateringType(v); }}>
                                 <SelectTrigger className="w-full" aria-label="Watering type">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -190,7 +180,7 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="create-quantity">Watering quantity *</Label>
-                        <Input id="create-quantity" value={wateringQuantity} onChange={handleWateringQuantityChange} placeholder="e.g. 200ml" aria-required="true" aria-invalid={wateringQuantity.trim() === "" && wateringQuantity !== ""} aria-describedby={wateringQuantity.trim() === "" && wateringQuantity !== "" ? "create-quantity-error" : undefined} />
+                        <Input id="create-quantity" value={wateringQuantity} onChange={(e) => setWateringQuantity(e.target.value)} placeholder="e.g. 200ml" aria-required="true" aria-invalid={wateringQuantity.trim() === "" && wateringQuantity !== ""} aria-describedby={wateringQuantity.trim() === "" && wateringQuantity !== "" ? "create-quantity-error" : undefined} />
                         {wateringQuantity.trim() === "" && wateringQuantity !== "" && <p id="create-quantity-error" role="alert" className="text-xs text-destructive">Watering quantity is required.</p>}
                     </div>
                     <div className="flex flex-col gap-1.5">

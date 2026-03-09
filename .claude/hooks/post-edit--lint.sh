@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-# PostToolUse hook: lint files after Edit/Write.
-# Registered in .claude/settings.json with matcher "Edit|Write".
-# Runs oxlint on the written file so lint issues surface immediately
-# without waiting for the pre-commit lint pass.
+# PostToolUse/Edit|Write: lint files after edits.
+# Runs oxlint so lint issues surface immediately without waiting for commit.
 
 INPUT=$(cat)
 

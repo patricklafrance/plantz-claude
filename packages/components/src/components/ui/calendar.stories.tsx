@@ -1,4 +1,3 @@
-/* oxlint-disable react-perf/jsx-no-new-function-as-prop, react-perf/jsx-no-new-object-as-prop -- Stories are dev-only; perf optimization is not applicable */
 import * as React from "react";
 import type { DateRange } from "react-day-picker";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";

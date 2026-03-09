@@ -1,4 +1,3 @@
-/* oxlint-disable eslint/no-console -- CLI script; console output is intentional */
 /**
  * Standalone seed script for the plants collection.
  *
@@ -170,4 +169,5 @@ const plantCount = Object.keys(plants).length;
 
 writeFileSync(seedJsonPublic, json, "utf-8");
 
+// oxlint-disable-next-line eslint/no-console -- CLI script; console output is intentional
 console.log(`✔ Generated ${plantCount} plants → apps/host/public/seed-plants.json`);

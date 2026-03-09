@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-# PreToolUse hook: block Edit/Write to sensitive or generated files.
-# Registered in .claude/settings.json with matcher "Edit|Write".
-# Prevents accidental writes to lockfiles, env files, and directories
-# that should only be modified by tooling (pnpm install, git, etc.).
+# PreToolUse/Edit|Write: block edits to sensitive or generated files.
+# Prevents writes to lockfiles, env files, and directories managed by tooling.
 
 INPUT=$(cat)
 FILE_PATH=$(echo "$INPUT" | grep -oP '"file_path"\s*:\s*"\K[^"]+' | head -1)

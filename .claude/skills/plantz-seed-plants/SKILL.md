@@ -1,11 +1,11 @@
 ---
 name: plantz-seed-plants
 description: |
-    [Plantz] Generate and inject seed data for the plants collection.
+    Generate and inject seed data for the plants collection.
     Wipes existing plant data in localStorage and replaces it with fresh seed data.
     Requires the dev server and Chrome DevTools MCP browser to be available.
     Triggers: /seed-plants, "seed plants", "reseed plants", "reset plant data"
-user_invocable: true
+disable-model-invocation: true
 license: MIT
 ---
 
@@ -61,7 +61,7 @@ async () => {
     localStorage.removeItem("plantz-plants");
     localStorage.setItem("plantz-plants", data);
     return { ok: true, size: data.length };
-}
+};
 ```
 
 Verify the result contains `ok: true`.

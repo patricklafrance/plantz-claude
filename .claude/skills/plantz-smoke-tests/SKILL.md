@@ -1,13 +1,13 @@
 ---
-name: plantz-verify-apps
+name: plantz-smoke-tests
 description: |
-    [Plantz] Smoke-test every application by starting dev servers and verifying pages load.
+    Smoke-test every application by starting dev servers and verifying pages load.
     Use when asked to "verify apps", "test all apps", "smoke test", "check dev servers".
-    Triggers: /plantz-verify-apps, "verify apps", "test all apps", "smoke test"
+    Triggers: /plantz-smoke-tests, "smoke test", "verify apps", "test all apps"
 license: MIT
 ---
 
-# Verify Apps
+# Smoke Tests
 
 Smoke-test every application in the repository by starting each dev server and verifying the page loads without errors.
 
@@ -19,7 +19,7 @@ Smoke-test every application in the repository by starting each dev server and v
 
 ## Procedure
 
-Before testing any app, delete `tmp/verify-apps/` if it exists — this clears stale artifacts from prior failed runs. Then recreate the directory.
+Before testing any app, delete `tmp/smoke-tests/` if it exists — this clears stale artifacts from prior failed runs. Then recreate the directory.
 
 For each app in the list, run these steps sequentially:
 
@@ -36,7 +36,7 @@ Watch stdout for the local URL (typically `http://localhost:<port>`). Wait for t
 1. Navigate to the local URL.
 2. Take a page snapshot and confirm meaningful content loaded (not a blank page or error screen).
 3. Check the browser console for errors. Warnings are acceptable — errors are not.
-4. Take a screenshot and save it to `tmp/verify-apps/{app-name}.png`.
+4. Take a screenshot and save it to `tmp/smoke-tests/{app-name}.png`.
 
 ### Step 4 — Stop the dev server and kill orphan processes
 

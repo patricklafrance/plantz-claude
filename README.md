@@ -78,7 +78,7 @@ Skills are reusable procedures that agents load when a task matches. They contai
 | `plantz-seed-plants`               | Generates seed data and injects it into localStorage via Chrome DevTools MCP                       |
 | `plantz-audit-agent-docs`          | 3-pass audit of all docs against the live codebase (structural, accuracy, instruction quality)     |
 | `plantz-validate-modules`          | Validates every module conforms to the expected structure (9 checks)                               |
-| `plantz-verify-apps`               | Smoke-tests every app by starting dev servers and verifying pages load in a browser                |
+| `plantz-smoke-tests`               | Smoke-tests every app by starting dev servers and verifying pages load in a browser                |
 
 Skills use a **reference module pattern** — instead of hardcoding dependency versions or configs, they read a canonical reference module (e.g., `apps/management/plants/`) at execution time and clone from it. When tooling changes, only the reference module needs updating.
 

@@ -28,9 +28,9 @@
         "reset": "pnpm run --sequential \"/^reset:.*/\"",
         "reset:clean": "pnpm clean",
         "reset:delete-node-modules": "pnpm -r --parallel --include-workspace-root exec pnpm dlx rimraf node_modules pnpm-lock.yaml",
-        "list-outdated-deps": "pnpm outdated -r --format list",
+        "list-outdated-deps": "pnpm outdated -r --format list !storybook-react-rsbuild",
         "update-outdated-deps": "pnpm run --sequential \"/^update-outdated-deps:.*/\"",
-        "update-outdated-deps:update-versions": "pnpm update -r --latest",
+        "update-outdated-deps:update-versions": "pnpm update -r --latest !storybook-react-rsbuild",
         "update-outdated-deps:update-peers": "syncpack fix"
     },
     "devDependencies": {

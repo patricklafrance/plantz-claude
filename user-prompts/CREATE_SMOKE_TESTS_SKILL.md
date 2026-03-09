@@ -1,4 +1,4 @@
-Create a Claude Code project command at .claude/commands/verify-apps.md that smoke-tests every application in the repository.  
+Create a Claude Code project command at .claude/commands/smoke-tests.md that smoke-tests every application in the repository.
  The command should:
 
 1. Read root package.json to discover all dev-\* scripts that start an application (host and all storybooks — not individual modules like dev-management-plants).
@@ -11,5 +11,5 @@ Create a Claude Code project command at .claude/commands/verify-apps.md that smo
 
 3. After all apps are tested, output a summary table: app name, status (pass/fail), and any errors found.
 
-Use the existing command at .github/prompts/audit-agent-docs.md as a formatting reference — the command should be a self-contained prompt file that tells the agent exactly what to do, step by  
+Use the existing command at .github/prompts/audit-agent-docs.md as a formatting reference — the command should be a self-contained prompt file that tells the agent exactly what to do, step by
  step. The command must not hardcode app names or ports — it should discover them dynamically so it stays current as apps are added or removed.

@@ -1,7 +1,7 @@
 ---
 name: plantz-validate-modules
 description: |
-    [Plantz] Validate that all Squide federated modules conform to the expected structure.
+    Validate that all Squide local modules conform to the expected structure.
     Use when asked to "validate modules", "check module structure", "verify modules",
     or after scaffolding a new module.
     Triggers: /plantz-validate-modules, "validate modules", "check modules", "verify module structure"

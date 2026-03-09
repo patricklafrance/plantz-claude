@@ -1,11 +1,10 @@
 ---
 name: plantz-scaffold-domain-storybook
 description: |
-    [Plantz] Scaffold a domain-scoped Storybook with Chromatic CI integration.
+    Scaffold a domain-scoped Storybook with Chromatic CI integration.
     Use when asked to "add a storybook", "create a domain storybook", "scaffold storybook for {domain}".
     Triggers: /plantz-scaffold-domain-storybook, "add storybook", "new domain storybook"
 license: MIT
-disable-model-invocation: true
 ---
 
 # Add Domain Storybook

@@ -1,7 +1,7 @@
 ---
 name: plantz-audit-agent-docs
 description: |
-    [Plantz] Audit agent-docs/ for accuracy, completeness, and instruction quality.
+    Audit agent-docs/ for accuracy, completeness, and instruction quality.
     Use when asked to "audit docs", "review agent-docs", "check documentation",
     or after significant architectural or tooling changes.
     Triggers: /plantz-audit-agent-docs, "audit docs", "review documentation quality"

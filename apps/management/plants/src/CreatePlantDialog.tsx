@@ -100,9 +100,9 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
-                            <Label>Location *</Label>
+                            <Label htmlFor="create-location">Location *</Label>
                             <Select value={location} onValueChange={(v) => { if (v) setLocation(v); }}>
-                                <SelectTrigger className="w-full" aria-label="Location">
+                                <SelectTrigger id="create-location" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -117,9 +117,9 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                             </Select>
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <Label>Luminosity *</Label>
+                            <Label htmlFor="create-luminosity">Luminosity *</Label>
                             <Select value={luminosity} onValueChange={(v) => { if (v) setLuminosity(v); }}>
-                                <SelectTrigger className="w-full" aria-label="Luminosity">
+                                <SelectTrigger id="create-luminosity" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -144,9 +144,9 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
-                            <Label>Watering frequency *</Label>
+                            <Label htmlFor="create-watering-frequency">Watering frequency *</Label>
                             <Select value={wateringFrequency} onValueChange={(v) => { if (v) setWateringFrequency(v); }}>
-                                <SelectTrigger className="w-full" aria-label="Watering frequency">
+                                <SelectTrigger id="create-watering-frequency" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -161,9 +161,9 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                             </Select>
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <Label>Watering type *</Label>
+                            <Label htmlFor="create-watering-type">Watering type *</Label>
                             <Select value={wateringType} onValueChange={(v) => { if (v) setWateringType(v); }}>
-                                <SelectTrigger className="w-full" aria-label="Watering type">
+                                <SelectTrigger id="create-watering-type" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>

@@ -43,7 +43,7 @@ export function PlantsPage() {
             result = result.filter((p) => p.luminosity === filters.luminosity);
         }
         if (filters.mistLeaves !== null) {
-            result = result.filter((p) => p.mistLeaves === true);
+            result = result.filter((p) => p.mistLeaves === filters.mistLeaves);
         }
         if (filters.wateringFrequency) {
             result = result.filter((p) => p.wateringFrequency === filters.wateringFrequency);

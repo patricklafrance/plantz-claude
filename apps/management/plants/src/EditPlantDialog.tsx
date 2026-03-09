@@ -47,6 +47,7 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
 
     const saveChanges = useCallback(() => {
         if (!plantIdRef.current) return;
+        if (!name.trim() || !wateringQuantity.trim()) return;
         const id = plantIdRef.current;
         plantsCollection.update(id, (draft) => {
             draft.name = name.trim();
@@ -109,9 +110,9 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
-                            <Label>Location *</Label>
+                            <Label htmlFor="edit-location">Location *</Label>
                             <Select value={location} onValueChange={(v) => { if (v) setLocation(v); }}>
-                                <SelectTrigger className="w-full" aria-label="Location">
+                                <SelectTrigger id="edit-location" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -126,9 +127,9 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
                             </Select>
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <Label>Luminosity *</Label>
+                            <Label htmlFor="edit-luminosity">Luminosity *</Label>
                             <Select value={luminosity} onValueChange={(v) => { if (v) setLuminosity(v); }}>
-                                <SelectTrigger className="w-full" aria-label="Luminosity">
+                                <SelectTrigger id="edit-luminosity" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -153,9 +154,9 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
-                            <Label>Watering frequency *</Label>
+                            <Label htmlFor="edit-watering-frequency">Watering frequency *</Label>
                             <Select value={wateringFrequency} onValueChange={(v) => { if (v) setWateringFrequency(v); }}>
-                                <SelectTrigger className="w-full" aria-label="Watering frequency">
+                                <SelectTrigger id="edit-watering-frequency" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -170,9 +171,9 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
                             </Select>
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <Label>Watering type *</Label>
+                            <Label htmlFor="edit-watering-type">Watering type *</Label>
                             <Select value={wateringType} onValueChange={(v) => { if (v) setWateringType(v); }}>
-                                <SelectTrigger className="w-full" aria-label="Watering type">
+                                <SelectTrigger id="edit-watering-type" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>

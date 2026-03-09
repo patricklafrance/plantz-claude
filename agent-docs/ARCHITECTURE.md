@@ -60,21 +60,25 @@ See [ADR-0002](adr/0002-domain-scoped-storybooks.md) for rationale.
 
 ## Technology stack
 
-| Tool                | Version                                        | Purpose                                                                  |
-| ------------------- | ---------------------------------------------- | ------------------------------------------------------------------------ |
-| Node.js             | >= 24.0.0                                      | Runtime                                                                  |
-| pnpm                | 10.30.1                                        | Package manager                                                          |
-| TypeScript          | 7.0.0-dev (tsgo, `@typescript/native-preview`) | Type checking                                                            |
-| Squide              | —                                              | Federated module shell                                                   |
-| Storybook           | —                                              | Component development                                                    |
-| Chromatic           | —                                              | Visual regression testing                                                |
-| Tailwind CSS        | 4.x                                            | Utility-first CSS framework (via `@tailwindcss/postcss`)                 |
-| shadcn/ui (Base UI) | —                                              | UI component library, base-nova preset (lives in `@packages/components`) |
-| Turborepo           | 2.8.12                                         | Task orchestration and caching                                           |
-| oxlint              | 1.51.0                                         | Fast JS/TS linter (zero config)                                          |
-| oxfmt               | 0.36.0                                         | Fast code formatter (Prettier-compatible, import sorting, Tailwind sort) |
-| Vitest              | —                                              | Unit testing                                                             |
-| Syncpack            | 14.0.0                                         | Dependency version enforcement                                           |
+For exact versions, read the root `package.json` (`engines`, `packageManager`, `devDependencies`).
+
+| Tool                | Purpose                                                                  |
+| ------------------- | ------------------------------------------------------------------------ |
+| Node.js             | Runtime                                                                  |
+| pnpm                | Package manager                                                          |
+| TypeScript          | Type checking (`@typescript/native-preview` — tsgo)                      |
+| Squide              | Federated module shell                                                   |
+| Storybook           | Component development                                                    |
+| Chromatic           | Visual regression testing                                                |
+| Tailwind CSS        | Utility-first CSS framework (via `@tailwindcss/postcss`)                 |
+| shadcn/ui (Base UI) | UI component library, base-nova preset (lives in `@packages/components`) |
+| Turborepo           | Task orchestration and caching                                           |
+| oxlint              | Fast JS/TS linter (zero config)                                          |
+| oxfmt               | Fast code formatter (Prettier-compatible, import sorting, Tailwind sort) |
+| Syncpack            | Dependency version enforcement                                           |
+| TanStack DB         | Client-side data layer with localStorage persistence (`@tanstack/react-db`) |
+| TanStack Virtual    | List virtualization (`@tanstack/react-virtual`)                          |
+| Zod                 | Schema validation                                                        |
 
 ## MODULES env var
 

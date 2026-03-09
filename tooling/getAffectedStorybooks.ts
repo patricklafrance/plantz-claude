@@ -48,6 +48,7 @@ try {
     affectedPackages = parsedResult.packages?.items.map((x: TurborepoAffectedItem) => x.name) || [];
 
     if (affectedPackages.length > 0) {
+        // oxlint-disable-next-line eslint/no-console -- CI script; console output is intentional
         console.info(`[getAffectedStorybooks] Found ${affectedPackages.length} affected packages:`, affectedPackages);
 
         // Find the affected Storybook applications based on the affected packages.
@@ -77,17 +78,22 @@ try {
         );
 
         if (packageNames.length > 0) {
+            // oxlint-disable-next-line eslint/no-console -- CI script; console output is intentional
             console.info(`[getAffectedStorybooks] Found ${packageNames.length} affected Storybook applications:`, packageNames);
         } else {
+            // oxlint-disable-next-line eslint/no-console -- CI script; console output is intentional
             console.info("[getAffectedStorybooks] Found no affected Storybook application.");
         }
     } else {
+        // oxlint-disable-next-line eslint/no-console -- CI script; console output is intentional
         console.info("[getAffectedStorybooks] Found no affected package.");
 
         affectedStorybooks = createAffectedStorybooksRecordFromBooleanValue(false);
     }
 } catch (error: unknown) {
+    // oxlint-disable-next-line eslint/no-console -- CI script; console output is intentional
     console.error("[getAffectedStorybooks] An error occured while retrieving the affected packages from Turborepo:", error);
+    // oxlint-disable-next-line eslint/no-console -- CI script; console output is intentional
     console.info("[getAffectedStorybooks] Returning all Storybook applications as affected.");
 
     affectedStorybooks = createAffectedStorybooksRecordFromBooleanValue(true);

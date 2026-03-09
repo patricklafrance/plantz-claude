@@ -1,10 +1,5 @@
 # Development Reference
 
-## Runtime requirements
-
-- **Node.js** >= 24.0.0 (enforced via `engines` in root `package.json`)
-- **pnpm** 10.30.1 (enforced via `packageManager` in root `package.json`)
-
 ## Workspace topology
 
 Defined in `pnpm-workspace.yaml`:
@@ -30,9 +25,20 @@ Scripts follow a naming convention:
 
 See [ARCHITECTURE.md](../ARCHITECTURE.md#modules-env-var) for selective module loading via the `MODULES` env var.
 
-## onlyBuiltDependencies
+## Stopping dev servers (Windows)
 
-The `pnpm-workspace.yaml` allowlists native packages that require build steps: `@parcel/watcher`, `core-js`, `esbuild`, `netlify-cli`, `protobufjs`, `sharp`, `unix-dgram`.
+This project runs on Windows. Unix commands like `pkill` or `lsof` do not exist. To stop a dev server:
+
+```bash
+# 1. Find the process listening on the port (e.g. 8080)
+netstat -ano | grep :8080 | grep LISTENING
+# Output: TCP  [::1]:8080  [::]:0  LISTENING  <PID>
+
+# 2. Kill the process tree
+taskkill //PID <PID> //T //F
+```
+
+Common dev server ports: host app = 8080, storybooks = 6006.
 
 ---
 

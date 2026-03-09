@@ -7,11 +7,15 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash .claude/hooks/pre-commit.sh"
+                        "command": "bash .claude/hooks/pre-bash--lint-on-commit.sh"
                     },
                     {
                         "type": "command",
-                        "command": "bash .claude/hooks/enforce-pnpm.sh"
+                        "command": "bash .claude/hooks/pre-bash--no-file-level-disable-on-commit.sh"
+                    },
+                    {
+                        "type": "command",
+                        "command": "bash .claude/hooks/pre-bash--enforce-pnpm.sh"
                     }
                 ]
             },
@@ -20,11 +24,11 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash .claude/hooks/protect-files.sh"
+                        "command": "bash .claude/hooks/pre-edit--protect-files.sh"
                     },
                     {
                         "type": "command",
-                        "command": "bash .claude/hooks/module-import-guard.sh"
+                        "command": "bash .claude/hooks/pre-edit--module-import-guard.sh"
                     }
                 ]
             }
@@ -35,7 +39,11 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "bash .claude/hooks/auto-format.sh"
+                        "command": "bash .claude/hooks/post-edit--format.sh"
+                    },
+                    {
+                        "type": "command",
+                        "command": "bash .claude/hooks/post-edit--lint.sh"
                     }
                 ]
             }

@@ -17,16 +17,20 @@ All code in this package must use **semicolons** at the end of statements. The `
 
 ## Component Stories
 
+For shared conventions (CSF3 format, import extensions, Chromatic compatibility, isolation, verification process), read [storybook.md](../../agent-docs/references/storybook.md). The rules below are specific to `packages/components/`.
+
 Every component under `src/components/ui/` must have a co-located `.stories.tsx` file (e.g., `button.tsx` → `button.stories.tsx`).
 
-### Requirements
+### Package-Specific Requirements
 
+- Title convention: `Components/{ComponentName}` (e.g., `Components/Button`).
+- Use the `satisfies` pattern: `export const Foo = { ... } satisfies Story;`
 - Cover **all variants** exposed by the component's CVA config with individual named stories.
+- Include an `AllVariants` matrix story that renders every variant × size combination for visual regression.
 - Icon-only sizes (`icon`, `icon-xs`, `icon-sm`, `icon-lg`) must use an icon child, not text.
 - Icons inside `Button` must use `data-icon="inline-start"` or `data-icon="inline-end"` — never manual margin (`mr-2`) or size (`size-4`) classes.
-- Include an `AllVariants` matrix story that renders every variant × size combination for visual regression.
-- Use CSF3 format with types from `storybook-react-rsbuild`, following the pattern in `button.stories.tsx`.
-- Title convention: `Components/{ComponentName}` (e.g., `Components/Button`).
+- Reference: `src/components/ui/button.stories.tsx`.
+- Storybook dev command: `pnpm dev-packages-storybook`.
 
 ## After adding a shadcn component
 
@@ -38,4 +42,4 @@ This is the complete workflow. Do not skip steps or consider the task done after
 4. **Normalize semicolons** to match the project convention (see Code Style above).
 5. **Create the `.stories.tsx` file** next to the component in `src/components/ui/` (see Requirements above).
 6. **Export the component** from `src/index.ts`.
-7. **Visually verify** — start packages-storybook (`pnpm dev-packages-storybook`), open it in a browser, and confirm every new story renders without errors. Never report the task as complete based on `typecheck` alone — type-checking does not catch runtime rendering failures, missing CSS, or broken imports that only surface in the browser.
+7. **Visually verify** — start packages-storybook (`pnpm dev-packages-storybook`), open it in a browser, and confirm every new story renders without errors. Never report the task as complete based on `typecheck` alone — type-checking does not catch runtime rendering failures, missing CSS, or broken imports that only surface in the browser. Always stop the dev server when verification is complete — never leave it running. See [development.md](../../agent-docs/references/development.md#stopping-dev-servers-windows) for the Windows procedure.

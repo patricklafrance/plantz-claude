@@ -1,6 +1,9 @@
 import { useNavigationItems, useRenderedNavigationItems, isNavigationLink, type RenderItemFunction, type RenderSectionFunction } from "@squide/firefly";
 import { Link, Outlet } from "react-router";
 
+import { ColorModeToggle } from "./ColorModeToggle.tsx";
+import { PlantzLogo } from "./PlantzLogo.tsx";
+
 const renderItem: RenderItemFunction = (item, key) => {
     if (!isNavigationLink(item)) {
         return null;
@@ -10,23 +13,38 @@ const renderItem: RenderItemFunction = (item, key) => {
 
     return (
         <li key={key}>
-            <Link {...linkProps} {...additionalProps}>
+            <Link {...linkProps} {...additionalProps} className="text-muted-foreground hover:text-foreground text-sm transition-colors">
                 {label}
             </Link>
         </li>
     );
 };
 
-const renderSection: RenderSectionFunction = (elements, key) => <ul key={key}>{elements}</ul>;
+const renderSection: RenderSectionFunction = (elements, key) => (
+    <ul key={key} className="flex items-center gap-4">
+        {elements}
+    </ul>
+);
 
 export function RootLayout() {
     const navigationItems = useNavigationItems();
     const navigationElements = useRenderedNavigationItems(navigationItems, renderItem, renderSection);
 
     return (
-        <>
-            <nav>{navigationElements}</nav>
-            <Outlet />
-        </>
+        <div className="flex min-h-screen flex-col bg-background text-foreground">
+            <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:font-medium">
+                Skip to main content
+            </a>
+            <header className="border-border flex items-center gap-6 border-b px-6 py-3">
+                <Link to="/" aria-label="Plantz home">
+                    <PlantzLogo className="text-foreground h-7 w-auto" />
+                </Link>
+                <nav aria-label="Main" className="flex-1">{navigationElements}</nav>
+                <ColorModeToggle />
+            </header>
+            <main id="main-content" className="flex-1">
+                <Outlet />
+            </main>
+        </div>
     );
 }

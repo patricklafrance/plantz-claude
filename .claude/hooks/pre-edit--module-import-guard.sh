@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-# PreToolUse hook: block Edit/Write when content introduces cross-module imports.
-# Registered in .claude/settings.json with matcher "Edit|Write".
-# Enforces the architectural invariant: @modules/* packages must never
-# import from other @modules/* packages — only from @packages/* and host.
+# PreToolUse/Edit|Write: block cross-module imports.
+# @modules/* packages must never import from other @modules/* — only from @packages/* and host.
 
 INPUT=$(cat)
 FILE_PATH=$(echo "$INPUT" | grep -oP '"file_path"\s*:\s*"\K[^"]+' | head -1)

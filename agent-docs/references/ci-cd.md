@@ -1,90 +1,20 @@
 # CI/CD Reference
 
-Five GitHub Actions workflows in `.github/workflows/`.
+Five GitHub Actions workflows in `.github/workflows/`:
 
-## ci.yml — Continuous Integration
+| File                   | Purpose                                             |
+| ---------------------- | --------------------------------------------------- |
+| `ci.yml`               | Lint, typecheck, build, test on PRs and main pushes |
+| `chromatic.yml`        | Visual regression via Chromatic                     |
+| `claude.yml`           | Claude Code agent for issue/PR comments             |
+| `code-review.yml`      | Automated PR code review via Claude                 |
+| `audit-agent-docs.yml` | Weekly agent-docs freshness audit                   |
 
-**Triggers**: push to `main`, PRs targeting `main`
-**Concurrency**: `ci-${{ github.ref }}`, cancel in-progress
+Read the YAML files directly for triggers, steps, and concurrency rules.
 
-Steps:
+## Chromatic label gate
 
-1. Checkout (full history)
-2. Install pnpm + Node.js + dependencies
-3. Restore Turborepo cache (`${{ runner.os }}-turbo-ci-${{ github.sha }}`, prefix fallbacks)
-4. **Build host** — on PRs, filtered to packages diverging from PR base SHA
-5. **Oxlint** — on PRs, filtered to affected packages with `--continue`
-6. **Typecheck** — on PRs, filtered to affected packages with `--continue`
-7. **Syncpack** — always runs full `pnpm turbo run syncpack`
-8. **Test packages** — on PRs, filtered to affected packages with `--continue`
-9. Save Turborepo cache
-
-## chromatic.yml — Visual Regression Testing
-
-**Triggers**: push to `main`, PRs targeting `main` (on `opened` and `labeled`)
-**Concurrency**: `chromatic-${{ github.ref }}`, cancel in-progress
-**Gate**: PRs require the `run chromatic` label — exits early without it
-
-Steps:
-
-1. Label gate check
-2. Checkout (full history, PR head ref)
-3. Install pnpm + Node.js + dependencies
-4. Restore Turborepo cache
-5. Compute base SHA (PR base for PRs, push `before` for main)
-6. **Detect affected Storybooks** via `pnpm tsx tooling/getAffectedStorybooks.ts` (see [Affected Storybook detection](#affected-storybook-detection) below)
-7. **Chromatic — Management** (token: `MANAGEMENT_CHROMATIC_PROJECT_TOKEN`, skip if unaffected)
-8. **Chromatic — Today** (token: `TODAY_CHROMATIC_PROJECT_TOKEN`, skip if unaffected)
-9. **Chromatic — Packages** (token: `PACKAGES_CHROMATIC_PROJECT_TOKEN`, skip if unaffected)
-10. Remove `run chromatic` label after completion
-11. Save Turborepo cache
-
-All Chromatic steps use `onlyChanged: true` and `autoAcceptChanges: main`.
-
-## claude.yml — Claude Code Agent
-
-**Triggers**: issue/PR comments containing `@claude`, issues with `@claude` in title/body
-**Timeout**: 60 minutes
-**Permissions**: contents write, pull-requests write, issues write, id-token write, actions read
-
-Steps:
-
-1. Checkout
-2. Install pnpm + Node.js + dependencies
-3. Restore Turborepo cache
-4. Run `anthropics/claude-code-action@v1`
-5. Save Turborepo cache
-
-## code-review.yml — Automated Code Review
-
-**Triggers**: PRs targeting `main` (opened, synchronize, ready_for_review, reopened)
-**Concurrency**: `code-review-${{ github.ref }}`, cancel in-progress
-**Skip**: draft PRs
-
-Steps:
-
-1. Checkout (full history)
-2. Run `anthropics/claude-code-action@v1` with:
-    - Restricted tools (passed via `claude_args` to the action): `Read`, `Glob`, `Grep`, `Skill`, `Task`, `Bash(gh:*)`, `mcp__github_inline_comment__*`
-    - Prompt reads `.github/prompts/code-review.md`
-
-## audit-agent-docs.yml — Weekly Documentation Audit
-
-**Triggers**: weekly cron (Sunday midnight UTC), manual `workflow_dispatch`
-**Concurrency**: `audit-agent-docs-${{ github.ref }}`, cancel in-progress
-**Timeout**: 60 minutes
-
-Steps:
-
-1. Checkout
-2. Get current date (used in branch names, PR titles, and issue titles)
-3. Run `anthropics/claude-code-action@v1` with:
-    - Prompt reads `.github/prompts/audit-agent-docs.md`
-    - Allowed tools: `Read`, `Write`, `Edit`, `Glob`, `Grep`, `Skill`, `Bash(git:*)`, `Bash(gh:*)`, `Bash(date:*)`
-    - Loads the `audit-agent-docs` skill and runs the 3-pass audit procedure
-4. If Critical/High findings: fixes them, creates a PR against `main`
-5. If no Critical/High findings: creates and closes a GitHub issue with the report
-6. On failure: creates a GitHub issue with a link to the failed workflow run
+PRs require the `run chromatic` label to trigger `chromatic.yml`. Without it, the workflow exits early. The label is automatically removed after Chromatic completes.
 
 ## Affected Storybook detection
 
@@ -97,20 +27,23 @@ Steps:
 
 **Maintenance**: When adding a new Storybook or changing domain package names, update the `StorybookDependencies` map in `getAffectedStorybooks.ts`.
 
-## CI coverage gaps
+## Code review tool restrictions
 
-What CI does **not** catch currently:
+`code-review.yml` restricts the Claude agent to read-only tools (`Read`, `Glob`, `Grep`, `Skill`, `Task`, `Bash(gh:*)`, `mcp__github_inline_comment__*`). This is intentional — the review agent must not modify code. The review prompt is in `.github/prompts/code-review.md`.
 
-- Smoke tests — not yet configured
+## Audit agent-docs behavioral flow
+
+`audit-agent-docs.yml` runs weekly (Sunday midnight UTC) and can be triggered manually. The behavior is split between the workflow YAML and `.github/prompts/audit-agent-docs.md`:
+
+- **Critical/High findings**: fixes them in-place and creates a PR against `main`.
+- **No Critical/High findings**: creates and immediately closes a GitHub issue with the report.
+- **Workflow failure**: creates a GitHub issue linking to the failed run.
 
 ## Turbo cache strategy
 
-Three of the five workflows (ci, chromatic, claude) share the same pattern. `code-review.yml` and `audit-agent-docs.yml` do not use Turbo cache.
+Three workflows (ci, chromatic, claude) share a Turbo cache pattern with restore-key prefixes (`${{ runner.os }}-turbo-`) that allow cross-workflow cache hits. `code-review.yml` and `audit-agent-docs.yml` do not use Turbo cache.
 
-- **Key**: `${{ runner.os }}-turbo-<workflow>-${{ github.sha }}`
-- **Restore keys**: `${{ runner.os }}-turbo-<workflow>-`, `${{ runner.os }}-turbo-`
-- **Path**: `.turbo`
-- Save only on cache miss (`cache-hit != 'true'`)
+When adding a new workflow that runs Turbo tasks, follow the existing pattern: restore before tasks, save on cache miss (`cache-hit != 'true'`), use prefix fallback keys.
 
 ---
 

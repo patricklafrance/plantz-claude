@@ -10,12 +10,20 @@
     "scripts": {
         "typecheck": "tsgo"
     },
+    "dependencies": {
+        "@packages/components": "workspace:*",
+        "@tanstack/react-db": "^0.1.75",
+        "@tanstack/react-virtual": "^3.13.21",
+        "date-fns": "^4.1.0",
+        "lucide-react": "^0.577.0",
+        "zod": "^4.3.6"
+    },
     "devDependencies": {
         "@types/react": "19.2.9",
         "@types/react-dom": "19.2.3",
         "@typescript/native-preview": "7.0.0-dev.20260303.1",
         "@workleap/typescript-configs": "3.0.7",
-        "storybook-react-rsbuild": "3.3.0",
+        "storybook-react-rsbuild": "3.2.3",
         "typescript": "5.9.3"
     },
     "peerDependencies": {

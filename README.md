@@ -32,7 +32,7 @@ Each domain is fully isolated — modules never import from each other. Each has
 
 ### Tech stack
 
-Node 24+, pnpm 10, TypeScript 7 (tsgo), Rsbuild, Tailwind CSS 4, Storybook 10, Chromatic, Vitest, oxlint, oxfmt, syncpack.
+Node 24+, pnpm 10, TypeScript 7 (tsgo), Rsbuild, Tailwind CSS 4, TanStack DB, Storybook 10, Chromatic, Vitest, oxlint, oxfmt, syncpack.
 
 ---
 
@@ -75,6 +75,7 @@ Skills are reusable procedures that agents load when a task matches. They contai
 | ---------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `plantz-scaffold-domain-module`    | Scaffolds a new Squide module — creates files, registers in host, wires Storybook, adds dev script |
 | `plantz-scaffold-domain-storybook` | Scaffolds a domain Storybook with Chromatic CI integration                                         |
+| `plantz-seed-plants`               | Generates seed data and injects it into localStorage via Chrome DevTools MCP                       |
 | `plantz-audit-agent-docs`          | 3-pass audit of all docs against the live codebase (structural, accuracy, instruction quality)     |
 | `plantz-validate-modules`          | Validates every module conforms to the expected structure (9 checks)                               |
 | `plantz-verify-apps`               | Smoke-tests every app by starting dev servers and verifying pages load in a browser                |
@@ -104,13 +105,17 @@ Principles:
 
 Shell scripts that run automatically before or after agent tool calls, enforcing architectural guardrails in real time.
 
-| Hook                     | Trigger           | What it does                                                        |
-| ------------------------ | ----------------- | ------------------------------------------------------------------- |
-| `enforce-pnpm.sh`        | Before Bash       | Blocks npm usage — only pnpm allowed                                |
-| `protect-files.sh`       | Before Edit/Write | Prevents modification of sensitive files                            |
-| `module-import-guard.sh` | Before Edit/Write | Prevents cross-module imports (`@modules/*` packages stay isolated) |
-| `auto-format.sh`         | After Edit/Write  | Auto-formats with oxfmt                                             |
-| `pre-commit.sh`          | Before Bash       | Validates commits before they happen                                |
+Hook names follow the `{event}--{what}.sh` convention so it's clear at a glance when a hook fires and what it does.
+
+| Hook                                           | Trigger           | What it does                                                        |
+| ---------------------------------------------- | ----------------- | ------------------------------------------------------------------- |
+| `pre-bash--enforce-pnpm.sh`                    | Before Bash       | Blocks npm/npx — only pnpm allowed                                  |
+| `pre-bash--lint-on-commit.sh`                  | Before Bash       | Runs oxlint on staged files before git commit                       |
+| `pre-bash--no-file-level-disable-on-commit.sh` | Before Bash       | Rejects file-level `/* oxlint-disable */` comments on commit        |
+| `pre-edit--protect-files.sh`                   | Before Edit/Write | Prevents modification of sensitive files                            |
+| `pre-edit--module-import-guard.sh`             | Before Edit/Write | Prevents cross-module imports (`@modules/*` packages stay isolated) |
+| `post-edit--format.sh`                         | After Edit/Write  | Formats with oxfmt                                                  |
+| `post-edit--lint.sh`                           | After Edit/Write  | Lints with oxlint — reports issues immediately                      |
 
 **Files:** [`.claude/hooks/`](.claude/hooks/), [`.claude/settings.json`](.claude/settings.json)
 
@@ -142,15 +147,65 @@ This is driven by a hardcoded dependency map (`StorybookDependencies`) that maps
 
 ## Getting started
 
+### Prerequisites
+
+- Node.js 24+
+- pnpm 10+
+
+### Install
+
 ```bash
 pnpm install
-pnpm dev-host                    # Start the full app (http://localhost:8080)
-pnpm dev-management-storybook    # Start management Storybook (http://localhost:6006)
-pnpm lint                        # Run all checks (oxlint, oxfmt, typecheck, syncpack)
 ```
 
-Load a single module during development:
+### Seed data
+
+The app stores plant data in localStorage via TanStack DB. Without seeding, the plant list will be empty.
+
+**With Claude Code** (recommended): run `/seed-plants`. The skill generates data, injects it into localStorage via Chrome DevTools MCP, and reloads the page automatically.
+
+**Manually:**
+
+```bash
+pnpm seed-plants      # Generates apps/host/public/seed-plants.json
+```
+
+Then start the dev server, open DevTools in the browser, and run:
+
+```js
+const data = await fetch("/seed-plants.json").then((r) => r.text());
+localStorage.setItem("plantz-plants", data);
+location.reload();
+```
+
+### Run the app
+
+```bash
+pnpm dev-host                  # Full app — all modules (http://localhost:8080)
+pnpm dev-management-plants     # Just the plants module
+pnpm dev-today-landing-page    # Just the today module
+```
+
+To load specific modules manually:
 
 ```bash
 cross-env MODULES=management/plants pnpm dev-host
+```
+
+### Run Storybooks
+
+```bash
+pnpm dev-packages-storybook      # Shared components (http://localhost:6006)
+pnpm dev-management-storybook    # Management domain
+pnpm dev-today-storybook         # Today domain
+```
+
+### Run checks
+
+```bash
+pnpm lint          # ESLint (per-package, via Turborepo)
+pnpm oxlint        # oxlint (custom config in oxlintrc.json)
+pnpm oxfmt         # Formatter check (oxfmt with Tailwind class sorting)
+pnpm typecheck     # TypeScript (tsgo)
+pnpm syncpack      # Dependency version consistency
 ```

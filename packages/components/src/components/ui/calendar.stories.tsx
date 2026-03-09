@@ -47,6 +47,7 @@ export const WithDropdownCaption: Story = {
 
 export const RangeSelection: Story = {
     render: () => {
+        // oxlint-disable-next-line react/rules-of-hooks -- CSF3 render functions are valid React components
         const [range, setRange] = React.useState<DateRange>({
             from: new Date(2026, 2, 6),
             to: new Date(2026, 2, 12),

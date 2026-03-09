@@ -13,20 +13,21 @@ Never guess about architecture, tooling, or conventions — always load the rele
 
 - [ARCHITECTURE.md](agent-docs/ARCHITECTURE.md) — repo structure, package naming, Squide topology, tech stack, MODULES env var
 
-### Design
-
-- [design/README.md](agent-docs/design/README.md) — conventions for cross-cutting design docs
-
 ### References
 
-- [references/development.md](agent-docs/references/development.md) — pnpm workspace, Node version, script naming conventions, MODULES
+- [references/color-mode.md](agent-docs/references/color-mode.md) — light/dark/system color mode (theme tokens, `dark:` variant, class-based toggle)
+- [references/responsive-layout.md](agent-docs/references/responsive-layout.md) — phone/tablet/desktop responsive layout (mobile-first, Tailwind breakpoints)
+- [references/development.md](agent-docs/references/development.md) — pnpm workspace, Node version, script naming conventions, MODULES, stopping dev servers
 - [references/turborepo.md](agent-docs/references/turborepo.md) — task definitions, dependsOn, caching, conventions
-- [references/syncpack.md](agent-docs/references/syncpack.md) — semver groups, version groups
+- [references/syncpack.md](agent-docs/references/syncpack.md) — dependency version enforcement (config in `.syncpackrc.js`)
 - [references/typescript.md](agent-docs/references/typescript.md) — tsconfig, tsgo
 - [references/tailwind-postcss.md](agent-docs/references/tailwind-postcss.md) — PostCSS transformer, cross-package class scanning
 - [references/shadcn.md](agent-docs/references/shadcn.md) — Base UI preset, CLI bug explanations, Tailwind v4 source detection
 - [references/ci-cd.md](agent-docs/references/ci-cd.md) — CI, Chromatic, Claude, code-review, and audit-agent-docs GitHub Actions workflows
 - [references/writing-agent-instructions.md](agent-docs/references/writing-agent-instructions.md) — principles for writing instructions agents actually follow
+- [references/tanstack-db.md](agent-docs/references/tanstack-db.md) — TanStack DB collection setup, CRUD patterns, localStorage persistence
+- [references/storybook.md](agent-docs/references/storybook.md) — shared story conventions, variant coverage, Chromatic compatibility, isolation
+- [references/quality-gates.md](agent-docs/references/quality-gates.md) — WCAG AA conformance, mandatory visual verification before shipping UI
 
 ### Decisions
 

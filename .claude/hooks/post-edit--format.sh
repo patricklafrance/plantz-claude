@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-# PostToolUse hook: auto-format files after Edit/Write.
-# Registered in .claude/settings.json with matcher "Edit|Write".
-# Runs oxfmt on the written file so formatting is always consistent
-# without waiting for the pre-commit lint pass.
+# PostToolUse/Edit|Write: format files after edits.
+# Runs oxfmt so formatting is always consistent without waiting for commit.
 
 INPUT=$(cat)
 

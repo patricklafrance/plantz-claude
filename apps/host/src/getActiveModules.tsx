@@ -17,6 +17,7 @@ export function getActiveModules(filter?: string): ModuleRegisterFunction<Firefl
         .map((m) => m.trim())
         .filter((m) => {
             if (!ModuleRegistry[m]) {
+                // oxlint-disable-next-line eslint/no-console -- Runtime warning for misconfigured MODULES env var
                 console.warn(`[host] Unknown module "${m}". Available: ${Object.keys(ModuleRegistry).join(", ")}`);
                 return false;
             }

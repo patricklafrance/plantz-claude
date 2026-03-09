@@ -40,9 +40,9 @@ All names are mechanically derived from `domain` and `module`. **PascalCase** me
 
 ## Reference Module
 
-`apps/management/plants/` is the canonical reference. Before creating any file, list the reference module's directory tree (`apps/management/plants/` and `apps/management/plants/src/`) and read every file. This ensures new config files, scripts, or dependencies added to the reference are automatically picked up.
+`apps/management/plants/` is the canonical reference. Before creating any file, read these 5 files from the reference module: `package.json`, `tsconfig.json`, `src/index.ts`, `src/registerManagementPlants.tsx`, and `src/PlantsPage.tsx`. Do not read domain-specific files (dialogs, schemas, collections, utilities, stories) — they are irrelevant to scaffolding.
 
-Reproduce the same structure for the new module with substituted names. Copy dependency versions and scripts exactly — do not invent or upgrade versions.
+Reproduce the same 5-file skeleton for the new module with substituted names. Copy dependency versions and scripts exactly — do not invent or upgrade versions.
 
 ## Procedure
 
@@ -113,7 +113,7 @@ Run `pnpm install` to link the new workspace package.
 
 ### Step 9 — Verify
 
-1. Confirm every file from the reference module has a corresponding file in the new module.
+1. Confirm all 5 files from the Step 2 table exist in the new module.
 2. Confirm `getActiveModules.tsx` imports the register function and has the registry entry.
 3. Confirm `apps/host/package.json` lists the new package in `dependencies`.
 4. Confirm domain storybook's `storybook.css` includes a `@source` directive for the new module.

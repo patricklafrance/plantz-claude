@@ -33,6 +33,8 @@ The orchestrator agent must spawn two coding subagents to execute the `./tmp/run
 
 On top of the instructions to execute the plan, the coding subagents must also receive the same instructions listed for the planning subagents writing the plan.
 
+When done, the subagents must write a `./tmp/runs/[hash]/changes-[iteration].md` file summarizing the changes.
+
 ## Validate code
 
 Once the coding subagents are done, the orchestrator agent must spawn two validation subagents to validate the code. Those validation subagents should assist and challenge each others.
@@ -83,13 +85,13 @@ gh pr create \
   --title "<type>: <description>" \
   --body "$(cat <<'EOF'
 ## Changes
-<brief description of the chanes>
+<description of the changes>
 
 ## Quality checks
 - [ ] Lint
-- [ ] Module structure
-- [ ] Smoke tests
+- [ ] Modules structure
 - [ ] Quality gate
+- [ ] Smoke tests
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
@@ -97,6 +99,8 @@ EOF
 ```
 
 Use the conventional commit prefix matching the branch prefix (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`).
+
+The description of the changes must be obtained from an aggreation of all the `./tmp/runs/[hash]/changes-[iteration].md` files.
 
 ## Monitor PR
 

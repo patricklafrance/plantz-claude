@@ -110,7 +110,7 @@ Read `src/{registerFunction}.tsx` and verify:
 
 - It calls `runtime.registerRoute()` with a `path` property
 - It calls `runtime.registerNavigationItem()` with a `$id` matching `{domain}-{module}`
-- It uses a lazy import for the page component (e.g., `lazy(() => import("./..."))`)
+- The route config passed to `runtime.registerRoute()` includes a `lazy` property that dynamically imports the page component (e.g., `lazy: async () => { const { PageName } = await import("./PageName.tsx"); return { element: <PageName /> }; }`)
 
 Route path and `$label` values may intentionally differ from the mechanical defaults (e.g., `today/landing-page` uses path `/today` and label `Today`). Do not flag these as errors — note them as intentional overrides.
 

@@ -11,5 +11,4 @@ chromatic-diagnostics.json
 .claude/worktrees
 tmp
 *.env.local
-seed-plants.json
 

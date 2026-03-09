@@ -1,10 +1,11 @@
 ---
 name: plantz-validate-modules
 description: |
-    [Plantz] Validate that all Squide federated modules conform to the expected structure.
+    Validate that all Squide local modules conform to the expected structure.
     Use when asked to "validate modules", "check module structure", "verify modules",
     or after scaffolding a new module.
     Triggers: /plantz-validate-modules, "validate modules", "check modules", "verify module structure"
+disable-model-invocation: true
 license: MIT
 ---
 
@@ -22,16 +23,16 @@ Verify that every `@modules/*` package conforms to the scaffold template and is 
 
 All names are mechanically derived. **PascalCase** means split on `-`, capitalize each segment's first letter, join (e.g., `landing-page` → `LandingPage`).
 
-| Name              | Formula                                                                       |
-| ----------------- | ----------------------------------------------------------------------------- |
-| Package name      | `@modules/{domain}-{module}`                                                  |
-| Register function | `register` + PascalCase(domain) + PascalCase(module)                          |
-| Page component    | PascalCase(module) + `Page` (skip `Page` if module already ends with `-page`) |
-| Registry key      | `{domain}/{module}`                                                           |
-| Route path        | `/{domain}/{module}`                                                          |
-| `$id`             | `{domain}-{module}`                                                           |
-| Dev script        | `dev-{domain}-{module}`                                                       |
-| Domain storybook  | `@apps/{domain}-storybook`                                                    |
+| Name              | Formula                                                                                         |
+| ----------------- | ----------------------------------------------------------------------------------------------- |
+| Package name      | `@modules/{domain}-{module}`                                                                    |
+| Register function | `register` + PascalCase(domain) + PascalCase(module)                                            |
+| Page component    | PascalCase(module) + `Page` (skip `Page` if module already ends with `-page`)                   |
+| Registry key      | `{domain}/{module}`                                                                             |
+| Route path        | `/{domain}/{module}` (default — modules may override, e.g., `today/landing-page` uses `/today`) |
+| `$id`             | `{domain}-{module}`                                                                             |
+| Dev script        | `dev-{domain}-{module}`                                                                         |
+| Domain storybook  | `@apps/{domain}-storybook`                                                                      |
 
 ## Checks
 
@@ -55,8 +56,10 @@ Read the module's `package.json` and verify:
 - `version` is `"0.0.0"`
 - `private` is `true`
 - `type` is `"module"`
-- `exports` includes `"./src/index.ts"` (exact value or object with `.` key)
-- `scripts` contains `"typecheck"` and `"oxlint"`
+- `exports` is the bare string `"./src/index.ts"` (do not accept the object form — the codebase uses the string shorthand exclusively)
+- `scripts` contains `"typecheck"`
+- `license` is `"Apache-2.0"`
+- `author` is `"Patrick Lafrance"`
 
 ### 3. Barrel export
 
@@ -97,7 +100,25 @@ Read root `package.json` and verify:
 
 - `scripts` contains `"dev-{domain}-{module}"` with value `"cross-env MODULES={domain}/{module} pnpm dev-host"`
 
-### 8. Story file existence
+### 8. Storybook CSS source directive
+
+Read `apps/{domain}/storybook/.storybook/storybook.css` and verify it contains a `@source` directive that resolves to the module's `src/` directory (typically `@source "../../{module}/src/**/*.{ts,tsx}";`). Without this, Tailwind classes used in the module will not be scanned and will be missing from the domain storybook. If the domain storybook does not exist, record a warning rather than a failure.
+
+### 9. Register function internals
+
+Read `src/{registerFunction}.tsx` and verify:
+
+- It calls `runtime.registerRoute()` with a `path` property
+- It calls `runtime.registerNavigationItem()` with a `$id` matching `{domain}-{module}`
+- The route config passed to `runtime.registerRoute()` includes a `lazy` property that dynamically imports the page component (e.g., `lazy: async () => { const { PageName } = await import("./PageName.tsx"); return { element: <PageName /> }; }`)
+
+Route path and `$label` values may intentionally differ from the mechanical defaults (e.g., `today/landing-page` uses path `/today` and label `Today`). Do not flag these as errors — note them as intentional overrides.
+
+### 10. Tsconfig extends value
+
+Read `apps/{domain}/{module}/tsconfig.json` and verify `extends` is `"@workleap/typescript-configs/library.json"`. Modules are libraries consumed by the host — never `web-application.json`.
+
+### 11. Story file existence
 
 Verify at least one `.stories.tsx` file exists under `apps/{domain}/{module}/src/`.
 
@@ -118,6 +139,9 @@ After all checks, output a summary:
 - [x] Unified storybook glob present
 - [x] Affected detection entry present
 - [x] Root dev script present
+- [x] Storybook CSS source directive present
+- [x] Register function internals correct
+- [x] Tsconfig extends correct
 - [x] Story file exists
 ```
 
@@ -125,6 +149,6 @@ Use `[x]` for passing checks, `[ ]` for failures. For each failure, include a on
 
 ## Prohibitions
 
-- Never modify any files — this skill is read-only validation.
-- Never skip a module — validate every `@modules/*` package found in the workspace.
-- Never assume a check passes without reading the actual file content.
+- Never modify any files — this skill is read-only validation. Modifications during validation corrupt the audit trail and make results unreliable.
+- Never skip a module — validate every `@modules/*` package found in the workspace. A skipped module silently accumulates drift that compounds with each new scaffold.
+- Never assume a check passes without reading the actual file content. Assumptions produce false passes that give false confidence in module correctness.

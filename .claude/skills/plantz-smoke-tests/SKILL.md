@@ -1,0 +1,72 @@
+---
+name: plantz-smoke-tests
+description: |
+    Smoke-test every application by starting dev servers and verifying pages load.
+    Use when asked to "verify apps", "test all apps", "smoke test", "check dev servers".
+    Triggers: /plantz-smoke-tests, "smoke test", "verify apps", "test all apps"
+disable-model-invocation: true
+license: MIT
+---
+
+# Smoke Tests
+
+Smoke-test every application in the repository by starting each dev server and verifying the page loads without errors.
+
+## Prerequisites
+
+This skill requires `agent-browser` CLI to be available for browser verification steps (navigating to URLs, taking snapshots, checking console errors, taking screenshots). If `agent-browser` is not available, the skill cannot complete Steps 3.1–3.4.
+
+## Discovery
+
+1. Read root `package.json` and collect every `dev-*` script.
+2. Filter out module-specific scripts — those that use `cross-env MODULES=` are filtered host instances, not standalone apps. Keep only scripts that start a distinct application (the host and each storybook).
+3. Build an ordered list of apps to test. Test the host first, then storybooks.
+
+## Procedure
+
+Before testing any app, delete `tmp/smoke-tests/` if it exists — this clears stale artifacts from prior failed runs. Then recreate the directory.
+
+For each app in the list, run these steps sequentially:
+
+### Step 1 — Start the dev server
+
+Run the dev script in the background (e.g., `pnpm dev-host`). Capture the task ID so you can stop it later.
+
+### Step 2 — Wait for ready
+
+Watch stdout for the local URL (typically `http://localhost:<port>`). Wait for the server to emit it — this confirms the build succeeded and the server is listening. Use a 60-second timeout for the host and 300 seconds for storybooks — storybooks compile on first launch and are significantly slower.
+
+### Step 3 — Verify in browser
+
+1. Navigate to the local URL.
+2. Take a page snapshot and confirm meaningful content loaded (not a blank page or error screen).
+3. Check the browser console for errors. Warnings are acceptable — errors are not.
+4. Take a screenshot and save it to `tmp/smoke-tests/{app-name}.png`.
+
+### Step 4 — Stop the dev server and kill orphan processes
+
+Stop the background task started in step 1. Then verify the port is actually free — `TaskStop` kills the turbo wrapper but child processes (the actual node dev server) can survive. Run `netstat -ano | grep -E "LISTENING" | grep ":<port>"` to check. If the port is still occupied, kill the orphan process with `taskkill //PID <pid> //T //F` (Windows) or `kill <pid>` (Unix). The `//T` flag kills the entire process tree. Never start the next app's dev server until the previous port is confirmed free.
+
+### Step 5 — Record result
+
+Record the app name, URL, status (pass/fail), and any errors found.
+
+## Summary
+
+After all apps are tested, output a markdown table:
+
+```
+| App | URL | Status | Errors |
+|---|---|---|---|
+| {app-name} | {discovered-url} | pass | — |
+| ... | ... | ... | ... |
+```
+
+If any app failed, list the failure details below the table.
+
+## Prohibitions
+
+- Never hardcode app names or ports — discover them from `package.json` and server output. Hardcoded values silently break when apps are added or ports change.
+- Never leave a dev server running — always stop it before starting the next one. Orphan servers cause port conflicts that fail subsequent tests.
+- Never skip an app — test every discovered application even if a previous one failed. Skipping hides cascading failures across apps.
+- Always save screenshots as evidence, even for passing apps. Without screenshots, failures cannot be diagnosed after the fact.

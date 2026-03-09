@@ -1,3 +1,4 @@
+/* oxlint-disable react-perf/jsx-no-jsx-as-prop -- Stories are dev-only; perf optimization is not applicable */
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
 import { Button } from "./button.tsx";
@@ -65,12 +66,12 @@ export const WithCustomContent: Story = {
                 </PopoverHeader>
                 <div className="grid gap-2">
                     <div className="grid grid-cols-3 items-center gap-4">
-                        <label className="text-sm">Width</label>
-                        <input className="col-span-2 h-8 rounded-md border px-2 text-sm" defaultValue="100%" />
+                        <label htmlFor="popover-width" className="text-sm">Width</label>
+                        <input id="popover-width" className="col-span-2 h-8 rounded-md border px-2 text-sm" defaultValue="100%" />
                     </div>
                     <div className="grid grid-cols-3 items-center gap-4">
-                        <label className="text-sm">Height</label>
-                        <input className="col-span-2 h-8 rounded-md border px-2 text-sm" defaultValue="25px" />
+                        <label htmlFor="popover-height" className="text-sm">Height</label>
+                        <input id="popover-height" className="col-span-2 h-8 rounded-md border px-2 text-sm" defaultValue="25px" />
                     </div>
                 </div>
             </PopoverContent>

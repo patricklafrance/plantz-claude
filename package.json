@@ -20,7 +20,7 @@
         "serve-storybook": "turbo run serve-storybook --filter=@apps/storybook",
         "lint": "turbo run lint --continue",
         "typecheck": "tsgo",
-        "oxlint": "oxlint",
+        "oxlint": "oxlint --react-plugin --import-plugin --jsx-a11y-plugin --react-perf-plugin --promise-plugin --vitest-plugin",
         "oxfmt": "oxfmt --check",
         "syncpack": "syncpack lint",
         "seed-plants": "tsx scripts/seed-plants.ts",

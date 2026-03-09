@@ -1,3 +1,4 @@
+/* oxlint-disable react-perf/jsx-no-jsx-as-prop, react-perf/jsx-no-new-function-as-prop -- Base UI render prop and DayPicker callback patterns */
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import * as React from "react";

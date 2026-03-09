@@ -30,7 +30,7 @@ fi
 # Lint the file. Use the binary directly to avoid pnpm exec startup overhead.
 # Report only — do not auto-fix. The agent decides how to address issues.
 # Exit non-zero on warnings or errors so the agent is forced to fix them immediately.
-OUTPUT=$(./node_modules/.bin/oxlint "$FILE_PATH" 2>/dev/null)
+OUTPUT=$(./node_modules/.bin/oxlint --react-plugin --import-plugin --jsx-a11y-plugin --react-perf-plugin --promise-plugin --vitest-plugin "$FILE_PATH" 2>/dev/null)
 EXIT_CODE=$?
 
 if echo "$OUTPUT" | grep -qP 'Found \d+ warnings? and \d+ errors?'; then

@@ -27,7 +27,7 @@ Never guess about architecture, tooling, or conventions — always load the rele
 - [references/writing-agent-instructions.md](agent-docs/references/writing-agent-instructions.md) — principles for writing instructions agents actually follow
 - [references/tanstack-db.md](agent-docs/references/tanstack-db.md) — TanStack DB collection setup, CRUD patterns, localStorage persistence
 - [references/storybook.md](agent-docs/references/storybook.md) — shared story conventions, variant coverage, Chromatic compatibility, isolation
-- [references/quality-gates.md](agent-docs/references/quality-gates.md) — mandatory visual verification and accessibility checks for all UI tasks
+- [references/quality-gates.md](agent-docs/references/quality-gates.md) — WCAG AA conformance, mandatory visual verification before shipping UI
 
 ### Decisions
 

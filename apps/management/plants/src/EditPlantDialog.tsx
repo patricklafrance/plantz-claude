@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button, Input, Textarea, Label, Switch, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, DatePicker } from "@packages/components";
 import { format } from "date-fns";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, type ChangeEvent } from "react";
 
 import { locations, luminosities, wateringFrequencies, wateringTypes } from "./constants.ts";
 import type { Plant } from "./plantSchema.ts";
@@ -82,6 +82,22 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
         };
     }, [name, description, family, location, luminosity, mistLeaves, soilType, wateringFrequency, wateringQuantity, wateringType, plant, open, saveChanges]);
 
+    const handleNameChange = useCallback((e: ChangeEvent<HTMLInputElement>) => setName(e.target.value), []);
+    const handleDescriptionChange = useCallback((e: ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value), []);
+    const handleFamilyChange = useCallback((e: ChangeEvent<HTMLInputElement>) => setFamily(e.target.value), []);
+    const handleLocationChange = useCallback((v: string | null) => { if (v) setLocation(v); }, []);
+    const handleLuminosityChange = useCallback((v: string | null) => { if (v) setLuminosity(v); }, []);
+    const handleSoilTypeChange = useCallback((e: ChangeEvent<HTMLInputElement>) => setSoilType(e.target.value), []);
+    const handleWateringFrequencyChange = useCallback((v: string | null) => { if (v) setWateringFrequency(v); }, []);
+    const handleWateringTypeChange = useCallback((v: string | null) => { if (v) setWateringType(v); }, []);
+    const handleWateringQuantityChange = useCallback((e: ChangeEvent<HTMLInputElement>) => setWateringQuantity(e.target.value), []);
+
+    const handleDelete = useCallback(() => {
+        if (plant) onDelete(plant);
+    }, [plant, onDelete]);
+
+    const handleClose = useCallback(() => onOpenChange(false), [onOpenChange]);
+
     if (!plant) return null;
 
     return (
@@ -90,32 +106,27 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
                 <DialogHeader>
                     <div className="flex items-center gap-2">
                         <DialogTitle>Edit plant</DialogTitle>
-                        {saved && <span className="text-xs text-muted-foreground animate-in fade-in">Saved</span>}
+                        <span role="status" aria-live="polite">{saved && <span className="text-xs text-muted-foreground animate-in fade-in">Saved</span>}</span>
                     </div>
                 </DialogHeader>
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="edit-name">Name *</Label>
-                        <Input id="edit-name" value={name} onChange={(e) => setName(e.target.value)} />
+                        <Input id="edit-name" value={name} onChange={handleNameChange} />
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="edit-description">Description</Label>
-                        <Textarea id="edit-description" value={description} onChange={(e) => setDescription(e.target.value)} />
+                        <Textarea id="edit-description" value={description} onChange={handleDescriptionChange} />
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="edit-family">Family</Label>
-                        <Input id="edit-family" value={family} onChange={(e) => setFamily(e.target.value)} />
+                        <Input id="edit-family" value={family} onChange={handleFamilyChange} />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
                             <Label>Location *</Label>
-                            <Select
-                                value={location}
-                                onValueChange={(v: string | null) => {
-                                    if (v) setLocation(v);
-                                }}
-                            >
-                                <SelectTrigger className="w-full">
+                            <Select value={location} onValueChange={handleLocationChange}>
+                                <SelectTrigger className="w-full" aria-label="Location">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -131,13 +142,8 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <Label>Luminosity *</Label>
-                            <Select
-                                value={luminosity}
-                                onValueChange={(v: string | null) => {
-                                    if (v) setLuminosity(v);
-                                }}
-                            >
-                                <SelectTrigger className="w-full">
+                            <Select value={luminosity} onValueChange={handleLuminosityChange}>
+                                <SelectTrigger className="w-full" aria-label="Luminosity">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -158,18 +164,13 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="edit-soil">Soil type</Label>
-                        <Input id="edit-soil" value={soilType} onChange={(e) => setSoilType(e.target.value)} />
+                        <Input id="edit-soil" value={soilType} onChange={handleSoilTypeChange} />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
                             <Label>Watering frequency *</Label>
-                            <Select
-                                value={wateringFrequency}
-                                onValueChange={(v: string | null) => {
-                                    if (v) setWateringFrequency(v);
-                                }}
-                            >
-                                <SelectTrigger className="w-full">
+                            <Select value={wateringFrequency} onValueChange={handleWateringFrequencyChange}>
+                                <SelectTrigger className="w-full" aria-label="Watering frequency">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -185,13 +186,8 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <Label>Watering type *</Label>
-                            <Select
-                                value={wateringType}
-                                onValueChange={(v: string | null) => {
-                                    if (v) setWateringType(v);
-                                }}
-                            >
-                                <SelectTrigger className="w-full">
+                            <Select value={wateringType} onValueChange={handleWateringTypeChange}>
+                                <SelectTrigger className="w-full" aria-label="Watering type">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -208,21 +204,21 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="edit-quantity">Watering quantity *</Label>
-                        <Input id="edit-quantity" value={wateringQuantity} onChange={(e) => setWateringQuantity(e.target.value)} />
+                        <Input id="edit-quantity" value={wateringQuantity} onChange={handleWateringQuantityChange} />
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <Label>Next watering date</Label>
-                        <DatePicker value={plant.nextWateringDate} disabled />
+                        <DatePicker value={plant.nextWateringDate} disabled aria-label="Next watering date" />
                     </div>
                     <div className="text-xs text-muted-foreground">
                         Created: {format(plant.creationDate, "PPP")} · Last updated: {format(plant.lastUpdateDate, "PPP")}
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button variant="destructive" size="sm" onClick={() => onDelete(plant)}>
+                    <Button variant="destructive" size="sm" onClick={handleDelete}>
                         Delete
                     </Button>
-                    <Button variant="outline" size="sm" onClick={() => onOpenChange(false)}>
+                    <Button variant="outline" size="sm" onClick={handleClose}>
                         Close
                     </Button>
                 </DialogFooter>

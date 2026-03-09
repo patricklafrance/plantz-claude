@@ -44,6 +44,7 @@ export const DisabledWithValue: Story = {
 
 export const Controlled: Story = {
     render: () => {
+        // oxlint-disable-next-line react/rules-of-hooks -- CSF3 render functions are valid React components
         const [date, setDate] = React.useState<Date | undefined>(new Date(2026, 2, 6));
 
         return (

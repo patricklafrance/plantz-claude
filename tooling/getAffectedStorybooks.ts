@@ -1,3 +1,4 @@
+/* oxlint-disable eslint/no-console -- CI script; console output is intentional */
 import { execSync } from "node:child_process";
 import { appendFileSync } from "node:fs";
 

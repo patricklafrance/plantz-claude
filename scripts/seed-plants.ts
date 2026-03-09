@@ -1,3 +1,4 @@
+/* oxlint-disable eslint/no-console -- CLI script; console output is intentional */
 /**
  * Standalone seed script for the plants collection.
  *

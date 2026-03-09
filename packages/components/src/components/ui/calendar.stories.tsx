@@ -1,3 +1,4 @@
+/* oxlint-disable react-perf/jsx-no-new-function-as-prop, react-perf/jsx-no-new-object-as-prop -- Stories are dev-only; perf optimization is not applicable */
 import * as React from "react";
 import type { DateRange } from "react-day-picker";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
@@ -47,6 +48,7 @@ export const WithDropdownCaption: Story = {
 
 export const RangeSelection: Story = {
     render: () => {
+        // oxlint-disable-next-line react/rules-of-hooks -- CSF3 render functions are valid React components
         const [range, setRange] = React.useState<DateRange>({
             from: new Date(2026, 2, 6),
             to: new Date(2026, 2, 12),

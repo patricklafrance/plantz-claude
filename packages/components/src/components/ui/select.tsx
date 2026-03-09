@@ -1,3 +1,4 @@
+/* oxlint-disable react-perf/jsx-no-jsx-as-prop -- Base UI render prop pattern */
 import * as React from "react";
 import { Select as SelectPrimitive } from "@base-ui/react/select";
 

@@ -18,6 +18,7 @@ on:
             - opened
             # To conditionally execute the workflow based on a PR label.
             - labeled
+            - synchronize
 
 env:
     CI: true

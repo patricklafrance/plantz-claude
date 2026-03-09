@@ -4,6 +4,7 @@ description: |
     Smoke-test every application by starting dev servers and verifying pages load.
     Use when asked to "verify apps", "test all apps", "smoke test", "check dev servers".
     Triggers: /plantz-smoke-tests, "smoke test", "verify apps", "test all apps"
+disable-model-invocation: true
 license: MIT
 ---
 
@@ -33,7 +34,7 @@ Run the dev script in the background (e.g., `pnpm dev-host`). Capture the task I
 
 ### Step 2 — Wait for ready
 
-Watch stdout for the local URL (typically `http://localhost:<port>`). Wait for the server to emit it — this confirms the build succeeded and the server is listening. If the server fails to start within 120 seconds, record a failure and move to the next app. Storybooks can take significantly longer than the host on a cold start.
+Watch stdout for the local URL (typically `http://localhost:<port>`). Wait for the server to emit it — this confirms the build succeeded and the server is listening. Use a 60-second timeout for the host and 300 seconds for storybooks — storybooks compile on first launch and are significantly slower.
 
 ### Step 3 — Verify in browser
 
@@ -65,7 +66,7 @@ If any app failed, list the failure details below the table.
 
 ## Prohibitions
 
-- Never hardcode app names or ports — discover them from `package.json` and server output.
-- Never leave a dev server running — always stop it before starting the next one.
+- Never hardcode app names or ports — discover them from `package.json` and server output. Hardcoded values silently break when apps are added or ports change.
+- Never leave a dev server running — always stop it before starting the next one. Orphan servers cause port conflicts that fail subsequent tests.
 - Never skip an app — test every discovered application even if a previous one failed. Skipping hides cascading failures across apps.
-- Always save screenshots as evidence, even for passing apps.
+- Always save screenshots as evidence, even for passing apps. Without screenshots, failures cannot be diagnosed after the fact.

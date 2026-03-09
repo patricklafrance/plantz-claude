@@ -4,7 +4,7 @@
     "private": true,
     "description": "Workspace root.",
     "license": "Apache-2.0",
-    "author": "Workleap",
+    "author": "Patrick Lafrance",
     "type": "module",
     "scripts": {
         "dev-host": "turbo run dev --filter=@apps/host",
@@ -37,6 +37,7 @@
         "@types/node": "25.3.3",
         "@typescript/native-preview": "7.0.0-dev.20260303.1",
         "@workleap/typescript-configs": "3.0.7",
+        "agent-browser": "0.17.1",
         "cross-env": "10.1.0",
         "oxfmt": "0.36.0",
         "oxlint": "1.51.0",
@@ -48,5 +49,10 @@
         "node": ">=24.0.0",
         "pnpm": ">=10"
     },
-    "packageManager": "pnpm@10.30.1"
+    "packageManager": "pnpm@10.30.1",
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "agent-browser"
+        ]
+    }
 }

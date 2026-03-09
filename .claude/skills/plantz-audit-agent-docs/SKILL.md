@@ -5,6 +5,7 @@ description: |
     Use when asked to "audit docs", "review agent-docs", "check documentation",
     or after significant architectural or tooling changes.
     Triggers: /plantz-audit-agent-docs, "audit docs", "review documentation quality"
+disable-model-invocation: true
 license: MIT
 ---
 

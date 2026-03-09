@@ -3,6 +3,7 @@ name: plantz-scaffold-domain-module
 description: |
     Scaffold a new Squide federated module in the monorepo.
     Use when asked to "create a module", "scaffold a module", "add a module", "new module".
+disable-model-invocation: true
 license: MIT
 ---
 
@@ -23,19 +24,19 @@ Two required inputs; everything else is derived.
 
 All names are mechanically derived from `domain` and `module`. **PascalCase** means split on `-`, capitalize each segment's first letter, join (e.g., `landing-page` → `LandingPage`).
 
-| Name              | Formula                                                                       | Example (`management` + `plants`)  |
-| ----------------- | ----------------------------------------------------------------------------- | ---------------------------------- |
-| Package name      | `@modules/{domain}-{module}`                                                  | `@modules/management-plants`       |
-| Directory         | `apps/{domain}/{module}/`                                                     | `apps/management/plants/`          |
-| Register function | `register` + PascalCase(domain) + PascalCase(module)                          | `registerManagementPlants`         |
-| Page component    | PascalCase(module) + `Page` (skip `Page` if module already ends with `-page`) | `PlantsPage`                       |
-| Register file     | `src/{registerFunction}.tsx`                                                  | `src/registerManagementPlants.tsx` |
-| Page file         | `src/{PageComponent}.tsx`                                                     | `src/PlantsPage.tsx`               |
-| `$id`             | `{domain}-{module}`                                                           | `management-plants`                |
-| Registry key      | `{domain}/{module}`                                                           | `management/plants`                |
-| Route path        | `/{domain}/{module}` (default — confirm with user if module ends with `-page` or represents a landing route) | `/management/plants` |
-| Nav label         | PascalCase(module) with spaces between words (default — confirm with user if module name is ambiguous) | `Plants` |
-| Dev script        | `dev-{domain}-{module}`                                                       | `dev-management-plants`            |
+| Name              | Formula                                                                                                      | Example (`management` + `plants`)  |
+| ----------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------- |
+| Package name      | `@modules/{domain}-{module}`                                                                                 | `@modules/management-plants`       |
+| Directory         | `apps/{domain}/{module}/`                                                                                    | `apps/management/plants/`          |
+| Register function | `register` + PascalCase(domain) + PascalCase(module)                                                         | `registerManagementPlants`         |
+| Page component    | PascalCase(module) + `Page` (skip `Page` if module already ends with `-page`)                                | `PlantsPage`                       |
+| Register file     | `src/{registerFunction}.tsx`                                                                                 | `src/registerManagementPlants.tsx` |
+| Page file         | `src/{PageComponent}.tsx`                                                                                    | `src/PlantsPage.tsx`               |
+| `$id`             | `{domain}-{module}`                                                                                          | `management-plants`                |
+| Registry key      | `{domain}/{module}`                                                                                          | `management/plants`                |
+| Route path        | `/{domain}/{module}` (default — confirm with user if module ends with `-page` or represents a landing route) | `/management/plants`               |
+| Nav label         | PascalCase(module) with spaces between words (default — confirm with user if module name is ambiguous)       | `Plants`                           |
+| Dev script        | `dev-{domain}-{module}`                                                                                      | `dev-management-plants`            |
 
 ## Reference Module
 
@@ -52,16 +53,15 @@ Reproduce the same structure for the new module with substituted names. Copy dep
 
 ### Step 2 — Create module files
 
-Mirror every file from the reference module. For each file, apply the relevant substitutions:
+Create only the files listed below — do not copy domain-specific source files from the reference (e.g., dialogs, schemas, collections, utilities, stories). The reference module contains many files specific to the plants domain; only its config files and skeletal source structure are relevant.
 
-| File                                | What to substitute                                                                                           |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `package.json`                      | Package name, description, `license`, `author`; copy `scripts`, `devDependencies`, and `peerDependencies` exactly; for `dependencies`, copy only `workspace:*` deps (e.g., `@packages/components`) — do not copy domain-specific deps (e.g., `zod`, `date-fns`); omit `dependencies` entirely if none are `workspace:*` |
-| `tsconfig.json`                     | Identical copy                                                                                               |
-| `src/index.ts`                      | Barrel export of the register function                                                                       |
-| `src/{registerFunction}.tsx`        | Register function name, route path, `$id`, nav label, page component import                                  |
-| `src/{PageComponent}.tsx`           | Component name                                                                                               |
-| Any file not listed above           | Copy verbatim — no substitutions needed                                                                      |
+| File                         | What to substitute                                                                                                                                                                                                                                                                                                      |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `package.json`               | Package name, description; `license` must be `"Apache-2.0"`, `author` must be `"Patrick Lafrance"` (never copy from root `package.json`); copy `scripts`, `devDependencies`, and `peerDependencies` exactly; for `dependencies`, copy only `workspace:*` deps — do not copy domain-specific deps (e.g., `zod`, `date-fns`); omit `dependencies` entirely if none are `workspace:*` |
+| `tsconfig.json`              | Identical copy                                                                                                                                                                                                                                                                                                          |
+| `src/index.ts`               | Barrel export of the register function                                                                                                                                                                                                                                                                                  |
+| `src/{registerFunction}.tsx` | Register function name, route path, `$id`, nav label, page component import                                                                                                                                                                                                                                             |
+| `src/{PageComponent}.tsx`    | Component name                                                                                                                                                                                                                                                                                                          |
 
 ### Step 3 — Register in host
 
@@ -88,10 +88,10 @@ If the domain storybook does not exist yet, skip this step and warn the user.
 In `apps/storybook/.storybook/main.ts`, add a story glob for the new module under the appropriate `// {DomainTitle}` comment section in the `stories` array:
 
 ```ts
-"../{domain}/{module}/src/**/*.stories.tsx"
+"../{domain}/{module}/src/**/*.stories.tsx";
 ```
 
-Follow the existing comment-section pattern visible in the file.
+Follow the existing comment-section pattern visible in the file. The `stories` array has a `// Packages` comment section for non-module packages — never add module globs under that section.
 
 ### Step 6 — Update storybook affected map
 

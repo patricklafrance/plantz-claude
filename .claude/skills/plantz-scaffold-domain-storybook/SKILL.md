@@ -4,6 +4,7 @@ description: |
     Scaffold a domain-scoped Storybook with Chromatic CI integration.
     Use when asked to "add a storybook", "create a domain storybook", "scaffold storybook for {domain}".
     Triggers: /plantz-scaffold-domain-storybook, "add storybook", "new domain storybook"
+disable-model-invocation: true
 license: MIT
 ---
 
@@ -153,7 +154,7 @@ Use the canonical package names read from each module's `package.json`.
 
 ### Step 6 — Add Chromatic CI step
 
-In `.github/workflows/chromatic.yml`, add a new step after the existing Chromatic steps (before the "Remove run chromatic label" step):
+In `.github/workflows/chromatic.yml`, add a new step after the last domain Chromatic step but before the "Chromatic - Packages" step. Domain storybooks are grouped before the packages storybook:
 
 ```yaml
 - name: Chromatic - {DomainTitle}

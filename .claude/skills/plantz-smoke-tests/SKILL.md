@@ -11,6 +11,10 @@ license: MIT
 
 Smoke-test every application in the repository by starting each dev server and verifying the page loads without errors.
 
+## Prerequisites
+
+This skill requires `agent-browser` CLI to be available for browser verification steps (navigating to URLs, taking snapshots, checking console errors, taking screenshots). If `agent-browser` is not available, the skill cannot complete Steps 3.1–3.4.
+
 ## Discovery
 
 1. Read root `package.json` and collect every `dev-*` script.
@@ -29,7 +33,7 @@ Run the dev script in the background (e.g., `pnpm dev-host`). Capture the task I
 
 ### Step 2 — Wait for ready
 
-Watch stdout for the local URL (typically `http://localhost:<port>`). Wait for the server to emit it — this confirms the build succeeded and the server is listening. If the server fails to start within 60 seconds, record a failure and move to the next app.
+Watch stdout for the local URL (typically `http://localhost:<port>`). Wait for the server to emit it — this confirms the build succeeded and the server is listening. If the server fails to start within 120 seconds, record a failure and move to the next app. Storybooks can take significantly longer than the host on a cold start.
 
 ### Step 3 — Verify in browser
 
@@ -40,7 +44,7 @@ Watch stdout for the local URL (typically `http://localhost:<port>`). Wait for t
 
 ### Step 4 — Stop the dev server and kill orphan processes
 
-Stop the background task started in step 1. Then verify the port is actually free — `TaskStop` kills the turbo wrapper but child processes (the actual node dev server) can survive. Run `netstat -ano | grep -E "LISTENING" | grep ":<port>"` to check. If the port is still occupied, kill the orphan process with `taskkill //PID <pid> //F` (Windows) or `kill <pid>` (Unix). Do not proceed to the next app until the port is confirmed free.
+Stop the background task started in step 1. Then verify the port is actually free — `TaskStop` kills the turbo wrapper but child processes (the actual node dev server) can survive. Run `netstat -ano | grep -E "LISTENING" | grep ":<port>"` to check. If the port is still occupied, kill the orphan process with `taskkill //PID <pid> //T //F` (Windows) or `kill <pid>` (Unix). The `//T` flag kills the entire process tree. Never start the next app's dev server until the previous port is confirmed free.
 
 ### Step 5 — Record result
 
@@ -53,8 +57,7 @@ After all apps are tested, output a markdown table:
 ```
 | App | URL | Status | Errors |
 |---|---|---|---|
-| host | http://localhost:8080 | pass | — |
-| management-storybook | http://localhost:6006 | pass | — |
+| {app-name} | {discovered-url} | pass | — |
 | ... | ... | ... | ... |
 ```
 
@@ -64,5 +67,5 @@ If any app failed, list the failure details below the table.
 
 - Never hardcode app names or ports — discover them from `package.json` and server output.
 - Never leave a dev server running — always stop it before starting the next one.
-- Never skip an app — test every discovered application even if a previous one failed.
+- Never skip an app — test every discovered application even if a previous one failed. Skipping hides cascading failures across apps.
 - Always save screenshots as evidence, even for passing apps.

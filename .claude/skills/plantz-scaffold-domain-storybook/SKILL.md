@@ -41,14 +41,15 @@ Module-level values are discovered at runtime:
 
 ## Reference Storybook
 
-`apps/management/storybook/` is the canonical reference. Before creating any file, read these 6 files from the reference:
+`apps/management/storybook/` is the canonical reference. Before creating any file, read these 7 files from the reference:
 
 1. `apps/management/storybook/package.json`
 2. `apps/management/storybook/.storybook/main.ts`
 3. `apps/management/storybook/.storybook/preview.tsx`
-4. `apps/management/storybook/chromatic.config.json`
-5. `apps/management/storybook/tsconfig.json`
-6. `apps/management/storybook/rsbuild.config.ts`
+4. `apps/management/storybook/.storybook/storybook.css`
+5. `apps/management/storybook/chromatic.config.json`
+6. `apps/management/storybook/tsconfig.json`
+7. `apps/management/storybook/rsbuild.config.ts`
 
 Never hardcode dependency versions or config values from memory — your general knowledge of these packages is wrong for this repo. Always read the reference files and replicate them.
 
@@ -63,7 +64,7 @@ Never hardcode dependency versions or config values from memory — your general
 
 ### Step 2 — Create storybook files
 
-Read all 6 reference files listed above, then create 6 files under `apps/{domain}/storybook/`:
+Read all 7 reference files listed above, then create 7 files under `apps/{domain}/storybook/`:
 
 #### `package.json`
 
@@ -87,6 +88,20 @@ Preserve the `framework`, `addons`, and `getAbsolutePath` helper exactly as they
 #### `.storybook/preview.tsx`
 
 Clone entirely from the reference. No substitutions.
+
+#### `.storybook/storybook.css`
+
+Clone the structure from the reference. Keep the `@import` for `globals.css` and the `@source` for `@packages/components` as-is. Replace the module-specific `@source` lines with one per discovered module:
+
+```css
+@import "../../../../packages/components/src/styles/globals.css";
+
+@source "../../../../packages/components/src/**/*.{ts,tsx}";
+@source "../../{module_dir_1}/src/**/*.{ts,tsx}";
+@source "../../{module_dir_2}/src/**/*.{ts,tsx}";
+```
+
+Without this file, Tailwind styles will not work in the new storybook.
 
 #### `chromatic.config.json`
 
@@ -162,12 +177,12 @@ Run `pnpm install` to link the new workspace package.
 
 ### Step 8 — Verify
 
-1. Confirm all 6 storybook files exist under `apps/{domain}/storybook/`.
+1. Confirm all 7 storybook files exist under `apps/{domain}/storybook/` (including `.storybook/storybook.css`).
 2. Confirm root `package.json` has the `dev-{domain}-storybook` script.
 3. Confirm `apps/storybook/.storybook/main.ts` includes the new story globs.
 4. Confirm `tooling/getAffectedStorybooks.ts` includes the new `StorybookDependencies` entry.
 5. Confirm `.github/workflows/chromatic.yml` has the new Chromatic step.
-6. Run `pnpm syncpack lint` — fix any version mismatches.
+6. Run `pnpm syncpack` — fix any version mismatches.
 7. Run `pnpm typecheck` — fix any type errors.
 8. Start the dev server with `pnpm dev-{domain}-storybook` and confirm it launches without errors.
 
@@ -178,4 +193,3 @@ Run `pnpm install` to link the new workspace package.
 - Never skip the Chromatic CI step (Step 6) — the storybook will not be tested in CI.
 - Never skip the unified storybook integration (Step 4) — the domain's stories will be missing from the unified Storybook.
 - Never invent a `projectId` in `chromatic.config.json` — remove it and let the user configure it after creating the Chromatic project.
-- Never use `^` or `~` ranges in app-level dependencies — this repo uses exact versions enforced by syncpack.

@@ -33,8 +33,8 @@ All names are mechanically derived from `domain` and `module`. **PascalCase** me
 | Page file         | `src/{PageComponent}.tsx`                                                     | `src/PlantsPage.tsx`               |
 | `$id`             | `{domain}-{module}`                                                           | `management-plants`                |
 | Registry key      | `{domain}/{module}`                                                           | `management/plants`                |
-| Route path        | `/{domain}/{module}`                                                          | `/management/plants`               |
-| Nav label         | PascalCase(module) with spaces between words                                  | `Plants`                           |
+| Route path        | `/{domain}/{module}` (default — confirm with user if module ends with `-page` or represents a landing route) | `/management/plants` |
+| Nav label         | PascalCase(module) with spaces between words (default — confirm with user if module name is ambiguous) | `Plants` |
 | Dev script        | `dev-{domain}-{module}`                                                       | `dev-management-plants`            |
 
 ## Reference Module
@@ -56,12 +56,12 @@ Mirror every file from the reference module. For each file, apply the relevant s
 
 | File                                | What to substitute                                                                                           |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `package.json`                      | Package name, description; copy `scripts`, `dependencies`, `devDependencies`, and `peerDependencies` exactly |
+| `package.json`                      | Package name, description, `license`, `author`; copy `scripts`, `devDependencies`, and `peerDependencies` exactly; for `dependencies`, copy only `workspace:*` deps (e.g., `@packages/components`) — do not copy domain-specific deps (e.g., `zod`, `date-fns`); omit `dependencies` entirely if none are `workspace:*` |
 | `tsconfig.json`                     | Identical copy                                                                                               |
 | `src/index.ts`                      | Barrel export of the register function                                                                       |
 | `src/{registerFunction}.tsx`        | Register function name, route path, `$id`, nav label, page component import                                  |
 | `src/{PageComponent}.tsx`           | Component name                                                                                               |
-| Any other file (config files, etc.) | Identical copy                                                                                               |
+| Any file not listed above           | Copy verbatim — no substitutions needed                                                                      |
 
 ### Step 3 — Register in host
 
@@ -71,13 +71,35 @@ Mirror every file from the reference module. For each file, apply the relevant s
 2. In `apps/host/package.json`:
     - Add `"{packageName}": "workspace:*"` to `dependencies`
 
-### Step 4 — Update storybook affected map
+### Step 4 — Update domain storybook CSS
+
+In `apps/{domain}/storybook/.storybook/storybook.css`, add a `@source` directive for the new module:
+
+```css
+@source "../../{module}/src/**/*.{ts,tsx}";
+```
+
+Without this, Tailwind classes used in the new module will not be scanned and will be missing from the domain storybook.
+
+If the domain storybook does not exist yet, skip this step and warn the user.
+
+### Step 5 — Update unified storybook
+
+In `apps/storybook/.storybook/main.ts`, add a story glob for the new module under the appropriate `// {DomainTitle}` comment section in the `stories` array:
+
+```ts
+"../{domain}/{module}/src/**/*.stories.tsx"
+```
+
+Follow the existing comment-section pattern visible in the file.
+
+### Step 6 — Update storybook affected map
 
 In `tooling/getAffectedStorybooks.ts`, add `"{packageName}"` to the `StorybookDependencies` entry for the domain's storybook (`@apps/{domain}-storybook`).
 
 If no storybook entry exists for the domain, warn the user but do not create one.
 
-### Step 5 — Add dev script
+### Step 7 — Add dev script
 
 In root `package.json`, add to `scripts`:
 
@@ -85,22 +107,24 @@ In root `package.json`, add to `scripts`:
 "dev-{domain}-{module}": "cross-env MODULES={domain}/{module} pnpm dev-host"
 ```
 
-### Step 6 — Install dependencies
+### Step 8 — Install dependencies
 
 Run `pnpm install` to link the new workspace package.
 
-### Step 7 — Verify
+### Step 9 — Verify
 
 1. Confirm every file from the reference module has a corresponding file in the new module.
 2. Confirm `getActiveModules.tsx` imports the register function and has the registry entry.
 3. Confirm `apps/host/package.json` lists the new package in `dependencies`.
-4. Confirm `getAffectedStorybooks.ts` includes the new package.
-5. Confirm root `package.json` has the dev script.
-6. Run `pnpm syncpack lint` — fix any version mismatches.
-7. Run `pnpm typecheck` — fix any type errors.
+4. Confirm domain storybook's `storybook.css` includes a `@source` directive for the new module.
+5. Confirm `apps/storybook/.storybook/main.ts` includes a story glob for the new module.
+6. Confirm `getAffectedStorybooks.ts` includes the new package.
+7. Confirm root `package.json` has the dev script.
+8. Run `pnpm syncpack` — fix any version mismatches.
+9. Run `pnpm typecheck` — fix any type errors.
 
 ## Prohibitions
 
 - Never hardcode dependency versions — always read them from the reference module.
-- Never skip host registration (Step 3) or storybook registration (Step 4) — these are silent failures at runtime and in CI.
+- Never skip host registration (Step 3), storybook CSS update (Step 4), unified storybook update (Step 5), or affected-map registration (Step 6) — these are silent failures at runtime and in CI.
 - Never create a module directory that already exists.

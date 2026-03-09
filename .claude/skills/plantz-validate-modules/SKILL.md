@@ -28,7 +28,7 @@ All names are mechanically derived. **PascalCase** means split on `-`, capitaliz
 | Register function | `register` + PascalCase(domain) + PascalCase(module)                          |
 | Page component    | PascalCase(module) + `Page` (skip `Page` if module already ends with `-page`) |
 | Registry key      | `{domain}/{module}`                                                           |
-| Route path        | `/{domain}/{module}`                                                          |
+| Route path        | `/{domain}/{module}` (default — modules may override, e.g., `today/landing-page` uses `/today`) |
 | `$id`             | `{domain}-{module}`                                                           |
 | Dev script        | `dev-{domain}-{module}`                                                       |
 | Domain storybook  | `@apps/{domain}-storybook`                                                    |
@@ -56,7 +56,9 @@ Read the module's `package.json` and verify:
 - `private` is `true`
 - `type` is `"module"`
 - `exports` includes `"./src/index.ts"` (exact value or object with `.` key)
-- `scripts` contains `"typecheck"` and `"oxlint"`
+- `scripts` contains `"typecheck"`
+- `license` is `"Apache-2.0"`
+- `author` is `"Patrick Lafrance"`
 
 ### 3. Barrel export
 
@@ -97,7 +99,11 @@ Read root `package.json` and verify:
 
 - `scripts` contains `"dev-{domain}-{module}"` with value `"cross-env MODULES={domain}/{module} pnpm dev-host"`
 
-### 8. Story file existence
+### 8. Storybook CSS source directive
+
+Read `apps/{domain}/storybook/.storybook/storybook.css` and verify it contains a `@source` directive that resolves to the module's `src/` directory (typically `@source "../../{module}/src/**/*.{ts,tsx}";`). Without this, Tailwind classes used in the module will not be scanned and will be missing from the domain storybook. If the domain storybook does not exist, record a warning rather than a failure.
+
+### 9. Story file existence
 
 Verify at least one `.stories.tsx` file exists under `apps/{domain}/{module}/src/`.
 
@@ -118,6 +124,7 @@ After all checks, output a summary:
 - [x] Unified storybook glob present
 - [x] Affected detection entry present
 - [x] Root dev script present
+- [x] Storybook CSS source directive present
 - [x] Story file exists
 ```
 

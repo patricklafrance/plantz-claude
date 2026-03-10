@@ -10,12 +10,12 @@ const storybookConfig: StorybookConfig = {
     addons: [getAbsolutePath("@storybook/addon-a11y")],
     stories: [
         // Packages
-        "../../packages/components/src/**/*.stories.tsx",
-        "../../packages/plants-core/src/**/*.stories.tsx",
+        "../../../packages/components/src/**/*.stories.tsx",
+        "../../../packages/plants-core/src/**/*.stories.tsx",
         // Management
-        "../management/plants/src/**/*.stories.tsx",
+        "../../management/plants/src/**/*.stories.tsx",
         // Today
-        "../today/landing-page/src/**/*.stories.tsx",
+        "../../today/landing-page/src/**/*.stories.tsx",
     ],
 };
 

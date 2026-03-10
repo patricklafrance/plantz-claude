@@ -16,12 +16,11 @@ plantz-claude/
     today/
       landing-page/                # Today domain — landing page module (@modules/today-landing-page)
       storybook/                   # Today domain Storybook (@apps/today-storybook)
-    storybook/                     # Packages-layer Storybook (@apps/packages-storybook)
+    storybook/                     # Unified Storybook — all stories in the repo (@apps/storybook)
   packages/
     components/                    # Shared UI components — shadcn/ui + Tailwind v4 (@packages/components)
     plants-core/                   # Shared plant domain types, utilities, and components (@packages/plants-core)
-    squide-core/                   # Shared Squide utilities (@packages/squide-core)
-    storybook/                     # Shared Storybook config (@packages/storybook)
+    storybook/                     # Packages-layer Storybook + shared Storybook config (@packages/storybook)
   tooling/                         # Build scripts (getAffectedStorybooks.ts)
   agent-docs/                      # Agent documentation (this folder)
   .agents/skills/                  # Shared agent skills (git-commit, etc.)
@@ -36,7 +35,7 @@ plantz-claude/
 | `apps/host`               | `@apps/*`     | `@apps/host`                 |
 | `apps/<domain>/storybook` | `@apps/*`     | `@apps/management-storybook` |
 | `apps/<domain>/<feature>` | `@modules/*`  | `@modules/management-plants` |
-| `packages/*`              | `@packages/*` | `@packages/squide-core`      |
+| `packages/*`              | `@packages/*` | `@packages/plants-core`      |
 
 ## Squide host/module topology
 
@@ -55,7 +54,7 @@ Two domain areas, each with independent Storybooks and Chromatic tokens:
 - **management** — Plant management features (`apps/management/`)
 - **today** — Daily watering view (`apps/today/`)
 
-A third Storybook (`apps/storybook/`) covers shared packages.
+A packages-layer Storybook (`packages/storybook/`) covers shared packages. A unified Storybook (`apps/storybook/`) aggregates all stories across the entire repo.
 
 See [ADR-0002](adr/0002-domain-scoped-storybooks.md) for rationale.
 

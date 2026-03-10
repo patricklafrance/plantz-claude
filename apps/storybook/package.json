@@ -12,6 +12,8 @@
         "doctor": "storybook doctor"
     },
     "dependencies": {
+        "@packages/components": "workspace:*",
+        "@packages/plants-core": "workspace:*",
         "@storybook/addon-a11y": "10.2.15",
         "react": "19.2.4",
         "react-dom": "19.2.4",
@@ -21,6 +23,7 @@
     },
     "devDependencies": {
         "@rsbuild/core": "1.7.2",
+        "@tailwindcss/postcss": "4.2.1",
         "@types/react": "19.2.9",
         "@types/react-dom": "19.2.3",
         "@typescript/native-preview": "7.0.0-dev.20260303.1",

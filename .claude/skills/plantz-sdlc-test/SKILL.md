@@ -3,7 +3,6 @@ name: plantz-sdlc-test
 description: |
     Validate code quality — lint, module structure, and accessibility. Reports issues but does not fix them.
     Use when asked to "test the feature", "validate code quality", "run checks", or as part of the SDLC orchestrator's test phase.
-disable-model-invocation: true
 license: MIT
 ---
 
@@ -15,9 +14,9 @@ Smoke tests and visual verification run in CI (not here) — see the `smoke-test
 
 ## Inputs (provided by orchestrator)
 
-| Input       | Description            |
-| ----------- | ---------------------- |
-| `run-uuid`  | Run folder identifier  |
+| Input       | Description              |
+| ----------- | ------------------------ |
+| `run-uuid`  | Run folder identifier    |
 | `iteration` | Current iteration number |
 
 ## Procedure

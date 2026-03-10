@@ -3,7 +3,6 @@ name: plantz-sdlc-plan
 description: |
     Draft a technical plan for a feature. Analyzes requirements, identifies affected packages, and outputs a structured plan file.
     Use when asked to "plan a feature", "draft a technical plan", "design the approach", or as part of the SDLC orchestrator's planning phase.
-disable-model-invocation: true
 license: MIT
 ---
 

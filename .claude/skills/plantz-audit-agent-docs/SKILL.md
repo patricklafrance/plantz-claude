@@ -5,7 +5,6 @@ description: |
     Use when asked to "audit docs", "review agent-docs", "check documentation",
     or after significant architectural or tooling changes.
     Triggers: /plantz-audit-agent-docs, "audit docs", "review documentation quality"
-disable-model-invocation: true
 license: MIT
 ---
 
@@ -16,11 +15,13 @@ Audit `CLAUDE.md` and `agent-docs/` against the live codebase. This skill define
 ## Scope
 
 This skill audits:
+
 - Root `CLAUDE.md` and its index entries
 - All files under `agent-docs/` (references, ADRs, ODRs)
 - Scaffold skill SKILL.md files (they are referenced from agent-docs and define module structure)
 
 This skill does NOT audit:
+
 - `.claude/skills/*/references/` files — these are owned by individual skills, not the agent-docs system
 - Third-party skill documentation (e.g., `accessibility`, `frontend-design`, `shadcn`)
 
@@ -31,8 +32,8 @@ Each doc has specific codebase sources. Check these files for accuracy:
 | Doc                                                        | Codebase sources                                                                                                                                                                      |
 | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ARCHITECTURE.md`                                          | `apps/**/package.json`, `packages/**/package.json`, `pnpm-workspace.yaml`, directory structure                                                                                        |
-| `references/turborepo.md`                                  | `turbo.json`                                                                                                                                                                           |
-| `references/typescript.md`                                 | root `tsconfig.json`                                                                                                                                                                   |
+| `references/turborepo.md`                                  | `turbo.json`                                                                                                                                                                          |
+| `references/typescript.md`                                 | root `tsconfig.json`                                                                                                                                                                  |
 | `references/ci-cd.md`                                      | `.github/workflows/*.yml`, `tooling/getAffectedStorybooks.ts`                                                                                                                         |
 | `references/writing-agent-instructions.md`                 | `CLAUDE.md` (verify that CLAUDE.md rules follow the principles this doc defines)                                                                                                      |
 | `adr/index.md`                                             | `agent-docs/adr/0*.md`                                                                                                                                                                |
@@ -40,7 +41,7 @@ Each doc has specific codebase sources. Check these files for accuracy:
 | `adr/0002-domain-scoped-storybooks.md`                     | `ARCHITECTURE.md` (domain isolation section), `apps/*/storybook/` directories                                                                                                         |
 | `odr/index.md`                                             | `agent-docs/odr/0*.md`                                                                                                                                                                |
 | `odr/0001-pnpm-turborepo-monorepo.md`                      | `pnpm-workspace.yaml`, `turbo.json`                                                                                                                                                   |
-| `odr/0002-dependency-versioning-syncpack.md`               | `.syncpackrc.js`                                                                                                                                                                       |
+| `odr/0002-dependency-versioning-syncpack.md`               | `.syncpackrc.js`                                                                                                                                                                      |
 | `odr/0003-selective-chromatic-runs.md`                     | `.github/workflows/chromatic.yml`, `tooling/getAffectedStorybooks.ts`                                                                                                                 |
 | `odr/0004-jit-packages.md`                                 | `packages/*/package.json` (`exports` fields), `turbo.json` (`dev` task)                                                                                                               |
 | `.claude/skills/plantz-scaffold-domain-module/SKILL.md`    | Reference module (`apps/management/plants/**`), `apps/host/src/getActiveModules.tsx`, `apps/host/package.json`, `tooling/getAffectedStorybooks.ts`, root `package.json`               |

@@ -3,7 +3,6 @@ name: plantz-smoke-tests
 description: |
     Smoke-test every application by starting dev servers and verifying pages load without errors.
     Use when asked to "verify apps", "test all apps", "smoke test", "check dev servers".
-disable-model-invocation: true
 license: MIT
 ---
 

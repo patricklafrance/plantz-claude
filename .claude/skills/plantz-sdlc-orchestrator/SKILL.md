@@ -3,7 +3,6 @@ name: plantz-sdlc-orchestrator
 description: |
     Entry point for end-to-end feature development. Leads the SDLC process by spawning subagents for planning, coding, testing, documenting, and merging.
     Use when asked to "build a feature", "develop end-to-end", "full SDLC", "implement feature from scratch", or any request that requires coordinated planning, implementation, testing, and PR creation.
-disable-model-invocation: true
 license: MIT
 ---
 

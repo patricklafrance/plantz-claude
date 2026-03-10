@@ -5,7 +5,6 @@ description: |
     Wipes existing plant data in localStorage and replaces it with fresh seed data.
     Requires the dev server and Chrome DevTools MCP browser to be available.
     Triggers: /seed-plants, "seed plants", "reseed plants", "reset plant data"
-disable-model-invocation: true
 license: MIT
 ---
 

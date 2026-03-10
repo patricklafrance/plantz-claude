@@ -3,7 +3,6 @@ name: plantz-sdlc-code
 description: |
     Implement a feature plan or fix issues reported by the test phase. Writes code to the repo and outputs a changes summary file.
     Use when asked to "implement the plan", "code the feature", "fix test issues", or as part of the SDLC orchestrator's coding phase.
-disable-model-invocation: true
 license: MIT
 ---
 
@@ -13,13 +12,13 @@ Implement the plan or fix issues reported by the test phase or CI.
 
 ## Inputs (provided by orchestrator)
 
-| Input        | Description                                                                                                                                                                |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `run-uuid`   | Run folder identifier                                                                                                                                                      |
-| `iteration`  | Current iteration number (starts at 1). This is the iteration the agent will **write** to (`changes-[iteration].md`).                                                      |
-| Plan path    | Always provided — `./tmp/runs/[run-uuid]/plan.md`                                                                                                                          |
+| Input        | Description                                                                                                                                             |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `run-uuid`   | Run folder identifier                                                                                                                                   |
+| `iteration`  | Current iteration number (starts at 1). This is the iteration the agent will **write** to (`changes-[iteration].md`).                                   |
+| Plan path    | Always provided — `./tmp/runs/[run-uuid]/plan.md`                                                                                                       |
 | Issues path  | `null` on iteration 1. On fix cycles: the path to the issues file — either `test-issues-*.md` (from test phase) or `ci-issues-*.md` (from CI failures). |
-| Changes path | `null` on iteration 1. On fix cycles: the explicit path to the **previous** iteration's changes file (e.g., `changes-1.md` when `iteration=2`).    |
+| Changes path | `null` on iteration 1. On fix cycles: the explicit path to the **previous** iteration's changes file (e.g., `changes-1.md` when `iteration=2`).         |
 
 ## Mode
 

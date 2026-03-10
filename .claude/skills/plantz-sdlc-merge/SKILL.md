@@ -3,7 +3,6 @@ name: plantz-sdlc-merge
 description: |
     Commit, push, open a PR, and monitor CI. Handles CI failures and PR comments by returning control to the orchestrator.
     Use when asked to "commit and push", "open a PR", "merge the feature", or as part of the SDLC orchestrator's merge phase.
-disable-model-invocation: true
 license: MIT
 ---
 
@@ -74,6 +73,7 @@ Poll every 60 seconds, with a maximum wait of 30 minutes per CI cycle.
 
     - [error output]
     ```
+
 2. **PR comments:** Monitor for 10 minutes after CI goes green. If comments are added during that window, evaluate their legitimacy. For legitimate comments, write them to `./tmp/runs/[run-uuid]/pr-comments-[attempt].md` and **return control to the orchestrator**. After the 10-minute window with no comments, report success to the orchestrator.
 3. **Chromatic:** When all workflows except Chromatic are green and all PR comments are resolved, add the `run chromatic` label to the pull request. Chromatic is label-gated — adding this label triggers the Chromatic workflows.
 4. **Chromatic failure:** If Chromatic workflows fail, tag the repository maintainers in the PR and ask them to review. Do not attempt to fix Chromatic issues autonomously.

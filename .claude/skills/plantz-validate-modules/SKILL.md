@@ -5,7 +5,6 @@ description: |
     Use when asked to "validate modules", "check module structure", "verify modules",
     or after scaffolding a new module.
     Triggers: /plantz-validate-modules, "validate modules", "check modules", "verify module structure"
-disable-model-invocation: true
 license: MIT
 ---
 

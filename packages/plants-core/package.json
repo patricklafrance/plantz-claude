@@ -7,15 +7,16 @@
     "author": "Patrick Lafrance",
     "type": "module",
     "exports": {
-        ".": "./src/index.ts"
+        ".": "./src/index.ts",
+        "./msw": "./src/msw/index.ts"
     },
     "scripts": {
         "typecheck": "tsgo"
     },
     "dependencies": {
         "@packages/components": "workspace:*",
-        "@tanstack/react-db": "^0.1.75",
         "lucide-react": "^0.577.0",
+        "msw": "^2.12.10",
         "zod": "^4.3.6"
     },
     "devDependencies": {
@@ -27,6 +28,7 @@
         "typescript": "5.9.3"
     },
     "peerDependencies": {
+        "@tanstack/react-query": "^5.90.21",
         "react": "^19.2.4",
         "react-dom": "^19.2.4"
     }

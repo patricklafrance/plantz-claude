@@ -17,6 +17,7 @@ const storybookConfig: StorybookConfig = {
         // Today
         "../../today/landing-page/src/**/*.stories.tsx",
     ],
+    staticDirs: ["./public"],
 };
 
 export default storybookConfig;

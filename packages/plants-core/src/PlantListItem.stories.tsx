@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
+import { freezeDate, restoreDate } from "./msw/freezeDate.ts";
 import { PlantListItem } from "./PlantListItem.tsx";
 import type { Plant } from "./plantSchema.ts";
 
@@ -9,26 +10,6 @@ import type { Plant } from "./plantSchema.ts";
 const FIXED_NOW = new Date(2026, 2, 10, 12, 0, 0, 0);
 const FIXED_FUTURE = new Date(2026, 2, 17, 0, 0, 0, 0);
 const FIXED_PAST = new Date(2026, 2, 8, 0, 0, 0, 0);
-const OriginalDate = globalThis.Date;
-
-function freezeDate() {
-    const Frozen = function (this: Date, ...args: unknown[]) {
-        if (args.length === 0) {
-            return new OriginalDate(FIXED_NOW);
-        }
-        return new (OriginalDate as unknown as new (...a: unknown[]) => Date)(...args);
-    } as unknown as DateConstructor;
-    Object.setPrototypeOf(Frozen, OriginalDate);
-    Object.setPrototypeOf(Frozen.prototype, OriginalDate.prototype);
-    Frozen.now = () => FIXED_NOW.getTime();
-    Frozen.parse = OriginalDate.parse.bind(OriginalDate);
-    Frozen.UTC = OriginalDate.UTC.bind(OriginalDate);
-    globalThis.Date = Frozen;
-}
-
-function restoreDate() {
-    globalThis.Date = OriginalDate;
-}
 
 function makePlant(overrides: Partial<Plant> = {}): Plant {
     return {
@@ -66,7 +47,7 @@ const meta = {
         (Story) => {
             const frozenRef = useRef(false);
             if (!frozenRef.current) {
-                freezeDate();
+                freezeDate(FIXED_NOW);
                 frozenRef.current = true;
             }
 

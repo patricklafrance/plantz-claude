@@ -50,6 +50,9 @@ importers:
       '@packages/components':
         specifier: workspace:*
         version: link:../../packages/components
+      '@packages/plants-core':
+        specifier: workspace:*
+        version: link:../../packages/plants-core
       '@squide/firefly':
         specifier: 16.1.12
         version: 16.1.12(@tanstack/react-query@5.90.21(react@19.2.4))(launchdarkly-js-client-sdk@3.9.0)(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react-router@7.12.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
@@ -96,6 +99,9 @@ importers:
       http-server:
         specifier: 14.1.1
         version: 14.1.1
+      msw:
+        specifier: 2.12.10
+        version: 2.12.10(@types/node@25.3.3)(typescript@5.9.3)
       tailwindcss:
         specifier: 4.2.1
         version: 4.2.1
@@ -114,9 +120,9 @@ importers:
       '@squide/firefly':
         specifier: ^16.1.12
         version: 16.1.12(@tanstack/react-query@5.90.21(react@19.2.4))(launchdarkly-js-client-sdk@3.9.0)(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react-router@7.12.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
-      '@tanstack/react-db':
-        specifier: ^0.1.75
-        version: 0.1.75(react@19.2.4)(typescript@5.9.3)
+      '@tanstack/react-query':
+        specifier: ^5.90.21
+        version: 5.90.21(react@19.2.4)
       '@tanstack/react-virtual':
         specifier: ^3.13.21
         version: 3.13.21(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -151,6 +157,9 @@ importers:
       '@workleap/typescript-configs':
         specifier: 3.0.7
         version: 3.0.7(typescript@5.9.3)
+      msw:
+        specifier: 2.12.10
+        version: 2.12.10(@types/node@25.3.3)(typescript@5.9.3)
       storybook-react-rsbuild:
         specifier: 3.2.3
         version: 3.2.3(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
@@ -163,9 +172,18 @@ importers:
       '@packages/components':
         specifier: workspace:*
         version: link:../../../packages/components
+      '@packages/plants-core':
+        specifier: workspace:*
+        version: link:../../../packages/plants-core
       '@storybook/addon-a11y':
         specifier: 10.2.15
         version: 10.2.15(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
+      '@tanstack/react-query':
+        specifier: 5.90.21
+        version: 5.90.21(react@19.2.4)
+      msw:
+        specifier: 2.12.10
+        version: 2.12.10(@types/node@25.3.3)(typescript@5.9.3)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -221,6 +239,12 @@ importers:
       '@storybook/addon-a11y':
         specifier: 10.2.15
         version: 10.2.15(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
+      '@tanstack/react-query':
+        specifier: 5.90.21
+        version: 5.90.21(react@19.2.4)
+      msw:
+        specifier: 2.12.10
+        version: 2.12.10(@types/node@25.3.3)(typescript@5.9.3)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -276,9 +300,9 @@ importers:
       '@squide/firefly':
         specifier: ^16.1.12
         version: 16.1.12(@tanstack/react-query@5.90.21(react@19.2.4))(launchdarkly-js-client-sdk@3.9.0)(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react-router@7.12.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
-      '@tanstack/react-db':
-        specifier: ^0.1.75
-        version: 0.1.75(react@19.2.4)(typescript@5.9.3)
+      '@tanstack/react-query':
+        specifier: ^5.90.21
+        version: 5.90.21(react@19.2.4)
       '@tanstack/react-virtual':
         specifier: ^3.13.21
         version: 3.13.21(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -310,6 +334,9 @@ importers:
       '@workleap/typescript-configs':
         specifier: 3.0.7
         version: 3.0.7(typescript@5.9.3)
+      msw:
+        specifier: 2.12.10
+        version: 2.12.10(@types/node@25.3.3)(typescript@5.9.3)
       storybook-react-rsbuild:
         specifier: 3.2.3
         version: 3.2.3(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
@@ -322,9 +349,18 @@ importers:
       '@packages/components':
         specifier: workspace:*
         version: link:../../../packages/components
+      '@packages/plants-core':
+        specifier: workspace:*
+        version: link:../../../packages/plants-core
       '@storybook/addon-a11y':
         specifier: 10.2.15
         version: 10.2.15(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
+      '@tanstack/react-query':
+        specifier: 5.90.21
+        version: 5.90.21(react@19.2.4)
+      msw:
+        specifier: 2.12.10
+        version: 2.12.10(@types/node@25.3.3)(typescript@5.9.3)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -425,7 +461,7 @@ importers:
         version: 3.0.7(typescript@5.9.3)
       storybook-react-rsbuild:
         specifier: 3.2.3
-        version: 3.2.3(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
+        version: 3.2.3(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
       tailwindcss:
         specifier: 4.2.1
         version: 4.2.1
@@ -438,12 +474,15 @@ importers:
       '@packages/components':
         specifier: workspace:*
         version: link:../components
-      '@tanstack/react-db':
-        specifier: ^0.1.75
-        version: 0.1.75(react@19.2.4)(typescript@5.9.3)
+      '@tanstack/react-query':
+        specifier: ^5.90.21
+        version: 5.90.21(react@19.2.4)
       lucide-react:
         specifier: ^0.577.0
         version: 0.577.0(react@19.2.4)
+      msw:
+        specifier: ^2.12.10
+        version: 2.12.10(@types/node@25.3.3)(typescript@5.9.3)
       react:
         specifier: ^19.2.4
         version: 19.2.4
@@ -484,6 +523,12 @@ importers:
       '@storybook/addon-a11y':
         specifier: 10.2.15
         version: 10.2.15(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
+      '@tanstack/react-query':
+        specifier: 5.90.21
+        version: 5.90.21(react@19.2.4)
+      msw:
+        specifier: 2.12.10
+        version: 2.12.10(@types/node@25.3.3)(typescript@5.9.3)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -1626,9 +1671,6 @@ packages:
       react-dom: ^18.0.0 || ^19.0.0
       react-router: ^7.13.1
 
-  '@standard-schema/spec@1.1.0':
-    resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
-
   '@storybook/addon-a11y@10.2.15':
     resolution: {integrity: sha512-lhWG4NbR1o0AOzrCucz2m3AU5pmNSzN4lC7Q2wHjpDSgXokz5xzGvilYlDzCuEvsyPFiivOBx1igwSWdIV4BTw==}
     peerDependencies:
@@ -1840,27 +1882,8 @@ packages:
   '@tailwindcss/postcss@4.2.1':
     resolution: {integrity: sha512-OEwGIBnXnj7zJeonOh6ZG9woofIjGrd2BORfvE5p9USYKDCZoQmfqLcfNiRWoJlRWLdNPn2IgVZuWAOM4iTYMw==}
 
-  '@tanstack/db-ivm@0.1.17':
-    resolution: {integrity: sha512-DK7vm56CDxNuRAdsbiPs+gITJ+16tUtYgZg3BRTLYKGIDsy8sdIO7sQFq5zl7Y+aIKAPmMAbVp9UjJ75FTtwgQ==}
-    peerDependencies:
-      typescript: '>=4.7'
-
-  '@tanstack/db@0.5.31':
-    resolution: {integrity: sha512-q2gCcFLkQec6AwA8aSDDOEAT7hlyVn67J/kseUoZfEPyiokmx1oBekg27tywirmlSqc3Q5GUi5Vt/mjQ85gQmQ==}
-    peerDependencies:
-      typescript: '>=4.7'
-
-  '@tanstack/pacer-lite@0.2.1':
-    resolution: {integrity: sha512-3PouiFjR4B6x1c969/Pl4ZIJleof1M0n6fNX8NRiC9Sqv1g06CVDlEaXUR4212ycGFyfq4q+t8Gi37Xy+z34iQ==}
-    engines: {node: '>=18'}
-
   '@tanstack/query-core@5.90.20':
     resolution: {integrity: sha512-OMD2HLpNouXEfZJWcKeVKUgQ5n+n3A2JFmBaScpNDUqSrQSjiveC7dKMe53uJUg1nDG16ttFPz2xfilz6i2uVg==}
-
-  '@tanstack/react-db@0.1.75':
-    resolution: {integrity: sha512-23LVu1zArKXaPug7euZO07SsEjATfzvLQSuCOW+C4bK6V17CL6129EbrW23q9KUwnMkp8VpLOpqZniNY4ib3ig==}
-    peerDependencies:
-      react: '>=16.8.0'
 
   '@tanstack/react-query@5.90.21':
     resolution: {integrity: sha512-0Lu6y5t+tvlTJMTO7oh5NSpJfpg/5D41LlThfepTixPYkJ0sE2Jj0m0f6yYqujBwIXlId87e234+MxG3D3g7kg==}
@@ -2847,10 +2870,6 @@ packages:
   foreground-child@3.3.1:
     resolution: {integrity: sha512-gIXjKqtFuWEgzFRJA9WCQeSJLZDjgJUOMCMzxtvFq/37KojM1BFGufqsCy0r4qSQmYLsZYMeyRqzIWOMup03sw==}
     engines: {node: '>=14'}
-
-  fractional-indexing@3.2.0:
-    resolution: {integrity: sha512-PcOxmqwYCW7O2ovKRU8OoQQj2yqTfEB/yeTYk4gPid6dN5ODRfU1hXd9tTVZzax/0NkO7AxpHykvZnT1aYp/BQ==}
-    engines: {node: ^14.13.1 || >=16.0.0}
 
   fs-extra@11.3.4:
     resolution: {integrity: sha512-CTXd6rk/M3/ULNQj8FBqBWHYBVYybQ3VPBw0xGKFe3tuH7ytT6ACnvzpIQ3UZtB8yvUKC2cXn1a+x+5EVQLovA==}
@@ -3919,9 +3938,6 @@ packages:
     resolution: {integrity: sha512-HLpt+uLy/pxB+bum/9DzAgiKS8CX1EvbWxI4zlmgGCExImLdiad2iCwXT5Z4c9c3Eq8rP2318mPW2c+QbtjK8A==}
     engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
 
-  sorted-btree@1.8.1:
-    resolution: {integrity: sha512-395+XIP+wqNn3USkFSrNz7G3Ss/MXlZEqesxvzCRFwL14h6e8LukDHdLBePn5pwbm5OQ9vGu8mDyz2lLDIqamQ==}
-
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
@@ -4168,11 +4184,11 @@ packages:
     resolution: {integrity: sha512-azl+t0z7pw/z958Gy9svOTuzqIk6xq+NSheJzn5MMWtWTFywIacg2wUlzKFGtt3cthx0r2SxMK0yzJOR0IES7Q==}
     engines: {node: '>=14.0.0'}
 
-  tldts-core@7.0.24:
-    resolution: {integrity: sha512-pj7yygNMoMRqG7ML2SDQ0xNIOfN3IBDUcPVM2Sg6hP96oFNN2nqnzHreT3z9xLq85IWJyNTvD38O002DdOrPMw==}
+  tldts-core@7.0.25:
+    resolution: {integrity: sha512-ZjCZK0rppSBu7rjHYDYsEaMOIbbT+nWF57hKkv4IUmZWBNrBWBOjIElc0mKRgLM8bm7x/BBlof6t2gi/Oq/Asw==}
 
-  tldts@7.0.24:
-    resolution: {integrity: sha512-1r6vQTTt1rUiJkI5vX7KG8PR342Ru/5Oh13kEQP2SMbRSZpOey9SrBe27IDxkoWulx8ShWu4K6C0BkctP8Z1bQ==}
+  tldts@7.0.25:
+    resolution: {integrity: sha512-keinCnPbwXEUG3ilrWQZU+CqcTTzHq9m2HhoUP2l7Xmi8l1LuijAXLpAJ5zRW+ifKTNscs4NdCkfkDCBYm352w==}
     hasBin: true
 
   to-regex-range@5.0.1:
@@ -5440,8 +5456,6 @@ snapshots:
       react-dom: 19.2.4(react@19.2.4)
       react-router: 7.12.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
 
-  '@standard-schema/spec@1.1.0': {}
-
   '@storybook/addon-a11y@10.2.15(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))':
     dependencies:
       '@storybook/global': 5.0.0
@@ -5642,30 +5656,7 @@ snapshots:
       postcss: 8.5.8
       tailwindcss: 4.2.1
 
-  '@tanstack/db-ivm@0.1.17(typescript@5.9.3)':
-    dependencies:
-      fractional-indexing: 3.2.0
-      sorted-btree: 1.8.1
-      typescript: 5.9.3
-
-  '@tanstack/db@0.5.31(typescript@5.9.3)':
-    dependencies:
-      '@standard-schema/spec': 1.1.0
-      '@tanstack/db-ivm': 0.1.17(typescript@5.9.3)
-      '@tanstack/pacer-lite': 0.2.1
-      typescript: 5.9.3
-
-  '@tanstack/pacer-lite@0.2.1': {}
-
   '@tanstack/query-core@5.90.20': {}
-
-  '@tanstack/react-db@0.1.75(react@19.2.4)(typescript@5.9.3)':
-    dependencies:
-      '@tanstack/db': 0.5.31(typescript@5.9.3)
-      react: 19.2.4
-      use-sync-external-store: 1.6.0(react@19.2.4)
-    transitivePeerDependencies:
-      - typescript
 
   '@tanstack/react-query@5.90.21(react@19.2.4)':
     dependencies:
@@ -6740,8 +6731,6 @@ snapshots:
     dependencies:
       cross-spawn: 7.0.6
       signal-exit: 4.1.0
-
-  fractional-indexing@3.2.0: {}
 
   fs-extra@11.3.4:
     dependencies:
@@ -7837,8 +7826,6 @@ snapshots:
       ip-address: 10.1.0
       smart-buffer: 4.2.0
 
-  sorted-btree@1.8.1: {}
-
   source-map-js@1.2.1: {}
 
   source-map-support@0.5.21:
@@ -7920,6 +7907,38 @@ snapshots:
       - tslib
       - vite
 
+  storybook-builder-rsbuild@3.2.3(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3):
+    dependencies:
+      '@rsbuild/core': 1.7.3
+      '@rsbuild/plugin-type-check': 1.3.4(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(tslib@2.8.1)(typescript@5.9.3)
+      '@vitest/mocker': 3.2.4(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))
+      browser-assert: 1.2.1
+      case-sensitive-paths-webpack-plugin: 2.4.0
+      cjs-module-lexer: 2.2.0
+      constants-browserify: 1.0.0
+      es-module-lexer: 1.7.0
+      fs-extra: 11.3.4
+      magic-string: 0.30.21
+      path-browserify: 1.0.1
+      picocolors: 1.1.1
+      process: 0.11.10
+      rsbuild-plugin-html-minifier-terser: 1.1.3(@rsbuild/core@1.7.3)
+      sirv: 2.0.4
+      storybook: 10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      ts-dedent: 2.2.0
+      url: 0.11.4
+      util: 0.12.5
+      util-deprecate: 1.0.2
+    optionalDependencies:
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - '@rspack/core'
+      - msw
+      - tslib
+      - vite
+
   storybook-react-rsbuild@3.2.3(@rsbuild/core@1.7.2)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4):
     dependencies:
       '@rollup/pluginutils': 5.3.0
@@ -7962,6 +7981,33 @@ snapshots:
       resolve: 1.22.11
       storybook: 10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       storybook-builder-rsbuild: 3.2.3(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)
+      tsconfig-paths: 4.2.0
+    optionalDependencies:
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - '@rspack/core'
+      - msw
+      - rollup
+      - supports-color
+      - tslib
+      - vite
+      - webpack
+
+  storybook-react-rsbuild@3.2.3(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4):
+    dependencies:
+      '@rollup/pluginutils': 5.3.0
+      '@rsbuild/core': 1.7.3
+      '@storybook/react': 10.2.15(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@5.9.3)
+      '@storybook/react-docgen-typescript-plugin': 1.0.1(typescript@5.9.3)(webpack@5.105.4)
+      find-up: 5.0.0
+      magic-string: 0.30.21
+      react: 19.2.4
+      react-docgen: 8.0.2
+      react-docgen-typescript: 2.4.0(typescript@5.9.3)
+      react-dom: 19.2.4(react@19.2.4)
+      resolve: 1.22.11
+      storybook: 10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      storybook-builder-rsbuild: 3.2.3(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)
       tsconfig-paths: 4.2.0
     optionalDependencies:
       typescript: 5.9.3
@@ -8181,11 +8227,11 @@ snapshots:
 
   tinyspy@4.0.4: {}
 
-  tldts-core@7.0.24: {}
+  tldts-core@7.0.25: {}
 
-  tldts@7.0.24:
+  tldts@7.0.25:
     dependencies:
-      tldts-core: 7.0.24
+      tldts-core: 7.0.25
 
   to-regex-range@5.0.1:
     dependencies:
@@ -8195,7 +8241,7 @@ snapshots:
 
   tough-cookie@6.0.0:
     dependencies:
-      tldts: 7.0.24
+      tldts: 7.0.25
 
   tree-dump@1.1.0(tslib@2.8.1):
     dependencies:

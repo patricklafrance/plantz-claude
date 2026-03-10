@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button, Input, Textarea, Label, Switch, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, DatePicker } from "@packages/components";
-import { locations, luminosities, wateringFrequencies, wateringTypes, plantsCollection } from "@packages/plants-core";
+import { locations, luminosities, wateringFrequencies, wateringTypes, useCreatePlant } from "@packages/plants-core";
 
 interface CreatePlantDialogProps {
     open: boolean;
@@ -28,6 +28,8 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
     const [wateringType, setWateringType] = useState("surface");
     const [firstWateringDate, setFirstWateringDate] = useState<Date | undefined>(tomorrow());
 
+    const createPlant = useCreatePlant();
+
     const isValid = name.trim() !== "" && wateringQuantity.trim() !== "" && firstWateringDate !== undefined;
 
     function resetForm() {
@@ -48,26 +50,27 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
         e.preventDefault();
         if (!isValid) return;
 
-        const now = new Date();
-        plantsCollection.insert({
-            id: crypto.randomUUID(),
-            name: name.trim(),
-            description: description.trim() || undefined,
-            family: family.trim() || undefined,
-            location,
-            luminosity,
-            mistLeaves,
-            soilType: soilType.trim() || undefined,
-            wateringFrequency,
-            wateringQuantity: wateringQuantity.trim(),
-            wateringType,
-            nextWateringDate: firstWateringDate!,
-            creationDate: now,
-            lastUpdateDate: now,
-        });
-
-        resetForm();
-        onOpenChange(false);
+        createPlant.mutate(
+            {
+                name: name.trim(),
+                description: description.trim() || undefined,
+                family: family.trim() || undefined,
+                location,
+                luminosity,
+                mistLeaves,
+                soilType: soilType.trim() || undefined,
+                wateringFrequency,
+                wateringQuantity: wateringQuantity.trim(),
+                wateringType,
+                nextWateringDate: firstWateringDate!,
+            },
+            {
+                onSuccess: () => {
+                    resetForm();
+                    onOpenChange(false);
+                },
+            },
+        );
     }
 
     function handleOpenChange(nextOpen: boolean) {

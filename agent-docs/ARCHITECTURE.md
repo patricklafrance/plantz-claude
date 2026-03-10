@@ -62,23 +62,24 @@ See [ADR-0002](adr/0002-domain-scoped-storybooks.md) for rationale.
 
 For exact versions, read the root `package.json` (`engines`, `packageManager`, `devDependencies`).
 
-| Tool                | Purpose                                                                     |
-| ------------------- | --------------------------------------------------------------------------- |
-| Node.js             | Runtime                                                                     |
-| pnpm                | Package manager                                                             |
-| TypeScript          | Type checking (`@typescript/native-preview` — tsgo)                         |
-| Squide              | Modular monolith shell (local modules)                                      |
-| Storybook           | Component development                                                       |
-| Chromatic           | Visual regression testing                                                   |
-| Tailwind CSS        | Utility-first CSS framework (via `@tailwindcss/postcss`)                    |
-| shadcn/ui (Base UI) | UI component library, base-nova preset (lives in `@packages/components`)    |
-| Turborepo           | Task orchestration and caching                                              |
-| oxlint              | Fast JS/TS linter (zero config)                                             |
-| oxfmt               | Fast code formatter (Prettier-compatible, import sorting, Tailwind sort)    |
-| Syncpack            | Dependency version enforcement                                              |
-| TanStack DB         | Client-side data layer with localStorage persistence (`@tanstack/react-db`) |
-| TanStack Virtual    | List virtualization (`@tanstack/react-virtual`)                             |
-| Zod                 | Schema validation                                                           |
+| Tool                | Purpose                                                                  |
+| ------------------- | ------------------------------------------------------------------------ |
+| Node.js             | Runtime                                                                  |
+| pnpm                | Package manager                                                          |
+| TypeScript          | Type checking (`@typescript/native-preview` — tsgo)                      |
+| Squide              | Modular monolith shell (local modules)                                   |
+| Storybook           | Component development                                                    |
+| Chromatic           | Visual regression testing                                                |
+| Tailwind CSS        | Utility-first CSS framework (via `@tailwindcss/postcss`)                 |
+| shadcn/ui (Base UI) | UI component library, base-nova preset (lives in `@packages/components`) |
+| Turborepo           | Task orchestration and caching                                           |
+| oxlint              | Fast JS/TS linter (zero config)                                          |
+| oxfmt               | Fast code formatter (Prettier-compatible, import sorting, Tailwind sort) |
+| Syncpack            | Dependency version enforcement                                           |
+| MSW                 | Mock Service Worker for API mocking in browser and Storybook             |
+| TanStack Query      | Server state management and data fetching (`@tanstack/react-query`)      |
+| TanStack Virtual    | List virtualization (`@tanstack/react-virtual`)                          |
+| Zod                 | Schema validation                                                        |
 
 ## Script conventions
 

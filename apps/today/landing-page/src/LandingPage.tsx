@@ -1,9 +1,8 @@
-import { useLiveQuery } from "@tanstack/react-db";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useState, useRef, useMemo, useCallback } from "react";
 
 import { Button, Checkbox } from "@packages/components";
-import { applyPlantFilters, DeleteConfirmDialog, FilterBar, isDueForWatering, PlantListItem, plantsCollection, usePlantFilters } from "@packages/plants-core";
+import { applyPlantFilters, DeleteConfirmDialog, FilterBar, isDueForWatering, PlantListItem, usePlantsQuery, useDeletePlants, usePlantFilters } from "@packages/plants-core";
 import type { Plant } from "@packages/plants-core";
 
 const scrollContainerStyle = { height: "calc(100vh - 340px)" };
@@ -14,13 +13,16 @@ export function LandingPage() {
     const [deleteTarget, setDeleteTarget] = useState<Plant[] | null>(null);
     const parentRef = useRef<HTMLDivElement>(null);
 
-    const { data: allPlants } = useLiveQuery((q) => q.from({ plant: plantsCollection }).orderBy(({ plant }) => plant.name, "asc"));
+    const { data: allPlants, isLoading, error } = usePlantsQuery();
+    const deleteMany = useDeletePlants();
 
     const plants = useMemo(() => {
         if (!allPlants) return [];
 
-        // First filter to only plants due for watering, then apply user filters
-        const duePlants = (allPlants as Plant[]).filter((p) => isDueForWatering(p));
+        // First sort by name, then filter to only plants due for watering, then apply user filters
+        const sorted = allPlants.toSorted((a, b) => a.name.localeCompare(b.name));
+        const duePlants = sorted.filter((p) => isDueForWatering(p));
+
         return applyPlantFilters(duePlants, filters);
     }, [allPlants, filters]);
 
@@ -66,9 +68,8 @@ export function LandingPage() {
 
     const confirmDelete = useCallback(() => {
         if (!deleteTarget) return;
-        for (const plant of deleteTarget) {
-            plantsCollection.delete(plant.id);
-        }
+        const ids = deleteTarget.map((p) => p.id);
+        deleteMany.mutate(ids);
         setSelectedIds((prev) => {
             const next = new Set(prev);
             for (const plant of deleteTarget) {
@@ -77,7 +78,7 @@ export function LandingPage() {
             return next;
         });
         setDeleteTarget(null);
-    }, [deleteTarget]);
+    }, [deleteTarget, deleteMany]);
 
     const handleDeleteDialogOpenChange = useCallback((open: boolean) => {
         if (!open) setDeleteTarget(null);
@@ -96,6 +97,22 @@ export function LandingPage() {
         }),
         [totalSize],
     );
+
+    if (isLoading) {
+        return (
+            <div className="flex h-full items-center justify-center p-6">
+                <p className="text-muted-foreground text-sm">Loading plants...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex h-full items-center justify-center p-6">
+                <p className="text-destructive text-sm">Failed to load plants. Please try again.</p>
+            </div>
+        );
+    }
 
     return (
         <div className="flex h-full flex-col gap-4 p-6">

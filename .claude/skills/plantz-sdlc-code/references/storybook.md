@@ -21,7 +21,7 @@ Every story file must cover **every visually distinct state** the component can 
 - Edge cases: empty/null/undefined optional fields (`MinimalFields`), long text that could overflow (`LongName`, `LongFieldValues`), boundary conditions (`DueToday`).
 - For components with open/closed states (dialogs), include stories for both.
 - Do **not** create stories for prop combinations that look identical — if `location="kitchen"` and `location="bathroom"` render the same layout, one story is sufficient.
-- A page backed by runtime data (e.g., TanStack DB with auto-seeding) may have fewer variants if state can only be exercised via interaction. Document why in a comment.
+- A page backed by runtime data (e.g., MSW with default seed data) may have fewer variants if state can only be exercised via interaction. Document why in a comment.
 
 ## Story Patterns
 
@@ -37,12 +37,12 @@ Every story is automatically snapshotted by Chromatic — stories ARE the visual
 - Stories must render their meaningful visual state **without user interaction**. If a component requires a click to show content (e.g., a dialog), pass `open: true` in args so Chromatic captures the open state.
 - Avoid animations or timers that could produce flaky snapshots.
 - **Viewport parameters:** All domain story files (pages, components, dialogs) must set `parameters: { chromatic: { viewports: [375, 768, 1280] } }` in `meta` so Chromatic captures mobile, tablet, and desktop snapshots. This does not apply to `packages/components/` primitive stories.
-- **Date-dependent stories must freeze `Date`.** If a story renders components that call `new Date()`, `Date.now()`, or date-comparison functions like `isDueForWatering()`, freeze the Date constructor in a decorator so snapshots are identical across runs. See `packages/plants-core/src/PlantListItem.stories.tsx` for the pattern: store `globalThis.Date`, replace it with a frozen version via `useRef` (so the initial render sees the fixed date), and restore in a cleanup effect.
+- **Date-dependent stories must freeze `Date`.** If a story renders components that call `new Date()`, `Date.now()`, or date-comparison functions like `isDueForWatering()`, freeze the Date constructor in a decorator so snapshots are identical across runs. Import `freezeDate(fixedNow)` and `restoreDate()` from `@packages/plants-core/msw` — call `freezeDate` synchronously via `useRef` (so the initial render sees the fixed date), and call `restoreDate` in a cleanup effect. See `packages/plants-core/src/PlantListItem.stories.tsx` for usage.
 
 ## Isolation
 
 - Stories must render without Squide runtime or React Router. If a component depends on these, extract a presentational sub-component that takes data via props and write stories for that instead.
-- TanStack DB collections work in Storybook (they use localStorage). Components that read from collections will render with whatever data is in localStorage.
+- MSW + TanStack Query are initialized in each storybook preview. Stories that need data use `parameters.msw.handlers` for per-story handler overrides. See `tanstack-db.md` reference for the full pattern.
 
 ## Verification
 

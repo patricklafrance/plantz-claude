@@ -1,17 +1,10 @@
 import "./storybook.css";
-import { Suspense } from "react";
 import type { Preview } from "storybook-react-rsbuild";
 
+import { mswDecorator } from "@packages/plants-core/msw";
+
 const preview: Preview = {
-    decorators: [
-        (Story) => {
-            return (
-                <Suspense fallback="Loading...">
-                    <Story />
-                </Suspense>
-            );
-        },
-    ],
+    decorators: [mswDecorator],
 };
 
 export default preview;

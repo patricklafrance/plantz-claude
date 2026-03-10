@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 
 import { App } from "./App.tsx";
 import { getActiveModules } from "./getActiveModules.tsx";
+import { enableMocking } from "./mswSetup.ts";
 import { registerHost } from "./register.tsx";
 
 const runtime = initializeFirefly({
@@ -14,10 +15,12 @@ const runtime = initializeFirefly({
 const queryClient = new QueryClient();
 const root = createRoot(document.getElementById("root")!);
 
-root.render(
-    <FireflyProvider runtime={runtime}>
-        <QueryClientProvider client={queryClient}>
-            <App />
-        </QueryClientProvider>
-    </FireflyProvider>,
-);
+enableMocking().then(() => {
+    root.render(
+        <FireflyProvider runtime={runtime}>
+            <QueryClientProvider client={queryClient}>
+                <App />
+            </QueryClientProvider>
+        </FireflyProvider>,
+    );
+});

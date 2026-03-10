@@ -1,10 +1,9 @@
-import { useLiveQuery } from "@tanstack/react-db";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Plus } from "lucide-react";
 import { useState, useRef, useMemo, useCallback } from "react";
 
 import { Button, Checkbox } from "@packages/components";
-import { applyPlantFilters, DeleteConfirmDialog, FilterBar, PlantListItem, plantsCollection, usePlantFilters } from "@packages/plants-core";
+import { applyPlantFilters, DeleteConfirmDialog, FilterBar, PlantListItem, usePlantsQuery, useDeletePlants, usePlantFilters } from "@packages/plants-core";
 import type { Plant } from "@packages/plants-core";
 
 import { CreatePlantDialog } from "./CreatePlantDialog.tsx";
@@ -21,11 +20,14 @@ export function PlantsPage() {
     const [deleteTarget, setDeleteTarget] = useState<Plant[] | null>(null);
     const parentRef = useRef<HTMLDivElement>(null);
 
-    const { data: allPlants } = useLiveQuery((q) => q.from({ plant: plantsCollection }).orderBy(({ plant }) => plant.name, "asc"));
+    const { data: allPlants, isLoading, error } = usePlantsQuery();
+    const deleteMany = useDeletePlants();
 
     const plants = useMemo(() => {
         if (!allPlants) return [];
-        return applyPlantFilters(allPlants as Plant[], filters);
+        const sorted = allPlants.toSorted((a, b) => a.name.localeCompare(b.name));
+
+        return applyPlantFilters(sorted, filters);
     }, [allPlants, filters]);
 
     const virtualizer = useVirtualizer({
@@ -70,9 +72,8 @@ export function PlantsPage() {
 
     const confirmDelete = useCallback(() => {
         if (!deleteTarget) return;
-        for (const plant of deleteTarget) {
-            plantsCollection.delete(plant.id);
-        }
+        const ids = deleteTarget.map((p) => p.id);
+        deleteMany.mutate(ids);
         setSelectedIds((prev) => {
             const next = new Set(prev);
             for (const plant of deleteTarget) {
@@ -85,7 +86,7 @@ export function PlantsPage() {
             setEditPlant(null);
         }
         setDeleteTarget(null);
-    }, [deleteTarget, editOpen, editPlant]);
+    }, [deleteTarget, editOpen, editPlant, deleteMany]);
 
     const handleEditFromDialog = useCallback(
         (plant: Plant) => {
@@ -120,6 +121,22 @@ export function PlantsPage() {
         }),
         [totalSize],
     );
+
+    if (isLoading) {
+        return (
+            <div className="flex h-full items-center justify-center p-6">
+                <p className="text-muted-foreground text-sm">Loading plants...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex h-full items-center justify-center p-6">
+                <p className="text-destructive text-sm">Failed to load plants. Please try again.</p>
+            </div>
+        );
+    }
 
     return (
         <div className="flex h-full flex-col gap-4 p-6">

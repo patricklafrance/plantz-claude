@@ -9,6 +9,7 @@ const storybookConfig: StorybookConfig = {
     framework: getAbsolutePath("storybook-react-rsbuild"),
     addons: [getAbsolutePath("@storybook/addon-a11y")],
     stories: ["../../plants/src/**/*.stories.tsx"],
+    staticDirs: ["./public"],
 };
 
 export default storybookConfig;

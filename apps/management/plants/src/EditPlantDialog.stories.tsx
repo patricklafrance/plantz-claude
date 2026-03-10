@@ -1,3 +1,4 @@
+import { http, HttpResponse } from "msw";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
 import type { Plant } from "@packages/plants-core";
@@ -34,6 +35,16 @@ const meta = {
     component: EditPlantDialog,
     parameters: {
         chromatic: { viewports: [375, 768, 1280] },
+        msw: {
+            handlers: [
+                // Provide a handler for the debounced auto-save so it doesn't produce network errors
+                http.put("/api/plants/:id", async ({ request }) => {
+                    const body = (await request.json()) as Record<string, unknown>;
+
+                    return HttpResponse.json({ ...body, lastUpdateDate: new Date().toISOString() });
+                }),
+            ],
+        },
     },
     args: {
         open: true,

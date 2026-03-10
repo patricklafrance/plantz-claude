@@ -29,7 +29,7 @@ For files under `apps/{domain}/` or `packages/{name}/`, also read the scoped `CL
 Read reference docs only when the diff touches their topic:
 
 - `turbo.json` or pipeline config → `agent-docs/references/turborepo.md`
-- `package.json` dependency fields → `agent-docs/references/syncpack.md`
+- `package.json` dependency fields → `agent-docs/odr/0002-dependency-versioning-syncpack.md`
 - `tsconfig*` files → `agent-docs/references/typescript.md`
 - `.github/workflows/` → `agent-docs/references/ci-cd.md`
 

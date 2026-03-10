@@ -80,6 +80,10 @@ For exact versions, read the root `package.json` (`engines`, `packageManager`, `
 | TanStack Virtual    | List virtualization (`@tanstack/react-virtual`)                          |
 | Zod                 | Schema validation                                                        |
 
+## Script conventions
+
+Scripts in root `package.json` follow a prefix convention: `dev-*` (local dev servers), `build-*` / `serve-*` (production), `lint` / `typecheck` / `syncpack` (quality), `clean` / `reset` (maintenance). Read root `package.json` for the full list — never duplicate it in docs.
+
 ## MODULES env var
 
 Set `MODULES` to load only specific modules during development:

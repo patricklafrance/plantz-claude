@@ -36,23 +36,98 @@ Node 24+, pnpm 10, TypeScript 7 (tsgo), Rsbuild, Tailwind CSS 4, TanStack DB, St
 
 ---
 
-## Agent harness concepts
+## Agent harness
 
-These are the patterns and tools that make this repo agent-friendly. Each section links to the implementation files.
+Five pillars make this repo fully agent-driven. Each section links to the implementation files.
 
-### 1. Agent memory (`CLAUDE.md` + `agent-docs/`)
+### 1. SDLC skills — end-to-end feature development
 
-Agents don't retain context between sessions. The `CLAUDE.md` file at the repo root acts as an **index** — a table of contents that agents read at the start of every task to find the right doc. Detailed documentation lives in `agent-docs/`.
+Six skills that form a complete Software Development Lifecycle. The orchestrator (`/plantz-sdlc-orchestrator`) is the sole entry point for feature development — it spawns subagents for each phase and coordinates them through file-based handoffs in `./tmp/runs/[uuid]/`.
 
-The key rule: **agents must never guess about architecture or conventions**. They load the relevant doc first.
+```
+User: "Add watering schedules to the management domain"
+  └─ Orchestrator (step 1-9)
+       ├─ Plan    → plan.md
+       ├─ Code    → changes-1.md  (scaffolds modules, implements features)
+       ├─ Test    → test-issues-1.md or ∅  (lint, modules, visual, smoke)
+       │    └─ Fix loop: Code → Test → Code → Test  (max 3 iterations)
+       ├─ Simplify → /simplify on changed files
+       ├─ Document → audits agent-docs for drift
+       └─ Merge   → commit, PR, monitor CI
+```
 
-`CLAUDE.md` is kept under ~55 lines. When a topic grows, it gets extracted into `agent-docs/` with an index entry pointing to it.
+| Skill                      | What it does                                                                                          |
+| -------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `plantz-sdlc-orchestrator` | Entry point. Generates a run UUID, creates a branch, and runs steps 1-9 sequentially                  |
+| `plantz-sdlc-plan`         | Drafts a structured technical plan (affected packages, file changes, acceptance criteria)              |
+| `plantz-sdlc-code`         | Implements the plan or fixes issues from the test phase. Scaffolds modules on iteration 1              |
+| `plantz-sdlc-test`         | Validates code quality — lint, module structure, quality gates, visual verification, smoke tests       |
+| `plantz-sdlc-document`     | Audits agent-docs and CLAUDE.md for drift, creates ADRs/ODRs if new decisions were made               |
+| `plantz-sdlc-merge`        | Commits, pushes, opens a PR, monitors CI. Returns control to orchestrator if fixes are needed         |
 
-**Files:** [`CLAUDE.md`](CLAUDE.md), [`agent-docs/`](agent-docs/)
+Key design decisions:
+- **Self-contained**: plan, code, and test skills each embed their own `references/` files (tech-stack rules, styling conventions, accessibility requirements). Subagents never need to read another skill's files.
+- **Subagent protocol**: Every multi-agent step uses a drafter/reviewer pair. The orchestrator spawns both — subagents never spawn further subagents.
+- **File-based coordination**: All inter-step communication goes through files in `./tmp/runs/[uuid]/` (plan.md, changes-N.md, test-issues-N.md). This makes handoffs explicit and debuggable.
+- **Automated quality gates**: Visual verification uses `agent-browser` to screenshot pages in light/dark mode, inspect the accessibility tree, and test keyboard navigation — no human reviewer in the loop.
 
-### 2. Architectural Decision Records (ADRs) and Operational Decision Records (ODRs)
+**Files:** [`.claude/skills/plantz-sdlc-*/`](.claude/skills/)
 
-Formal logs of _why_ decisions were made — not just what was decided. Agents check these before making changes to prevent contradictory work.
+### 2. Hooks (`.claude/hooks/`)
+
+Shell scripts that run automatically before or after agent tool calls, enforcing architectural guardrails in real time. These fire on every agent action — they are the hard constraints that skills cannot bypass.
+
+| Hook                                           | Trigger           | What it does                                                        |
+| ---------------------------------------------- | ----------------- | ------------------------------------------------------------------- |
+| `pre-bash--enforce-pnpm.sh`                    | Before Bash       | Blocks npm/npx — only pnpm allowed                                  |
+| `pre-bash--lint-on-commit.sh`                  | Before Bash       | Runs oxlint on staged files before git commit                       |
+| `pre-bash--no-file-level-disable-on-commit.sh` | Before Bash       | Rejects file-level `/* oxlint-disable */` comments on commit        |
+| `pre-edit--protect-files.sh`                   | Before Edit/Write | Prevents modification of sensitive files                            |
+| `pre-edit--module-import-guard.sh`             | Before Edit/Write | Prevents cross-module imports (`@modules/*` packages stay isolated) |
+| `post-edit--format.sh`                         | After Edit/Write  | Formats with oxfmt                                                  |
+| `post-edit--lint.sh`                           | After Edit/Write  | Lints with oxlint — reports issues immediately                      |
+
+Hook names follow the `{event}--{what}.sh` convention so it's clear at a glance when a hook fires and what it does.
+
+**Files:** [`.claude/hooks/`](.claude/hooks/), [`.claude/settings.json`](.claude/settings.json)
+
+### 3. Supporting skills
+
+The SDLC skills don't work alone — they load project-specific utility skills and shared external skills at runtime.
+
+**Utility skills** (prefixed with `plantz-`):
+
+| Skill                              | What it does                                                                                       |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `plantz-scaffold-domain-module`    | Scaffolds a new Squide module — creates files, registers in host, wires Storybook, adds dev script |
+| `plantz-scaffold-domain-storybook` | Scaffolds a domain Storybook with Chromatic CI integration                                         |
+| `plantz-seed-plants`               | Generates seed data and injects it into localStorage via Chrome DevTools MCP                       |
+| `plantz-audit-agent-docs`          | 3-pass audit of all docs against the live codebase (structural, accuracy, instruction quality)     |
+| `plantz-validate-modules`          | Validates every module conforms to the expected structure (12 checks)                              |
+| `plantz-smoke-tests`               | Smoke-tests every app by starting dev servers and verifying pages load in a browser                |
+
+Utility skills use a **reference module pattern** — instead of hardcoding dependency versions or configs, they read a canonical reference module (e.g., `apps/management/plants/`) at execution time and clone from it.
+
+**External skills** (symlinked from `.agents/skills/`):
+
+| Skill                            | Loaded by                    | Purpose                                              |
+| -------------------------------- | ---------------------------- | ---------------------------------------------------- |
+| `workleap-react-best-practices`  | plan, code                   | React SPA performance patterns                       |
+| `accessibility`                  | plan, code                   | WCAG 2.1 audit and remediation                       |
+| `shadcn`                         | plan, code                   | shadcn/ui component management                       |
+| `frontend-design`                | plan, code                   | Production-grade UI design                           |
+| `workleap-squide`                | plan, code                   | Squide modular shell conventions                     |
+| `pnpm`                           | code, test                   | Workspace dependency management                      |
+| `turborepo`                      | code, test                   | Monorepo task orchestration                          |
+| `vitest`                         | test                         | Unit testing                                         |
+| `workleap-web-configs`           | code                         | Shared ESLint/TypeScript/Rsbuild configs             |
+| `workleap-logging`               | code                         | Structured logging                                   |
+
+**Files:** [`.claude/skills/`](.claude/skills/), [`.agents/skills/`](.agents/skills/)
+
+### 4. ADRs and ODRs
+
+Formal logs of _why_ decisions were made — not just what was decided. Agents check these before making changes to prevent contradictory work. The `plantz-sdlc-document` skill creates new records when implementation introduces new architectural or operational decisions.
 
 | Record   | Decision                                                        |
 | -------- | --------------------------------------------------------------- |
@@ -65,61 +140,7 @@ Formal logs of _why_ decisions were made — not just what was decided. Agents c
 
 **Files:** [`agent-docs/adr/`](agent-docs/adr/), [`agent-docs/odr/`](agent-docs/odr/)
 
-### 3. Agent skills (`.claude/skills/`)
-
-Skills are reusable procedures that agents load when a task matches. They contain step-by-step instructions, file templates, and prohibitions.
-
-**Project-specific skills** (prefixed with `plantz-`):
-
-| Skill                              | What it does                                                                                       |
-| ---------------------------------- | -------------------------------------------------------------------------------------------------- |
-| `plantz-scaffold-domain-module`    | Scaffolds a new Squide module — creates files, registers in host, wires Storybook, adds dev script |
-| `plantz-scaffold-domain-storybook` | Scaffolds a domain Storybook with Chromatic CI integration                                         |
-| `plantz-seed-plants`               | Generates seed data and injects it into localStorage via Chrome DevTools MCP                       |
-| `plantz-audit-agent-docs`          | 3-pass audit of all docs against the live codebase (structural, accuracy, instruction quality)     |
-| `plantz-validate-modules`          | Validates every module conforms to the expected structure (9 checks)                               |
-| `plantz-smoke-tests`               | Smoke-tests every app by starting dev servers and verifying pages load in a browser                |
-
-Skills use a **reference module pattern** — instead of hardcoding dependency versions or configs, they read a canonical reference module (e.g., `apps/management/plants/`) at execution time and clone from it. When tooling changes, only the reference module needs updating.
-
-**Shared skills** (symlinked from `.agents/skills/`): pnpm, turborepo, vitest, shadcn, accessibility, frontend-design, workleap-squide, workleap-logging, workleap-react-best-practices, workleap-web-configs.
-
-**Files:** [`.claude/skills/`](.claude/skills/), [`.agents/skills/`](.agents/skills/)
-
-### 4. Instruction authoring principles
-
-A formal framework for writing agent instructions that actually get followed. The key insight: **agents ignore advisory framing** ("you should...") but follow **prohibition framing** ("never...").
-
-Principles:
-
-- Prohibition framing over advisory
-- State consequences explicitly ("a stale skill silently produces incomplete modules")
-- Concrete verification steps, not vague diligence
-- Negative examples adjacent to rules
-- Single source of truth — never duplicate prescriptive content across files
-- Tooling over prose — don't document what linters/compilers already enforce
-
-**File:** [`agent-docs/references/writing-agent-instructions.md`](agent-docs/references/writing-agent-instructions.md)
-
-### 5. Hooks (`.claude/hooks/`)
-
-Shell scripts that run automatically before or after agent tool calls, enforcing architectural guardrails in real time.
-
-Hook names follow the `{event}--{what}.sh` convention so it's clear at a glance when a hook fires and what it does.
-
-| Hook                                           | Trigger           | What it does                                                        |
-| ---------------------------------------------- | ----------------- | ------------------------------------------------------------------- |
-| `pre-bash--enforce-pnpm.sh`                    | Before Bash       | Blocks npm/npx — only pnpm allowed                                  |
-| `pre-bash--lint-on-commit.sh`                  | Before Bash       | Runs oxlint on staged files before git commit                       |
-| `pre-bash--no-file-level-disable-on-commit.sh` | Before Bash       | Rejects file-level `/* oxlint-disable */` comments on commit        |
-| `pre-edit--protect-files.sh`                   | Before Edit/Write | Prevents modification of sensitive files                            |
-| `pre-edit--module-import-guard.sh`             | Before Edit/Write | Prevents cross-module imports (`@modules/*` packages stay isolated) |
-| `post-edit--format.sh`                         | After Edit/Write  | Formats with oxfmt                                                  |
-| `post-edit--lint.sh`                           | After Edit/Write  | Lints with oxlint — reports issues immediately                      |
-
-**Files:** [`.claude/hooks/`](.claude/hooks/), [`.claude/settings.json`](.claude/settings.json)
-
-### 6. CI/CD workflows (`.github/workflows/`)
+### 5. CI/CD workflows (`.github/workflows/`)
 
 Five GitHub Actions workflows, three of which involve Claude Code:
 
@@ -135,13 +156,13 @@ The audit workflow is self-healing — it detects when docs drift from reality a
 
 **Files:** [`.github/workflows/`](.github/workflows/), [`.github/prompts/`](.github/prompts/)
 
-### 7. Selective Chromatic runs
+---
 
-A custom TypeScript utility that detects which Storybooks were affected by code changes. Unaffected Storybooks skip their Chromatic build entirely.
+### Other notable patterns
 
-This is driven by a hardcoded dependency map (`StorybookDependencies`) that maps each Storybook to the packages it depends on. The affected-detection runs `turbo ls --filter=...[baseSha]` to find changed packages and cross-references against the map.
+**Selective Chromatic runs** — a custom TypeScript utility ([`tooling/getAffectedStorybooks.ts`](tooling/getAffectedStorybooks.ts)) that detects which Storybooks were affected by code changes. Unaffected Storybooks skip their Chromatic build entirely.
 
-**File:** [`tooling/getAffectedStorybooks.ts`](tooling/getAffectedStorybooks.ts)
+**Instruction authoring principles** — a framework for writing agent instructions that actually get followed. Key insight: agents ignore advisory framing ("you should...") but follow prohibition framing ("never..."). See [`agent-docs/references/writing-agent-instructions.md`](agent-docs/references/writing-agent-instructions.md).
 
 ---
 

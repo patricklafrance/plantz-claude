@@ -53,6 +53,9 @@ function makePlant(overrides: Partial<Plant> = {}): Plant {
 const meta = {
     title: "Packages/PlantsCore/Components/PlantListItem",
     component: PlantListItem,
+    parameters: {
+        chromatic: { viewports: [375, 768, 1280] },
+    },
     args: {
         selected: false,
         onToggleSelect: () => {},
@@ -74,7 +77,7 @@ const meta = {
             }, []);
 
             return (
-                <div className="border-border w-[900px] rounded-lg border">
+                <div className="border-border w-full max-w-[900px] rounded-lg border">
                     <Story />
                 </div>
             );

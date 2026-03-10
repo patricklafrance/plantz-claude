@@ -31,6 +31,9 @@ function restoreDate() {
 const meta = {
     title: "Management/Plants/Components/CreatePlantDialog",
     component: CreatePlantDialog,
+    parameters: {
+        chromatic: { viewports: [375, 768, 1280] },
+    },
     args: {
         open: true,
         onOpenChange: () => {},

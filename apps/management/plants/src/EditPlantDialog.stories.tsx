@@ -32,6 +32,9 @@ function makePlant(overrides: Partial<Plant> = {}): Plant {
 const meta = {
     title: "Management/Plants/Components/EditPlantDialog",
     component: EditPlantDialog,
+    parameters: {
+        chromatic: { viewports: [375, 768, 1280] },
+    },
     args: {
         open: true,
         onOpenChange: () => {},

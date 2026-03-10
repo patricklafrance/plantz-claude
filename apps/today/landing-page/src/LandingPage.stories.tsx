@@ -9,6 +9,9 @@ import { LandingPage } from "./LandingPage.tsx";
 const meta = {
     title: "Today/LandingPage/Pages/LandingPage",
     component: LandingPage,
+    parameters: {
+        chromatic: { viewports: [375, 768, 1280] },
+    },
 } satisfies Meta<typeof LandingPage>;
 
 export default meta;

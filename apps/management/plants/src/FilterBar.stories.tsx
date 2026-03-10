@@ -17,6 +17,9 @@ const defaultFilters: PlantFilters = {
 const meta = {
     title: "Management/Plants/Components/FilterBar",
     component: FilterBar,
+    parameters: {
+        chromatic: { viewports: [375, 768, 1280] },
+    },
     args: {
         onFilterChange: () => {},
         onClear: () => {},

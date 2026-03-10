@@ -36,6 +36,7 @@ Every story is automatically snapshotted by Chromatic — stories ARE the visual
 
 - Stories must render their meaningful visual state **without user interaction**. If a component requires a click to show content (e.g., a dialog), pass `open: true` in args so Chromatic captures the open state.
 - Avoid animations or timers that could produce flaky snapshots.
+- **Viewport parameters:** All domain story files (pages, components, dialogs) must set `parameters: { chromatic: { viewports: [375, 768, 1280] } }` in `meta` so Chromatic captures mobile, tablet, and desktop snapshots. This does not apply to `packages/components/` primitive stories.
 - **Date-dependent stories must freeze `Date`.** If a story renders components that call `new Date()`, `Date.now()`, or date-comparison functions like `isDueForWatering()`, freeze the Date constructor in a decorator so snapshots are identical across runs. See `packages/plants-core/src/PlantListItem.stories.tsx` for the pattern: store `globalThis.Date`, replace it with a frozen version via `useRef` (so the initial render sees the fixed date), and restore in a cleanup effect.
 
 ## Isolation

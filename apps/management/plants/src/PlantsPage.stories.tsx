@@ -5,6 +5,9 @@ import { PlantsPage } from "./PlantsPage.tsx";
 const meta = {
     title: "Management/Plants/Pages/PlantsPage",
     component: PlantsPage,
+    parameters: {
+        chromatic: { viewports: [375, 768, 1280] },
+    },
 } satisfies Meta<typeof PlantsPage>;
 
 export default meta;

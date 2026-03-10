@@ -1,15 +1,22 @@
 import type { FireflyRuntime, ModuleRegisterFunction } from "@squide/firefly";
 
 function registerRoutes(runtime: FireflyRuntime) {
+    const lazy = async () => {
+        const { PlantsPage } = await import("./PlantsPage.tsx");
+
+        return {
+            element: <PlantsPage />,
+        };
+    };
+
+    runtime.registerRoute({
+        index: true,
+        lazy,
+    });
+
     runtime.registerRoute({
         path: "/management/plants",
-        lazy: async () => {
-            const { PlantsPage } = await import("./PlantsPage.tsx");
-
-            return {
-                element: <PlantsPage />,
-            };
-        },
+        lazy,
     });
 
     runtime.registerNavigationItem({

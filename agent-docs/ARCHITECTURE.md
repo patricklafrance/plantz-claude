@@ -19,6 +19,7 @@ plantz-claude/
     storybook/                     # Packages-layer Storybook (@apps/packages-storybook)
   packages/
     components/                    # Shared UI components — shadcn/ui + Tailwind v4 (@packages/components)
+    plants-core/                   # Shared plant domain types, utilities, and components (@packages/plants-core)
     squide-core/                   # Shared Squide utilities (@packages/squide-core)
     storybook/                     # Shared Storybook config (@packages/storybook)
   tooling/                         # Build scripts (getAffectedStorybooks.ts)
@@ -40,7 +41,7 @@ plantz-claude/
 ## Squide host/module topology
 
 - **Host** (`apps/host/`): Thin shell that bootstraps Squide via `FireflyRuntime` and renders `AppRouter`. Contains no domain logic.
-- **Modules**: Each feature area registers via `ModuleRegisterFunction`. Modules are isolated — they do not import from each other's root export. When two modules need to share code, the owning module exposes a named subpath export (e.g., `./plants`) separate from its root registration export. See [ADR-0003](adr/0003-cross-module-subpath-exports.md). If a third consumer appears, extract to a shared package instead.
+- **Modules**: Each feature area registers via `ModuleRegisterFunction`. Modules are isolated — they never import from each other. When two modules need to share domain code, extract it to a shared package under `packages/` (e.g., `@packages/plants-core`). See [ADR-0003](adr/0003-shared-domain-packages.md).
 - **Module registry**: `apps/host/src/getActiveModules.tsx` maps module path keys to their register functions. The host loads only modules present in this map.
 - **Shared packages**: Cross-cutting utilities live in `packages/` and are consumed by both host and modules.
 - **JIT packages**: Packages under `packages/` expose source directly via `exports` fields (e.g., `"./": "./src/index.ts"`). Consumers compile them at build time through their own bundler — no pre-build step is required. This means the Turborepo `dev` task has no `^dev` dependency; persistent watch builds in packages run in parallel, not as prerequisites. See [ODR-0004](odr/0004-jit-packages.md) for rationale.

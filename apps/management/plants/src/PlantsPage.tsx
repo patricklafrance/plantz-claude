@@ -4,16 +4,11 @@ import { Plus } from "lucide-react";
 import { useState, useRef, useMemo, useCallback } from "react";
 
 import { Button, Checkbox } from "@packages/components";
+import { applyPlantFilters, DeleteConfirmDialog, FilterBar, PlantListItem, plantsCollection, usePlantFilters } from "@packages/plants-core";
+import type { Plant } from "@packages/plants-core";
 
 import { CreatePlantDialog } from "./CreatePlantDialog.tsx";
-import { DeleteConfirmDialog } from "./DeleteConfirmDialog.tsx";
 import { EditPlantDialog } from "./EditPlantDialog.tsx";
-import { FilterBar } from "./FilterBar.tsx";
-import { PlantListItem } from "./PlantListItem.tsx";
-import type { Plant } from "./plantSchema.ts";
-import { plantsCollection } from "./plantsCollection.ts";
-import { applyPlantFilters } from "./plantUtils.ts";
-import { usePlantFilters } from "./usePlantFilters.ts";
 
 const scrollContainerStyle = { height: "calc(100vh - 340px)" };
 

@@ -2,10 +2,8 @@ import { format } from "date-fns";
 import { useState, useEffect, useRef, useCallback } from "react";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button, Input, Textarea, Label, Switch, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, DatePicker } from "@packages/components";
-
-import { locations, luminosities, wateringFrequencies, wateringTypes } from "./constants.ts";
-import type { Plant } from "./plantSchema.ts";
-import { plantsCollection } from "./plantsCollection.ts";
+import { locations, luminosities, wateringFrequencies, wateringTypes, plantsCollection } from "@packages/plants-core";
+import type { Plant } from "@packages/plants-core";
 
 interface EditPlantDialogProps {
     plant: Plant | null;

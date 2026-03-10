@@ -11,6 +11,7 @@ const storybookConfig: StorybookConfig = {
     stories: [
         // Packages
         "../../packages/squide-core/src/**/*.stories.tsx",
+        "../../packages/plants-core/src/**/*.stories.tsx",
         // Management
         "../management/plants/src/**/*.stories.tsx",
         // Today

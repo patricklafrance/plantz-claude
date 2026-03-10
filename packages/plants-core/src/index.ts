@@ -1,7 +1,8 @@
-export type { Plant } from "./plantSchema.ts";
+export { plantSchema, type Plant } from "./plantSchema.ts";
 export { plantsCollection } from "./plantsCollection.ts";
 export { isDueForWatering, applyPlantFilters } from "./plantUtils.ts";
-export { locations, wateringTypes, wateringFrequencies, luminosities } from "./constants.ts";
+export { locations, luminosities, wateringFrequencies, wateringTypes } from "./constants.ts";
+export type { LocationId, LuminosityId, WateringFrequencyId, WateringTypeId } from "./constants.ts";
 export { PlantListItem } from "./PlantListItem.tsx";
 export { DeleteConfirmDialog } from "./DeleteConfirmDialog.tsx";
 export { FilterBar } from "./FilterBar.tsx";

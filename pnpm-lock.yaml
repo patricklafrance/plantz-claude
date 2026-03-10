@@ -108,6 +108,9 @@ importers:
       '@packages/components':
         specifier: workspace:*
         version: link:../../../packages/components
+      '@packages/plants-core':
+        specifier: workspace:*
+        version: link:../../../packages/plants-core
       '@squide/firefly':
         specifier: ^16.1.12
         version: 16.1.12(@tanstack/react-query@5.90.21(react@19.2.4))(launchdarkly-js-client-sdk@3.9.0)(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react-router@7.12.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
@@ -255,12 +258,12 @@ importers:
 
   apps/today/landing-page:
     dependencies:
-      '@modules/management-plants':
-        specifier: workspace:*
-        version: link:../../management/plants
       '@packages/components':
         specifier: workspace:*
         version: link:../../../packages/components
+      '@packages/plants-core':
+        specifier: workspace:*
+        version: link:../../../packages/plants-core
       '@squide/firefly':
         specifier: ^16.1.12
         version: 16.1.12(@tanstack/react-query@5.90.21(react@19.2.4))(launchdarkly-js-client-sdk@3.9.0)(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react-router@7.12.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
@@ -421,11 +424,54 @@ importers:
         specifier: 5.9.3
         version: 5.9.3
 
+  packages/plants-core:
+    dependencies:
+      '@packages/components':
+        specifier: workspace:*
+        version: link:../components
+      '@tanstack/react-db':
+        specifier: ^0.1.75
+        version: 0.1.75(react@19.2.4)(typescript@5.9.3)
+      lucide-react:
+        specifier: ^0.577.0
+        version: 0.577.0(react@19.2.4)
+      react:
+        specifier: ^19.2.4
+        version: 19.2.4
+      react-dom:
+        specifier: ^19.2.4
+        version: 19.2.4(react@19.2.4)
+      zod:
+        specifier: ^4.3.6
+        version: 4.3.6
+    devDependencies:
+      '@types/react':
+        specifier: 19.2.9
+        version: 19.2.9
+      '@types/react-dom':
+        specifier: 19.2.3
+        version: 19.2.3(@types/react@19.2.9)
+      '@typescript/native-preview':
+        specifier: 7.0.0-dev.20260303.1
+        version: 7.0.0-dev.20260303.1
+      '@workleap/typescript-configs':
+        specifier: 3.0.7
+        version: 3.0.7(typescript@5.9.3)
+      storybook-react-rsbuild:
+        specifier: 3.2.3
+        version: 3.2.3(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+
   packages/storybook:
     dependencies:
       '@packages/components':
         specifier: workspace:*
         version: link:../components
+      '@packages/plants-core':
+        specifier: workspace:*
+        version: link:../plants-core
       '@storybook/addon-a11y':
         specifier: 10.2.15
         version: 10.2.15(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))

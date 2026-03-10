@@ -62,6 +62,12 @@ This skill runs in one of two modes, determined by the inputs:
 [Anything the test or document phases should know about]
 ```
 
+## Hard Constraints
+
+- **Modules MUST NOT import from each other.** No direct imports, no subpath exports, no re-exports, no workarounds. This is absolute — no exceptions.
+- If you discover that code needs to be shared between modules during implementation, extract it to a package under `packages/` (e.g., `@packages/plants-core` for plant domain code). Never create an import from one `@modules/*` package to another.
+- When fixing issues, if the fix would require a cross-module import, restructure to use a shared package instead.
+
 ## Subagent Pattern
 
 Subagent A implements the full change set and writes `changes-[iteration].md`. Subagent B receives the same inputs as A (plan path, tech-stack references, issues file if any), reads every changed file listed in `changes-[iteration].md`, and improves the code directly — fixing mechanical issues (semicolons, import paths, missing exports) and substantive issues (component structure, accessibility gaps, missing dark mode variants, incorrect patterns). B updates `changes-[iteration].md` to reflect any additional modifications it made. B does not defer concerns — it resolves them.

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
-import { FilterBar } from "./FilterBar.tsx";
-import type { PlantFilters } from "./usePlantFilters.ts";
+import { FilterBar } from "@packages/plants-core";
+import type { PlantFilters } from "@packages/plants-core";
 
 const defaultFilters: PlantFilters = {
     name: "",

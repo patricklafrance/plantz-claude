@@ -1,9 +1,7 @@
 import { useState, type FormEvent } from "react";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button, Input, Textarea, Label, Switch, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, DatePicker } from "@packages/components";
-
-import { locations, luminosities, wateringFrequencies, wateringTypes } from "./constants.ts";
-import { plantsCollection } from "./plantsCollection.ts";
+import { locations, luminosities, wateringFrequencies, wateringTypes, plantsCollection } from "@packages/plants-core";
 
 interface CreatePlantDialogProps {
     open: boolean;

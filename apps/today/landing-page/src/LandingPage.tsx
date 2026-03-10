@@ -2,9 +2,9 @@ import { useLiveQuery } from "@tanstack/react-db";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useState, useRef, useMemo, useCallback } from "react";
 
-import { applyPlantFilters, DeleteConfirmDialog, FilterBar, isDueForWatering, PlantListItem, plantsCollection, usePlantFilters } from "@modules/management-plants/plants";
-import type { Plant } from "@modules/management-plants/plants";
 import { Button, Checkbox } from "@packages/components";
+import { applyPlantFilters, DeleteConfirmDialog, FilterBar, isDueForWatering, PlantListItem, plantsCollection, usePlantFilters } from "@packages/plants-core";
+import type { Plant } from "@packages/plants-core";
 
 const scrollContainerStyle = { height: "calc(100vh - 340px)" };
 

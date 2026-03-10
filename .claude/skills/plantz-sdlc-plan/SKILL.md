@@ -72,6 +72,12 @@ and gotchas to watch for]
 [How to verify the feature works — specific, testable statements]
 ```
 
+## Hard Constraints
+
+- **Modules MUST NOT import from each other.** No direct imports, no subpath exports, no re-exports, no workarounds. This is absolute — no exceptions.
+- When two modules need shared code (components, utilities, types, data collections), the plan MUST extract that code to a package under `packages/`. For plant domain code, use `@packages/plants-core`. For new domains, create a new `@packages/<domain>-core` package.
+- If a feature request implies cross-module imports, redesign the approach to use a shared package instead. Never plan a module-to-module dependency.
+
 ## Subagent Pattern
 
 Subagent A drafts the plan and writes `plan.md`. Subagent B reads the plan, challenges it — checking for missing affected packages, unrealistic scope, incorrect patterns, missing stories, or accessibility gaps — and edits `plan.md` directly to improve it. B does not append concerns; it rewrites sections that need improvement.

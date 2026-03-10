@@ -34,7 +34,7 @@ function pastDate(): Date {
 }
 
 const meta = {
-    title: "Management/Plants/Components/PlantListItem",
+    title: "Packages/PlantsCore/Components/PlantListItem",
     component: PlantListItem,
     args: {
         selected: false,

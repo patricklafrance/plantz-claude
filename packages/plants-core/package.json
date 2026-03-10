@@ -1,20 +1,20 @@
 {
-    "name": "@modules/today-landing-page",
+    "name": "@packages/plants-core",
     "version": "0.0.0",
     "private": true,
-    "description": "Today landing page module of the plantz application.",
+    "description": "Shared plants data, utilities, and components used by management and today modules.",
     "license": "Apache-2.0",
     "author": "Patrick Lafrance",
     "type": "module",
-    "exports": "./src/index.ts",
+    "exports": {
+        ".": "./src/index.ts"
+    },
     "scripts": {
         "typecheck": "tsgo"
     },
     "dependencies": {
         "@packages/components": "workspace:*",
-        "@packages/plants-core": "workspace:*",
         "@tanstack/react-db": "^0.1.75",
-        "@tanstack/react-virtual": "^3.13.21",
         "lucide-react": "^0.577.0",
         "zod": "^4.3.6"
     },
@@ -27,9 +27,7 @@
         "typescript": "5.9.3"
     },
     "peerDependencies": {
-        "@squide/firefly": "^16.1.12",
         "react": "^19.2.4",
-        "react-dom": "^19.2.4",
-        "react-router": "^7.12.0"
+        "react-dom": "^19.2.4"
     }
 }

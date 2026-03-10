@@ -8,7 +8,7 @@ const require = createRequire(import.meta.url);
 const storybookConfig: StorybookConfig = {
     framework: getAbsolutePath("storybook-react-rsbuild"),
     addons: [getAbsolutePath("@storybook/addon-a11y")],
-    stories: ["../../components/src/**/*.stories.tsx"],
+    stories: ["../../components/src/**/*.stories.tsx", "../../plants-core/src/**/*.stories.tsx"],
 };
 
 export default storybookConfig;

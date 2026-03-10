@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
+import type { Plant } from "@packages/plants-core";
+
 import { EditPlantDialog } from "./EditPlantDialog.tsx";
-import type { Plant } from "./plantSchema.ts";
 
 function makePlant(overrides: Partial<Plant> = {}): Plant {
     const now = new Date();

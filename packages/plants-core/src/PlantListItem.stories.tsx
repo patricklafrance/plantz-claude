@@ -1,13 +1,36 @@
+import { useEffect, useRef } from "react";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
 import { PlantListItem } from "./PlantListItem.tsx";
 import type { Plant } from "./plantSchema.ts";
 
-function makePlant(overrides: Partial<Plant> = {}): Plant {
-    const now = new Date();
-    const future = new Date();
-    future.setDate(future.getDate() + 7);
+// Fixed dates for deterministic Chromatic snapshots.
+// The Date freeze decorator is required because isDueForWatering() calls new Date() internally.
+const FIXED_NOW = new Date(2026, 2, 10, 12, 0, 0, 0);
+const FIXED_FUTURE = new Date(2026, 2, 17, 0, 0, 0, 0);
+const FIXED_PAST = new Date(2026, 2, 8, 0, 0, 0, 0);
+const OriginalDate = globalThis.Date;
 
+function freezeDate() {
+    const Frozen = function (this: Date, ...args: unknown[]) {
+        if (args.length === 0) {
+            return new OriginalDate(FIXED_NOW);
+        }
+        return new (OriginalDate as unknown as new (...a: unknown[]) => Date)(...args);
+    } as unknown as DateConstructor;
+    Object.setPrototypeOf(Frozen, OriginalDate);
+    Object.setPrototypeOf(Frozen.prototype, OriginalDate.prototype);
+    Frozen.now = () => FIXED_NOW.getTime();
+    Frozen.parse = OriginalDate.parse.bind(OriginalDate);
+    Frozen.UTC = OriginalDate.UTC.bind(OriginalDate);
+    globalThis.Date = Frozen;
+}
+
+function restoreDate() {
+    globalThis.Date = OriginalDate;
+}
+
+function makePlant(overrides: Partial<Plant> = {}): Plant {
     return {
         id: "test-1",
         name: "Monstera Deliciosa",
@@ -20,17 +43,11 @@ function makePlant(overrides: Partial<Plant> = {}): Plant {
         wateringFrequency: "1-week",
         wateringQuantity: "200ml",
         wateringType: "surface",
-        nextWateringDate: future,
-        creationDate: now,
-        lastUpdateDate: now,
+        nextWateringDate: FIXED_FUTURE,
+        creationDate: FIXED_NOW,
+        lastUpdateDate: FIXED_NOW,
         ...overrides,
     };
-}
-
-function pastDate(): Date {
-    const d = new Date();
-    d.setDate(d.getDate() - 2);
-    return d;
 }
 
 const meta = {
@@ -43,11 +60,25 @@ const meta = {
         onDelete: () => {},
     },
     decorators: [
-        (Story) => (
-            <div className="border-border w-[900px] rounded-lg border">
-                <Story />
-            </div>
-        ),
+        (Story) => {
+            const frozenRef = useRef(false);
+            if (!frozenRef.current) {
+                freezeDate();
+                frozenRef.current = true;
+            }
+
+            useEffect(() => {
+                return () => {
+                    restoreDate();
+                };
+            }, []);
+
+            return (
+                <div className="border-border w-[900px] rounded-lg border">
+                    <Story />
+                </div>
+            );
+        },
     ],
 } satisfies Meta<typeof PlantListItem>;
 
@@ -70,13 +101,13 @@ export const Selected: Story = {
 
 export const DueForWatering: Story = {
     args: {
-        plant: makePlant({ nextWateringDate: pastDate() }),
+        plant: makePlant({ nextWateringDate: FIXED_PAST }),
     },
 };
 
 export const DueAndSelected: Story = {
     args: {
-        plant: makePlant({ nextWateringDate: pastDate() }),
+        plant: makePlant({ nextWateringDate: FIXED_PAST }),
         selected: true,
     },
 };
@@ -112,11 +143,7 @@ export const MinimalFields: Story = {
 export const DueToday: Story = {
     args: {
         plant: makePlant({
-            nextWateringDate: (() => {
-                const d = new Date();
-                d.setHours(0, 0, 0, 0);
-                return d;
-            })(),
+            nextWateringDate: new Date(2026, 2, 10, 0, 0, 0, 0),
         }),
     },
 };

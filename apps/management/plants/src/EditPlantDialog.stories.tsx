@@ -4,11 +4,12 @@ import type { Plant } from "@packages/plants-core";
 
 import { EditPlantDialog } from "./EditPlantDialog.tsx";
 
-function makePlant(overrides: Partial<Plant> = {}): Plant {
-    const now = new Date();
-    const future = new Date();
-    future.setDate(future.getDate() + 7);
+// Fixed dates for deterministic Chromatic snapshots.
+const FIXED_NOW = new Date(2026, 2, 10, 12, 0, 0, 0);
+const FIXED_FUTURE = new Date(2026, 2, 17, 0, 0, 0, 0);
+const FIXED_PAST = new Date(2026, 2, 8, 0, 0, 0, 0);
 
+function makePlant(overrides: Partial<Plant> = {}): Plant {
     return {
         id: "test-edit-1",
         name: "Monstera Deliciosa",
@@ -21,17 +22,11 @@ function makePlant(overrides: Partial<Plant> = {}): Plant {
         wateringFrequency: "1-week",
         wateringQuantity: "200ml",
         wateringType: "surface",
-        nextWateringDate: future,
-        creationDate: now,
-        lastUpdateDate: now,
+        nextWateringDate: FIXED_FUTURE,
+        creationDate: FIXED_NOW,
+        lastUpdateDate: FIXED_NOW,
         ...overrides,
     };
-}
-
-function pastDate(): Date {
-    const d = new Date();
-    d.setDate(d.getDate() - 2);
-    return d;
 }
 
 const meta = {
@@ -76,7 +71,7 @@ export const AllOptionalFieldsFilled: Story = {
 
 export const DueForWatering: Story = {
     args: {
-        plant: makePlant({ nextWateringDate: pastDate() }),
+        plant: makePlant({ nextWateringDate: FIXED_PAST }),
     },
 };
 

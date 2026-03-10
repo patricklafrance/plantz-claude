@@ -4,11 +4,18 @@ import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
 import { Calendar } from "./calendar.tsx";
 
+// Fixed dates for deterministic Chromatic snapshots — stories always show March 2026
+// and highlight March 10 as "today".
+const FIXED_MONTH = new Date(2026, 2, 1);
+const FIXED_TODAY = new Date(2026, 2, 10);
+
 const meta = {
     title: "Components/Calendar",
     component: Calendar,
     args: {
         mode: "single",
+        month: FIXED_MONTH,
+        today: FIXED_TODAY,
     },
 } satisfies Meta<typeof Calendar>;
 
@@ -56,6 +63,8 @@ export const RangeSelection: Story = {
         return (
             <Calendar
                 mode="range"
+                month={FIXED_MONTH}
+                today={FIXED_TODAY}
                 selected={range}
                 onSelect={(value) => {
                     if (value) setRange(value);
@@ -82,27 +91,27 @@ export const AllVariants: Story = {
         <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
                 <span className="text-muted-foreground text-sm font-medium">Default (single)</span>
-                <Calendar mode="single" selected={new Date(2026, 2, 6)} />
+                <Calendar mode="single" month={FIXED_MONTH} today={FIXED_TODAY} selected={new Date(2026, 2, 6)} />
             </div>
             <div className="flex flex-col gap-2">
                 <span className="text-muted-foreground text-sm font-medium">Range selection</span>
-                <Calendar mode="range" selected={{ from: new Date(2026, 2, 6), to: new Date(2026, 2, 12) }} />
+                <Calendar mode="range" month={FIXED_MONTH} today={FIXED_TODAY} selected={{ from: new Date(2026, 2, 6), to: new Date(2026, 2, 12) }} />
             </div>
             <div className="flex flex-col gap-2">
                 <span className="text-muted-foreground text-sm font-medium">Multiple months</span>
-                <Calendar mode="single" numberOfMonths={2} />
+                <Calendar mode="single" month={FIXED_MONTH} today={FIXED_TODAY} numberOfMonths={2} />
             </div>
             <div className="flex flex-col gap-2">
                 <span className="text-muted-foreground text-sm font-medium">Dropdown caption</span>
-                <Calendar mode="single" captionLayout="dropdown" startMonth={new Date(2020, 0)} endMonth={new Date(2030, 11)} />
+                <Calendar mode="single" month={FIXED_MONTH} today={FIXED_TODAY} captionLayout="dropdown" startMonth={new Date(2020, 0)} endMonth={new Date(2030, 11)} />
             </div>
             <div className="flex flex-col gap-2">
                 <span className="text-muted-foreground text-sm font-medium">Outside days hidden</span>
-                <Calendar mode="single" showOutsideDays={false} />
+                <Calendar mode="single" month={FIXED_MONTH} today={FIXED_TODAY} showOutsideDays={false} />
             </div>
             <div className="flex flex-col gap-2">
                 <span className="text-muted-foreground text-sm font-medium">With week numbers</span>
-                <Calendar mode="single" showWeekNumber />
+                <Calendar mode="single" month={FIXED_MONTH} today={FIXED_TODAY} showWeekNumber />
             </div>
         </div>
     ),

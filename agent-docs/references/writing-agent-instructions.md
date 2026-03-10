@@ -40,7 +40,7 @@
 ### 6. Single source of truth over duplicated content
 
 - **Bad:** Repeat the same Turborepo task list in three different files.
-- **Good:** Write it once in `references/build-tooling.md`, link everywhere else.
+- **Good:** Write it once in the relevant reference file (e.g., `references/turborepo.md`), link everywhere else.
   Duplicated content drifts and agents follow the stale copy.
 
 **Clarification:** This applies to prescriptive content (rules, commands, config

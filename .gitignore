@@ -10,5 +10,6 @@ chromatic-diagnostics.json
 .netlify
 .claude/worktrees
 tmp
+.env
 *.env.local
 

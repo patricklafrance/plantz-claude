@@ -1,6 +1,6 @@
 <!-- This file is auto-injected when working in packages/components/.
      It owns ALL component-authoring rules: style, deps, stories, verification.
-     shadcn CLI *explanations* (why bugs happen) live in agent-docs/references/shadcn.md.
+     shadcn CLI *explanations* (why bugs happen) live in the plantz-sdlc-code skill's references/shadcn.md.
      Generic shadcn knowledge (composition, forms, component selection) lives in the shadcn agent skill.
      Do not duplicate content from those sources here — one-liner reminders at the point of use are fine,
      full explanations and code blocks are not. Duplicated rules drift. -->
@@ -17,7 +17,7 @@ All code in this package must use **semicolons** at the end of statements. The `
 
 ## Component Stories
 
-For shared conventions (CSF3 format, import extensions, Chromatic compatibility, isolation, verification process), read [storybook.md](../../agent-docs/references/storybook.md). The rules below are specific to `packages/components/`.
+For shared conventions (CSF3 format, import extensions, Chromatic compatibility, isolation, verification process), load the `plantz-sdlc-code` skill for storybook conventions. The rules below are specific to `packages/components/`.
 
 Every component under `src/components/ui/` must have a co-located `.stories.tsx` file (e.g., `button.tsx` → `button.stories.tsx`).
 
@@ -38,7 +38,7 @@ This is the complete workflow. Do not skip steps or consider the task done after
 
 1. Run `pnpm dlx shadcn@latest add <component>` from `packages/components/`.
 2. **Move files** from the literal `@/` directory the CLI creates into `src/` (the alias doesn't resolve in this Rslib package).
-3. **Fix imports** — replace `@/lib/utils` with relative paths using `.ts` extensions (e.g., `../../lib/utils.ts`). Fix any `@base-ui/react/*` imports the CLI mangled into `@/components/ui/*`. Use `pnpm dlx shadcn@latest add <component> --view <file>` to see correct upstream imports. See [shadcn reference](../../agent-docs/references/shadcn.md) for why these bugs happen.
+3. **Fix imports** — replace `@/lib/utils` with relative paths using `.ts` extensions (e.g., `../../lib/utils.ts`). Fix any `@base-ui/react/*` imports the CLI mangled into `@/components/ui/*`. Use `pnpm dlx shadcn@latest add <component> --view <file>` to see correct upstream imports. Load the `plantz-sdlc-code` skill for shadcn CLI bug details.
 4. **Normalize semicolons** to match the project convention (see Code Style above).
 5. **Create the `.stories.tsx` file** next to the component in `src/components/ui/` (see Requirements above).
 6. **Export the component** from `src/index.ts`.

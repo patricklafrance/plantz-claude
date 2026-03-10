@@ -1,0 +1,77 @@
+name: Smoke Tests
+
+on:
+    pull_request:
+        branches:
+            - main
+
+env:
+    CI: true
+
+concurrency:
+    group: smoke-tests-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    smoke-tests:
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+        env:
+            TURBO_TELEMETRY_DISABLED: "1"
+        permissions:
+            contents: read
+            pull-requests: write
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+
+            - name: Install pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  run_install: false
+
+            - name: Install Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version: ">=24.0.0"
+                  check-latest: true
+                  cache: pnpm
+                  cache-dependency-path: pnpm-lock.yaml
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Restore Turborepo cache
+              id: cache-turborepo-restore
+              uses: actions/cache/restore@v5
+              with:
+                  key: ${{ runner.os }}-turbo-smoke-${{ github.sha }}
+                  restore-keys: |
+                      ${{ runner.os }}-turbo-smoke-
+                      ${{ runner.os }}-turbo-
+                  path: .turbo
+
+            - name: Run smoke tests
+              uses: anthropics/claude-code-action@v1
+              with:
+                  anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+                  allowed_bots: "claude[bot]"
+                  prompt: |
+                      Load the `plantz-smoke-tests` skill and run smoke tests for all applications.
+                      If any app fails to start or has console errors, report the failures as a PR comment.
+                      If all apps pass, post a summary comment with the results table.
+                  claude_args: >-
+                      --allowedTools Read,Glob,Grep,Bash,Skill,Task*
+              env:
+                  GH_TOKEN: ${{ github.token }}
+
+            - name: Save Turborepo cache
+              id: cache-turborepo-save
+              if: always() && steps.cache-turborepo-restore.outputs.cache-hit != 'true'
+              uses: actions/cache/save@v5
+              with:
+                  key: ${{ steps.cache-turborepo-restore.outputs.cache-primary-key }}
+                  path: .turbo

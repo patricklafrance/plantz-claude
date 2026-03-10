@@ -20,7 +20,7 @@ Use syncpack with differentiated policies (Option 1). The split between apps (pi
 
 ## Consequences
 
-See [build-tooling.md](../references/build-tooling.md#syncpack) for the full semver groups table and version group configuration.
+See [syncpack.md](../references/syncpack.md) for the full semver groups table and version group configuration.
 
 Additional implications:
 

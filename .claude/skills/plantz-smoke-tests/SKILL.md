@@ -1,9 +1,8 @@
 ---
 name: plantz-smoke-tests
 description: |
-    Smoke-test every application by starting dev servers and verifying pages load.
+    Smoke-test every application by starting dev servers and verifying pages load without errors.
     Use when asked to "verify apps", "test all apps", "smoke test", "check dev servers".
-    Triggers: /plantz-smoke-tests, "smoke test", "verify apps", "test all apps"
 disable-model-invocation: true
 license: MIT
 ---
@@ -14,7 +13,18 @@ Smoke-test every application in the repository by starting each dev server and v
 
 ## Prerequisites
 
-This skill requires `agent-browser` CLI to be available for browser verification steps (navigating to URLs, taking snapshots, checking console errors, taking screenshots). If `agent-browser` is not available, the skill cannot complete Steps 3.1–3.4.
+This skill requires `agent-browser` CLI for browser verification (navigating to URLs, taking snapshots, checking console errors, taking screenshots).
+
+## Run Folder
+
+Generate a UUID at the start of the run:
+
+```bash
+RUN_UUID=$(node -e "console.log(require('crypto').randomUUID())")
+mkdir -p ./tmp/smoke-tests/$RUN_UUID
+```
+
+All screenshots and artifacts go in `./tmp/smoke-tests/$RUN_UUID/`.
 
 ## Discovery
 
@@ -24,8 +34,6 @@ This skill requires `agent-browser` CLI to be available for browser verification
 
 ## Procedure
 
-Before testing any app, delete `tmp/smoke-tests/` if it exists — this clears stale artifacts from prior failed runs. Then recreate the directory.
-
 For each app in the list, run these steps sequentially:
 
 ### Step 1 — Start the dev server
@@ -34,22 +42,56 @@ Run the dev script in the background (e.g., `pnpm dev-host`). Capture the task I
 
 ### Step 2 — Wait for ready
 
-Watch stdout for the local URL (typically `http://localhost:<port>`). Wait for the server to emit it — this confirms the build succeeded and the server is listening. Use a 60-second timeout for the host and 300 seconds for storybooks — storybooks compile on first launch and are significantly slower.
+Watch stdout for the local URL. Wait for the server to emit it — this confirms the build succeeded and the server is listening.
+
+**Known ports:** host app = `8080`, storybooks = `6006`.
+
+**Timeouts:** 60 seconds for the host app, 300 seconds for storybooks (storybooks compile on first launch and are significantly slower).
 
 ### Step 3 — Verify in browser
 
 1. Navigate to the local URL.
 2. Take a page snapshot and confirm meaningful content loaded (not a blank page or error screen).
 3. Check the browser console for errors. Warnings are acceptable — errors are not.
-4. Take a screenshot and save it to `tmp/smoke-tests/{app-name}.png`.
+4. Take a screenshot and save it to `./tmp/smoke-tests/$RUN_UUID/{app-name}.png`.
 
-### Step 4 — Stop the dev server and kill orphan processes
+### Step 4 — Stop the dev server
 
-Stop the background task started in step 1. Then verify the port is actually free — `TaskStop` kills the turbo wrapper but child processes (the actual node dev server) can survive. Run `netstat -ano | grep -E "LISTENING" | grep ":<port>"` to check. If the port is still occupied, kill the orphan process with `taskkill //PID <pid> //T //F` (Windows) or `kill <pid>` (Unix). The `//T` flag kills the entire process tree. Never start the next app's dev server until the previous port is confirmed free.
+Stop the background task started in Step 1. Then **immediately** run the port-cleanup procedure below.
 
 ### Step 5 — Record result
 
-Record the app name, URL, status (pass/fail), and any errors found.
+Record the app name, URL, status (pass/fail), and any errors.
+
+## Port-Cleanup Procedure
+
+This is the most failure-prone part of the skill. `TaskStop` kills the Turbo wrapper, but child processes (the actual Node dev server) survive. You **must** verify the port is free before starting the next app.
+
+After stopping the background task, run these commands for the port the app was using:
+
+```bash
+# For the host app (port 8080):
+netstat -ano | grep :8080 | grep LISTENING
+# If output shows a PID, kill the entire process tree:
+taskkill //PID <PID> //T //F
+
+# For storybooks (port 6006):
+netstat -ano | grep :6006 | grep LISTENING
+taskkill //PID <PID> //T //F
+```
+
+**Rules:**
+
+- Always check the port after TaskStop, even if TaskStop reported success.
+- Always use `//T` (tree kill) — child processes survive without it.
+- Always use `//F` (force) — graceful shutdown is unreliable for orphan processes.
+- Never start the next app's dev server until the port is confirmed free (netstat returns no output for that port).
+- If the server used a port other than 8080 or 6006 (discovered from server output), use that port instead.
+
+## Cleanup
+
+- **On success:** delete the run folder: `rm -rf ./tmp/smoke-tests/$RUN_UUID`.
+- **On failure:** never delete the run folder. Leave artifacts for diagnosis.
 
 ## Summary
 
@@ -66,7 +108,7 @@ If any app failed, list the failure details below the table.
 
 ## Prohibitions
 
-- Never hardcode app names or ports — discover them from `package.json` and server output. Hardcoded values silently break when apps are added or ports change.
-- Never leave a dev server running — always stop it before starting the next one. Orphan servers cause port conflicts that fail subsequent tests.
+- Never leave a dev server running — always stop it and run the port-cleanup procedure before starting the next one. Orphan servers cause port conflicts that fail subsequent tests.
 - Never skip an app — test every discovered application even if a previous one failed. Skipping hides cascading failures across apps.
 - Always save screenshots as evidence, even for passing apps. Without screenshots, failures cannot be diagnosed after the fact.
+- Never skip the port-cleanup procedure — checking with netstat and killing orphans is mandatory, not optional.

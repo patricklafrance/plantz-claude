@@ -1,6 +1,6 @@
 # Management Domain
 
-Federated modules for plant management features.
+Local modules for plant management features.
 
 ## Stories
 

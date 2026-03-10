@@ -1,6 +1,6 @@
 # Today Domain
 
-Federated modules for the daily plant care view.
+Local modules for the daily plant care view.
 
 ## Stories
 

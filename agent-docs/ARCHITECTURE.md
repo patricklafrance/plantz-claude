@@ -2,7 +2,7 @@
 
 ## What is plantz-claude
 
-A plants watering application and proof-of-concept for Claude Code agent workflows. Built as a pnpm monorepo with Turborepo orchestration and Squide federated modules.
+A plants watering application and proof-of-concept for Claude Code agent workflows. Built as a modular monolith using pnpm, Turborepo, and Squide local modules.
 
 ## Repository structure
 
@@ -46,7 +46,7 @@ plantz-claude/
 - **Shared packages**: Cross-cutting utilities live in `packages/` and are consumed by both host and modules.
 - **JIT packages**: Packages under `packages/` expose source directly via `exports` fields (e.g., `"./": "./src/index.ts"`). Consumers compile them at build time through their own bundler — no pre-build step is required. This means the Turborepo `dev` task has no `^dev` dependency; persistent watch builds in packages run in parallel, not as prerequisites. See [ODR-0004](odr/0004-jit-packages.md) for rationale.
 
-See [ADR-0001](adr/0001-squide-federated-modules.md) for rationale.
+See [ADR-0001](adr/0001-squide-local-modules.md) for rationale.
 
 ## Domain isolation
 
@@ -68,7 +68,7 @@ For exact versions, read the root `package.json` (`engines`, `packageManager`, `
 | Node.js             | Runtime                                                                     |
 | pnpm                | Package manager                                                             |
 | TypeScript          | Type checking (`@typescript/native-preview` — tsgo)                         |
-| Squide              | Federated module shell                                                      |
+| Squide              | Modular monolith shell (local modules)                                      |
 | Storybook           | Component development                                                       |
 | Chromatic           | Visual regression testing                                                   |
 | Tailwind CSS        | Utility-first CSS framework (via `@tailwindcss/postcss`)                    |

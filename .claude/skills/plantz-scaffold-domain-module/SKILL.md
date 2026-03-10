@@ -1,14 +1,14 @@
 ---
 name: plantz-scaffold-domain-module
 description: |
-    Scaffold a new Squide federated module in the monorepo.
+    Scaffold a new Squide local module in the monorepo.
     Use when asked to "create a module", "scaffold a module", "add a module", "new module".
 license: MIT
 ---
 
 # Scaffold Module
 
-Create a new Squide federated module with all required registrations.
+Create a new Squide local module with all required registrations.
 
 ## Inputs
 

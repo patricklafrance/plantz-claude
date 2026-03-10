@@ -1,4 +1,4 @@
-# ADR-0001: Federated Module Architecture with Workleap Squide
+# ADR-0001: Modular Monolith with Workleap Squide Local Modules
 
 ## Status
 
@@ -10,13 +10,13 @@ plantz-claude needs to support multiple feature areas (plant management, daily w
 
 ## Options Considered
 
-1. **Workleap Squide** — Workleap's federated module shell. Modules register routes and navigation via `ModuleRegisterFunction`. Host is a thin shell (`FireflyRuntime` + `AppRouter`). No runtime federation overhead — modules are imported at build time but architecturally isolated.
+1. **Workleap Squide local modules** — A modular monolith using Squide's local module system. Modules register routes and navigation via `ModuleRegisterFunction`. Host is a thin shell (`FireflyRuntime` + `AppRouter`). Modules are imported at build time but architecturally isolated — no runtime federation overhead.
 2. **Webpack Module Federation** — Runtime federation with independently deployed micro-frontends. Adds runtime complexity (shared scope, version negotiation) that is unnecessary for a single-repo app.
 3. **Monolithic React app** — Single app with folder-based code organization. Simpler initially, but domain boundaries are conventions only — no enforcement of isolation.
 
 ## Decision
 
-Use Workleap Squide (Option 1). It provides module isolation boundaries enforced by the framework without the operational complexity of runtime federation. Since all code lives in one monorepo, build-time composition is sufficient.
+Use Workleap Squide local modules (Option 1). It provides module isolation boundaries enforced by the framework without the operational complexity of runtime federation. Since all code lives in one monorepo, build-time composition is sufficient.
 
 ## Consequences
 

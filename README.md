@@ -8,7 +8,7 @@ The app itself is intentionally simple. The interesting part is the agent infras
 
 ### The application
 
-A pnpm monorepo with Turborepo orchestration and [Squide](https://github.com/gsoft-inc/wl-squide) federated modules.
+A pnpm monorepo with Turborepo orchestration and [Squide](https://github.com/gsoft-inc/wl-squide) modules.
 
 ```
 apps/
@@ -56,16 +56,17 @@ User: "Add watering schedules to the management domain"
        └─ Merge   → commit, PR, monitor CI
 ```
 
-| Skill                      | What it does                                                                                          |
-| -------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `plantz-sdlc-orchestrator` | Entry point. Generates a run UUID, creates a branch, and runs steps 1-9 sequentially                  |
-| `plantz-sdlc-plan`         | Drafts a structured technical plan (affected packages, file changes, acceptance criteria)              |
-| `plantz-sdlc-code`         | Implements the plan or fixes issues from the test phase. Scaffolds modules on iteration 1              |
-| `plantz-sdlc-test`         | Validates code quality — lint, module structure, quality gates, visual verification, smoke tests       |
-| `plantz-sdlc-document`     | Audits agent-docs and CLAUDE.md for drift, creates ADRs/ODRs if new decisions were made               |
-| `plantz-sdlc-merge`        | Commits, pushes, opens a PR, monitors CI. Returns control to orchestrator if fixes are needed         |
+| Skill                      | What it does                                                                                     |
+| -------------------------- | ------------------------------------------------------------------------------------------------ |
+| `plantz-sdlc-orchestrator` | Entry point. Generates a run UUID, creates a branch, and runs steps 1-9 sequentially             |
+| `plantz-sdlc-plan`         | Drafts a structured technical plan (affected packages, file changes, acceptance criteria)        |
+| `plantz-sdlc-code`         | Implements the plan or fixes issues from the test phase. Scaffolds modules on iteration 1        |
+| `plantz-sdlc-test`         | Validates code quality — lint, module structure, quality gates, visual verification, smoke tests |
+| `plantz-sdlc-document`     | Audits agent-docs and CLAUDE.md for drift, creates ADRs/ODRs if new decisions were made          |
+| `plantz-sdlc-merge`        | Commits, pushes, opens a PR, monitors CI. Returns control to orchestrator if fixes are needed    |
 
 Key design decisions:
+
 - **Self-contained**: plan, code, and test skills each embed their own `references/` files (tech-stack rules, styling conventions, accessibility requirements). Subagents never need to read another skill's files.
 - **Subagent protocol**: Every multi-agent step uses a drafter/reviewer pair. The orchestrator spawns both — subagents never spawn further subagents.
 - **File-based coordination**: All inter-step communication goes through files in `./tmp/runs/[uuid]/` (plan.md, changes-N.md, test-issues-N.md). This makes handoffs explicit and debuggable.
@@ -110,18 +111,18 @@ Utility skills use a **reference module pattern** — instead of hardcoding depe
 
 **External skills** (symlinked from `.agents/skills/`):
 
-| Skill                            | Loaded by                    | Purpose                                              |
-| -------------------------------- | ---------------------------- | ---------------------------------------------------- |
-| `workleap-react-best-practices`  | plan, code                   | React SPA performance patterns                       |
-| `accessibility`                  | plan, code                   | WCAG 2.1 audit and remediation                       |
-| `shadcn`                         | plan, code                   | shadcn/ui component management                       |
-| `frontend-design`                | plan, code                   | Production-grade UI design                           |
-| `workleap-squide`                | plan, code                   | Squide modular shell conventions                     |
-| `pnpm`                           | code, test                   | Workspace dependency management                      |
-| `turborepo`                      | code, test                   | Monorepo task orchestration                          |
-| `vitest`                         | test                         | Unit testing                                         |
-| `workleap-web-configs`           | code                         | Shared ESLint/TypeScript/Rsbuild configs             |
-| `workleap-logging`               | code                         | Structured logging                                   |
+| Skill                           | Loaded by  | Purpose                                  |
+| ------------------------------- | ---------- | ---------------------------------------- |
+| `workleap-react-best-practices` | plan, code | React SPA performance patterns           |
+| `accessibility`                 | plan, code | WCAG 2.1 audit and remediation           |
+| `shadcn`                        | plan, code | shadcn/ui component management           |
+| `frontend-design`               | plan, code | Production-grade UI design               |
+| `workleap-squide`               | plan, code | Squide modular shell conventions         |
+| `pnpm`                          | code, test | Workspace dependency management          |
+| `turborepo`                     | code, test | Monorepo task orchestration              |
+| `vitest`                        | test       | Unit testing                             |
+| `workleap-web-configs`          | code       | Shared ESLint/TypeScript/Rsbuild configs |
+| `workleap-logging`              | code       | Structured logging                       |
 
 **Files:** [`.claude/skills/`](.claude/skills/), [`.agents/skills/`](.agents/skills/)
 
@@ -144,14 +145,14 @@ Formal logs of _why_ decisions were made — not just what was decided. Agents c
 
 Six GitHub Actions workflows, four of which involve Claude Code:
 
-| Workflow               | Trigger                         | Purpose                                                      |
-| ---------------------- | ------------------------------- | ------------------------------------------------------------ |
-| `ci.yml`               | Push to main, PRs               | Build, lint (oxlint, oxfmt, typecheck, syncpack), test       |
-| `chromatic.yml`        | Push to main, labeled PRs       | Visual regression testing — only affected Storybooks         |
-| `claude.yml`           | `@claude` mention in issues/PRs | Claude Code agent responds to issues and PR comments         |
-| `code-review.yml`      | PRs opened/updated              | Automated code review by Claude (read-only tools)            |
+| Workflow               | Trigger                         | Purpose                                                                   |
+| ---------------------- | ------------------------------- | ------------------------------------------------------------------------- |
+| `ci.yml`               | Push to main, PRs               | Build, lint (oxlint, oxfmt, typecheck, syncpack), test                    |
+| `chromatic.yml`        | Push to main, labeled PRs       | Visual regression testing — only affected Storybooks                      |
+| `claude.yml`           | `@claude` mention in issues/PRs | Claude Code agent responds to issues and PR comments                      |
+| `code-review.yml`      | PRs opened/updated              | Automated code review by Claude (read-only tools)                         |
 | `smoke-tests.yml`      | PRs to main                     | Smoke-tests all apps via Claude (scoped Bash, artifact upload on failure) |
-| `audit-agent-docs.yml` | Weekly cron + manual            | Runs the audit skill, creates PRs for Critical/High findings |
+| `audit-agent-docs.yml` | Weekly cron + manual            | Runs the audit skill, creates PRs for Critical/High findings              |
 
 The audit workflow is self-healing — it detects when docs drift from reality and opens PRs to fix them. The smoke-tests workflow loads the `plantz-smoke-tests` skill, which starts each dev server, verifies it in a headless browser via `agent-browser`, and posts results as a PR comment.
 

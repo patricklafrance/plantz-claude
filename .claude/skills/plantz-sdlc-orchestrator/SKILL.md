@@ -90,7 +90,7 @@ When done, verify `./tmp/runs/[run-uuid]/changes-1.md` exists. If not, fail the 
 
 ### Step 5 — Simplify
 
-Run the `/simplify` skill to review the uncommitted changes for dead code, redundant abstractions, and over-engineering. This runs once on the initial implementation — fix iterations produce small surgical patches that don't need simplification.
+Spawn **one** subagent to run the `/simplify` skill — review the uncommitted changes for dead code, redundant abstractions, and over-engineering. This runs once on the initial implementation — fix iterations produce small surgical patches that don't need simplification.
 
 ### Step 6 — Test and iterate
 
@@ -118,8 +118,8 @@ Pass: `run-uuid`, the branch name from step 2, the commit type from step 2.
 
 The merge subagent may return control in these cases:
 
-- **CI failure:** The merge subagent writes `ci-issues-[attempt].md` and returns. The orchestrator spawns `plantz-sdlc-code` subagents (2 subagents, following the subagent protocol) with: `run-uuid`, `iteration` continuing from where the test phase left off, plan path, the CI issues file, and the latest changes file. After the fix, spawn a new merge subagent to commit, push, and resume monitoring. **Maximum 3 CI fix attempts** — if CI still fails, follow the failure handling procedure.
-- **PR comments:** The merge subagent writes `pr-comments-[attempt].md` and returns. The orchestrator spawns `plantz-sdlc-code` and/or `plantz-sdlc-document` subagents (2 subagents each, following the subagent protocol) to address legitimate comments. After the fix, spawn a new merge subagent to commit, push, resolve comments, and resume monitoring.
+- **CI failure:** The merge subagent writes `ci-issues-[attempt].md` and returns. The orchestrator spawns `plantz-sdlc-code` subagents (2 subagents, following the subagent protocol) with: `run-uuid`, `iteration` continuing from where the test phase left off, plan path, the CI issues file, and the latest changes file. After the fix, run `pnpm lint` to catch regressions before pushing again. Then spawn a new merge subagent to commit, push, and resume monitoring. **Maximum 3 CI fix attempts** — if CI still fails, follow the failure handling procedure.
+- **PR comments:** The merge subagent writes `pr-comments-[attempt].md` and returns. The orchestrator spawns `plantz-sdlc-code` and/or `plantz-sdlc-document` subagents (2 subagents each, following the subagent protocol) to address legitimate comments. After the fix, spawn a new merge subagent to commit, push, resolve comments, and resume monitoring. **Maximum 3 PR comment cycles** — if comments keep coming, follow the failure handling procedure.
 
 ### Step 9 — Clean up
 
@@ -137,7 +137,7 @@ After completing each step, write the current state to `./tmp/runs/[run-uuid]/or
 - Commit type: [type]
 - Current step: [step number]
 - Iteration: [current iteration number]
-- Sub-phase: [code/test/none] (within step 5 only)
+- Sub-phase: [code/test/none] (within step 6 only)
 - Status: [completed/in-progress/failed]
 ```
 

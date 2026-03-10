@@ -35,7 +35,7 @@ EOF
 
 Use the conventional commit type provided by the orchestrator. The description should be a concise summary derived from aggregating all `./tmp/runs/[run-uuid]/changes-*.md` files.
 
-Use `git add -A` to stage all changes. Rely on `.gitignore` to exclude temporary and sensitive files. If `git status` shows unexpected files before committing, investigate rather than blindly staging.
+Prefer `git add -A` to stage all changes — `.gitignore` already excludes `tmp/`, `.env`, `node_modules`, and build output. If `git status` shows unexpected files before committing, investigate rather than blindly staging.
 
 ## Step 2 — Push and open PR
 

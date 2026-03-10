@@ -26,13 +26,13 @@ Implement the plan or fix issues reported by the test phase.
 This skill runs in one of two modes, determined by the inputs:
 
 - **Plan mode** (`iteration=1`, issues path is `null`): Implement the feature from scratch based on the plan.
-- **Fix mode** (`iteration>1`, issues path provided): Fix specific issues reported by the test phase. The plan is still read for context, but the issues file drives the work.
+- **Fix mode** (`iteration>1`, issues path provided): Fix specific issues from the test phase or CI. The plan is still read for context, but the issues file drives the work.
 
 ## Procedure
 
 1. Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, `agent-docs/odr/index.md`, and all files in this skill's `references/` directory.
 2. Load the `accessibility`, `shadcn`, `frontend-design`, and `workleap-react-best-practices` skills for implementation guidance.
-3. Read the plan file for architectural context. In **fix mode**, also read the issues file and previous changes file to understand what was done and what failed. If the issues file contains visual verification or accessibility findings, also read the referenced screenshots in `./tmp/runs/[run-uuid]/screenshots/` — visual issues typically require Tailwind class adjustments (`overflow`, `min-height`, `dark:` variants).
+3. Read the plan file for architectural context. In **fix mode**, also read the issues file and previous changes file to understand what was done and what failed.
 4. **Plan mode only:** If the plan requires scaffolding a new module, load and use the `plantz-scaffold-domain-module` skill. If it requires a new Storybook, use `plantz-scaffold-domain-storybook`.
 5. Implement the changes. Follow all technology rules from this skill's `references/` files. You have access to browser tools (chrome-devtools MCP) — use them to verify your work visually when it would help, the same way you would in any coding session.
 6. Write a summary of all changes to `./tmp/runs/[run-uuid]/changes-[iteration].md`.

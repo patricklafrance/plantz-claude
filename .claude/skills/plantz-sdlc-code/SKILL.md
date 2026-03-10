@@ -9,7 +9,7 @@ license: MIT
 
 # SDLC Code
 
-Implement the plan or fix issues reported by the test phase.
+Implement the plan or fix issues reported by the test phase or CI.
 
 ## Inputs (provided by orchestrator)
 
@@ -18,7 +18,7 @@ Implement the plan or fix issues reported by the test phase.
 | `run-uuid`   | Run folder identifier                                                                                                                                                      |
 | `iteration`  | Current iteration number (starts at 1). This is the iteration the agent will **write** to (`changes-[iteration].md`).                                                      |
 | Plan path    | Always provided — `./tmp/runs/[run-uuid]/plan.md`                                                                                                                          |
-| Issues path  | `null` on iteration 1. On fix cycles: the explicit path to the **previous** iteration's issues file (e.g., `test-issues-1.md` when `iteration=2`). |
+| Issues path  | `null` on iteration 1. On fix cycles: the path to the issues file — either `test-issues-*.md` (from test phase) or `ci-issues-*.md` (from CI failures). |
 | Changes path | `null` on iteration 1. On fix cycles: the explicit path to the **previous** iteration's changes file (e.g., `changes-1.md` when `iteration=2`).    |
 
 ## Mode

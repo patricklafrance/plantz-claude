@@ -18,7 +18,7 @@ export const plantsCollection = createCollection(
         storageKey: "plantz-plants",
         getKey: (item: Plant) => item.id,
         schema: plantSchema,
-    })
+    }),
 );
 ```
 
@@ -58,9 +58,7 @@ plantsCollection.delete(plantId);
 ```typescript
 import { useLiveQuery } from "@tanstack/react-db";
 
-const { data: plants } = useLiveQuery((q) =>
-    q.from({ plant: plantsCollection }).orderBy("plant.name" as any, "asc")
-);
+const { data: plants } = useLiveQuery((q) => q.from({ plant: plantsCollection }).orderBy("plant.name" as any, "asc"));
 ```
 
 The collection state is a `Map<string, Plant>`. Access via `plantsCollection.state.size` or `plantsCollection.state.values()`.

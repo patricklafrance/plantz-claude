@@ -40,7 +40,7 @@ plantz-claude/
 ## Squide host/module topology
 
 - **Host** (`apps/host/`): Thin shell that bootstraps Squide via `FireflyRuntime` and renders `AppRouter`. Contains no domain logic.
-- **Modules**: Each feature area registers via `ModuleRegisterFunction`. Modules are isolated — they never import from each other.
+- **Modules**: Each feature area registers via `ModuleRegisterFunction`. Modules are isolated — they do not import from each other's root export. When two modules need to share code, the owning module exposes a named subpath export (e.g., `./plants`) separate from its root registration export. See [ADR-0003](adr/0003-cross-module-subpath-exports.md). If a third consumer appears, extract to a shared package instead.
 - **Module registry**: `apps/host/src/getActiveModules.tsx` maps module path keys to their register functions. The host loads only modules present in this map.
 - **Shared packages**: Cross-cutting utilities live in `packages/` and are consumed by both host and modules.
 - **JIT packages**: Packages under `packages/` expose source directly via `exports` fields (e.g., `"./": "./src/index.ts"`). Consumers compile them at build time through their own bundler — no pre-build step is required. This means the Turborepo `dev` task has no `^dev` dependency; persistent watch builds in packages run in parallel, not as prerequisites. See [ODR-0004](odr/0004-jit-packages.md) for rationale.
@@ -62,23 +62,23 @@ See [ADR-0002](adr/0002-domain-scoped-storybooks.md) for rationale.
 
 For exact versions, read the root `package.json` (`engines`, `packageManager`, `devDependencies`).
 
-| Tool                | Purpose                                                                  |
-| ------------------- | ------------------------------------------------------------------------ |
-| Node.js             | Runtime                                                                  |
-| pnpm                | Package manager                                                          |
-| TypeScript          | Type checking (`@typescript/native-preview` — tsgo)                      |
-| Squide              | Federated module shell                                                   |
-| Storybook           | Component development                                                    |
-| Chromatic           | Visual regression testing                                                |
-| Tailwind CSS        | Utility-first CSS framework (via `@tailwindcss/postcss`)                 |
-| shadcn/ui (Base UI) | UI component library, base-nova preset (lives in `@packages/components`) |
-| Turborepo           | Task orchestration and caching                                           |
-| oxlint              | Fast JS/TS linter (zero config)                                          |
-| oxfmt               | Fast code formatter (Prettier-compatible, import sorting, Tailwind sort) |
-| Syncpack            | Dependency version enforcement                                           |
+| Tool                | Purpose                                                                     |
+| ------------------- | --------------------------------------------------------------------------- |
+| Node.js             | Runtime                                                                     |
+| pnpm                | Package manager                                                             |
+| TypeScript          | Type checking (`@typescript/native-preview` — tsgo)                         |
+| Squide              | Federated module shell                                                      |
+| Storybook           | Component development                                                       |
+| Chromatic           | Visual regression testing                                                   |
+| Tailwind CSS        | Utility-first CSS framework (via `@tailwindcss/postcss`)                    |
+| shadcn/ui (Base UI) | UI component library, base-nova preset (lives in `@packages/components`)    |
+| Turborepo           | Task orchestration and caching                                              |
+| oxlint              | Fast JS/TS linter (zero config)                                             |
+| oxfmt               | Fast code formatter (Prettier-compatible, import sorting, Tailwind sort)    |
+| Syncpack            | Dependency version enforcement                                              |
 | TanStack DB         | Client-side data layer with localStorage persistence (`@tanstack/react-db`) |
-| TanStack Virtual    | List virtualization (`@tanstack/react-virtual`)                          |
-| Zod                 | Schema validation                                                        |
+| TanStack Virtual    | List virtualization (`@tanstack/react-virtual`)                             |
+| Zod                 | Schema validation                                                           |
 
 ## Script conventions
 

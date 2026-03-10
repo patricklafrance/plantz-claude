@@ -12,7 +12,7 @@ import { FilterBar } from "./FilterBar.tsx";
 import { PlantListItem } from "./PlantListItem.tsx";
 import type { Plant } from "./plantSchema.ts";
 import { plantsCollection } from "./plantsCollection.ts";
-import { isDueForWatering } from "./plantUtils.ts";
+import { applyPlantFilters } from "./plantUtils.ts";
 import { usePlantFilters } from "./usePlantFilters.ts";
 
 const scrollContainerStyle = { height: "calc(100vh - 340px)" };
@@ -30,42 +30,13 @@ export function PlantsPage() {
 
     const plants = useMemo(() => {
         if (!allPlants) return [];
-        let result = allPlants as Plant[];
-
-        if (filters.name) {
-            const needle = filters.name.toLowerCase();
-            result = result.filter((p) => p.name.toLowerCase().includes(needle));
-        }
-        if (filters.location) {
-            result = result.filter((p) => p.location === filters.location);
-        }
-        if (filters.luminosity) {
-            result = result.filter((p) => p.luminosity === filters.luminosity);
-        }
-        if (filters.mistLeaves !== null) {
-            result = result.filter((p) => p.mistLeaves === filters.mistLeaves);
-        }
-        if (filters.wateringFrequency) {
-            result = result.filter((p) => p.wateringFrequency === filters.wateringFrequency);
-        }
-        if (filters.wateringType) {
-            result = result.filter((p) => p.wateringType === filters.wateringType);
-        }
-        if (filters.dueForWatering) {
-            result = result.filter((p) => isDueForWatering(p));
-        }
-        if (filters.soilType) {
-            const needle = filters.soilType.toLowerCase();
-            result = result.filter((p) => p.soilType?.toLowerCase().includes(needle));
-        }
-
-        return result;
+        return applyPlantFilters(allPlants as Plant[], filters);
     }, [allPlants, filters]);
 
     const virtualizer = useVirtualizer({
         count: plants.length,
         getScrollElement: () => parentRef.current,
-        estimateSize: () => 53,
+        estimateSize: () => 41,
         overscan: 10,
     });
 
@@ -121,11 +92,14 @@ export function PlantsPage() {
         setDeleteTarget(null);
     }, [deleteTarget, editOpen, editPlant]);
 
-    const handleEditFromDialog = useCallback((plant: Plant) => {
-        setEditOpen(false);
-        setEditPlant(null);
-        handleDeleteSingle(plant);
-    }, [handleDeleteSingle]);
+    const handleEditFromDialog = useCallback(
+        (plant: Plant) => {
+            setEditOpen(false);
+            setEditPlant(null);
+            handleDeleteSingle(plant);
+        },
+        [handleDeleteSingle],
+    );
 
     const handleOpenCreate = useCallback(() => setCreateOpen(true), []);
 
@@ -143,11 +117,14 @@ export function PlantsPage() {
     const deleteTargetNames = deleteTarget?.map((p) => p.name) ?? [];
 
     const totalSize = virtualizer.getTotalSize();
-    const virtualizerContainerStyle = useMemo(() => ({
-        height: `${totalSize}px`,
-        width: "100%",
-        position: "relative" as const,
-    }), [totalSize]);
+    const virtualizerContainerStyle = useMemo(
+        () => ({
+            height: `${totalSize}px`,
+            width: "100%",
+            position: "relative" as const,
+        }),
+        [totalSize],
+    );
 
     return (
         <div className="flex h-full flex-col gap-4 p-6">
@@ -179,15 +156,25 @@ export function PlantsPage() {
             <div className="border-border flex-1 overflow-hidden rounded-lg border">
                 <div className="bg-muted/50 border-border flex items-center gap-3 border-b px-4 py-2">
                     <Checkbox checked={allSelected} onCheckedChange={toggleAll} aria-label="Select all plants" />
-                    <span className="text-muted-foreground flex-1 text-xs font-medium">Name</span>
-                    <span className="text-muted-foreground w-20 text-right text-xs font-medium">Actions</span>
+                    <span className="text-muted-foreground min-w-0 flex-1 text-xs font-medium" aria-hidden="true">
+                        Name
+                    </span>
+                    <span className="size-3.5 shrink-0" aria-hidden="true" />
+                    <span className="text-muted-foreground w-24 shrink-0 text-xs font-medium" aria-hidden="true">
+                        Quantity
+                    </span>
+                    <span className="text-muted-foreground w-20 shrink-0 text-xs font-medium" aria-hidden="true">
+                        Type
+                    </span>
+                    <span className="text-muted-foreground w-24 shrink-0 text-xs font-medium" aria-hidden="true">
+                        Location
+                    </span>
+                    <span className="text-muted-foreground w-16 shrink-0 text-right text-xs font-medium" aria-hidden="true">
+                        Actions
+                    </span>
                 </div>
                 <div ref={parentRef} className="overflow-auto" style={scrollContainerStyle}>
-                    <div
-                        role="list"
-                        aria-label="Plants"
-                        style={virtualizerContainerStyle}
-                    >
+                    <div role="list" aria-label="Plants" style={virtualizerContainerStyle}>
                         {virtualizer.getVirtualItems().map((virtualRow) => {
                             const plant = plants[virtualRow.index]!;
                             // oxlint-disable-next-line react-perf/jsx-no-new-object-as-prop -- Virtual row positioning requires per-item inline styles
@@ -200,18 +187,8 @@ export function PlantsPage() {
                                 transform: `translateY(${virtualRow.start}px)`,
                             };
                             return (
-                                <div
-                                    key={plant.id}
-                                    role="listitem"
-                                    style={rowStyle}
-                                >
-                                    <PlantListItem
-                                        plant={plant}
-                                        selected={selectedIds.has(plant.id)}
-                                        onToggleSelect={toggleSelect}
-                                        onEdit={handleEditPlant}
-                                        onDelete={handleDeleteSingle}
-                                    />
+                                <div key={plant.id} role="listitem" style={rowStyle}>
+                                    <PlantListItem plant={plant} selected={selectedIds.has(plant.id)} onToggleSelect={toggleSelect} onEdit={handleEditPlant} onDelete={handleDeleteSingle} />
                                 </div>
                             );
                         })}
@@ -221,12 +198,7 @@ export function PlantsPage() {
 
             <CreatePlantDialog open={createOpen} onOpenChange={setCreateOpen} />
             <EditPlantDialog plant={editPlant} open={editOpen} onOpenChange={setEditOpen} onDelete={handleEditFromDialog} />
-            <DeleteConfirmDialog
-                open={deleteTarget !== null}
-                onOpenChange={handleDeleteDialogOpenChange}
-                plantNames={deleteTargetNames}
-                onConfirm={confirmDelete}
-            />
+            <DeleteConfirmDialog open={deleteTarget !== null} onOpenChange={handleDeleteDialogOpenChange} plantNames={deleteTargetNames} onConfirm={confirmDelete} />
         </div>
     );
 }

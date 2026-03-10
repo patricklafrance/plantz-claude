@@ -81,27 +81,27 @@ export const AllVariants: Story = {
     render: () => (
         <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">Default (single)</span>
+                <span className="text-muted-foreground text-sm font-medium">Default (single)</span>
                 <Calendar mode="single" selected={new Date(2026, 2, 6)} />
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">Range selection</span>
+                <span className="text-muted-foreground text-sm font-medium">Range selection</span>
                 <Calendar mode="range" selected={{ from: new Date(2026, 2, 6), to: new Date(2026, 2, 12) }} />
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">Multiple months</span>
+                <span className="text-muted-foreground text-sm font-medium">Multiple months</span>
                 <Calendar mode="single" numberOfMonths={2} />
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">Dropdown caption</span>
+                <span className="text-muted-foreground text-sm font-medium">Dropdown caption</span>
                 <Calendar mode="single" captionLayout="dropdown" startMonth={new Date(2020, 0)} endMonth={new Date(2030, 11)} />
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">Outside days hidden</span>
+                <span className="text-muted-foreground text-sm font-medium">Outside days hidden</span>
                 <Calendar mode="single" showOutsideDays={false} />
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">With week numbers</span>
+                <span className="text-muted-foreground text-sm font-medium">With week numbers</span>
                 <Calendar mode="single" showWeekNumber />
             </div>
         </div>

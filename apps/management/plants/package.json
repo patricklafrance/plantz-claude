@@ -6,7 +6,10 @@
     "license": "Apache-2.0",
     "author": "Patrick Lafrance",
     "type": "module",
-    "exports": "./src/index.ts",
+    "exports": {
+        ".": "./src/index.ts",
+        "./plants": "./src/plantExports.ts"
+    },
     "scripts": {
         "typecheck": "tsgo"
     },

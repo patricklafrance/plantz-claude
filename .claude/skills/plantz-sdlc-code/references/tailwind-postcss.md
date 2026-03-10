@@ -1,4 +1,5 @@
 <\!-- Canonical source: plantz-sdlc-plan. Keep in sync with plantz-sdlc-code, plantz-sdlc-test. -->
+
 # Tailwind CSS / PostCSS
 
 Tailwind v4 is integrated via `@tailwindcss/postcss`. Both library packages (`@packages/components`) and app packages (`@apps/host`) add it through a config transformer:

@@ -43,7 +43,7 @@ export const AllVariants: Story = {
     render: () => (
         <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">horizontal</span>
+                <span className="text-muted-foreground text-sm font-medium">horizontal</span>
                 <div className="w-64">
                     <div className="py-2 text-sm">Content above</div>
                     <Separator orientation="horizontal" />
@@ -51,7 +51,7 @@ export const AllVariants: Story = {
                 </div>
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">vertical</span>
+                <span className="text-muted-foreground text-sm font-medium">vertical</span>
                 <div className="flex h-8 items-center gap-4">
                     <span className="text-sm">Left</span>
                     <Separator orientation="vertical" />

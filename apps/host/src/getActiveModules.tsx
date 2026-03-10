@@ -1,6 +1,7 @@
+import type { ModuleRegisterFunction, FireflyRuntime } from "@squide/firefly";
+
 import { registerManagementPlants } from "@modules/management-plants";
 import { registerTodayLandingPage } from "@modules/today-landing-page";
-import type { ModuleRegisterFunction, FireflyRuntime } from "@squide/firefly";
 
 const ModuleRegistry: Record<string, ModuleRegisterFunction<FireflyRuntime>> = {
     "management/plants": registerManagementPlants,

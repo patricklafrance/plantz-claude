@@ -44,7 +44,7 @@ const meta = {
     },
     decorators: [
         (Story) => (
-            <div className="w-[600px] border border-border rounded-lg">
+            <div className="border-border w-[900px] rounded-lg border">
                 <Story />
             </div>
         ),
@@ -89,7 +89,7 @@ export const LongName: Story = {
     },
 };
 
-export const LongSubtext: Story = {
+export const LongFieldValues: Story = {
     args: {
         plant: makePlant({
             wateringQuantity: "500ml every other day when soil is dry",
@@ -118,5 +118,12 @@ export const DueToday: Story = {
                 return d;
             })(),
         }),
+    },
+};
+
+export const NoEditButton: Story = {
+    args: {
+        plant: makePlant(),
+        onEdit: undefined,
     },
 };

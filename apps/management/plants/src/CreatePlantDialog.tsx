@@ -1,5 +1,6 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button, Input, Textarea, Label, Switch, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, DatePicker } from "@packages/components";
 import { useState, type FormEvent } from "react";
+
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button, Input, Textarea, Label, Switch, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, DatePicker } from "@packages/components";
 
 import { locations, luminosities, wateringFrequencies, wateringTypes } from "./constants.ts";
 import { plantsCollection } from "./plantsCollection.ts";
@@ -80,7 +81,7 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+            <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
                 <DialogHeader>
                     <DialogTitle>New plant</DialogTitle>
                 </DialogHeader>
@@ -88,7 +89,11 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="create-name">Name *</Label>
                         <Input id="create-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Plant name" aria-required="true" aria-invalid={name.trim() === "" && name !== ""} aria-describedby={name.trim() === "" && name !== "" ? "create-name-error" : undefined} />
-                        {name.trim() === "" && name !== "" && <p id="create-name-error" role="alert" className="text-xs text-destructive">Name is required.</p>}
+                        {name.trim() === "" && name !== "" && (
+                            <p id="create-name-error" role="alert" className="text-destructive text-xs">
+                                Name is required.
+                            </p>
+                        )}
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="create-description">Description</Label>
@@ -101,7 +106,12 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
                             <Label htmlFor="create-location">Location *</Label>
-                            <Select value={location} onValueChange={(v) => { if (v) setLocation(v); }}>
+                            <Select
+                                value={location}
+                                onValueChange={(v) => {
+                                    if (v) setLocation(v);
+                                }}
+                            >
                                 <SelectTrigger id="create-location" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -118,7 +128,12 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <Label htmlFor="create-luminosity">Luminosity *</Label>
-                            <Select value={luminosity} onValueChange={(v) => { if (v) setLuminosity(v); }}>
+                            <Select
+                                value={luminosity}
+                                onValueChange={(v) => {
+                                    if (v) setLuminosity(v);
+                                }}
+                            >
                                 <SelectTrigger id="create-luminosity" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -145,7 +160,12 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
                             <Label htmlFor="create-watering-frequency">Watering frequency *</Label>
-                            <Select value={wateringFrequency} onValueChange={(v) => { if (v) setWateringFrequency(v); }}>
+                            <Select
+                                value={wateringFrequency}
+                                onValueChange={(v) => {
+                                    if (v) setWateringFrequency(v);
+                                }}
+                            >
                                 <SelectTrigger id="create-watering-frequency" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -162,7 +182,12 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <Label htmlFor="create-watering-type">Watering type *</Label>
-                            <Select value={wateringType} onValueChange={(v) => { if (v) setWateringType(v); }}>
+                            <Select
+                                value={wateringType}
+                                onValueChange={(v) => {
+                                    if (v) setWateringType(v);
+                                }}
+                            >
                                 <SelectTrigger id="create-watering-type" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -180,8 +205,20 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="create-quantity">Watering quantity *</Label>
-                        <Input id="create-quantity" value={wateringQuantity} onChange={(e) => setWateringQuantity(e.target.value)} placeholder="e.g. 200ml" aria-required="true" aria-invalid={wateringQuantity.trim() === "" && wateringQuantity !== ""} aria-describedby={wateringQuantity.trim() === "" && wateringQuantity !== "" ? "create-quantity-error" : undefined} />
-                        {wateringQuantity.trim() === "" && wateringQuantity !== "" && <p id="create-quantity-error" role="alert" className="text-xs text-destructive">Watering quantity is required.</p>}
+                        <Input
+                            id="create-quantity"
+                            value={wateringQuantity}
+                            onChange={(e) => setWateringQuantity(e.target.value)}
+                            placeholder="e.g. 200ml"
+                            aria-required="true"
+                            aria-invalid={wateringQuantity.trim() === "" && wateringQuantity !== ""}
+                            aria-describedby={wateringQuantity.trim() === "" && wateringQuantity !== "" ? "create-quantity-error" : undefined}
+                        />
+                        {wateringQuantity.trim() === "" && wateringQuantity !== "" && (
+                            <p id="create-quantity-error" role="alert" className="text-destructive text-xs">
+                                Watering quantity is required.
+                            </p>
+                        )}
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <Label>First watering date *</Label>

@@ -4,7 +4,7 @@ import { appendFileSync } from "node:fs";
 const StorybookDependencies = {
     "@apps/packages-storybook": ["@packages/components"],
     "@apps/management-storybook": ["@modules/management-plants"],
-    "@apps/today-storybook": ["@modules/today-landing-page"],
+    "@apps/today-storybook": ["@modules/today-landing-page", "@modules/management-plants"],
 } as const;
 
 interface TurborepoAffectedItem {

@@ -84,7 +84,7 @@ export const AllVariants: Story = {
         <div className="flex flex-col gap-6">
             {variants.map((variant) => (
                 <div key={variant} className="flex flex-col gap-2">
-                    <span className="text-sm font-medium text-muted-foreground">{variant}</span>
+                    <span className="text-muted-foreground text-sm font-medium">{variant}</span>
                     <div className="flex items-center gap-2">
                         {sizes.map((size) => (
                             <Button key={size} variant={variant} size={size}>

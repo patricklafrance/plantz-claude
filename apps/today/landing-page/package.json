@@ -10,6 +10,14 @@
     "scripts": {
         "typecheck": "tsgo"
     },
+    "dependencies": {
+        "@modules/management-plants": "workspace:*",
+        "@packages/components": "workspace:*",
+        "@tanstack/react-db": "^0.1.75",
+        "@tanstack/react-virtual": "^3.13.21",
+        "lucide-react": "^0.577.0",
+        "zod": "^4.3.6"
+    },
     "devDependencies": {
         "@types/react": "19.2.9",
         "@types/react-dom": "19.2.3",

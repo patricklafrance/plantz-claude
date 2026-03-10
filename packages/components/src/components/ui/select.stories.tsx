@@ -109,7 +109,7 @@ export const AllVariants: Story = {
     render: () => (
         <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">Default size</span>
+                <span className="text-muted-foreground text-sm font-medium">Default size</span>
                 <Select>
                     <SelectTrigger>
                         <SelectValue placeholder="Default size" />
@@ -123,7 +123,7 @@ export const AllVariants: Story = {
                 </Select>
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">Small size</span>
+                <span className="text-muted-foreground text-sm font-medium">Small size</span>
                 <Select>
                     <SelectTrigger size="sm">
                         <SelectValue placeholder="Small size" />
@@ -137,7 +137,7 @@ export const AllVariants: Story = {
                 </Select>
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">With groups and labels</span>
+                <span className="text-muted-foreground text-sm font-medium">With groups and labels</span>
                 <Select>
                     <SelectTrigger>
                         <SelectValue placeholder="Grouped items" />
@@ -158,7 +158,7 @@ export const AllVariants: Story = {
                 </Select>
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">Disabled</span>
+                <span className="text-muted-foreground text-sm font-medium">Disabled</span>
                 <Select disabled>
                     <SelectTrigger>
                         <SelectValue placeholder="Disabled" />

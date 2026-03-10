@@ -142,7 +142,7 @@ Formal logs of _why_ decisions were made — not just what was decided. Agents c
 
 ### 5. CI/CD workflows (`.github/workflows/`)
 
-Five GitHub Actions workflows, three of which involve Claude Code:
+Six GitHub Actions workflows, four of which involve Claude Code:
 
 | Workflow               | Trigger                         | Purpose                                                      |
 | ---------------------- | ------------------------------- | ------------------------------------------------------------ |
@@ -150,9 +150,10 @@ Five GitHub Actions workflows, three of which involve Claude Code:
 | `chromatic.yml`        | Push to main, labeled PRs       | Visual regression testing — only affected Storybooks         |
 | `claude.yml`           | `@claude` mention in issues/PRs | Claude Code agent responds to issues and PR comments         |
 | `code-review.yml`      | PRs opened/updated              | Automated code review by Claude (read-only tools)            |
+| `smoke-tests.yml`      | PRs to main                     | Smoke-tests all apps via Claude (scoped Bash, artifact upload on failure) |
 | `audit-agent-docs.yml` | Weekly cron + manual            | Runs the audit skill, creates PRs for Critical/High findings |
 
-The audit workflow is self-healing — it detects when docs drift from reality and opens PRs to fix them.
+The audit workflow is self-healing — it detects when docs drift from reality and opens PRs to fix them. The smoke-tests workflow loads the `plantz-smoke-tests` skill, which starts each dev server, verifies it in a headless browser via `agent-browser`, and posts results as a PR comment.
 
 **Files:** [`.github/workflows/`](.github/workflows/), [`.github/prompts/`](.github/prompts/)
 

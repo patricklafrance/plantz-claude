@@ -44,4 +44,15 @@ Every story is automatically snapshotted by Chromatic — stories ARE the visual
 
 ## Verification
 
-Start the domain storybook, open it in a browser, and confirm every new story renders without errors. Never report a task as complete based on `typecheck` alone — type-checking does not catch runtime rendering failures or broken imports that only surface in the browser. Always stop the dev server when verification is complete — never leave it running. See [development.md](development.md#stopping-dev-servers-windows) for the Windows procedure.
+Start the domain storybook, open it in a browser, and confirm every new story renders without errors. Never report a task as complete based on `lint` alone — it does not catch runtime rendering failures or broken imports that only surface in the browser. Always stop the dev server when verification is complete — never leave it running.
+
+### Stopping dev servers
+
+```bash
+# Linux:
+kill -9 $(lsof -ti :6006) 2>/dev/null
+
+# Windows:
+netstat -ano | grep :6006 | grep LISTENING
+taskkill //PID <PID> //T //F
+```

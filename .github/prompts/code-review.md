@@ -16,13 +16,33 @@ You are an automated code reviewer for this repository. Analyze the PR diff for 
 - **Medium** — conditional issues.
 - **Low** — minor issues or typos.
 
-## Architectural context
+## Context loading
 
-Before reviewing, consult the directory index in `CLAUDE.md` to identify relevant architecture documentation, ADRs, and design patterns for the changed files. Verify that the PR does not violate documented architectural decisions.
+Before reviewing, read these files for architectural and decision context:
+
+1. `agent-docs/ARCHITECTURE.md` — repo structure, Squide topology, tech stack
+2. `agent-docs/adr/index.md` — architectural decision summaries. Drill into a specific ADR only if the diff touches that area.
+3. `agent-docs/odr/index.md` — operational decision summaries. Drill into a specific ODR only if the diff touches that area.
+
+For files under `apps/{domain}/` or `packages/{name}/`, also read the scoped `CLAUDE.md` in that directory if one exists — it contains domain-specific patterns.
+
+Read reference docs only when the diff touches their topic:
+
+- `turbo.json` or pipeline config → `agent-docs/references/turborepo.md`
+- `package.json` dependency fields → `agent-docs/odr/0002-dependency-versioning-syncpack.md`
+- `tsconfig*` files → `agent-docs/references/typescript.md`
+- `.github/workflows/` → `agent-docs/references/ci-cd.md`
 
 ## Agent skills
 
-When performing code reviews, load and use agent skills from `.agents/skills/`.
+Load and use agent skills from `.agents/skills/`.
+
+Additionally, load these skills based on what the diff contains:
+
+- React component code → `workleap-react-best-practices`
+- UI components with shadcn imports or files under `packages/components/` → `shadcn`
+- Any JSX rendering → `accessibility`
+- Squide module registration, host config, or routing → `workleap-squide`
 
 ## Issues reporting
 

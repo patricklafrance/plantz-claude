@@ -20,7 +20,7 @@ Use syncpack with differentiated policies (Option 1). The split between apps (pi
 
 ## Consequences
 
-See [build-tooling.md](../references/build-tooling.md#syncpack) for the full semver groups table and version group configuration.
+Configuration lives in `.syncpackrc.js`. Each rule has a self-documenting `label` field. Run `pnpm syncpack lint` to verify compliance.
 
 Additional implications:
 

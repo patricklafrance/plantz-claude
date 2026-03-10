@@ -1,6 +1,6 @@
 # CI/CD Reference
 
-Five GitHub Actions workflows in `.github/workflows/`:
+Six GitHub Actions workflows in `.github/workflows/`:
 
 | File                   | Purpose                                             |
 | ---------------------- | --------------------------------------------------- |
@@ -9,6 +9,7 @@ Five GitHub Actions workflows in `.github/workflows/`:
 | `claude.yml`           | Claude Code agent for issue/PR comments             |
 | `code-review.yml`      | Automated PR code review via Claude                 |
 | `audit-agent-docs.yml` | Weekly agent-docs freshness audit                   |
+| `smoke-tests.yml`      | Smoke-test all apps on PRs via Claude               |
 
 Read the YAML files directly for triggers, steps, and concurrency rules.
 
@@ -39,9 +40,17 @@ PRs require the `run chromatic` label to trigger `chromatic.yml`. Without it, th
 - **No Critical/High findings**: creates and immediately closes a GitHub issue with the report.
 - **Workflow failure**: creates a GitHub issue linking to the failed run.
 
+## Smoke tests
+
+`smoke-tests.yml` runs on PRs to `main`. It uses `claude-code-action` to load the `plantz-smoke-tests` skill, which starts each app's dev server, verifies it in a headless browser via `agent-browser`, then stops with port cleanup. Results are posted as a PR comment. 30-minute timeout with concurrency group (`cancel-in-progress`).
+
+**Workflow validation caveat:** `claude-code-action` requires the workflow file on the PR branch to match the version on `main`. If the workflow is new or modified in the PR, the action silently no-ops and the job reports success without running the skill. The skill only executes once the workflow file is merged to `main`.
+
+**Tool scoping:** The agent's Bash access is restricted to specific CLIs (`pnpm`, `node`, `mkdir`, `rm`, `lsof`, `kill`, `agent-browser`). On failure, screenshots are uploaded as GitHub Actions artifacts for diagnosis.
+
 ## Turbo cache strategy
 
-Three workflows (ci, chromatic, claude) share a Turbo cache pattern with restore-key prefixes (`${{ runner.os }}-turbo-`) that allow cross-workflow cache hits. `code-review.yml` and `audit-agent-docs.yml` do not use Turbo cache.
+Four workflows (ci, chromatic, claude, smoke-tests) share a Turbo cache pattern with restore-key prefixes (`${{ runner.os }}-turbo-`) that allow cross-workflow cache hits. `code-review.yml` and `audit-agent-docs.yml` do not use Turbo cache.
 
 When adding a new workflow that runs Turbo tasks, follow the existing pattern: restore before tasks, save on cache miss (`cache-hit != 'true'`), use prefix fallback keys.
 

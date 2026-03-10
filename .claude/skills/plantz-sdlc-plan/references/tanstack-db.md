@@ -69,7 +69,7 @@ The collection state is a `Map<string, Plant>`. Access via `plantsCollection.sta
 
 Defined in `scripts/seed-plants.ts`. Run via `pnpm seed-plants` (requires the dev server to be running).
 
-- Generates 220–280 plants with real species names in TanStack DB localStorage format
+- Generates 220-280 plants with real species names in TanStack DB localStorage format
 - Writes the JSON to `apps/host/public/seed-plants.json`
 - Opens `http://localhost:8080/seed.html` in the default browser, which wipes existing data, loads the seed, and redirects to the app
 - The seed is **not** available from the app UI — it is a manual, terminal-only operation

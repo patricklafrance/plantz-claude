@@ -4,7 +4,7 @@ Federated modules for the daily plant care view.
 
 ## Stories
 
-Never write stories without first reading [storybook.md](../../agent-docs/references/storybook.md) — it contains the story conventions that apply to all domains.
+Never write stories without first loading the `plantz-sdlc-code` skill for storybook conventions that apply to all domains.
 
 Every page and component must have a co-located `.stories.tsx` file. A feature without stories is not complete.
 

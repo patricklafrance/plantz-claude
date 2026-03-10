@@ -83,9 +83,11 @@ rm apps/host/public/seed-plants.json
 Only if `SERVER_WAS_RUNNING = false` (i.e., this skill started the dev server), stop it now:
 
 ```bash
-# Find the PID listening on port 8080
+# Linux:
+kill -9 $(lsof -ti :8080) 2>/dev/null
+
+# Windows:
 netstat -ano | grep :8080 | grep LISTENING
-# Kill the process tree (replace <PID> with the actual PID from the output)
 taskkill //PID <PID> //T //F
 ```
 

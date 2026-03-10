@@ -27,6 +27,4 @@ Consuming apps use `@source` directives in their CSS to tell Tailwind where to f
 @source "../../../../packages/components/src/**/*.{ts,tsx}";
 ```
 
----
-
-_See [CLAUDE.md](../../CLAUDE.md) for navigation._
+If you add new source directories under `packages/components/src/`, add a corresponding `@source` directive in consuming apps.

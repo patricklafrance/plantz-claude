@@ -27,12 +27,14 @@ The two subagents exist to produce better output through collaboration. The real
 Code subagents may start dev servers (port `8080`) or Storybooks (port `6006`) to verify their work in a browser. They may not clean up properly — especially if they crash or hit context limits. **After every code or test subagent returns**, run the port-cleanup procedure before spawning the next subagent:
 
 ```bash
-# Check and kill any process on port 8080
+# Linux:
+kill -9 $(lsof -ti :8080) 2>/dev/null
+kill -9 $(lsof -ti :6006) 2>/dev/null
+
+# Windows:
 netstat -ano | grep :8080 | grep LISTENING
 # If a PID is found:
 taskkill //PID <PID> //T //F
-
-# Check and kill any process on port 6006
 netstat -ano | grep :6006 | grep LISTENING
 # If a PID is found:
 taskkill //PID <PID> //T //F

@@ -67,25 +67,21 @@ Record the app name, URL, status (pass/fail), and any errors.
 
 This is the most failure-prone part of the skill. `TaskStop` kills the Turbo wrapper, but child processes (the actual Node dev server) survive. You **must** verify the port is free before starting the next app.
 
-After stopping the background task, run these commands for the port the app was using:
+After stopping the background task, kill any process still holding the port:
 
 ```bash
-# For the host app (port 8080):
-netstat -ano | grep :8080 | grep LISTENING
-# If output shows a PID, kill the entire process tree:
-taskkill //PID <PID> //T //F
+# Linux:
+kill -9 $(lsof -ti :<PORT>) 2>/dev/null
 
-# For storybooks (port 6006):
-netstat -ano | grep :6006 | grep LISTENING
+# Windows:
+netstat -ano | grep :<PORT> | grep LISTENING
 taskkill //PID <PID> //T //F
 ```
 
 **Rules:**
 
 - Always check the port after TaskStop, even if TaskStop reported success.
-- Always use `//T` (tree kill) — child processes survive without it.
-- Always use `//F` (force) — graceful shutdown is unreliable for orphan processes.
-- Never start the next app's dev server until the port is confirmed free (netstat returns no output for that port).
+- Never start the next app's dev server until the port is confirmed free.
 - If the server used a port other than 8080 or 6006 (discovered from server output), use that port instead.
 
 ## Cleanup
@@ -111,4 +107,4 @@ If any app failed, list the failure details below the table.
 - Never leave a dev server running — always stop it and run the port-cleanup procedure before starting the next one. Orphan servers cause port conflicts that fail subsequent tests.
 - Never skip an app — test every discovered application even if a previous one failed. Skipping hides cascading failures across apps.
 - Always save screenshots as evidence, even for passing apps. Without screenshots, failures cannot be diagnosed after the fact.
-- Never skip the port-cleanup procedure — checking with netstat and killing orphans is mandatory, not optional.
+- Never skip the port-cleanup procedure — checking the port and killing orphans is mandatory, not optional. Use the platform-appropriate commands (lsof/kill on Linux, netstat/taskkill on Windows).

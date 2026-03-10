@@ -65,9 +65,17 @@ jobs:
                       If any app fails to start or has console errors, report the failures as a PR comment.
                       If all apps pass, post a summary comment with the results table.
                   claude_args: >-
-                      --allowedTools Read,Glob,Grep,Bash,Skill,Task*
+                      --allowedTools Read,Glob,Grep,Bash(pnpm:*,node:*,mkdir:*,rm:*,lsof:*,kill:*,agent-browser:*),Skill,Task*
               env:
                   GH_TOKEN: ${{ github.token }}
+
+            - name: Upload smoke test artifacts
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: smoke-test-screenshots
+                  path: ./tmp/smoke-tests/
+                  retention-days: 7
 
             - name: Save Turborepo cache
               id: cache-turborepo-save

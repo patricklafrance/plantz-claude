@@ -46,13 +46,13 @@ Every story is automatically snapshotted by Chromatic — stories ARE the visual
 
 Start the domain storybook, open it in a browser, and confirm every new story renders without errors. Never report a task as complete based on `lint` alone — it does not catch runtime rendering failures or broken imports that only surface in the browser. Always stop the dev server when verification is complete — never leave it running.
 
-### Stopping dev servers (Windows)
+### Stopping dev servers
 
 ```bash
-# 1. Find the process listening on the port (e.g. 6006 for storybooks, 8080 for host app)
-netstat -ano | grep :6006 | grep LISTENING
-# Output: TCP  [::1]:6006  [::]:0  LISTENING  <PID>
+# Linux:
+kill -9 $(lsof -ti :6006) 2>/dev/null
 
-# 2. Kill the process tree
+# Windows:
+netstat -ano | grep :6006 | grep LISTENING
 taskkill //PID <PID> //T //F
 ```

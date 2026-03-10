@@ -24,5 +24,5 @@ See [ARCHITECTURE.md](../ARCHITECTURE.md#squide-hostmodule-topology) for the res
 
 Additional implications:
 
-- Cross-module communication goes through Squide runtime APIs (event bus, shared data queries) — not direct imports. Modules never import from each other — no exceptions. When two modules need shared domain code, extract it to a package under `packages/` (see [ADR-0003](0003-shared-domain-packages.md)).
+- Cross-module communication goes through Squide runtime APIs (event bus, shared data queries) — not direct imports. Modules never import from each other — no exceptions. When two modules need shared domain code, prefer duplication if the surface area is small; extract to a package under `packages/` when it's large enough to justify the indirection.
 - New feature areas require creating a new module package under `apps/<domain>/`.

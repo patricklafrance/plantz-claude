@@ -20,7 +20,7 @@
 
 ### Decisions
 
-- [adr/index.md](agent-docs/adr/index.md) — architectural decision log (Squide modules, domain Storybooks, shared domain packages)
+- [adr/index.md](agent-docs/adr/index.md) — architectural decision log (Squide modules, domain Storybooks)
 - [odr/index.md](agent-docs/odr/index.md) — operational decision log (pnpm+Turborepo, syncpack, Chromatic)
 
 ## Growth Conventions

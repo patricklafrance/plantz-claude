@@ -65,7 +65,7 @@ This skill runs in one of two modes, determined by the inputs:
 ## Hard Constraints
 
 - **Modules MUST NOT import from each other.** No direct imports, no subpath exports, no re-exports, no workarounds. This is absolute — no exceptions.
-- If you discover that code needs to be shared between modules during implementation, extract it to a package under `packages/` (e.g., `@packages/plants-core` for plant domain code). Never create an import from one `@modules/*` package to another.
+- If you discover that code needs to be shared between modules during implementation: prefer duplication if the surface area is small; extract to a package under `packages/` (e.g., `@packages/plants-core`) when it's large enough to justify the indirection. Never create an import from one `@modules/*` package to another.
 - When fixing issues, if the fix would require a cross-module import, restructure to use a shared package instead.
 
 ## Subagent Pattern

@@ -61,7 +61,19 @@ The quality check boxes should reflect actual test results — mark as `[x]` onl
 
 Poll every 60 seconds, with a maximum wait of 30 minutes per CI cycle.
 
-1. **CI failures:** If any GitHub Actions workflow fails, read the failure logs. Write the errors to `./tmp/runs/[run-uuid]/ci-issues-[attempt].md` — include the workflow name, the failing step, and the relevant error output so the code skill can act on it. Then **return control to the orchestrator** by reporting the CI failure and the path to the issues file. The merge subagent does NOT fix CI issues itself — subagents cannot spawn further subagents.
+1. **CI failures:** If any GitHub Actions workflow fails, read the failure logs. Write the errors to `./tmp/runs/[run-uuid]/ci-issues-[attempt].md` using this format, then **return control to the orchestrator** by reporting the CI failure and the path to the issues file. The merge subagent does NOT fix CI issues itself — subagents cannot spawn further subagents.
+
+    ```markdown
+    # CI Issues — Attempt [N]
+
+    ## {workflow-name} / {step-name}
+
+    - [error output]
+
+    ## {workflow-name} / {step-name}
+
+    - [error output]
+    ```
 2. **PR comments:** Monitor for 10 minutes after CI goes green. If comments are added during that window, evaluate their legitimacy. For legitimate comments, write them to `./tmp/runs/[run-uuid]/pr-comments-[attempt].md` and **return control to the orchestrator**. After the 10-minute window with no comments, report success to the orchestrator.
 3. **Chromatic:** When all workflows except Chromatic are green and all PR comments are resolved, add the `run chromatic` label to the pull request. Chromatic is label-gated — adding this label triggers the Chromatic workflows.
 4. **Chromatic failure:** If Chromatic workflows fail, tag the repository maintainers in the PR and ask them to review. Do not attempt to fix Chromatic issues autonomously.

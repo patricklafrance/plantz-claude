@@ -31,15 +31,17 @@ export function RootLayout() {
     const navigationElements = useRenderedNavigationItems(navigationItems, renderItem, renderSection);
 
     return (
-        <div className="flex min-h-screen flex-col bg-background text-foreground">
-            <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-background focus:px-4 focus:py-2 focus:text-sm focus:font-medium">
+        <div className="bg-background text-foreground flex min-h-screen flex-col">
+            <a href="#main-content" className="focus:bg-background sr-only focus:not-sr-only focus:absolute focus:z-50 focus:px-4 focus:py-2 focus:text-sm focus:font-medium">
                 Skip to main content
             </a>
             <header className="border-border flex items-center gap-6 border-b px-6 py-3">
                 <Link to="/" aria-label="Plantz home">
                     <PlantzLogo className="text-foreground h-7 w-auto" />
                 </Link>
-                <nav aria-label="Main" className="flex-1">{navigationElements}</nav>
+                <nav aria-label="Main" className="flex-1">
+                    {navigationElements}
+                </nav>
                 <ColorModeToggle />
             </header>
             <main id="main-content" className="flex-1">

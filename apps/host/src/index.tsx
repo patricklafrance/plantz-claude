@@ -7,11 +7,16 @@ import { App } from "./App.tsx";
 import { getActiveModules } from "./getActiveModules.tsx";
 import { registerHost } from "./register.tsx";
 
+const queryClient = new QueryClient();
+
 const runtime = initializeFirefly({
-    localModules: [registerHost, ...getActiveModules(process.env.MODULES)],
+    useMsw: true,
+    localModules: [registerHost, ...getActiveModules(process.env.MODULES, queryClient)],
+    startMsw: async (x) => {
+        return (await import("./mocks/browser.ts")).startMsw(x.requestHandlers);
+    },
 });
 
-const queryClient = new QueryClient();
 const root = createRoot(document.getElementById("root")!);
 
 root.render(

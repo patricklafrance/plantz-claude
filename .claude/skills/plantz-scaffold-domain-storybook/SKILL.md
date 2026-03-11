@@ -149,6 +149,8 @@ In `tooling/getAffectedStorybooks.ts`, add a new entry to the `StorybookDependen
 ]
 ```
 
+**Only list module package names (`@modules/*`).** Never add shared packages (`@packages/*`) — Turborepo's transitive dependency detection already handles them. If `@packages/plants-core` changes, Turborepo marks the modules that depend on it as affected, which then triggers the storybook.
+
 Use the canonical package names read from each module's `package.json`.
 
 ### Step 6 — Add Chromatic CI step

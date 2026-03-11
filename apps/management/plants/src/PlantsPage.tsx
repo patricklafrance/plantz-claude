@@ -4,16 +4,12 @@ import { Plus } from "lucide-react";
 import { useState, useRef, useMemo, useCallback } from "react";
 
 import { Button, Checkbox } from "@packages/components";
+import { applyPlantFilters, DeleteConfirmDialog, FilterBar, PlantListItem, usePlantFilters } from "@packages/plants-core";
+import type { Plant } from "@packages/plants-core";
 
 import { CreatePlantDialog } from "./CreatePlantDialog.tsx";
-import { DeleteConfirmDialog } from "./DeleteConfirmDialog.tsx";
 import { EditPlantDialog } from "./EditPlantDialog.tsx";
-import { FilterBar } from "./FilterBar.tsx";
-import { PlantListItem } from "./PlantListItem.tsx";
-import type { Plant } from "./plantSchema.ts";
-import { plantsCollection } from "./plantsCollection.ts";
-import { isDueForWatering } from "./plantUtils.ts";
-import { usePlantFilters } from "./usePlantFilters.ts";
+import { getManagementPlantsCollection, createManagementPlantActions } from "./plantsCollection.ts";
 
 const scrollContainerStyle = { height: "calc(100vh - 340px)" };
 
@@ -26,46 +22,21 @@ export function PlantsPage() {
     const [deleteTarget, setDeleteTarget] = useState<Plant[] | null>(null);
     const parentRef = useRef<HTMLDivElement>(null);
 
-    const { data: allPlants } = useLiveQuery((q) => q.from({ plant: plantsCollection }).orderBy(({ plant }) => plant.name, "asc"));
+    const collection = getManagementPlantsCollection();
+    const actions = useMemo(() => createManagementPlantActions(collection), [collection]);
+    const { data: allPlants, isReady } = useLiveQuery((q) => q.from({ plant: collection }));
 
     const plants = useMemo(() => {
         if (!allPlants) return [];
-        let result = allPlants as Plant[];
+        const sorted = allPlants.toSorted((a, b) => a.name.localeCompare(b.name));
 
-        if (filters.name) {
-            const needle = filters.name.toLowerCase();
-            result = result.filter((p) => p.name.toLowerCase().includes(needle));
-        }
-        if (filters.location) {
-            result = result.filter((p) => p.location === filters.location);
-        }
-        if (filters.luminosity) {
-            result = result.filter((p) => p.luminosity === filters.luminosity);
-        }
-        if (filters.mistLeaves !== null) {
-            result = result.filter((p) => p.mistLeaves === filters.mistLeaves);
-        }
-        if (filters.wateringFrequency) {
-            result = result.filter((p) => p.wateringFrequency === filters.wateringFrequency);
-        }
-        if (filters.wateringType) {
-            result = result.filter((p) => p.wateringType === filters.wateringType);
-        }
-        if (filters.dueForWatering) {
-            result = result.filter((p) => isDueForWatering(p));
-        }
-        if (filters.soilType) {
-            const needle = filters.soilType.toLowerCase();
-            result = result.filter((p) => p.soilType?.toLowerCase().includes(needle));
-        }
-
-        return result;
+        return applyPlantFilters(sorted, filters);
     }, [allPlants, filters]);
 
     const virtualizer = useVirtualizer({
         count: plants.length,
         getScrollElement: () => parentRef.current,
-        estimateSize: () => 53,
+        estimateSize: () => 49,
         overscan: 10,
     });
 
@@ -104,9 +75,8 @@ export function PlantsPage() {
 
     const confirmDelete = useCallback(() => {
         if (!deleteTarget) return;
-        for (const plant of deleteTarget) {
-            plantsCollection.delete(plant.id);
-        }
+        const ids = deleteTarget.map((p) => p.id);
+        actions.deletePlants(ids);
         setSelectedIds((prev) => {
             const next = new Set(prev);
             for (const plant of deleteTarget) {
@@ -119,13 +89,16 @@ export function PlantsPage() {
             setEditPlant(null);
         }
         setDeleteTarget(null);
-    }, [deleteTarget, editOpen, editPlant]);
+    }, [deleteTarget, editOpen, editPlant, actions]);
 
-    const handleEditFromDialog = useCallback((plant: Plant) => {
-        setEditOpen(false);
-        setEditPlant(null);
-        handleDeleteSingle(plant);
-    }, [handleDeleteSingle]);
+    const handleEditFromDialog = useCallback(
+        (plant: Plant) => {
+            setEditOpen(false);
+            setEditPlant(null);
+            handleDeleteSingle(plant);
+        },
+        [handleDeleteSingle],
+    );
 
     const handleOpenCreate = useCallback(() => setCreateOpen(true), []);
 
@@ -143,11 +116,22 @@ export function PlantsPage() {
     const deleteTargetNames = deleteTarget?.map((p) => p.name) ?? [];
 
     const totalSize = virtualizer.getTotalSize();
-    const virtualizerContainerStyle = useMemo(() => ({
-        height: `${totalSize}px`,
-        width: "100%",
-        position: "relative" as const,
-    }), [totalSize]);
+    const virtualizerContainerStyle = useMemo(
+        () => ({
+            height: `${totalSize}px`,
+            width: "100%",
+            position: "relative" as const,
+        }),
+        [totalSize],
+    );
+
+    if (!isReady) {
+        return (
+            <div className="flex h-full items-center justify-center p-6">
+                <p className="text-muted-foreground text-sm">Loading plants...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="flex h-full flex-col gap-4 p-6">
@@ -179,15 +163,12 @@ export function PlantsPage() {
             <div className="border-border flex-1 overflow-hidden rounded-lg border">
                 <div className="bg-muted/50 border-border flex items-center gap-3 border-b px-4 py-2">
                     <Checkbox checked={allSelected} onCheckedChange={toggleAll} aria-label="Select all plants" />
-                    <span className="text-muted-foreground flex-1 text-xs font-medium">Name</span>
-                    <span className="text-muted-foreground w-20 text-right text-xs font-medium">Actions</span>
+                    <span className="text-muted-foreground min-w-0 flex-1 text-xs font-medium" aria-hidden="true">
+                        Select all
+                    </span>
                 </div>
                 <div ref={parentRef} className="overflow-auto" style={scrollContainerStyle}>
-                    <div
-                        role="list"
-                        aria-label="Plants"
-                        style={virtualizerContainerStyle}
-                    >
+                    <div role="list" aria-label="Plants" style={virtualizerContainerStyle}>
                         {virtualizer.getVirtualItems().map((virtualRow) => {
                             const plant = plants[virtualRow.index]!;
                             // oxlint-disable-next-line react-perf/jsx-no-new-object-as-prop -- Virtual row positioning requires per-item inline styles
@@ -200,18 +181,8 @@ export function PlantsPage() {
                                 transform: `translateY(${virtualRow.start}px)`,
                             };
                             return (
-                                <div
-                                    key={plant.id}
-                                    role="listitem"
-                                    style={rowStyle}
-                                >
-                                    <PlantListItem
-                                        plant={plant}
-                                        selected={selectedIds.has(plant.id)}
-                                        onToggleSelect={toggleSelect}
-                                        onEdit={handleEditPlant}
-                                        onDelete={handleDeleteSingle}
-                                    />
+                                <div key={plant.id} role="listitem" style={rowStyle}>
+                                    <PlantListItem plant={plant} selected={selectedIds.has(plant.id)} onToggleSelect={toggleSelect} onEdit={handleEditPlant} onDelete={handleDeleteSingle} />
                                 </div>
                             );
                         })}
@@ -221,12 +192,7 @@ export function PlantsPage() {
 
             <CreatePlantDialog open={createOpen} onOpenChange={setCreateOpen} />
             <EditPlantDialog plant={editPlant} open={editOpen} onOpenChange={setEditOpen} onDelete={handleEditFromDialog} />
-            <DeleteConfirmDialog
-                open={deleteTarget !== null}
-                onOpenChange={handleDeleteDialogOpenChange}
-                plantNames={deleteTargetNames}
-                onConfirm={confirmDelete}
-            />
+            <DeleteConfirmDialog open={deleteTarget !== null} onOpenChange={handleDeleteDialogOpenChange} plantNames={deleteTargetNames} onConfirm={confirmDelete} />
         </div>
     );
 }

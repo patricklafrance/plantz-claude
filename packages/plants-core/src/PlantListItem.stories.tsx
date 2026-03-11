@@ -3,11 +3,13 @@ import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import { PlantListItem } from "./PlantListItem.tsx";
 import type { Plant } from "./plantSchema.ts";
 
-function makePlant(overrides: Partial<Plant> = {}): Plant {
-    const now = new Date();
-    const future = new Date();
-    future.setDate(future.getDate() + 7);
+// Extreme dates ensure isDueForWatering() returns a deterministic result
+// regardless of when the snapshot runs — no Date freeze needed.
+const FAR_FUTURE = new Date(2099, 0, 1, 0, 0, 0, 0);
+const FAR_PAST = new Date(2020, 0, 1, 0, 0, 0, 0);
+const FIXED_CREATION = new Date(2025, 0, 1, 0, 0, 0, 0);
 
+function makePlant(overrides: Partial<Plant> = {}): Plant {
     return {
         id: "test-1",
         name: "Monstera Deliciosa",
@@ -20,22 +22,19 @@ function makePlant(overrides: Partial<Plant> = {}): Plant {
         wateringFrequency: "1-week",
         wateringQuantity: "200ml",
         wateringType: "surface",
-        nextWateringDate: future,
-        creationDate: now,
-        lastUpdateDate: now,
+        nextWateringDate: FAR_FUTURE,
+        creationDate: FIXED_CREATION,
+        lastUpdateDate: FIXED_CREATION,
         ...overrides,
     };
 }
 
-function pastDate(): Date {
-    const d = new Date();
-    d.setDate(d.getDate() - 2);
-    return d;
-}
-
 const meta = {
-    title: "Management/Plants/Components/PlantListItem",
+    title: "Packages/PlantsCore/Components/PlantListItem",
     component: PlantListItem,
+    parameters: {
+        chromatic: { viewports: [375, 768, 1280] },
+    },
     args: {
         selected: false,
         onToggleSelect: () => {},
@@ -44,7 +43,7 @@ const meta = {
     },
     decorators: [
         (Story) => (
-            <div className="w-[600px] border border-border rounded-lg">
+            <div className="border-border w-full max-w-[900px] rounded-lg border">
                 <Story />
             </div>
         ),
@@ -70,13 +69,13 @@ export const Selected: Story = {
 
 export const DueForWatering: Story = {
     args: {
-        plant: makePlant({ nextWateringDate: pastDate() }),
+        plant: makePlant({ nextWateringDate: FAR_PAST }),
     },
 };
 
 export const DueAndSelected: Story = {
     args: {
-        plant: makePlant({ nextWateringDate: pastDate() }),
+        plant: makePlant({ nextWateringDate: FAR_PAST }),
         selected: true,
     },
 };
@@ -89,7 +88,7 @@ export const LongName: Story = {
     },
 };
 
-export const LongSubtext: Story = {
+export const LongFieldValues: Story = {
     args: {
         plant: makePlant({
             wateringQuantity: "500ml every other day when soil is dry",
@@ -111,12 +110,17 @@ export const MinimalFields: Story = {
 
 export const DueToday: Story = {
     args: {
+        // Use FAR_PAST — a plant due "today" would be non-deterministic across runs,
+        // so we test the "due" visual state with a clearly past date instead.
         plant: makePlant({
-            nextWateringDate: (() => {
-                const d = new Date();
-                d.setHours(0, 0, 0, 0);
-                return d;
-            })(),
+            nextWateringDate: FAR_PAST,
         }),
+    },
+};
+
+export const NoEditButton: Story = {
+    args: {
+        plant: makePlant(),
+        onEdit: undefined,
     },
 };

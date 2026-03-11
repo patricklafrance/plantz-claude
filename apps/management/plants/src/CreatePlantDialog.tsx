@@ -1,12 +1,14 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button, Input, Textarea, Label, Switch, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, DatePicker } from "@packages/components";
-import { useState, type FormEvent } from "react";
+import { useState, useMemo, type FormEvent } from "react";
 
-import { locations, luminosities, wateringFrequencies, wateringTypes } from "./constants.ts";
-import { plantsCollection } from "./plantsCollection.ts";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button, Input, Textarea, Label, Switch, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, DatePicker } from "@packages/components";
+import { locations, luminosities, wateringFrequencies, wateringTypes } from "@packages/plants-core";
+
+import { getManagementPlantsCollection, createManagementPlantActions } from "./plantsCollection.ts";
 
 interface CreatePlantDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    defaultFirstWateringDate?: Date;
 }
 
 function tomorrow() {
@@ -16,7 +18,7 @@ function tomorrow() {
     return d;
 }
 
-export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps) {
+export function CreatePlantDialog({ open, onOpenChange, defaultFirstWateringDate }: CreatePlantDialogProps) {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [family, setFamily] = useState("");
@@ -27,7 +29,10 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
     const [wateringFrequency, setWateringFrequency] = useState("1-week");
     const [wateringQuantity, setWateringQuantity] = useState("");
     const [wateringType, setWateringType] = useState("surface");
-    const [firstWateringDate, setFirstWateringDate] = useState<Date | undefined>(tomorrow());
+    const [firstWateringDate, setFirstWateringDate] = useState<Date | undefined>(defaultFirstWateringDate ?? tomorrow());
+
+    const collection = getManagementPlantsCollection();
+    const actions = useMemo(() => createManagementPlantActions(collection), [collection]);
 
     const isValid = name.trim() !== "" && wateringQuantity.trim() !== "" && firstWateringDate !== undefined;
 
@@ -42,16 +47,14 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
         setWateringFrequency("1-week");
         setWateringQuantity("");
         setWateringType("surface");
-        setFirstWateringDate(tomorrow());
+        setFirstWateringDate(defaultFirstWateringDate ?? tomorrow());
     }
 
     function handleSubmit(e: FormEvent) {
         e.preventDefault();
         if (!isValid) return;
 
-        const now = new Date();
-        plantsCollection.insert({
-            id: crypto.randomUUID(),
+        actions.insertPlant({
             name: name.trim(),
             description: description.trim() || undefined,
             family: family.trim() || undefined,
@@ -63,10 +66,9 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
             wateringQuantity: wateringQuantity.trim(),
             wateringType,
             nextWateringDate: firstWateringDate!,
-            creationDate: now,
-            lastUpdateDate: now,
         });
 
+        // Close optimistically — the UI updates instantly via TanStack DB
         resetForm();
         onOpenChange(false);
     }
@@ -80,7 +82,7 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+            <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
                 <DialogHeader>
                     <DialogTitle>New plant</DialogTitle>
                 </DialogHeader>
@@ -88,7 +90,11 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="create-name">Name *</Label>
                         <Input id="create-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Plant name" aria-required="true" aria-invalid={name.trim() === "" && name !== ""} aria-describedby={name.trim() === "" && name !== "" ? "create-name-error" : undefined} />
-                        {name.trim() === "" && name !== "" && <p id="create-name-error" role="alert" className="text-xs text-destructive">Name is required.</p>}
+                        {name.trim() === "" && name !== "" && (
+                            <p id="create-name-error" role="alert" className="text-destructive text-xs">
+                                Name is required.
+                            </p>
+                        )}
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="create-description">Description</Label>
@@ -101,7 +107,12 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
                             <Label htmlFor="create-location">Location *</Label>
-                            <Select value={location} onValueChange={(v) => { if (v) setLocation(v); }}>
+                            <Select
+                                value={location}
+                                onValueChange={(v) => {
+                                    if (v) setLocation(v);
+                                }}
+                            >
                                 <SelectTrigger id="create-location" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -118,7 +129,12 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <Label htmlFor="create-luminosity">Luminosity *</Label>
-                            <Select value={luminosity} onValueChange={(v) => { if (v) setLuminosity(v); }}>
+                            <Select
+                                value={luminosity}
+                                onValueChange={(v) => {
+                                    if (v) setLuminosity(v);
+                                }}
+                            >
                                 <SelectTrigger id="create-luminosity" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -145,7 +161,12 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
                             <Label htmlFor="create-watering-frequency">Watering frequency *</Label>
-                            <Select value={wateringFrequency} onValueChange={(v) => { if (v) setWateringFrequency(v); }}>
+                            <Select
+                                value={wateringFrequency}
+                                onValueChange={(v) => {
+                                    if (v) setWateringFrequency(v);
+                                }}
+                            >
                                 <SelectTrigger id="create-watering-frequency" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -162,7 +183,12 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <Label htmlFor="create-watering-type">Watering type *</Label>
-                            <Select value={wateringType} onValueChange={(v) => { if (v) setWateringType(v); }}>
+                            <Select
+                                value={wateringType}
+                                onValueChange={(v) => {
+                                    if (v) setWateringType(v);
+                                }}
+                            >
                                 <SelectTrigger id="create-watering-type" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -180,8 +206,20 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <Label htmlFor="create-quantity">Watering quantity *</Label>
-                        <Input id="create-quantity" value={wateringQuantity} onChange={(e) => setWateringQuantity(e.target.value)} placeholder="e.g. 200ml" aria-required="true" aria-invalid={wateringQuantity.trim() === "" && wateringQuantity !== ""} aria-describedby={wateringQuantity.trim() === "" && wateringQuantity !== "" ? "create-quantity-error" : undefined} />
-                        {wateringQuantity.trim() === "" && wateringQuantity !== "" && <p id="create-quantity-error" role="alert" className="text-xs text-destructive">Watering quantity is required.</p>}
+                        <Input
+                            id="create-quantity"
+                            value={wateringQuantity}
+                            onChange={(e) => setWateringQuantity(e.target.value)}
+                            placeholder="e.g. 200ml"
+                            aria-required="true"
+                            aria-invalid={wateringQuantity.trim() === "" && wateringQuantity !== ""}
+                            aria-describedby={wateringQuantity.trim() === "" && wateringQuantity !== "" ? "create-quantity-error" : undefined}
+                        />
+                        {wateringQuantity.trim() === "" && wateringQuantity !== "" && (
+                            <p id="create-quantity-error" role="alert" className="text-destructive text-xs">
+                                Watering quantity is required.
+                            </p>
+                        )}
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <Label>First watering date *</Label>

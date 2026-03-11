@@ -13,7 +13,7 @@ Coordinates the full software development lifecycle for a feature by spawning sp
 ## Subagent Protocol
 
 1. **Subagent A** (drafter): produces the initial output (plan, code, test report, doc update).
-2. **Subagent B** (challenger): reviews Subagent A's output and improves it. B applies all fixes directly — both mechanical (missing semicolons, import paths) and substantive (better component structure, missing accessibility, architectural improvements). B does not defer concerns — it resolves them by editing the output files and the code.
+2. **Subagent B** (challenger): reviews Subagent A's output and improves it. B applies all fixes directly — both mechanical (missing semicolons, import paths) and substantive (better component structure, missing accessibility, architectural improvements). B does not defer fixable concerns — it resolves them by editing the output files and the code. The one exception: B can write an escalation file for structural issues that require a plan revision (see "Escalation Check").
 
 The **orchestrator** spawns both subagents directly — subagents never spawn further subagents. Only one subagent writes to the repo or output file at a time (A finishes before B starts).
 
@@ -89,6 +89,8 @@ Spawn two subagents using the `plantz-sdlc-code` skill.
 Pass: `run-uuid`, `iteration=1`, plan path. Issues path and changes path are `null` for iteration 1.
 When done, verify `./tmp/runs/[run-uuid]/changes-1.md` exists. If not, fail the run.
 
+**Escalation check:** After the code subagent returns, check for `./tmp/runs/[run-uuid]/escalation-1.md`. If present, follow the escalation check procedure (see "Escalation check" below).
+
 ### Step 5 — Simplify
 
 Spawn **one** subagent to run the `/simplify` skill — review the uncommitted changes for dead code, redundant abstractions, and over-engineering. This runs once on the initial implementation — fix iterations produce small surgical patches that don't need simplification.
@@ -101,6 +103,8 @@ Pass: `run-uuid`, `iteration=1`.
 - If `./tmp/runs/[run-uuid]/test-issues-[iteration].md` is produced with issues:
     - Increment the iteration number. Update `orchestrator-state.md` with the new iteration and sub-phase (`code`).
     - Spawn new `plantz-sdlc-code` subagents. Pass: `run-uuid`, the new `iteration`, plan path, the previous iteration's issues file path, and the previous iteration's changes file path. They produce `changes-[iteration].md`.
+    - **Escalation check:** After the code subagent returns, follow the escalation check procedure (see "Escalation check" below).
+    - **Health check (iteration 3):** Before running the final test, compare `changes-[iteration].md` to the previous iteration. If the current iteration modified more files than the previous, and the same files appear in both iterations' test issues, the fix cycle is expanding rather than converging — follow the failure handling procedure instead of spending the last iteration.
     - Update `orchestrator-state.md` sub-phase to `test`.
     - Spawn new `plantz-sdlc-test` subagents. Pass: `run-uuid`, the new `iteration`.
     - Repeat until no issues or max iterations reached.
@@ -119,8 +123,8 @@ Pass: `run-uuid`, the branch name from step 2, the commit type from step 2.
 
 The merge subagent may return control in these cases:
 
-- **CI failure:** The merge subagent writes `ci-issues-[attempt].md` and returns. The orchestrator spawns `plantz-sdlc-code` subagents (2 subagents, following the subagent protocol) with: `run-uuid`, `iteration` continuing from where the test phase left off, plan path, the CI issues file, and the latest changes file. After the fix, run `pnpm lint` to catch regressions before pushing again. Then spawn a new merge subagent to commit, push, and resume monitoring. **Maximum 3 CI fix attempts** — if CI still fails, follow the failure handling procedure.
-- **PR comments:** The merge subagent writes `pr-comments-[attempt].md` and returns. The orchestrator spawns `plantz-sdlc-code` and/or `plantz-sdlc-document` subagents (2 subagents each, following the subagent protocol) to address legitimate comments. After the fix, spawn a new merge subagent to commit, push, resolve comments, and resume monitoring. **Maximum 3 PR comment cycles** — if comments keep coming, follow the failure handling procedure.
+- **CI failure:** Update `orchestrator-state.md` sub-phase to `ci-fix` and increment `CI fix attempts`. The merge subagent writes `ci-issues-[attempt].md` and returns. The orchestrator spawns `plantz-sdlc-code` subagents (2 subagents, following the subagent protocol) with: `run-uuid`, `iteration` continuing from where the test phase left off, plan path, the CI issues file, and the latest changes file. After the code subagent returns, run the escalation check (see "Escalation Check"). If no escalation, run `pnpm lint` to catch regressions before pushing again. Then spawn a new merge subagent to commit, push, and resume monitoring. **Maximum 3 CI fix attempts** — if CI still fails, follow the failure handling procedure.
+- **PR comments:** Update `orchestrator-state.md` sub-phase to `pr-comments` and increment `PR comment cycles`. The merge subagent writes `pr-comments-[attempt].md` and returns. The orchestrator spawns `plantz-sdlc-code` and/or `plantz-sdlc-document` subagents (2 subagents each, following the subagent protocol) to address legitimate comments. After the fix, spawn a new merge subagent to commit, push, resolve comments, and resume monitoring. **Maximum 3 PR comment cycles** — if comments keep coming, follow the failure handling procedure.
 
 ### Step 9 — Clean up
 
@@ -138,7 +142,10 @@ After completing each step, write the current state to `./tmp/runs/[run-uuid]/or
 - Commit type: [type]
 - Current step: [step number]
 - Iteration: [current iteration number]
-- Sub-phase: [code/test/none] (within step 6 only)
+- Sub-phase: [code/test/none] (within step 6 only; within step 8: ci-fix/pr-comments/none)
+- Plan revised: [yes/no]
+- CI fix attempts: [0-3] (within step 8 only)
+- PR comment cycles: [0-3] (within step 8 only)
 - Status: [completed/in-progress/failed]
 ```
 
@@ -154,3 +161,22 @@ The orchestrator maintains the iteration counter (starting at 1). Each test-fix 
 
 - `changes-1.md`, `changes-2.md`, ...
 - `test-issues-1.md`, `test-issues-2.md`, ...
+
+## Escalation Check
+
+Referenced from Step 4, Step 6, and Step 8. After any code subagent returns, check for `./tmp/runs/[run-uuid]/escalation-[iteration].md`. If absent, continue normally (proceed to the next phase — test, simplify, or lint depending on context). If present:
+
+1. Read `orchestrator-state.md` to check whether `Plan revised` is already `yes`. If so, this is a second escalation — follow the failure handling procedure immediately.
+2. Read the escalation file and judge whether the issue is genuinely structural (the plan's approach is fundamentally wrong) or whether the code agent is being too cautious about a fixable problem.
+3. **If justified:** Spawn new `plantz-sdlc-plan` subagents (following the subagent protocol) with the original feature description, the current `plan.md` path, and the escalation file path. They revise `plan.md`. After the plan subagents finish, delete all `escalation-*.md`, `changes-*.md`, `test-issues-*.md`, and `ci-issues-*.md` files from the run folder. Then reset the working tree and undo any commits from the failed approach:
+    ```bash
+    # If escalation happened during Step 8 (code was already committed), undo the commit:
+    # git reset HEAD~1
+    # Then discard all working tree changes:
+    git checkout -- .
+    git clean -fd --exclude=tmp/
+    ```
+    If this escalation happened during Step 8, first run `git reset HEAD~1` to undo the merge skill's commit before cleaning the working tree. The existing PR remains open — the merge skill checks for an existing PR and skips creation.
+    Reset iteration to 1, update `orchestrator-state.md` with `Plan revised: yes`, and restart from Step 4 (Code). Step 5 (Simplify) runs again on the fresh implementation.
+4. **If not justified:** Proceed to the next phase (simplify, test, or lint depending on context). The escalation file remains on disk. Pass it to the next code subagent via the `Escalation context` input if another fix cycle occurs — the code subagent reads it to understand what was tried and why the orchestrator disagreed. If no further fix cycle occurs (tests pass), ignore it.
+5. **Maximum 1 plan revision per run.** Enforced by checking `Plan revised` in step 1 above.

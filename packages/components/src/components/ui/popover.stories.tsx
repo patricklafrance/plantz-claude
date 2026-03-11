@@ -65,11 +65,15 @@ export const WithCustomContent: Story = {
                 </PopoverHeader>
                 <div className="grid gap-2">
                     <div className="grid grid-cols-3 items-center gap-4">
-                        <label htmlFor="popover-width" className="text-sm">Width</label>
+                        <label htmlFor="popover-width" className="text-sm">
+                            Width
+                        </label>
                         <input id="popover-width" className="col-span-2 h-8 rounded-md border px-2 text-sm" defaultValue="100%" />
                     </div>
                     <div className="grid grid-cols-3 items-center gap-4">
-                        <label htmlFor="popover-height" className="text-sm">Height</label>
+                        <label htmlFor="popover-height" className="text-sm">
+                            Height
+                        </label>
                         <input id="popover-height" className="col-span-2 h-8 rounded-md border px-2 text-sm" defaultValue="25px" />
                     </div>
                 </div>

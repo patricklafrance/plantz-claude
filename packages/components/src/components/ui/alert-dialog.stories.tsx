@@ -92,7 +92,7 @@ export const AllVariants: Story = {
     render: () => (
         <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">Default size</span>
+                <span className="text-muted-foreground text-sm font-medium">Default size</span>
                 <AlertDialog>
                     <AlertDialogTrigger render={<Button />}>Default</AlertDialogTrigger>
                     <AlertDialogContent>
@@ -108,7 +108,7 @@ export const AllVariants: Story = {
                 </AlertDialog>
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">Small size</span>
+                <span className="text-muted-foreground text-sm font-medium">Small size</span>
                 <AlertDialog>
                     <AlertDialogTrigger render={<Button />}>Small</AlertDialogTrigger>
                     <AlertDialogContent size="sm">
@@ -124,7 +124,7 @@ export const AllVariants: Story = {
                 </AlertDialog>
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">With media icon</span>
+                <span className="text-muted-foreground text-sm font-medium">With media icon</span>
                 <AlertDialog>
                     <AlertDialogTrigger render={<Button />}>With Media</AlertDialogTrigger>
                     <AlertDialogContent>
@@ -143,7 +143,7 @@ export const AllVariants: Story = {
                 </AlertDialog>
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">Destructive action</span>
+                <span className="text-muted-foreground text-sm font-medium">Destructive action</span>
                 <AlertDialog>
                     <AlertDialogTrigger render={<Button variant="destructive" />}>Destructive</AlertDialogTrigger>
                     <AlertDialogContent>

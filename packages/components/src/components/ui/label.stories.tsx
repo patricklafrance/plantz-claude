@@ -40,16 +40,16 @@ export const AllVariants: Story = {
     render: () => (
         <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">standalone</span>
+                <span className="text-muted-foreground text-sm font-medium">standalone</span>
                 <Label>Standalone label</Label>
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">with input</span>
+                <span className="text-muted-foreground text-sm font-medium">with input</span>
                 <Label htmlFor="all-variants-email">Email</Label>
                 <Input id="all-variants-email" placeholder="you@example.com" />
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">with checkbox</span>
+                <span className="text-muted-foreground text-sm font-medium">with checkbox</span>
                 <div className="flex items-center gap-2">
                     <Checkbox id="all-variants-terms" />
                     <Label htmlFor="all-variants-terms">Accept terms</Label>

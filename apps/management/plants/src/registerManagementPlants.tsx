@@ -1,4 +1,7 @@
-import type { FireflyRuntime, ModuleRegisterFunction } from "@squide/firefly";
+import type { FireflyRuntime } from "@squide/firefly";
+import type { QueryClient } from "@tanstack/react-query";
+
+import { initManagementPlantsCollection } from "./plantsCollection.ts";
 
 function registerRoutes(runtime: FireflyRuntime) {
     runtime.registerRoute({
@@ -19,6 +22,12 @@ function registerRoutes(runtime: FireflyRuntime) {
     });
 }
 
-export const registerManagementPlants: ModuleRegisterFunction<FireflyRuntime> = (runtime) => {
+export async function registerManagementPlants(runtime: FireflyRuntime, queryClient: QueryClient) {
+    initManagementPlantsCollection(queryClient);
     registerRoutes(runtime);
-};
+
+    if (runtime.isMswEnabled) {
+        const { managementPlantHandlers } = await import("./mocks/index.ts");
+        runtime.registerRequestHandlers(managementPlantHandlers);
+    }
+}

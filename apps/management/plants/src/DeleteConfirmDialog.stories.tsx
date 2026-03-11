@@ -1,10 +1,13 @@
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
-import { DeleteConfirmDialog } from "./DeleteConfirmDialog.tsx";
+import { DeleteConfirmDialog } from "@packages/plants-core";
 
 const meta = {
     title: "Management/Plants/Components/DeleteConfirmDialog",
     component: DeleteConfirmDialog,
+    parameters: {
+        chromatic: { viewports: [375, 768, 1280] },
+    },
     args: {
         open: true,
         onOpenChange: () => {},

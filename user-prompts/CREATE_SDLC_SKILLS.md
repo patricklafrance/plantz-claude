@@ -141,6 +141,7 @@ After completing each step, write the current state to `./tmp/runs/[run-uuid]/or
 
 ```markdown
 # Orchestrator State
+
 - Run UUID: [uuid]
 - Branch: [branch-name]
 - Commit type: [type]
@@ -293,11 +294,11 @@ Validates that the generated code meets quality standards. Does NOT fix issues â
 
 ### Inputs (provided by orchestrator)
 
-| Input              | Description                                                                                  |
-| ------------------ | -------------------------------------------------------------------------------------------- |
-| `run-uuid`         | Run folder identifier                                                                        |
-| `iteration`        | Current iteration number                                                                     |
-| `run-smoke-tests`  | `true` on iteration 1. On subsequent iterations, the orchestrator decides (default `false`).  |
+| Input             | Description                                                                                  |
+| ----------------- | -------------------------------------------------------------------------------------------- |
+| `run-uuid`        | Run folder identifier                                                                        |
+| `iteration`       | Current iteration number                                                                     |
+| `run-smoke-tests` | `true` on iteration 1. On subsequent iterations, the orchestrator decides (default `false`). |
 
 ### Procedure
 
@@ -305,18 +306,18 @@ Validates that the generated code meets quality standards. Does NOT fix issues â
 2. Run `pnpm lint` from the workspace root. This includes typecheck and syncpack. Record any errors.
 3. Load the `plantz-validate-modules` skill and validate all modules. Record any failures.
 4. Verify the changes meet the quality gates from the skill's own reference files:
-   - **Code-level checks** (static): semantic HTML structure (lists, headings), `aria-label` on icon-only buttons, form labels, `aria-invalid`/`aria-describedby` on error states, `sr-only` text for color-only indicators, live regions for dynamic content. For each failure, include the file path and element reference so the code skill can act on it.
+    - **Code-level checks** (static): semantic HTML structure (lists, headings), `aria-label` on icon-only buttons, form labels, `aria-invalid`/`aria-describedby` on error states, `sr-only` text for color-only indicators, live regions for dynamic content. For each failure, include the file path and element reference so the code skill can act on it.
 5. **Visual verification + smoke tests** (automated via `agent-browser`). Only run if `run-smoke-tests` is `true`. Load the `plantz-smoke-tests` skill and run smoke tests for every app. **During each app's server session** (while the dev server is already running), also run the visual verification steps below for every page affected by the changes. This avoids starting dev servers twice.
-   - Before starting, create the screenshots directory: `mkdir -p ./tmp/runs/[run-uuid]/screenshots/`.
-   - For each affected page:
-     1. Navigate to the page. Wait for the page to fully load (network idle).
-     2. Take an annotated screenshot in light mode: `screenshot ./tmp/runs/[run-uuid]/screenshots/[page]-light.png --annotate`.
-     3. Switch to dark mode: `emulate --color-scheme dark`. Take a screenshot: `screenshot ./tmp/runs/[run-uuid]/screenshots/[page]-dark.png --annotate`. Reset: `emulate --color-scheme light`.
-     4. Take an accessibility tree snapshot (`snapshot -i`) to verify all interactive elements have accessible names, correct roles, and logical tab order.
-     5. Run a keyboard navigation check: use `press_key Tab` repeatedly (max 50 presses) and after each press use `eval 'document.activeElement?.tagName + " " + (document.activeElement?.textContent?.trim()?.slice(0,40) || document.activeElement?.getAttribute("aria-label") || "")'` to record the focused element. Stop when focus cycles back to the first element. Record the full tab sequence.
-     6. Review the annotated screenshots for layout breakage (elements overflowing viewport, zero-height containers) or missing dark mode styles (unstyled backgrounds, invisible text). Do NOT claim to measure contrast ratios â€” that requires numeric computation, not visual inspection.
-   - After all pages are verified, close the browser session before stopping the dev server. Follow the port-cleanup procedure from the `plantz-smoke-tests` skill.
-   - **Iteration rule:** Run the full visual verification + smoke tests on iteration 1. On subsequent iterations, the orchestrator decides whether to include them by passing a `run-smoke-tests` flag.
+    - Before starting, create the screenshots directory: `mkdir -p ./tmp/runs/[run-uuid]/screenshots/`.
+    - For each affected page:
+        1. Navigate to the page. Wait for the page to fully load (network idle).
+        2. Take an annotated screenshot in light mode: `screenshot ./tmp/runs/[run-uuid]/screenshots/[page]-light.png --annotate`.
+        3. Switch to dark mode: `emulate --color-scheme dark`. Take a screenshot: `screenshot ./tmp/runs/[run-uuid]/screenshots/[page]-dark.png --annotate`. Reset: `emulate --color-scheme light`.
+        4. Take an accessibility tree snapshot (`snapshot -i`) to verify all interactive elements have accessible names, correct roles, and logical tab order.
+        5. Run a keyboard navigation check: use `press_key Tab` repeatedly (max 50 presses) and after each press use `eval 'document.activeElement?.tagName + " " + (document.activeElement?.textContent?.trim()?.slice(0,40) || document.activeElement?.getAttribute("aria-label") || "")'` to record the focused element. Stop when focus cycles back to the first element. Record the full tab sequence.
+        6. Review the annotated screenshots for layout breakage (elements overflowing viewport, zero-height containers) or missing dark mode styles (unstyled backgrounds, invisible text). Do NOT claim to measure contrast ratios â€” that requires numeric computation, not visual inspection.
+    - After all pages are verified, close the browser session before stopping the dev server. Follow the port-cleanup procedure from the `plantz-smoke-tests` skill.
+    - **Iteration rule:** Run the full visual verification + smoke tests on iteration 1. On subsequent iterations, the orchestrator decides whether to include them by passing a `run-smoke-tests` flag.
 
 ### Output
 
@@ -369,9 +370,9 @@ Audits agent documentation for drift after implementation and fixes any issues f
 
 ### Inputs (provided by orchestrator)
 
-| Input       | Description                                                            |
-| ----------- | ---------------------------------------------------------------------- |
-| `run-uuid`  | Run folder identifier                                                  |
+| Input       | Description                                                                    |
+| ----------- | ------------------------------------------------------------------------------ |
+| `run-uuid`  | Run folder identifier                                                          |
 | `iteration` | The latest iteration number (used to know how many `changes-*.md` files exist) |
 
 ### Procedure

@@ -21,7 +21,7 @@ Every story file must cover **every visually distinct state** the component can 
 - Edge cases: empty/null/undefined optional fields (`MinimalFields`), long text that could overflow (`LongName`, `LongFieldValues`), boundary conditions (`DueToday`).
 - For components with open/closed states (dialogs), include stories for both.
 - Do **not** create stories for prop combinations that look identical — if `location="kitchen"` and `location="bathroom"` render the same layout, one story is sufficient.
-- A page backed by runtime data (e.g., TanStack DB with auto-seeding) may have fewer variants if state can only be exercised via interaction. Document why in a comment.
+- A page backed by runtime data (e.g., MSW with default seed data) may have fewer variants if state can only be exercised via interaction. Document why in a comment.
 
 ## Story Patterns
 
@@ -36,11 +36,25 @@ Every story is automatically snapshotted by Chromatic — stories ARE the visual
 
 - Stories must render their meaningful visual state **without user interaction**. If a component requires a click to show content (e.g., a dialog), pass `open: true` in args so Chromatic captures the open state.
 - Avoid animations or timers that could produce flaky snapshots.
+- **Viewport parameters:** All domain story files (pages, components, dialogs) must set `parameters: { chromatic: { viewports: [375, 768, 1280] } }` in `meta` so Chromatic captures mobile, tablet, and desktop snapshots. This does not apply to `packages/components/` primitive stories.
+- **Date-dependent stories must use deterministic data.** Never monkey-patch `globalThis.Date`. Instead, use extreme dates in story data so that date-comparison functions like `isDueForWatering()` return the same result regardless of when the snapshot runs: use far-past dates (e.g., `new Date(2020, 0, 1)`) for "due" plants and far-future dates (e.g., `new Date(2099, 0, 1)`) for "not due" plants. For components that display the current date (e.g., `CreatePlantDialog`), accept an optional prop to inject a fixed date and pass it from stories. See `packages/plants-core/src/PlantListItem.stories.tsx` for usage.
+
+## Tailwind CSS Source Scanning
+
+Each domain storybook's `.storybook/storybook.css` must include `@source` directives for every package whose components appear in that storybook's stories. At minimum, domain storybooks need:
+
+- `@source` for `packages/components/src/**/*.{ts,tsx}` (shared UI primitives)
+- `@source` for `packages/plants-core/src/**/*.{ts,tsx}` (shared domain components)
+- `@source` for each domain module's `src/**/*.{ts,tsx}`
+
+Without these directives, Tailwind will not generate utility classes used by those packages, causing unstyled components in Storybook and Chromatic snapshots.
 
 ## Isolation
 
 - Stories must render without Squide runtime or React Router. If a component depends on these, extract a presentational sub-component that takes data via props and write stories for that instead.
-- TanStack DB collections work in Storybook (they use localStorage). Components that read from collections will render with whatever data is in localStorage.
+- MSW + TanStack DB collections are initialized per-domain via a `storybook.setup.ts` file that each story file imports. The setup uses `initializeFireflyForStorybook` (MSW worker singleton + module registration) and `withModuleDecorator` (per-story MSW reset, db reset, QueryClientProvider, Suspense) from `@packages/core-squide/storybook`. Domain storybook `preview.tsx` files are minimal (CSS import only). Per-story handler overrides are applied via `context.parameters.msw.handlers`.
+- The packages storybook (`packages/storybook/`) does not need MSW, collections, or QueryClient since it only tests presentational components.
+- Stories that need data use `parameters.msw.handlers` for per-story handler overrides. See `msw-tanstack-query.md` reference for the full pattern.
 
 ## Verification
 

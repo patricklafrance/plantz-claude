@@ -39,28 +39,28 @@ export const AllVariants: Story = {
     render: () => (
         <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">unchecked</span>
+                <span className="text-muted-foreground text-sm font-medium">unchecked</span>
                 <div className="flex items-center gap-2">
                     <Checkbox id="all-unchecked" />
                     <Label htmlFor="all-unchecked">Unchecked</Label>
                 </div>
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">checked</span>
+                <span className="text-muted-foreground text-sm font-medium">checked</span>
                 <div className="flex items-center gap-2">
                     <Checkbox id="all-checked" defaultChecked />
                     <Label htmlFor="all-checked">Checked</Label>
                 </div>
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">disabled</span>
+                <span className="text-muted-foreground text-sm font-medium">disabled</span>
                 <div className="flex items-center gap-2">
                     <Checkbox id="all-disabled" disabled />
                     <Label htmlFor="all-disabled">Disabled</Label>
                 </div>
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">disabled checked</span>
+                <span className="text-muted-foreground text-sm font-medium">disabled checked</span>
                 <div className="flex items-center gap-2">
                     <Checkbox id="all-disabled-checked" disabled defaultChecked />
                     <Label htmlFor="all-disabled-checked">Disabled Checked</Label>

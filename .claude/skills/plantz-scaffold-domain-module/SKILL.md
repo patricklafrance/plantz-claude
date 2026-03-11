@@ -1,14 +1,14 @@
 ---
 name: plantz-scaffold-domain-module
 description: |
-    Scaffold a new Squide federated module in the monorepo.
+    Scaffold a new Squide local module in the monorepo.
     Use when asked to "create a module", "scaffold a module", "add a module", "new module".
 license: MIT
 ---
 
 # Scaffold Module
 
-Create a new Squide federated module with all required registrations.
+Create a new Squide local module with all required registrations.
 
 ## Inputs
 
@@ -95,6 +95,8 @@ Follow the existing comment-section pattern visible in the file. The `stories` a
 ### Step 6 — Update storybook affected map
 
 In `tooling/getAffectedStorybooks.ts`, add `"{packageName}"` to the `StorybookDependencies` entry for the domain's storybook (`@apps/{domain}-storybook`).
+
+**Only list module package names (`@modules/*`).** Never add shared packages (`@packages/*`) — Turborepo's `--filter=...[baseSha]` already detects transitive dependency changes, so if a shared package changes, the modules that depend on it are automatically marked as affected.
 
 If no storybook entry exists for the domain, warn the user but do not create one.
 

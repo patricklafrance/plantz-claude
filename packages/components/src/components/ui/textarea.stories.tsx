@@ -38,19 +38,19 @@ export const AllVariants: Story = {
     render: () => (
         <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">default</span>
+                <span className="text-muted-foreground text-sm font-medium">default</span>
                 <Textarea placeholder="Default textarea..." />
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">with value</span>
+                <span className="text-muted-foreground text-sm font-medium">with value</span>
                 <Textarea defaultValue="This textarea has pre-filled content." />
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">disabled</span>
+                <span className="text-muted-foreground text-sm font-medium">disabled</span>
                 <Textarea disabled defaultValue="Disabled textarea" />
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">with label</span>
+                <span className="text-muted-foreground text-sm font-medium">with label</span>
                 <Label htmlFor="all-variants-message">Message</Label>
                 <Textarea id="all-variants-message" placeholder="Type your message..." />
             </div>

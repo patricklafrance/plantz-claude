@@ -1,10 +1,11 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button, Input, Textarea, Label, Switch, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, DatePicker } from "@packages/components";
 import { format } from "date-fns";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
-import { locations, luminosities, wateringFrequencies, wateringTypes } from "./constants.ts";
-import type { Plant } from "./plantSchema.ts";
-import { plantsCollection } from "./plantsCollection.ts";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button, Input, Textarea, Label, Switch, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, DatePicker } from "@packages/components";
+import { locations, luminosities, wateringFrequencies, wateringTypes } from "@packages/plants-core";
+import type { Plant } from "@packages/plants-core";
+
+import { getManagementPlantsCollection, createManagementPlantActions } from "./plantsCollection.ts";
 
 interface EditPlantDialogProps {
     plant: Plant | null;
@@ -28,6 +29,9 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const plantIdRef = useRef<string | null>(null);
 
+    const collection = getManagementPlantsCollection();
+    const actions = useMemo(() => createManagementPlantActions(collection), [collection]);
+
     useEffect(() => {
         if (plant) {
             plantIdRef.current = plant.id;
@@ -49,22 +53,26 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
         if (!plantIdRef.current) return;
         if (!name.trim() || !wateringQuantity.trim()) return;
         const id = plantIdRef.current;
-        plantsCollection.update(id, (draft) => {
-            draft.name = name.trim();
-            draft.description = description.trim() || undefined;
-            draft.family = family.trim() || undefined;
-            draft.location = location;
-            draft.luminosity = luminosity;
-            draft.mistLeaves = mistLeaves;
-            draft.soilType = soilType.trim() || undefined;
-            draft.wateringFrequency = wateringFrequency;
-            draft.wateringQuantity = wateringQuantity.trim();
-            draft.wateringType = wateringType;
-            draft.lastUpdateDate = new Date();
+
+        const tx = actions.updatePlant({
+            id,
+            name: name.trim(),
+            description: description.trim() || undefined,
+            family: family.trim() || undefined,
+            location,
+            luminosity,
+            mistLeaves,
+            soilType: soilType.trim() || undefined,
+            wateringFrequency,
+            wateringQuantity: wateringQuantity.trim(),
+            wateringType,
         });
-        setSaved(true);
-        setTimeout(() => setSaved(false), 2000);
-    }, [name, description, family, location, luminosity, mistLeaves, soilType, wateringFrequency, wateringQuantity, wateringType]);
+
+        tx.isPersisted.promise.then(() => {
+            setSaved(true);
+            setTimeout(() => setSaved(false), 2000);
+        });
+    }, [name, description, family, location, luminosity, mistLeaves, soilType, wateringFrequency, wateringQuantity, wateringType, actions]);
 
     useEffect(() => {
         if (!plant || !open) return;
@@ -83,16 +91,17 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
         };
     }, [name, description, family, location, luminosity, mistLeaves, soilType, wateringFrequency, wateringQuantity, wateringType, plant, open, saveChanges]);
 
-
     if (!plant) return null;
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+            <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
                 <DialogHeader>
                     <div className="flex items-center gap-2">
                         <DialogTitle>Edit plant</DialogTitle>
-                        <span role="status" aria-live="polite">{saved && <span className="text-xs text-muted-foreground animate-in fade-in">Saved</span>}</span>
+                        <span role="status" aria-live="polite">
+                            {saved && <span className="text-muted-foreground animate-in fade-in text-xs">Saved</span>}
+                        </span>
                     </div>
                 </DialogHeader>
                 <div className="flex flex-col gap-4">
@@ -111,7 +120,12 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
                             <Label htmlFor="edit-location">Location *</Label>
-                            <Select value={location} onValueChange={(v) => { if (v) setLocation(v); }}>
+                            <Select
+                                value={location}
+                                onValueChange={(v) => {
+                                    if (v) setLocation(v);
+                                }}
+                            >
                                 <SelectTrigger id="edit-location" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -128,7 +142,12 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <Label htmlFor="edit-luminosity">Luminosity *</Label>
-                            <Select value={luminosity} onValueChange={(v) => { if (v) setLuminosity(v); }}>
+                            <Select
+                                value={luminosity}
+                                onValueChange={(v) => {
+                                    if (v) setLuminosity(v);
+                                }}
+                            >
                                 <SelectTrigger id="edit-luminosity" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -155,7 +174,12 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
                             <Label htmlFor="edit-watering-frequency">Watering frequency *</Label>
-                            <Select value={wateringFrequency} onValueChange={(v) => { if (v) setWateringFrequency(v); }}>
+                            <Select
+                                value={wateringFrequency}
+                                onValueChange={(v) => {
+                                    if (v) setWateringFrequency(v);
+                                }}
+                            >
                                 <SelectTrigger id="edit-watering-frequency" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -172,7 +196,12 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <Label htmlFor="edit-watering-type">Watering type *</Label>
-                            <Select value={wateringType} onValueChange={(v) => { if (v) setWateringType(v); }}>
+                            <Select
+                                value={wateringType}
+                                onValueChange={(v) => {
+                                    if (v) setWateringType(v);
+                                }}
+                            >
                                 <SelectTrigger id="edit-watering-type" className="w-full" aria-required="true">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -196,12 +225,18 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
                         <Label>Next watering date</Label>
                         <DatePicker value={plant.nextWateringDate} disabled aria-label="Next watering date" />
                     </div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-muted-foreground text-xs">
                         Created: {format(plant.creationDate, "PPP")} · Last updated: {format(plant.lastUpdateDate, "PPP")}
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button variant="destructive" size="sm" onClick={() => { if (plant) onDelete(plant); }}>
+                    <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => {
+                            if (plant) onDelete(plant);
+                        }}
+                    >
                         Delete
                     </Button>
                     <Button variant="outline" size="sm" onClick={() => onOpenChange(false)}>

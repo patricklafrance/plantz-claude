@@ -15,7 +15,7 @@ Multiple domain areas (management, today) and a shared packages layer each need 
 
 ## Decision
 
-Use per-domain Storybooks (Option 1). Each domain area has a Storybook at `apps/<domain>/storybook/`, and shared packages have one at `apps/storybook/`. This allows independent Chromatic runs that skip unaffected domains.
+Use per-domain Storybooks (Option 1). Each domain area has a Storybook at `apps/<domain>/storybook/`, and shared packages have one at `packages/storybook/`. This allows independent Chromatic runs that skip unaffected domains. A unified Storybook at `apps/storybook/` aggregates all stories for local development convenience but is not used by Chromatic.
 
 ## Consequences
 

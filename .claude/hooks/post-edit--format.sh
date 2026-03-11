@@ -14,9 +14,9 @@ if [[ -z "${FILE_PATH:-}" ]]; then
     exit 0
 fi
 
-# Only format JS/TS files.
+# Only format JS/TS/JSON/MD files.
 case "$FILE_PATH" in
-    *.ts|*.tsx|*.js|*.jsx|*.mts|*.mjs|*.cts|*.cjs) ;;
+    *.ts|*.tsx|*.js|*.jsx|*.mts|*.mjs|*.cts|*.cjs|*.json|*.md) ;;
     *) exit 0 ;;
 esac
 

@@ -11,6 +11,7 @@ if ! echo "$INPUT" | grep -q 'git commit'; then
 fi
 
 OFFENDING=$(git diff --cached --name-only --diff-filter=ACM -- '*.ts' '*.tsx' '*.js' '*.jsx' \
+    | grep -v 'mockServiceWorker\.js$' \
     | xargs grep -Pln '^\s*/\*\s*(oxlint|eslint)-disable\b' 2>/dev/null)
 
 if [[ -n "$OFFENDING" ]]; then

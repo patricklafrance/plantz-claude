@@ -46,24 +46,26 @@ function Calendar({
 }) {
     const defaultClassNames = getDefaultClassNames();
 
-    const mergedFormatters = React.useMemo(() => ({
-        formatMonthDropdown: (date: Date) => date.toLocaleString(locale?.code, { month: "short" }),
-        ...formatters,
-    }), [locale?.code, formatters]);
-
-    const DayButtonWrapper = React.useCallback(
-        ({ ...dayButtonProps }: React.ComponentProps<typeof DayButton>) =>
-            <CalendarDayButton locale={locale} {...dayButtonProps} />,
-        [locale],
+    const mergedFormatters = React.useMemo(
+        () => ({
+            formatMonthDropdown: (date: Date) => date.toLocaleString(locale?.code, { month: "short" }),
+            ...formatters,
+        }),
+        [locale?.code, formatters],
     );
 
-    const mergedComponents = React.useMemo(() => ({
-        Root: CalendarRoot,
-        Chevron: CalendarChevron,
-        DayButton: DayButtonWrapper,
-        WeekNumber: CalendarWeekNumber,
-        ...components,
-    }), [DayButtonWrapper, components]);
+    const DayButtonWrapper = React.useCallback(({ ...dayButtonProps }: React.ComponentProps<typeof DayButton>) => <CalendarDayButton locale={locale} {...dayButtonProps} />, [locale]);
+
+    const mergedComponents = React.useMemo(
+        () => ({
+            Root: CalendarRoot,
+            Chevron: CalendarChevron,
+            DayButton: DayButtonWrapper,
+            WeekNumber: CalendarWeekNumber,
+            ...components,
+        }),
+        [DayButtonWrapper, components],
+    );
 
     // oxlint-disable-next-line react-perf/jsx-no-new-object-as-prop -- 25+ computed classNames keys with 5+ deps; memoizing adds fragile complexity for no benefit since DayPicker does not compare by reference
     const calendarClassNames = {

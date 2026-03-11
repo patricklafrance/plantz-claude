@@ -53,7 +53,7 @@ export const AllVariants: Story = {
             <div className="flex flex-col gap-6">
                 {sizes.map((size) => (
                     <div key={size} className="flex flex-col gap-2">
-                        <span className="text-sm font-medium text-muted-foreground">{size}</span>
+                        <span className="text-muted-foreground text-sm font-medium">{size}</span>
                         <div className="flex items-center gap-4">
                             <div className="flex items-center gap-2">
                                 <Switch size={size} />

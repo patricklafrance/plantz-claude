@@ -89,7 +89,7 @@ export const AllVariants: Story = {
     render: () => (
         <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">Default (with close button)</span>
+                <span className="text-muted-foreground text-sm font-medium">Default (with close button)</span>
                 <Dialog>
                     <DialogTrigger render={<Button />}>Default Dialog</DialogTrigger>
                     <DialogContent>
@@ -105,7 +105,7 @@ export const AllVariants: Story = {
                 </Dialog>
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">Without close button</span>
+                <span className="text-muted-foreground text-sm font-medium">Without close button</span>
                 <Dialog>
                     <DialogTrigger render={<Button />}>No Close Button</DialogTrigger>
                     <DialogContent showCloseButton={false}>
@@ -121,7 +121,7 @@ export const AllVariants: Story = {
                 </Dialog>
             </div>
             <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">Footer close button</span>
+                <span className="text-muted-foreground text-sm font-medium">Footer close button</span>
                 <Dialog>
                     <DialogTrigger render={<Button />}>Footer Close</DialogTrigger>
                     <DialogContent>

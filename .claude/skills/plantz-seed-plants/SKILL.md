@@ -2,7 +2,7 @@
 name: plantz-seed-plants
 description: |
     Generate and inject seed data for the plants collection.
-    Wipes existing plant data in localStorage and replaces it with fresh seed data.
+    Resets the MSW in-memory database with fresh randomly generated plant data.
     Requires the dev server and Chrome DevTools MCP browser to be available.
     Triggers: /seed-plants, "seed plants", "reseed plants", "reset plant data"
 license: MIT
@@ -10,23 +10,17 @@ license: MIT
 
 # Seed Plants
 
-Generate seed data and inject it into the running app's localStorage via Chrome DevTools MCP.
+Reset the MSW in-memory plant database with fresh seed data via Chrome DevTools MCP.
+
+## Background
+
+Plant data lives in an MSW in-memory database (`plantsDb` from `@packages/plants-core/db`). On page load, the host app calls `plantsDb.reset(defaultSeedPlants)` which populates ~250 plants. The `scripts/seed-plants.ts` script can also generate a static JSON file, but the primary seeding mechanism is the in-memory DB.
 
 ## Procedure
 
 Execute these steps sequentially. Do not skip steps.
 
-### Step 1 — Generate seed data
-
-Run the seed script:
-
-```
-pnpm seed-plants
-```
-
-This writes `apps/host/public/seed-plants.json` containing 220–280 plants in TanStack DB localStorage format.
-
-### Step 2 — Ensure dev server is running
+### Step 1 — Ensure dev server is running
 
 Check if the dev server is reachable:
 
@@ -44,40 +38,17 @@ pnpm dev-management-plants
 
 Wait until `http://localhost:8080` returns `200` before proceeding.
 
-### Step 3 — Navigate MCP browser to the app
+### Step 2 — Navigate MCP browser to the app
 
 Use `mcp__chrome-devtools__navigate_page` to go to `http://localhost:8080`.
 
-### Step 4 — Inject seed into localStorage
+### Step 3 — Reload the page to reset seed data
 
-Use `mcp__chrome-devtools__evaluate_script` to run:
-
-```javascript
-async () => {
-    const res = await fetch("/seed-plants.json");
-    if (!res.ok) return { error: "fetch failed: " + res.status };
-    const data = await res.text();
-    localStorage.removeItem("plantz-plants");
-    localStorage.setItem("plantz-plants", data);
-    return { ok: true, size: data.length };
-};
-```
-
-Verify the result contains `ok: true`.
-
-### Step 5 — Reload the page
+The MSW in-memory database resets on every page load (the host app calls `plantsDb.reset(defaultSeedPlants)` during MSW initialization). Simply reload the page to get fresh seed data.
 
 Use `mcp__chrome-devtools__navigate_page` with `type: reload` to reload the page.
 
-### Step 6 — Clean up
-
-Delete the temporary JSON file:
-
-```
-rm apps/host/public/seed-plants.json
-```
-
-### Step 7 — Stop dev server if we started it
+### Step 4 — Stop dev server if we started it
 
 Only if `SERVER_WAS_RUNNING = false` (i.e., this skill started the dev server), stop it now:
 
@@ -92,6 +63,6 @@ taskkill //PID <PID> //T //F
 
 Do NOT stop the server if it was already running before this skill started.
 
-### Step 8 — Confirm
+### Step 5 — Confirm
 
-Report the number of plants seeded and that the page has been reloaded.
+Report that the page has been reloaded and the in-memory plant database has been reset with fresh seed data.

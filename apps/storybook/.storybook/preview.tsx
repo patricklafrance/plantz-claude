@@ -1,16 +1,6 @@
-import { Suspense } from "react";
+import "./storybook.css";
 import type { Preview } from "storybook-react-rsbuild";
 
-const preview: Preview = {
-    decorators: [
-        (Story) => {
-            return (
-                <Suspense fallback="Loading...">
-                    <Story />
-                </Suspense>
-            );
-        },
-    ],
-};
+const preview: Preview = {};
 
 export default preview;

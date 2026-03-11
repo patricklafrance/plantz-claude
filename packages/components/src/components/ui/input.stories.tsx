@@ -58,20 +58,20 @@ export const AllVariants: Story = {
             <div className="flex flex-col gap-6">
                 {types.map((type) => (
                     <div key={type} className="flex flex-col gap-2">
-                        <span className="text-sm font-medium text-muted-foreground">{type}</span>
+                        <span className="text-muted-foreground text-sm font-medium">{type}</span>
                         <Input type={type} placeholder={`${type} input...`} />
                     </div>
                 ))}
                 <div className="flex flex-col gap-2">
-                    <span className="text-sm font-medium text-muted-foreground">file</span>
+                    <span className="text-muted-foreground text-sm font-medium">file</span>
                     <Input type="file" />
                 </div>
                 <div className="flex flex-col gap-2">
-                    <span className="text-sm font-medium text-muted-foreground">disabled</span>
+                    <span className="text-muted-foreground text-sm font-medium">disabled</span>
                     <Input disabled defaultValue="Disabled input" />
                 </div>
                 <div className="flex flex-col gap-2">
-                    <span className="text-sm font-medium text-muted-foreground">with label</span>
+                    <span className="text-muted-foreground text-sm font-medium">with label</span>
                     <Label htmlFor="all-variants-email">Email</Label>
                     <Input id="all-variants-email" type="email" placeholder="you@example.com" />
                 </div>

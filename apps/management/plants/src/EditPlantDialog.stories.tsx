@@ -1,13 +1,17 @@
+import { http, HttpResponse } from "msw";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
+import type { Plant } from "@packages/plants-core";
+
 import { EditPlantDialog } from "./EditPlantDialog.tsx";
-import type { Plant } from "./plantSchema.ts";
+import { moduleDecorator } from "./storybook.setup.ts";
+
+// Fixed dates for deterministic Chromatic snapshots.
+const FIXED_NOW = new Date(2026, 2, 10, 12, 0, 0, 0);
+const FIXED_FUTURE = new Date(2026, 2, 17, 0, 0, 0, 0);
+const FIXED_PAST = new Date(2026, 2, 8, 0, 0, 0, 0);
 
 function makePlant(overrides: Partial<Plant> = {}): Plant {
-    const now = new Date();
-    const future = new Date();
-    future.setDate(future.getDate() + 7);
-
     return {
         id: "test-edit-1",
         name: "Monstera Deliciosa",
@@ -20,22 +24,30 @@ function makePlant(overrides: Partial<Plant> = {}): Plant {
         wateringFrequency: "1-week",
         wateringQuantity: "200ml",
         wateringType: "surface",
-        nextWateringDate: future,
-        creationDate: now,
-        lastUpdateDate: now,
+        nextWateringDate: FIXED_FUTURE,
+        creationDate: FIXED_NOW,
+        lastUpdateDate: FIXED_NOW,
         ...overrides,
     };
-}
-
-function pastDate(): Date {
-    const d = new Date();
-    d.setDate(d.getDate() - 2);
-    return d;
 }
 
 const meta = {
     title: "Management/Plants/Components/EditPlantDialog",
     component: EditPlantDialog,
+    decorators: [moduleDecorator],
+    parameters: {
+        chromatic: { viewports: [375, 768, 1280] },
+        msw: {
+            handlers: [
+                // Provide a handler for the debounced auto-save so it doesn't produce network errors
+                http.put("/api/management/plants/:id", async ({ request }) => {
+                    const body = (await request.json()) as Record<string, unknown>;
+
+                    return HttpResponse.json({ ...body, lastUpdateDate: "2025-01-15T00:00:00.000Z" });
+                }),
+            ],
+        },
+    },
     args: {
         open: true,
         onOpenChange: () => {},
@@ -75,7 +87,7 @@ export const AllOptionalFieldsFilled: Story = {
 
 export const DueForWatering: Story = {
     args: {
-        plant: makePlant({ nextWateringDate: pastDate() }),
+        plant: makePlant({ nextWateringDate: FIXED_PAST }),
     },
 };
 

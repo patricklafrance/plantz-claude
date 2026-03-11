@@ -9,7 +9,7 @@
 
 ### Architecture
 
-- [ARCHITECTURE.md](agent-docs/ARCHITECTURE.md) — repo structure, package naming, Squide topology, tech stack, MODULES env var
+- [ARCHITECTURE.md](agent-docs/ARCHITECTURE.md) — repo structure, package naming, Squide topology, data layer (BFF-per-module), tech stack, MODULES env var
 
 ### References
 
@@ -20,7 +20,7 @@
 
 ### Decisions
 
-- [adr/index.md](agent-docs/adr/index.md) — architectural decision log (Squide modules, domain Storybooks)
+- [adr/index.md](agent-docs/adr/index.md) — architectural decision log (Squide local modules, domain Storybooks, MSW + TanStack Query data layer, BFF-per-module)
 - [odr/index.md](agent-docs/odr/index.md) — operational decision log (pnpm+Turborepo, syncpack, Chromatic)
 
 ## Growth Conventions

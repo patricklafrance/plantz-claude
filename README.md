@@ -22,7 +22,8 @@ apps/
   storybook/                   # Packages-layer Storybook
 packages/
   components/                  # Shared UI — shadcn/ui (Base UI) + Tailwind v4
-  squide-core/                 # Shared Squide utilities
+  core-squide/                 # Shared Squide utilities
+  plants-core/                 # Shared plants data layer (MSW handlers, TanStack DB, seed data)
   storybook/                   # Shared Storybook config
 ```
 
@@ -142,7 +143,7 @@ The SDLC skills don't work alone — they load project-specific utility skills a
 | ---------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `plantz-scaffold-domain-module`    | Scaffolds a new Squide module — creates files, registers in host, wires Storybook, adds dev script |
 | `plantz-scaffold-domain-storybook` | Scaffolds a domain Storybook with Chromatic CI integration                                         |
-| `plantz-seed-plants`               | Generates seed data and injects it into localStorage via Chrome DevTools MCP                       |
+| `plantz-seed-plants`               | Resets the MSW in-memory plant database by reloading the page via Chrome DevTools MCP              |
 | `plantz-audit-agent-docs`          | 3-pass audit of all docs against the live codebase (structural, accuracy, instruction quality)     |
 | `plantz-validate-modules`          | Validates every module conforms to the expected structure (12 checks)                              |
 | `plantz-smoke-tests`               | Smoke-tests every app by starting dev servers and verifying pages load in a browser                |
@@ -206,22 +207,14 @@ pnpm install
 
 ### Seed data
 
-The app stores plant data in localStorage via TanStack DB. Without seeding, the plant list will be empty.
+Plant data lives in an MSW in-memory database (`plantsDb` from `@packages/plants-core`). On page load, the host app calls `plantsDb.reset(defaultSeedPlants)` which populates ~250 plants automatically. Data resets on every reload — no manual seeding needed.
 
-**With Claude Code** (recommended): run `/seed-plants`. The skill generates data, injects it into localStorage via Chrome DevTools MCP, and reloads the page automatically.
+**With Claude Code**: run `/seed-plants` to reload the page and reset the in-memory database via Chrome DevTools MCP.
 
-**Manually:**
+**To regenerate the static seed file** (used as the default data source):
 
 ```bash
 pnpm seed-plants      # Generates apps/host/public/seed-plants.json
-```
-
-Then start the dev server, open DevTools in the browser, and run:
-
-```js
-const data = await fetch("/seed-plants.json").then((r) => r.text());
-localStorage.setItem("plantz-plants", data);
-location.reload();
 ```
 
 ### Run the app

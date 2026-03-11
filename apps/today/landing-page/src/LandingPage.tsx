@@ -91,7 +91,7 @@ export function LandingPage() {
                             };
                             return (
                                 <div key={plant.id} role="listitem" style={rowStyle}>
-                                    <PlantListItem plant={plant} onEdit={handleViewDetail} />
+                                    <PlantListItem plant={plant} onClick={handleViewDetail} />
                                 </div>
                             );
                         })}

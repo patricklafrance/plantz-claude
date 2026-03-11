@@ -140,3 +140,14 @@ export const NoSelectionNoDelete: Story = {
         selected: undefined,
     },
 };
+
+export const ClickOnly: Story = {
+    args: {
+        plant: makePlant(),
+        onClick: () => {},
+        onToggleSelect: undefined,
+        onEdit: undefined,
+        onDelete: undefined,
+        selected: undefined,
+    },
+};

@@ -2,22 +2,20 @@ import { useLiveQuery } from "@tanstack/react-db";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useState, useRef, useMemo, useCallback } from "react";
 
-import { Button, Checkbox } from "@packages/components";
-import { applyPlantFilters, DeleteConfirmDialog, FilterBar, isDueForWatering, PlantListItem, usePlantFilters } from "@packages/plants-core";
+import { applyPlantFilters, FilterBar, isDueForWatering, PlantListItem, usePlantFilters } from "@packages/plants-core";
 import type { Plant } from "@packages/plants-core";
 
-import { getTodayPlantsCollection, createTodayPlantActions } from "./plantsCollection.ts";
+import { PlantDetailDialog } from "./PlantDetailDialog.tsx";
+import { getTodayPlantsCollection } from "./plantsCollection.ts";
 
 const scrollContainerStyle = { height: "calc(100vh - 340px)" };
 
 export function LandingPage() {
     const { filters, updateFilter, clearFilters, hasActiveFilters } = usePlantFilters();
-    const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-    const [deleteTarget, setDeleteTarget] = useState<Plant[] | null>(null);
+    const [detailPlant, setDetailPlant] = useState<Plant | null>(null);
     const parentRef = useRef<HTMLDivElement>(null);
 
     const collection = getTodayPlantsCollection();
-    const actions = useMemo(() => createTodayPlantActions(collection), [collection]);
     const { data: allPlants, isReady } = useLiveQuery((q) => q.from({ plant: collection }));
 
     const plants = useMemo(() => {
@@ -37,60 +35,15 @@ export function LandingPage() {
         overscan: 10,
     });
 
-    const allSelected = plants.length > 0 && plants.every((p) => selectedIds.has(p.id));
-
-    const toggleSelect = useCallback((id: string) => {
-        setSelectedIds((prev) => {
-            const next = new Set(prev);
-            if (next.has(id)) {
-                next.delete(id);
-            } else {
-                next.add(id);
-            }
-            return next;
-        });
+    const handleViewDetail = useCallback((plant: Plant) => {
+        setDetailPlant(plant);
     }, []);
 
-    const toggleAll = useCallback(() => {
-        if (allSelected) {
-            setSelectedIds(new Set());
-        } else {
-            setSelectedIds(new Set(plants.map((p) => p.id)));
+    const handleDetailOpenChange = useCallback((open: boolean) => {
+        if (!open) {
+            setDetailPlant(null);
         }
-    }, [allSelected, plants]);
-
-    const handleDeleteSingle = useCallback((plant: Plant) => {
-        setDeleteTarget([plant]);
     }, []);
-
-    const handleBulkDelete = useCallback(() => {
-        const selected = plants.filter((p) => selectedIds.has(p.id));
-        if (selected.length > 0) {
-            setDeleteTarget(selected);
-        }
-    }, [plants, selectedIds]);
-
-    const confirmDelete = useCallback(() => {
-        if (!deleteTarget) return;
-        const ids = deleteTarget.map((p) => p.id);
-        actions.deletePlants(ids);
-        setSelectedIds((prev) => {
-            const next = new Set(prev);
-            for (const plant of deleteTarget) {
-                next.delete(plant.id);
-            }
-            return next;
-        });
-        setDeleteTarget(null);
-    }, [deleteTarget, actions]);
-
-    const handleDeleteDialogOpenChange = useCallback((open: boolean) => {
-        if (!open) setDeleteTarget(null);
-    }, []);
-
-    const selectedCount = plants.filter((p) => selectedIds.has(p.id)).length;
-
-    const deleteTargetNames = deleteTarget?.map((p) => p.name) ?? [];
 
     const totalSize = virtualizer.getTotalSize();
     const virtualizerContainerStyle = useMemo(
@@ -118,26 +71,11 @@ export function LandingPage() {
 
             <FilterBar filters={filters} onFilterChange={updateFilter} onClear={clearFilters} hasActiveFilters={hasActiveFilters} showDueForWatering={false} />
 
-            {selectedCount > 0 && (
-                <div role="status" className="border-primary/20 bg-primary/5 flex items-center gap-3 rounded-lg border px-4 py-2">
-                    <span className="text-sm font-medium">{selectedCount} selected</span>
-                    <Button variant="destructive" size="xs" onClick={handleBulkDelete}>
-                        Delete selected
-                    </Button>
-                </div>
-            )}
-
             <div role="status" aria-live="polite" className="text-muted-foreground text-xs">
                 {plants.length} plant{plants.length !== 1 ? "s" : ""} due for watering
             </div>
 
             <div className="border-border flex-1 overflow-hidden rounded-lg border">
-                <div className="bg-muted/50 border-border flex items-center gap-3 border-b px-4 py-2">
-                    <Checkbox checked={allSelected} onCheckedChange={toggleAll} aria-label="Select all plants" />
-                    <span className="text-muted-foreground min-w-0 flex-1 text-xs font-medium" aria-hidden="true">
-                        Select all
-                    </span>
-                </div>
                 <div ref={parentRef} className="overflow-auto" style={scrollContainerStyle}>
                     <div role="list" aria-label="Plants due for watering" style={virtualizerContainerStyle}>
                         {virtualizer.getVirtualItems().map((virtualRow) => {
@@ -153,7 +91,7 @@ export function LandingPage() {
                             };
                             return (
                                 <div key={plant.id} role="listitem" style={rowStyle}>
-                                    <PlantListItem plant={plant} selected={selectedIds.has(plant.id)} onToggleSelect={toggleSelect} onDelete={handleDeleteSingle} />
+                                    <PlantListItem plant={plant} onEdit={handleViewDetail} />
                                 </div>
                             );
                         })}
@@ -161,7 +99,7 @@ export function LandingPage() {
                 </div>
             </div>
 
-            <DeleteConfirmDialog open={deleteTarget !== null} onOpenChange={handleDeleteDialogOpenChange} plantNames={deleteTargetNames} onConfirm={confirmDelete} />
+            <PlantDetailDialog plant={detailPlant} open={detailPlant !== null} onOpenChange={handleDetailOpenChange} />
         </div>
     );
 }

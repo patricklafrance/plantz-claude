@@ -1,6 +1,10 @@
 import type { Plant } from "./plantSchema.ts";
 import type { PlantFilters } from "./usePlantFilters.ts";
 
+export function getOptionLabel(options: readonly { id: string; label: string }[], id: string): string {
+    return options.find((o) => o.id === id)?.label ?? id;
+}
+
 export function isDueForWatering(plant: Plant, now?: Date): boolean {
     const today = now ? new Date(now) : new Date();
     today.setHours(0, 0, 0, 0);

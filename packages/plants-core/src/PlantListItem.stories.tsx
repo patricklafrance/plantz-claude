@@ -124,3 +124,19 @@ export const NoEditButton: Story = {
         onEdit: undefined,
     },
 };
+
+export const NoDeleteButton: Story = {
+    args: {
+        plant: makePlant(),
+        onDelete: undefined,
+    },
+};
+
+export const NoSelectionNoDelete: Story = {
+    args: {
+        plant: makePlant(),
+        onToggleSelect: undefined,
+        onDelete: undefined,
+        selected: undefined,
+    },
+};

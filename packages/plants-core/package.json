@@ -8,6 +8,7 @@
     "type": "module",
     "exports": {
         ".": "./src/index.ts",
+        "./collection": "./src/collection/index.ts",
         "./db": "./src/msw/index.ts"
     },
     "scripts": {
@@ -15,6 +16,8 @@
     },
     "dependencies": {
         "@packages/components": "workspace:*",
+        "@tanstack/db": "^0.5.32",
+        "@tanstack/query-db-collection": "^1.0.29",
         "lucide-react": "^0.577.0",
         "msw": "^2.12.10",
         "zod": "^4.3.6"
@@ -28,6 +31,7 @@
         "typescript": "5.9.3"
     },
     "peerDependencies": {
+        "@tanstack/react-db": "^0.1.76",
         "@tanstack/react-query": "^5.90.21",
         "react": "^19.2.4",
         "react-dom": "^19.2.4"

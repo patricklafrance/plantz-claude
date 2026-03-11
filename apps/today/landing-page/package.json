@@ -13,11 +13,14 @@
     "dependencies": {
         "@packages/components": "workspace:*",
         "@packages/plants-core": "workspace:*",
+        "@tanstack/db": "^0.5.32",
+        "@tanstack/react-db": "^0.1.76",
         "@tanstack/react-virtual": "^3.13.21",
         "lucide-react": "^0.577.0",
         "zod": "^4.3.6"
     },
     "devDependencies": {
+        "@packages/core-squide": "workspace:*",
         "@types/react": "19.2.9",
         "@types/react-dom": "19.2.3",
         "@typescript/native-preview": "7.0.0-dev.20260303.1",

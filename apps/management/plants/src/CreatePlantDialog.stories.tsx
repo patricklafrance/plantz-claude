@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
 import { CreatePlantDialog } from "./CreatePlantDialog.tsx";
+import { moduleDecorator } from "./storybook.setup.ts";
 
 // Fixed date for deterministic Chromatic snapshots — passed as a prop so the
 // DatePicker always displays the same value regardless of when the snapshot runs.
@@ -9,6 +10,7 @@ const FIXED_FIRST_WATERING_DATE = new Date(2026, 2, 11, 0, 0, 0, 0);
 const meta = {
     title: "Management/Plants/Components/CreatePlantDialog",
     component: CreatePlantDialog,
+    decorators: [moduleDecorator],
     parameters: {
         chromatic: { viewports: [375, 768, 1280] },
     },

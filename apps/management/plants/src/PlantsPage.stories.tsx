@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import type { Plant } from "@packages/plants-core";
 
 import { PlantsPage } from "./PlantsPage.tsx";
+import { moduleDecorator } from "./storybook.setup.ts";
 
 // Extreme dates ensure isDueForWatering() returns a deterministic result
 // regardless of when the snapshot runs — no Date freeze needed.
@@ -32,6 +33,7 @@ function makePlant(overrides: Partial<Plant> & { id: string; name: string }): Pl
 const meta = {
     title: "Management/Plants/Pages/PlantsPage",
     component: PlantsPage,
+    decorators: [moduleDecorator],
     parameters: {
         chromatic: { viewports: [375, 768, 1280] },
     },

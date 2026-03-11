@@ -1,9 +1,9 @@
-import { useState, type FormEvent } from "react";
+import { useState, useMemo, type FormEvent } from "react";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button, Input, Textarea, Label, Switch, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, DatePicker } from "@packages/components";
 import { locations, luminosities, wateringFrequencies, wateringTypes } from "@packages/plants-core";
 
-import { useCreatePlant } from "./api/usePlantMutations.ts";
+import { getManagementPlantsCollection, createManagementPlantActions } from "./plantsCollection.ts";
 
 interface CreatePlantDialogProps {
     open: boolean;
@@ -31,7 +31,8 @@ export function CreatePlantDialog({ open, onOpenChange, defaultFirstWateringDate
     const [wateringType, setWateringType] = useState("surface");
     const [firstWateringDate, setFirstWateringDate] = useState<Date | undefined>(defaultFirstWateringDate ?? tomorrow());
 
-    const createPlant = useCreatePlant();
+    const collection = getManagementPlantsCollection();
+    const actions = useMemo(() => createManagementPlantActions(collection), [collection]);
 
     const isValid = name.trim() !== "" && wateringQuantity.trim() !== "" && firstWateringDate !== undefined;
 
@@ -53,27 +54,23 @@ export function CreatePlantDialog({ open, onOpenChange, defaultFirstWateringDate
         e.preventDefault();
         if (!isValid) return;
 
-        createPlant.mutate(
-            {
-                name: name.trim(),
-                description: description.trim() || undefined,
-                family: family.trim() || undefined,
-                location,
-                luminosity,
-                mistLeaves,
-                soilType: soilType.trim() || undefined,
-                wateringFrequency,
-                wateringQuantity: wateringQuantity.trim(),
-                wateringType,
-                nextWateringDate: firstWateringDate!,
-            },
-            {
-                onSuccess: () => {
-                    resetForm();
-                    onOpenChange(false);
-                },
-            },
-        );
+        actions.insertPlant({
+            name: name.trim(),
+            description: description.trim() || undefined,
+            family: family.trim() || undefined,
+            location,
+            luminosity,
+            mistLeaves,
+            soilType: soilType.trim() || undefined,
+            wateringFrequency,
+            wateringQuantity: wateringQuantity.trim(),
+            wateringType,
+            nextWateringDate: firstWateringDate!,
+        });
+
+        // Close optimistically — the UI updates instantly via TanStack DB
+        resetForm();
+        onOpenChange(false);
     }
 
     function handleOpenChange(nextOpen: boolean) {

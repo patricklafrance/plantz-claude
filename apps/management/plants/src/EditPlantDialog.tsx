@@ -1,11 +1,11 @@
 import { format } from "date-fns";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button, Input, Textarea, Label, Switch, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, DatePicker } from "@packages/components";
 import { locations, luminosities, wateringFrequencies, wateringTypes } from "@packages/plants-core";
 import type { Plant } from "@packages/plants-core";
 
-import { useUpdatePlant } from "./api/usePlantMutations.ts";
+import { getManagementPlantsCollection, createManagementPlantActions } from "./plantsCollection.ts";
 
 interface EditPlantDialogProps {
     plant: Plant | null;
@@ -29,7 +29,8 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const plantIdRef = useRef<string | null>(null);
 
-    const updatePlant = useUpdatePlant();
+    const collection = getManagementPlantsCollection();
+    const actions = useMemo(() => createManagementPlantActions(collection), [collection]);
 
     useEffect(() => {
         if (plant) {
@@ -52,28 +53,26 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
         if (!plantIdRef.current) return;
         if (!name.trim() || !wateringQuantity.trim()) return;
         const id = plantIdRef.current;
-        updatePlant.mutate(
-            {
-                id,
-                name: name.trim(),
-                description: description.trim() || undefined,
-                family: family.trim() || undefined,
-                location,
-                luminosity,
-                mistLeaves,
-                soilType: soilType.trim() || undefined,
-                wateringFrequency,
-                wateringQuantity: wateringQuantity.trim(),
-                wateringType,
-            },
-            {
-                onSuccess: () => {
-                    setSaved(true);
-                    setTimeout(() => setSaved(false), 2000);
-                },
-            },
-        );
-    }, [name, description, family, location, luminosity, mistLeaves, soilType, wateringFrequency, wateringQuantity, wateringType, updatePlant]);
+
+        const tx = actions.updatePlant({
+            id,
+            name: name.trim(),
+            description: description.trim() || undefined,
+            family: family.trim() || undefined,
+            location,
+            luminosity,
+            mistLeaves,
+            soilType: soilType.trim() || undefined,
+            wateringFrequency,
+            wateringQuantity: wateringQuantity.trim(),
+            wateringType,
+        });
+
+        tx.isPersisted.promise.then(() => {
+            setSaved(true);
+            setTimeout(() => setSaved(false), 2000);
+        });
+    }, [name, description, family, location, luminosity, mistLeaves, soilType, wateringFrequency, wateringQuantity, wateringType, actions]);
 
     useEffect(() => {
         if (!plant || !open) return;

@@ -26,7 +26,7 @@ PRs require the `run chromatic` label to trigger `chromatic.yml`. Without it, th
 3. Outputs `<storybook-package>=true|false` to `GITHUB_OUTPUT` for use in subsequent Chromatic steps.
 4. On error, falls back to marking all Storybooks as affected.
 
-**Maintenance**: When adding a new Storybook or changing domain package names, update the `StorybookDependencies` map in `getAffectedStorybooks.ts`.
+**Maintenance**: When adding a new Storybook or changing domain package names, update the `StorybookDependencies` map in `getAffectedStorybooks.ts`. Domain storybook entries must only list module package names (`@modules/*`) — never shared packages (`@packages/*`). Turborepo's `--filter=...[baseSha]` already detects transitive dependency changes, so shared package changes automatically mark their dependent modules as affected.
 
 ## Code review tool restrictions
 

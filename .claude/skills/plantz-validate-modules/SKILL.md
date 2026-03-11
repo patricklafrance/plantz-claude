@@ -91,7 +91,7 @@ Read `apps/storybook/.storybook/main.ts` and verify:
 Read `tooling/getAffectedStorybooks.ts` and verify:
 
 - The `StorybookDependencies` object has an entry for `@apps/{domain}-storybook`
-- That entry's array includes the module's package name
+- That entry's array includes the module's package name (`@modules/*` only — never shared packages like `@packages/*`, since Turborepo handles transitive dependencies automatically)
 
 ### 7. Root dev script
 

@@ -96,6 +96,8 @@ Follow the existing comment-section pattern visible in the file. The `stories` a
 
 In `tooling/getAffectedStorybooks.ts`, add `"{packageName}"` to the `StorybookDependencies` entry for the domain's storybook (`@apps/{domain}-storybook`).
 
+**Only list module package names (`@modules/*`).** Never add shared packages (`@packages/*`) — Turborepo's `--filter=...[baseSha]` already detects transitive dependency changes, so if a shared package changes, the modules that depend on it are automatically marked as affected.
+
 If no storybook entry exists for the domain, warn the user but do not create one.
 
 ### Step 7 — Add dev script

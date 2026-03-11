@@ -52,8 +52,8 @@ Without these directives, Tailwind will not generate utility classes used by tho
 ## Isolation
 
 - Stories must render without Squide runtime or React Router. If a component depends on these, extract a presentational sub-component that takes data via props and write stories for that instead.
-- MSW + TanStack Query are initialized in each domain storybook's `.storybook/preview.tsx` via an inline decorator that imports domain-specific handlers (e.g., `managementPlantHandlers` or `todayPlantHandlers`) from the module's local `mocks/` folder along with `plantsDb` and `defaultSeedPlants`, sets up a `setupWorker`, and wraps stories in a `QueryClientProvider` with `Suspense`. Per-story handler overrides are applied via `context.parameters.msw.handlers` and `worker.use()`.
-- The packages storybook (`packages/storybook/`) does not need MSW or QueryClient since it only tests presentational components.
+- MSW + TanStack DB collections are initialized per-domain via a `storybook.setup.ts` file that each story file imports. The setup uses `initializeFireflyForStorybook` (MSW worker singleton + module registration) and `withModuleDecorator` (per-story MSW reset, db reset, QueryClientProvider, Suspense) from `@packages/core-squide/storybook`. Domain storybook `preview.tsx` files are minimal (CSS import only). Per-story handler overrides are applied via `context.parameters.msw.handlers`.
+- The packages storybook (`packages/storybook/`) does not need MSW, collections, or QueryClient since it only tests presentational components.
 - Stories that need data use `parameters.msw.handlers` for per-story handler overrides. See `msw-tanstack-query.md` reference for the full pattern.
 
 ## Verification

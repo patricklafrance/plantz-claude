@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from "storybook-react-rsbuild";
 import type { Plant } from "@packages/plants-core";
 
 import { EditPlantDialog } from "./EditPlantDialog.tsx";
+import { moduleDecorator } from "./storybook.setup.ts";
 
 // Fixed dates for deterministic Chromatic snapshots.
 const FIXED_NOW = new Date(2026, 2, 10, 12, 0, 0, 0);
@@ -33,6 +34,7 @@ function makePlant(overrides: Partial<Plant> = {}): Plant {
 const meta = {
     title: "Management/Plants/Components/EditPlantDialog",
     component: EditPlantDialog,
+    decorators: [moduleDecorator],
     parameters: {
         chromatic: { viewports: [375, 768, 1280] },
         msw: {
@@ -41,7 +43,7 @@ const meta = {
                 http.put("/api/management/plants/:id", async ({ request }) => {
                     const body = (await request.json()) as Record<string, unknown>;
 
-                    return HttpResponse.json({ ...body, lastUpdateDate: new Date().toISOString() });
+                    return HttpResponse.json({ ...body, lastUpdateDate: "2025-01-15T00:00:00.000Z" });
                 }),
             ],
         },

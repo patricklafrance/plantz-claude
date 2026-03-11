@@ -1,9 +1,10 @@
-import { http, HttpResponse } from "msw";
+import { delay, http, HttpResponse } from "msw";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
 import type { Plant } from "@packages/plants-core";
 
 import { LandingPage } from "./LandingPage.tsx";
+import { moduleDecorator } from "./storybook.setup.ts";
 
 // Extreme dates ensure isDueForWatering() returns a deterministic result
 // regardless of when the snapshot runs — no Date freeze needed.
@@ -32,6 +33,7 @@ function makePlant(overrides: Partial<Plant> & { id: string; name: string }): Pl
 const meta = {
     title: "Today/LandingPage/Pages/LandingPage",
     component: LandingPage,
+    decorators: [moduleDecorator],
     parameters: {
         chromatic: { viewports: [375, 768, 1280] },
     },
@@ -61,7 +63,7 @@ export const Default: Story = {
 };
 
 // All plants have future watering dates -- none are due
-export const NoPlantsdue: Story = {
+export const NoPlantsDue: Story = {
     parameters: {
         msw: {
             handlers: [
@@ -107,6 +109,28 @@ export const SinglePlant: Story = {
                         }),
                     ]),
                 ),
+            ],
+        },
+    },
+};
+
+export const Empty: Story = {
+    parameters: {
+        msw: {
+            handlers: [http.get("/api/today/plants", () => HttpResponse.json([]))],
+        },
+    },
+};
+
+export const Loading: Story = {
+    parameters: {
+        msw: {
+            handlers: [
+                http.get("/api/today/plants", async () => {
+                    await delay("infinite");
+
+                    return HttpResponse.json([]);
+                }),
             ],
         },
     },

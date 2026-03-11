@@ -1,4 +1,7 @@
-import type { FireflyRuntime, ModuleRegisterFunction } from "@squide/firefly";
+import type { FireflyRuntime } from "@squide/firefly";
+import type { QueryClient } from "@tanstack/react-query";
+
+import { initTodayPlantsCollection } from "./plantsCollection.ts";
 
 function registerRoutes(runtime: FireflyRuntime) {
     const lazy = async () => {
@@ -26,11 +29,12 @@ function registerRoutes(runtime: FireflyRuntime) {
     });
 }
 
-export const registerTodayLandingPage: ModuleRegisterFunction<FireflyRuntime> = async (runtime) => {
+export async function registerTodayLandingPage(runtime: FireflyRuntime, queryClient: QueryClient) {
+    initTodayPlantsCollection(queryClient);
     registerRoutes(runtime);
 
     if (runtime.isMswEnabled) {
         const { todayPlantHandlers } = await import("./mocks/index.ts");
         runtime.registerRequestHandlers(todayPlantHandlers);
     }
-};
+}

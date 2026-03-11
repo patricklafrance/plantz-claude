@@ -3,8 +3,8 @@ import { appendFileSync } from "node:fs";
 
 const StorybookDependencies = {
     "@apps/packages-storybook": ["@packages/components", "@packages/plants-core"],
-    "@apps/management-storybook": ["@modules/management-plants", "@packages/plants-core"],
-    "@apps/today-storybook": ["@modules/today-landing-page", "@packages/plants-core"],
+    "@apps/management-storybook": ["@modules/management-plants"],
+    "@apps/today-storybook": ["@modules/today-landing-page"],
 } as const;
 
 interface TurborepoAffectedItem {

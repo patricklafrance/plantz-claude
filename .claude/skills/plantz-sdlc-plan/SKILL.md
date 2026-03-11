@@ -12,18 +12,28 @@ Draft the technical approach for a feature and output it to a plan file.
 
 ## Inputs (provided by orchestrator)
 
-| Input               | Description               |
-| ------------------- | ------------------------- |
-| `run-uuid`          | Run folder identifier     |
-| Feature description | What the user wants built |
+| Input               | Description                                                                                                         |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `run-uuid`          | Run folder identifier                                                                                               |
+| Feature description | What the user wants built                                                                                           |
+| Escalation path     | `null` on first plan. On revision: path to `escalation-[iteration].md` — explains what the previous plan got wrong. |
+| Existing plan path  | `null` on first plan. On revision: path to the current `plan.md` to revise.                                         |
+
+## Mode
+
+This skill runs in one of two modes, determined by the inputs:
+
+- **Draft mode** (escalation path is `null`): Create a plan from scratch based on the feature description.
+- **Revision mode** (escalation path provided): Revise the existing plan to address the structural issue described in the escalation file.
 
 ## Procedure
 
 1. Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, `agent-docs/odr/index.md`, and all files in this skill's `references/` directory.
 2. Load the `accessibility`, `shadcn`, `frontend-design`, `workleap-react-best-practices`, and `workleap-squide` skills for design guidance.
-3. Analyze the feature requirements and determine which packages/modules are affected.
+3. **Draft mode:** Analyze the feature requirements and determine which packages/modules are affected.
+   **Revision mode:** Read the existing plan and the escalation file. Understand what was attempted, what failed structurally, and the proposed alternative. Focus the revision on the structural issue — don't rewrite sections that aren't affected.
 4. If a new module or storybook needs to be scaffolded, note it in the plan. Do NOT scaffold during planning — that happens during the coding phase.
-5. Draft the plan following the **plan output format** below.
+5. Draft (or revise) the plan following the **plan output format** below.
 6. Write the plan to `./tmp/runs/[run-uuid]/plan.md`.
 
 ## Plan Output Format
@@ -80,4 +90,6 @@ and gotchas to watch for]
 
 ## Subagent Pattern
 
-Subagent A drafts the plan and writes `plan.md`. Subagent B reads the plan, challenges it — checking for missing affected packages, unrealistic scope, incorrect patterns, missing stories, or accessibility gaps — and edits `plan.md` directly to improve it. B does not append concerns; it rewrites sections that need improvement.
+In **draft mode**, Subagent A drafts the plan from scratch and writes `plan.md`. In **revision mode**, A reads the existing plan and the escalation file, then revises `plan.md` to address the structural issue — keeping sections that aren't affected.
+
+Subagent B reads the plan, challenges it — checking for missing affected packages, unrealistic scope, incorrect patterns, missing stories, or accessibility gaps — and edits `plan.md` directly to improve it. B does not append concerns; it rewrites sections that need improvement.

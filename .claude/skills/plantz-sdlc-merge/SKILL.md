@@ -40,6 +40,11 @@ Prefer `git add -A` to stage all changes — `.gitignore` already excludes `tmp/
 
 ```bash
 git push -u origin {branch-name}
+
+# Check if a PR already exists for this branch
+gh pr list --head {branch-name} --json number --jq '.[0].number'
+# If a PR exists, skip creation and proceed to Step 3.
+# If no PR exists, create one:
 gh pr create --title "{type}: {description}" --body "$(cat <<'EOF'
 ## Summary
 [2-5 bullet points summarizing the feature, derived from changes-*.md files]

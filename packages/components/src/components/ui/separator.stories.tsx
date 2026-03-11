@@ -17,7 +17,7 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Horizontal = {
+export const Horizontal: Story = {
     args: { orientation: "horizontal" },
     decorators: [
         (Story) => (
@@ -26,9 +26,9 @@ export const Horizontal = {
             </div>
         ),
     ],
-} satisfies Story;
+};
 
-export const Vertical = {
+export const Vertical: Story = {
     args: { orientation: "vertical" },
     decorators: [
         (Story) => (
@@ -37,7 +37,7 @@ export const Vertical = {
             </div>
         ),
     ],
-} satisfies Story;
+};
 
 export const AllVariants: Story = {
     render: () => (

@@ -101,11 +101,21 @@ Pass: `run-uuid`, `iteration=1`.
 - If `./tmp/runs/[run-uuid]/test-issues-[iteration].md` is produced with issues:
     - Increment the iteration number. Update `orchestrator-state.md` with the new iteration and sub-phase (`code`).
     - Spawn new `plantz-sdlc-code` subagents. Pass: `run-uuid`, the new `iteration`, plan path, the previous iteration's issues file path, and the previous iteration's changes file path. They produce `changes-[iteration].md`.
+    - **Escalation check:** After the code subagent returns, check for `./tmp/runs/[run-uuid]/escalation-[iteration].md`. If present, read it and route to plan revision (see below).
+    - **Health check (iteration 3+):** Compare `changes-[iteration].md` to the previous iteration. If the current iteration modified more files than the previous, and the same files appear in both iterations' test issues, the fix cycle is expanding rather than converging — follow the failure handling procedure instead of attempting another iteration.
     - Update `orchestrator-state.md` sub-phase to `test`.
     - Spawn new `plantz-sdlc-test` subagents. Pass: `run-uuid`, the new `iteration`.
     - Repeat until no issues or max iterations reached.
 - **Maximum 3 iterations.** If issues persist after 3 test-fix cycles, stop the run and follow the failure handling procedure (write `failure-summary.md` with the unresolved issues, set status to failed).
 - If no issues file is produced (or it's empty), proceed.
+
+#### Plan revision (triggered by escalation)
+
+When an `escalation-[iteration].md` file is found:
+
+1. Spawn new `plantz-sdlc-plan` subagents (following the subagent protocol) with: the original feature description, the current `plan.md` path, and the escalation file path. They revise `plan.md` to address the structural issue identified in the escalation.
+2. Reset iteration to 1, update `orchestrator-state.md` with `Plan revised: yes`, and restart from Step 4 (Code) with the revised plan.
+3. **Maximum 1 plan revision per run.** If a second escalation occurs after revision, follow the failure handling procedure.
 
 ### Step 7 — Document
 
@@ -139,6 +149,7 @@ After completing each step, write the current state to `./tmp/runs/[run-uuid]/or
 - Current step: [step number]
 - Iteration: [current iteration number]
 - Sub-phase: [code/test/none] (within step 6 only)
+- Plan revised: [yes/no]
 - Status: [completed/in-progress/failed]
 ```
 

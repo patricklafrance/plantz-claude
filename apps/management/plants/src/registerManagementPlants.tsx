@@ -18,6 +18,7 @@ function registerRoutes(runtime: FireflyRuntime) {
     runtime.registerNavigationItem({
         $id: "management-plants",
         $label: "Plants",
+        $priority: 90,
         to: "/management/plants",
     });
 }

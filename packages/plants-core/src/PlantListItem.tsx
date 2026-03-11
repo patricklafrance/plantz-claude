@@ -5,32 +5,43 @@ import { Button, Checkbox } from "@packages/components";
 
 import { locations, wateringTypes } from "./constants.ts";
 import type { Plant } from "./plantSchema.ts";
-import { isDueForWatering } from "./plantUtils.ts";
+import { getOptionLabel, isDueForWatering } from "./plantUtils.ts";
 
 interface PlantListItemProps {
     plant: Plant;
-    selected: boolean;
-    onToggleSelect: (id: string) => void;
+    selected?: boolean | undefined;
+    onToggleSelect?: ((id: string) => void) | undefined;
     onEdit?: ((plant: Plant) => void) | undefined;
-    onDelete: (plant: Plant) => void;
+    onDelete?: ((plant: Plant) => void) | undefined;
 }
 
-function getLabel(options: readonly { id: string; label: string }[], id: string): string {
-    return options.find((o) => o.id === id)?.label ?? id;
-}
-
-export const PlantListItem = memo(function PlantListItem({ plant, selected, onToggleSelect, onEdit, onDelete }: PlantListItemProps) {
+export const PlantListItem = memo(function PlantListItem({ plant, selected = false, onToggleSelect, onEdit, onDelete }: PlantListItemProps) {
     const due = isDueForWatering(plant);
 
-    const handleToggleSelect = useCallback(() => onToggleSelect(plant.id), [onToggleSelect, plant.id]);
+    const handleToggleSelect = useCallback(() => onToggleSelect?.(plant.id), [onToggleSelect, plant.id]);
     const handleEdit = useCallback(() => onEdit?.(plant), [onEdit, plant]);
-    const handleDelete = useCallback(() => onDelete(plant), [onDelete, plant]);
+    const handleDelete = useCallback(() => onDelete?.(plant), [onDelete, plant]);
 
     return (
-        <div className={`border-border flex items-center gap-3 border-b px-4 py-2.5 transition-colors ${due ? "bg-destructive/5" : "hover:bg-muted/50"}`}>
-            <Checkbox checked={selected} onCheckedChange={handleToggleSelect} aria-label={`Select ${plant.name}`} />
-            <div className="flex min-w-0 flex-1 items-center gap-4">
-                <div className="flex min-w-0 flex-1 flex-col">
+        <div className={`border-border flex h-full items-center gap-3 border-b px-4 py-2.5 transition-colors ${due ? "bg-destructive/5" : "hover:bg-muted/50"}`}>
+            {onToggleSelect && <Checkbox checked={selected} onCheckedChange={handleToggleSelect} aria-label={`Select ${plant.name}`} />}
+            <div
+                className={`flex min-w-0 flex-1 items-center gap-4 ${onEdit ? "cursor-pointer" : ""}`}
+                role={onEdit ? "button" : undefined}
+                tabIndex={onEdit ? 0 : undefined}
+                onClick={onEdit ? handleEdit : undefined}
+                onKeyDown={
+                    onEdit
+                        ? (e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  handleEdit();
+                              }
+                          }
+                        : undefined
+                }
+            >
+                <div className="flex min-w-0 flex-1 flex-col md:flex-row md:items-center md:gap-4">
                     <div className="flex items-center gap-2">
                         <span className="truncate text-sm font-medium">{plant.name}</span>
                         {due && (
@@ -40,8 +51,8 @@ export const PlantListItem = memo(function PlantListItem({ plant, selected, onTo
                             </>
                         )}
                     </div>
-                    <span className="text-muted-foreground truncate text-xs">
-                        {plant.wateringQuantity} · {getLabel(wateringTypes, plant.wateringType)} · {getLabel(locations, plant.location)}
+                    <span className="text-muted-foreground truncate text-xs whitespace-nowrap">
+                        {plant.wateringQuantity} · {getOptionLabel(wateringTypes, plant.wateringType)} · {getOptionLabel(locations, plant.location)}
                     </span>
                 </div>
             </div>
@@ -51,9 +62,11 @@ export const PlantListItem = memo(function PlantListItem({ plant, selected, onTo
                         <Pencil />
                     </Button>
                 )}
-                <Button variant="ghost" size="icon-xs" onClick={handleDelete} aria-label={`Delete ${plant.name}`}>
-                    <Trash2 />
-                </Button>
+                {onDelete && (
+                    <Button variant="ghost" size="icon-xs" onClick={handleDelete} aria-label={`Delete ${plant.name}`}>
+                        <Trash2 />
+                    </Button>
+                )}
             </div>
         </div>
     );

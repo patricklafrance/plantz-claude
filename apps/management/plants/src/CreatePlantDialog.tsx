@@ -226,6 +226,9 @@ export function CreatePlantDialog({ open, onOpenChange, defaultFirstWateringDate
                         <DatePicker value={firstWateringDate} onChange={setFirstWateringDate} placeholder="Pick a date" aria-label="First watering date" />
                     </div>
                     <DialogFooter>
+                        <Button variant="outline" type="button" onClick={() => handleOpenChange(false)}>
+                            Cancel
+                        </Button>
                         <Button type="submit" disabled={!isValid}>
                             Create plant
                         </Button>

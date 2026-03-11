@@ -25,6 +25,7 @@ function registerRoutes(runtime: FireflyRuntime) {
     runtime.registerNavigationItem({
         $id: "today-landing-page",
         $label: "Today",
+        $priority: 100,
         to: "/today",
     });
 }

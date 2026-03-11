@@ -23,7 +23,7 @@ The two subagents exist to produce better output through collaboration. The real
 
 ## Port Cleanup Between Subagents
 
-Code subagents may start dev servers (port `8080`) or Storybooks (port `6006`) to verify their work in a browser. They may not clean up properly — especially if they crash or hit context limits. **After every code or test subagent returns**, run the port-cleanup procedure before spawning the next subagent:
+Code and test subagents may start dev servers (port `8080`) or Storybooks (port `6006`) for browser verification. They may not clean up properly — especially if they crash or hit context limits. **After every code or test subagent returns**, run the port-cleanup procedure before spawning the next subagent:
 
 ```bash
 # Linux:
@@ -119,7 +119,7 @@ Pass: `run-uuid`, the final iteration number.
 ### Step 8 — Merge
 
 Spawn **one** subagent using the `plantz-sdlc-merge` skill. This step uses a single subagent only — concurrent git operations would conflict.
-Pass: `run-uuid`, the branch name from step 2, the commit type from step 2.
+Pass: `run-uuid`, the branch name from step 2, the commit type from step 2, the plan path (`./tmp/runs/[run-uuid]/plan.md`).
 
 The merge subagent may return control in these cases:
 

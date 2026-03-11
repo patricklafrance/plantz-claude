@@ -38,7 +38,7 @@ const meta = {
         msw: {
             handlers: [
                 // Provide a handler for the debounced auto-save so it doesn't produce network errors
-                http.put("/api/plants/:id", async ({ request }) => {
+                http.put("/api/management/plants/:id", async ({ request }) => {
                     const body = (await request.json()) as Record<string, unknown>;
 
                     return HttpResponse.json({ ...body, lastUpdateDate: new Date().toISOString() });

@@ -20,6 +20,15 @@ Domain storybook: `@apps/today-storybook` (`apps/today/storybook/`).
 
 Story globs in `.storybook/main.ts` must include every module in this domain. When adding a module, add its glob: `../../{module}/src/**/*.stories.tsx` (where `{module}` is the directory name under `apps/today/`, e.g., `landing-page`).
 
+## Data Layer
+
+Modules in this domain own their API surface under `/api/today/`. Each module has:
+
+- `src/api/` — `fetch()` wrappers, TanStack Query hooks, query key factory (prefixed `today`)
+- `src/mocks/` — MSW handlers scoped to `/api/today/<entity>`
+
+See `msw-tanstack-query.md` in `.claude/skills/plantz-sdlc-*/references/` for implementation patterns.
+
 ## Adding a Module
 
 Use `/scaffold-domain-module` with `domain=today`. The skill handles host registration, storybook wiring, and affected-detection updates.

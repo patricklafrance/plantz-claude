@@ -1,8 +1,8 @@
 import type { Plant } from "./plantSchema.ts";
 import type { PlantFilters } from "./usePlantFilters.ts";
 
-export function isDueForWatering(plant: Plant): boolean {
-    const today = new Date();
+export function isDueForWatering(plant: Plant, now?: Date): boolean {
+    const today = now ? new Date(now) : new Date();
     today.setHours(0, 0, 0, 0);
     const next = new Date(plant.nextWateringDate);
     next.setHours(0, 0, 0, 0);

@@ -20,6 +20,15 @@ Domain storybook: `@apps/management-storybook` (`apps/management/storybook/`).
 
 Story globs in `.storybook/main.ts` must include every module in this domain. When adding a module, add its glob: `../../{module}/src/**/*.stories.tsx` (where `{module}` is the directory name under `apps/management/`, e.g., `plants`).
 
+## Data Layer
+
+Modules in this domain own their API surface under `/api/management/`. Each module has:
+
+- `src/api/` — `fetch()` wrappers, TanStack Query hooks, query key factory (prefixed `management`)
+- `src/mocks/` — MSW handlers scoped to `/api/management/<entity>`
+
+See `msw-tanstack-query.md` in `.claude/skills/plantz-sdlc-*/references/` for implementation patterns.
+
 ## Adding a Module
 
 Use `/scaffold-domain-module` with `domain=management`. The skill handles host registration, storybook wiring, and affected-detection updates.

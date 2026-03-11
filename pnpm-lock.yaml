@@ -161,8 +161,8 @@ importers:
         specifier: 2.12.10
         version: 2.12.10(@types/node@25.3.3)(typescript@5.9.3)
       storybook-react-rsbuild:
-        specifier: 3.2.3
-        version: 3.2.3(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
+        specifier: 3.3.1
+        version: 3.3.1(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -197,8 +197,8 @@ importers:
         specifier: 10.2.15
         version: 10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       storybook-react-rsbuild:
-        specifier: 3.2.3
-        version: 3.2.3(@rsbuild/core@1.7.2)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
+        specifier: 3.3.1
+        version: 3.3.1(@rsbuild/core@1.7.2)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
     devDependencies:
       '@rsbuild/core':
         specifier: 1.7.2
@@ -258,8 +258,8 @@ importers:
         specifier: 10.2.15
         version: 10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       storybook-react-rsbuild:
-        specifier: 3.2.3
-        version: 3.2.3(@rsbuild/core@1.7.2)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
+        specifier: 3.3.1
+        version: 3.3.1(@rsbuild/core@1.7.2)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
     devDependencies:
       '@rsbuild/core':
         specifier: 1.7.2
@@ -338,8 +338,8 @@ importers:
         specifier: 2.12.10
         version: 2.12.10(@types/node@25.3.3)(typescript@5.9.3)
       storybook-react-rsbuild:
-        specifier: 3.2.3
-        version: 3.2.3(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
+        specifier: 3.3.1
+        version: 3.3.1(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -374,8 +374,8 @@ importers:
         specifier: 10.2.15
         version: 10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       storybook-react-rsbuild:
-        specifier: 3.2.3
-        version: 3.2.3(@rsbuild/core@1.7.2)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
+        specifier: 3.3.1
+        version: 3.3.1(@rsbuild/core@1.7.2)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
     devDependencies:
       '@rsbuild/core':
         specifier: 1.7.2
@@ -460,8 +460,8 @@ importers:
         specifier: 3.0.7
         version: 3.0.7(typescript@5.9.3)
       storybook-react-rsbuild:
-        specifier: 3.2.3
-        version: 3.2.3(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
+        specifier: 3.3.1
+        version: 3.3.1(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
       tailwindcss:
         specifier: 4.2.1
         version: 4.2.1
@@ -506,8 +506,8 @@ importers:
         specifier: 3.0.7
         version: 3.0.7(typescript@5.9.3)
       storybook-react-rsbuild:
-        specifier: 3.2.3
-        version: 3.2.3(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
+        specifier: 3.3.1
+        version: 3.3.1(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
       typescript:
         specifier: 5.9.3
         version: 5.9.3
@@ -542,8 +542,8 @@ importers:
         specifier: 10.2.15
         version: 10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       storybook-react-rsbuild:
-        specifier: 3.2.3
-        version: 3.2.3(@rsbuild/core@1.7.2)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
+        specifier: 3.3.1
+        version: 3.3.1(@rsbuild/core@1.7.2)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4)
     devDependencies:
       '@rsbuild/core':
         specifier: 1.7.2
@@ -3963,10 +3963,10 @@ packages:
     resolution: {integrity: sha512-DvEy55V3DB7uknRo+4iOGT5fP1slR8wQohVdknigZPMpMstaKJQWhwiYBACJE3Ul2pTnATihhBYnRhZQHGBiRw==}
     engines: {node: '>= 0.8'}
 
-  storybook-builder-rsbuild@3.2.3:
-    resolution: {integrity: sha512-2jT3fMwo5eNos7gizzHM21ca2xJXcpnOe/WQagpo2dihXebDaPqRvRpxs1Wy7GMotEbC3Cnld5tpuQotmQjLBw==}
+  storybook-builder-rsbuild@3.3.1:
+    resolution: {integrity: sha512-tTvfIJQ0pyB1JoeefPhFPA2U7QtnLWln6HYqTEr3aIyr/tS+GgiSAr7Si4iekB64GuTYOIl2HDO5+AD3axb1Pw==}
     peerDependencies:
-      '@rsbuild/core': ^1.5.0
+      '@rsbuild/core': ^1.5.0 || ^2.0.0-0
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       storybook: ^10.1.0
@@ -3979,11 +3979,11 @@ packages:
       typescript:
         optional: true
 
-  storybook-react-rsbuild@3.2.3:
-    resolution: {integrity: sha512-9kXl1pLCI5xBtDN/sP3bvosLjZDJLm7z6+/QmzUJBOfuFyoQSmXirwgdYIrQvjSw/4iK5ziGkkWoST2tgBNzMg==}
+  storybook-react-rsbuild@3.3.1:
+    resolution: {integrity: sha512-pqPepHbB815cGri3srQcGNZYQnl5YoL6NIdD4Y/P8KrBmTj1J82rszWboyK3ThBMWjvd3Wkr3cv4Uu/ICUFQOw==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
-      '@rsbuild/core': ^1.5.0
+      '@rsbuild/core': ^1.5.0 || ^2.0.0-0
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       storybook: ^10.1.0
@@ -7843,7 +7843,7 @@ snapshots:
 
   statuses@2.0.2: {}
 
-  storybook-builder-rsbuild@3.2.3(@rsbuild/core@1.7.2)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3):
+  storybook-builder-rsbuild@3.3.1(@rsbuild/core@1.7.2)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3):
     dependencies:
       '@rsbuild/core': 1.7.2
       '@rsbuild/plugin-type-check': 1.3.4(@rsbuild/core@1.7.2)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(tslib@2.8.1)(typescript@5.9.3)
@@ -7875,7 +7875,7 @@ snapshots:
       - tslib
       - vite
 
-  storybook-builder-rsbuild@3.2.3(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3):
+  storybook-builder-rsbuild@3.3.1(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3):
     dependencies:
       '@rsbuild/core': 1.7.3
       '@rsbuild/plugin-type-check': 1.3.4(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(tslib@2.8.1)(typescript@5.9.3)
@@ -7907,7 +7907,7 @@ snapshots:
       - tslib
       - vite
 
-  storybook-builder-rsbuild@3.2.3(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3):
+  storybook-builder-rsbuild@3.3.1(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3):
     dependencies:
       '@rsbuild/core': 1.7.3
       '@rsbuild/plugin-type-check': 1.3.4(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(tslib@2.8.1)(typescript@5.9.3)
@@ -7939,7 +7939,7 @@ snapshots:
       - tslib
       - vite
 
-  storybook-react-rsbuild@3.2.3(@rsbuild/core@1.7.2)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4):
+  storybook-react-rsbuild@3.3.1(@rsbuild/core@1.7.2)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4):
     dependencies:
       '@rollup/pluginutils': 5.3.0
       '@rsbuild/core': 1.7.2
@@ -7953,7 +7953,7 @@ snapshots:
       react-dom: 19.2.4(react@19.2.4)
       resolve: 1.22.11
       storybook: 10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      storybook-builder-rsbuild: 3.2.3(@rsbuild/core@1.7.2)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)
+      storybook-builder-rsbuild: 3.3.1(@rsbuild/core@1.7.2)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)
       tsconfig-paths: 4.2.0
     optionalDependencies:
       typescript: 5.9.3
@@ -7966,7 +7966,7 @@ snapshots:
       - vite
       - webpack
 
-  storybook-react-rsbuild@3.2.3(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4):
+  storybook-react-rsbuild@3.3.1(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4):
     dependencies:
       '@rollup/pluginutils': 5.3.0
       '@rsbuild/core': 1.7.3
@@ -7980,7 +7980,7 @@ snapshots:
       react-dom: 19.2.4(react@19.2.4)
       resolve: 1.22.11
       storybook: 10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      storybook-builder-rsbuild: 3.2.3(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)
+      storybook-builder-rsbuild: 3.3.1(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(msw@2.12.10(@types/node@25.3.3)(typescript@5.9.3))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)
       tsconfig-paths: 4.2.0
     optionalDependencies:
       typescript: 5.9.3
@@ -7993,7 +7993,7 @@ snapshots:
       - vite
       - webpack
 
-  storybook-react-rsbuild@3.2.3(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4):
+  storybook-react-rsbuild@3.3.1(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)(webpack@5.105.4):
     dependencies:
       '@rollup/pluginutils': 5.3.0
       '@rsbuild/core': 1.7.3
@@ -8007,7 +8007,7 @@ snapshots:
       react-dom: 19.2.4(react@19.2.4)
       resolve: 1.22.11
       storybook: 10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      storybook-builder-rsbuild: 3.2.3(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)
+      storybook-builder-rsbuild: 3.3.1(@rsbuild/core@1.7.3)(@rspack/core@1.7.7(@swc/helpers@0.5.19))(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(storybook@10.2.15(@testing-library/dom@10.4.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(tslib@2.8.1)(typescript@5.9.3)
       tsconfig-paths: 4.2.0
     optionalDependencies:
       typescript: 5.9.3

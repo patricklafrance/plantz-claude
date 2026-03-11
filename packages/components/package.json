@@ -33,7 +33,7 @@
         "@typescript/native-preview": "7.0.0-dev.20260303.1",
         "@workleap/rslib-configs": "1.1.8",
         "@workleap/typescript-configs": "3.0.7",
-        "storybook-react-rsbuild": "3.2.3",
+        "storybook-react-rsbuild": "3.3.1",
         "tailwindcss": "4.2.1",
         "typescript": "5.9.3"
     },

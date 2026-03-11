@@ -37,12 +37,24 @@ Every story is automatically snapshotted by Chromatic — stories ARE the visual
 - Stories must render their meaningful visual state **without user interaction**. If a component requires a click to show content (e.g., a dialog), pass `open: true` in args so Chromatic captures the open state.
 - Avoid animations or timers that could produce flaky snapshots.
 - **Viewport parameters:** All domain story files (pages, components, dialogs) must set `parameters: { chromatic: { viewports: [375, 768, 1280] } }` in `meta` so Chromatic captures mobile, tablet, and desktop snapshots. This does not apply to `packages/components/` primitive stories.
-- **Date-dependent stories must freeze `Date`.** If a story renders components that call `new Date()`, `Date.now()`, or date-comparison functions like `isDueForWatering()`, freeze the Date constructor in a decorator so snapshots are identical across runs. Import `freezeDate(fixedNow)` and `restoreDate()` from `@packages/plants-core/msw` — call `freezeDate` synchronously via `useRef` (so the initial render sees the fixed date), and call `restoreDate` in a cleanup effect. See `packages/plants-core/src/PlantListItem.stories.tsx` for usage.
+- **Date-dependent stories must use deterministic data.** Never monkey-patch `globalThis.Date`. Instead, use extreme dates in story data so that date-comparison functions like `isDueForWatering()` return the same result regardless of when the snapshot runs: use far-past dates (e.g., `new Date(2020, 0, 1)`) for "due" plants and far-future dates (e.g., `new Date(2099, 0, 1)`) for "not due" plants. For components that display the current date (e.g., `CreatePlantDialog`), accept an optional prop to inject a fixed date and pass it from stories. See `packages/plants-core/src/PlantListItem.stories.tsx` for usage.
+
+## Tailwind CSS Source Scanning
+
+Each domain storybook's `.storybook/storybook.css` must include `@source` directives for every package whose components appear in that storybook's stories. At minimum, domain storybooks need:
+
+- `@source` for `packages/components/src/**/*.{ts,tsx}` (shared UI primitives)
+- `@source` for `packages/plants-core/src/**/*.{ts,tsx}` (shared domain components)
+- `@source` for each domain module's `src/**/*.{ts,tsx}`
+
+Without these directives, Tailwind will not generate utility classes used by those packages, causing unstyled components in Storybook and Chromatic snapshots.
 
 ## Isolation
 
 - Stories must render without Squide runtime or React Router. If a component depends on these, extract a presentational sub-component that takes data via props and write stories for that instead.
-- MSW + TanStack Query are initialized in each storybook preview. Stories that need data use `parameters.msw.handlers` for per-story handler overrides. See `tanstack-db.md` reference for the full pattern.
+- MSW + TanStack Query are initialized in each domain storybook's `.storybook/preview.tsx` via an inline decorator that imports domain-specific handlers (e.g., `managementPlantHandlers` or `todayPlantHandlers`) from the module's local `mocks/` folder along with `plantsDb` and `defaultSeedPlants`, sets up a `setupWorker`, and wraps stories in a `QueryClientProvider` with `Suspense`. Per-story handler overrides are applied via `context.parameters.msw.handlers` and `worker.use()`.
+- The packages storybook (`packages/storybook/`) does not need MSW or QueryClient since it only tests presentational components.
+- Stories that need data use `parameters.msw.handlers` for per-story handler overrides. See `msw-tanstack-query.md` reference for the full pattern.
 
 ## Verification
 

@@ -1,16 +1,16 @@
 import { http, HttpResponse } from "msw";
 
-import type { Plant } from "../plantSchema.ts";
-import { plantsDb } from "./db.ts";
+import type { Plant } from "@packages/plants-core";
+import { plantsDb } from "@packages/plants-core/db";
 
-export const plantHandlers = [
-    http.get("/api/plants", () => {
+export const managementPlantHandlers = [
+    http.get("/api/management/plants", () => {
         const plants = plantsDb.getAll();
 
         return HttpResponse.json(plants);
     }),
 
-    http.get("/api/plants/:id", ({ params }) => {
+    http.get("/api/management/plants/:id", ({ params }) => {
         const { id } = params;
         const plant = plantsDb.get(id as string);
 
@@ -21,7 +21,7 @@ export const plantHandlers = [
         return HttpResponse.json(plant);
     }),
 
-    http.post("/api/plants", async ({ request }) => {
+    http.post("/api/management/plants", async ({ request }) => {
         const body = (await request.json()) as Record<string, unknown>;
         const now = new Date();
 
@@ -37,7 +37,7 @@ export const plantHandlers = [
         return HttpResponse.json(plant, { status: 201 });
     }),
 
-    http.put("/api/plants/:id", async ({ params, request }) => {
+    http.put("/api/management/plants/:id", async ({ params, request }) => {
         const { id } = params;
         const body = (await request.json()) as Record<string, unknown>;
         const plant = plantsDb.update(id as string, body as Partial<Plant>);
@@ -49,7 +49,7 @@ export const plantHandlers = [
         return HttpResponse.json(plant);
     }),
 
-    http.delete("/api/plants/:id", ({ params }) => {
+    http.delete("/api/management/plants/:id", ({ params }) => {
         const { id } = params;
         const deleted = plantsDb.delete(id as string);
 
@@ -60,7 +60,7 @@ export const plantHandlers = [
         return new HttpResponse(null, { status: 204 });
     }),
 
-    http.delete("/api/plants", async ({ request }) => {
+    http.delete("/api/management/plants", async ({ request }) => {
         const body = (await request.json()) as { ids: string[] };
         plantsDb.deleteMany(body.ids);
 

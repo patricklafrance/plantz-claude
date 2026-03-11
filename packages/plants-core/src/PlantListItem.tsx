@@ -29,18 +29,22 @@ export const PlantListItem = memo(function PlantListItem({ plant, selected, onTo
     return (
         <div className={`border-border flex items-center gap-3 border-b px-4 py-2.5 transition-colors ${due ? "bg-destructive/5" : "hover:bg-muted/50"}`}>
             <Checkbox checked={selected} onCheckedChange={handleToggleSelect} aria-label={`Select ${plant.name}`} />
-            <span className="min-w-0 flex-1 truncate text-sm font-medium">{plant.name}</span>
-            {due ? (
-                <span className="flex shrink-0 items-center gap-1">
-                    <Droplets className="text-destructive size-3.5" aria-hidden="true" />
-                    <span className="sr-only">Due for watering</span>
-                </span>
-            ) : (
-                <span className="size-3.5 shrink-0" />
-            )}
-            <span className="text-muted-foreground w-24 shrink-0 truncate text-xs">{plant.wateringQuantity}</span>
-            <span className="text-muted-foreground w-20 shrink-0 truncate text-xs">{getLabel(wateringTypes, plant.wateringType)}</span>
-            <span className="text-muted-foreground w-24 shrink-0 truncate text-xs">{getLabel(locations, plant.location)}</span>
+            <div className="flex min-w-0 flex-1 items-center gap-4">
+                <div className="flex min-w-0 flex-1 flex-col">
+                    <div className="flex items-center gap-2">
+                        <span className="truncate text-sm font-medium">{plant.name}</span>
+                        {due && (
+                            <>
+                                <Droplets className="text-destructive size-3.5 shrink-0" aria-hidden="true" />
+                                <span className="sr-only">Due for watering</span>
+                            </>
+                        )}
+                    </div>
+                    <span className="text-muted-foreground truncate text-xs">
+                        {plant.wateringQuantity} · {getLabel(wateringTypes, plant.wateringType)} · {getLabel(locations, plant.location)}
+                    </span>
+                </div>
+            </div>
             <div className="flex shrink-0 items-center gap-1">
                 {onEdit && (
                     <Button variant="ghost" size="icon-xs" onClick={handleEdit} aria-label={`Edit ${plant.name}`}>

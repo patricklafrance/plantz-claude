@@ -1,11 +1,14 @@
 import { useState, type FormEvent } from "react";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button, Input, Textarea, Label, Switch, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, DatePicker } from "@packages/components";
-import { locations, luminosities, wateringFrequencies, wateringTypes, useCreatePlant } from "@packages/plants-core";
+import { locations, luminosities, wateringFrequencies, wateringTypes } from "@packages/plants-core";
+
+import { useCreatePlant } from "./api/usePlantMutations.ts";
 
 interface CreatePlantDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    defaultFirstWateringDate?: Date;
 }
 
 function tomorrow() {
@@ -15,7 +18,7 @@ function tomorrow() {
     return d;
 }
 
-export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps) {
+export function CreatePlantDialog({ open, onOpenChange, defaultFirstWateringDate }: CreatePlantDialogProps) {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [family, setFamily] = useState("");
@@ -26,7 +29,7 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
     const [wateringFrequency, setWateringFrequency] = useState("1-week");
     const [wateringQuantity, setWateringQuantity] = useState("");
     const [wateringType, setWateringType] = useState("surface");
-    const [firstWateringDate, setFirstWateringDate] = useState<Date | undefined>(tomorrow());
+    const [firstWateringDate, setFirstWateringDate] = useState<Date | undefined>(defaultFirstWateringDate ?? tomorrow());
 
     const createPlant = useCreatePlant();
 
@@ -43,7 +46,7 @@ export function CreatePlantDialog({ open, onOpenChange }: CreatePlantDialogProps
         setWateringFrequency("1-week");
         setWateringQuantity("");
         setWateringType("surface");
-        setFirstWateringDate(tomorrow());
+        setFirstWateringDate(defaultFirstWateringDate ?? tomorrow());
     }
 
     function handleSubmit(e: FormEvent) {

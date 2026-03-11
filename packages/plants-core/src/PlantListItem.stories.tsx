@@ -1,15 +1,13 @@
-import { useEffect, useRef } from "react";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
-import { freezeDate, restoreDate } from "./msw/freezeDate.ts";
 import { PlantListItem } from "./PlantListItem.tsx";
 import type { Plant } from "./plantSchema.ts";
 
-// Fixed dates for deterministic Chromatic snapshots.
-// The Date freeze decorator is required because isDueForWatering() calls new Date() internally.
-const FIXED_NOW = new Date(2026, 2, 10, 12, 0, 0, 0);
-const FIXED_FUTURE = new Date(2026, 2, 17, 0, 0, 0, 0);
-const FIXED_PAST = new Date(2026, 2, 8, 0, 0, 0, 0);
+// Extreme dates ensure isDueForWatering() returns a deterministic result
+// regardless of when the snapshot runs — no Date freeze needed.
+const FAR_FUTURE = new Date(2099, 0, 1, 0, 0, 0, 0);
+const FAR_PAST = new Date(2020, 0, 1, 0, 0, 0, 0);
+const FIXED_CREATION = new Date(2025, 0, 1, 0, 0, 0, 0);
 
 function makePlant(overrides: Partial<Plant> = {}): Plant {
     return {
@@ -24,9 +22,9 @@ function makePlant(overrides: Partial<Plant> = {}): Plant {
         wateringFrequency: "1-week",
         wateringQuantity: "200ml",
         wateringType: "surface",
-        nextWateringDate: FIXED_FUTURE,
-        creationDate: FIXED_NOW,
-        lastUpdateDate: FIXED_NOW,
+        nextWateringDate: FAR_FUTURE,
+        creationDate: FIXED_CREATION,
+        lastUpdateDate: FIXED_CREATION,
         ...overrides,
     };
 }
@@ -44,25 +42,11 @@ const meta = {
         onDelete: () => {},
     },
     decorators: [
-        (Story) => {
-            const frozenRef = useRef(false);
-            if (!frozenRef.current) {
-                freezeDate(FIXED_NOW);
-                frozenRef.current = true;
-            }
-
-            useEffect(() => {
-                return () => {
-                    restoreDate();
-                };
-            }, []);
-
-            return (
-                <div className="border-border w-full max-w-[900px] rounded-lg border">
-                    <Story />
-                </div>
-            );
-        },
+        (Story) => (
+            <div className="border-border w-full max-w-[900px] rounded-lg border">
+                <Story />
+            </div>
+        ),
     ],
 } satisfies Meta<typeof PlantListItem>;
 
@@ -85,13 +69,13 @@ export const Selected: Story = {
 
 export const DueForWatering: Story = {
     args: {
-        plant: makePlant({ nextWateringDate: FIXED_PAST }),
+        plant: makePlant({ nextWateringDate: FAR_PAST }),
     },
 };
 
 export const DueAndSelected: Story = {
     args: {
-        plant: makePlant({ nextWateringDate: FIXED_PAST }),
+        plant: makePlant({ nextWateringDate: FAR_PAST }),
         selected: true,
     },
 };
@@ -126,8 +110,10 @@ export const MinimalFields: Story = {
 
 export const DueToday: Story = {
     args: {
+        // Use FAR_PAST — a plant due "today" would be non-deterministic across runs,
+        // so we test the "due" visual state with a clearly past date instead.
         plant: makePlant({
-            nextWateringDate: new Date(2026, 2, 10, 0, 0, 0, 0),
+            nextWateringDate: FAR_PAST,
         }),
     },
 };

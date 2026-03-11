@@ -26,6 +26,11 @@ function registerRoutes(runtime: FireflyRuntime) {
     });
 }
 
-export const registerTodayLandingPage: ModuleRegisterFunction<FireflyRuntime> = (runtime) => {
+export const registerTodayLandingPage: ModuleRegisterFunction<FireflyRuntime> = async (runtime) => {
     registerRoutes(runtime);
+
+    if (runtime.isMswEnabled) {
+        const { todayPlantHandlers } = await import("./mocks/index.ts");
+        runtime.registerRequestHandlers(todayPlantHandlers);
+    }
 };

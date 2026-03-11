@@ -5,22 +5,23 @@ import { createRoot } from "react-dom/client";
 
 import { App } from "./App.tsx";
 import { getActiveModules } from "./getActiveModules.tsx";
-import { enableMocking } from "./mswSetup.ts";
 import { registerHost } from "./register.tsx";
 
 const runtime = initializeFirefly({
+    useMsw: true,
     localModules: [registerHost, ...getActiveModules(process.env.MODULES)],
+    startMsw: async (x) => {
+        return (await import("./mocks/browser.ts")).startMsw(x.requestHandlers);
+    },
 });
 
 const queryClient = new QueryClient();
 const root = createRoot(document.getElementById("root")!);
 
-enableMocking().then(() => {
-    root.render(
-        <FireflyProvider runtime={runtime}>
-            <QueryClientProvider client={queryClient}>
-                <App />
-            </QueryClientProvider>
-        </FireflyProvider>,
-    );
-});
+root.render(
+    <FireflyProvider runtime={runtime}>
+        <QueryClientProvider client={queryClient}>
+            <App />
+        </QueryClientProvider>
+    </FireflyProvider>,
+);

@@ -2,8 +2,11 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { useState, useRef, useMemo, useCallback } from "react";
 
 import { Button, Checkbox } from "@packages/components";
-import { applyPlantFilters, DeleteConfirmDialog, FilterBar, isDueForWatering, PlantListItem, usePlantsQuery, useDeletePlants, usePlantFilters } from "@packages/plants-core";
+import { applyPlantFilters, DeleteConfirmDialog, FilterBar, isDueForWatering, PlantListItem, usePlantFilters } from "@packages/plants-core";
 import type { Plant } from "@packages/plants-core";
+
+import { useDeletePlants } from "./api/usePlantMutations.ts";
+import { usePlantsQuery } from "./api/usePlantsQuery.ts";
 
 const scrollContainerStyle = { height: "calc(100vh - 340px)" };
 
@@ -29,7 +32,7 @@ export function LandingPage() {
     const virtualizer = useVirtualizer({
         count: plants.length,
         getScrollElement: () => parentRef.current,
-        estimateSize: () => 41,
+        estimateSize: () => 49,
         overscan: 10,
     });
 
@@ -139,20 +142,7 @@ export function LandingPage() {
                 <div className="bg-muted/50 border-border flex items-center gap-3 border-b px-4 py-2">
                     <Checkbox checked={allSelected} onCheckedChange={toggleAll} aria-label="Select all plants" />
                     <span className="text-muted-foreground min-w-0 flex-1 text-xs font-medium" aria-hidden="true">
-                        Name
-                    </span>
-                    <span className="size-3.5 shrink-0" aria-hidden="true" />
-                    <span className="text-muted-foreground w-24 shrink-0 text-xs font-medium" aria-hidden="true">
-                        Quantity
-                    </span>
-                    <span className="text-muted-foreground w-20 shrink-0 text-xs font-medium" aria-hidden="true">
-                        Type
-                    </span>
-                    <span className="text-muted-foreground w-24 shrink-0 text-xs font-medium" aria-hidden="true">
-                        Location
-                    </span>
-                    <span className="text-muted-foreground w-16 shrink-0 text-right text-xs font-medium" aria-hidden="true">
-                        Actions
+                        Select all
                     </span>
                 </div>
                 <div ref={parentRef} className="overflow-auto" style={scrollContainerStyle}>

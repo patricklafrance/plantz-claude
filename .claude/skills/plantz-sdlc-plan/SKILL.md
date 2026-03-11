@@ -20,7 +20,7 @@ Draft the technical approach for a feature and output it to a plan file.
 ## Procedure
 
 1. Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, `agent-docs/odr/index.md`, and all files in this skill's `references/` directory.
-2. Load the `accessibility`, `shadcn`, `frontend-design`, and `workleap-react-best-practices` skills for design guidance.
+2. Load the `accessibility`, `shadcn`, `frontend-design`, `workleap-react-best-practices`, and `workleap-squide` skills for design guidance.
 3. Analyze the feature requirements and determine which packages/modules are affected.
 4. If a new module or storybook needs to be scaffolded, note it in the plan. Do NOT scaffold during planning — that happens during the coding phase.
 5. Draft the plan following the **plan output format** below.

@@ -1,14 +1,10 @@
-import { useEffect, useRef } from "react";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
-
-import { freezeDate, restoreDate } from "@packages/plants-core/msw";
 
 import { CreatePlantDialog } from "./CreatePlantDialog.tsx";
 
-// Fixed date for deterministic Chromatic snapshots — the component internally
-// calls `new Date()` to compute the default "first watering date", so we freeze
-// the global Date constructor for the lifetime of each story.
-const FIXED_NOW = new Date(2026, 2, 10, 12, 0, 0, 0);
+// Fixed date for deterministic Chromatic snapshots — passed as a prop so the
+// DatePicker always displays the same value regardless of when the snapshot runs.
+const FIXED_FIRST_WATERING_DATE = new Date(2026, 2, 11, 0, 0, 0, 0);
 
 const meta = {
     title: "Management/Plants/Components/CreatePlantDialog",
@@ -19,25 +15,8 @@ const meta = {
     args: {
         open: true,
         onOpenChange: () => {},
+        defaultFirstWateringDate: FIXED_FIRST_WATERING_DATE,
     },
-    decorators: [
-        (Story) => {
-            // Freeze Date synchronously so the component's initial render sees the fixed date.
-            const frozenRef = useRef(false);
-            if (!frozenRef.current) {
-                freezeDate(FIXED_NOW);
-                frozenRef.current = true;
-            }
-
-            useEffect(() => {
-                return () => {
-                    restoreDate();
-                };
-            }, []);
-
-            return <Story />;
-        },
-    ],
 } satisfies Meta<typeof CreatePlantDialog>;
 
 export default meta;

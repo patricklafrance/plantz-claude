@@ -1,6 +1,6 @@
-import { plantSchema, type Plant } from "./plantSchema.ts";
+import { plantSchema, type Plant } from "@packages/plants-core";
 
-const API_BASE = "/api/plants";
+const API_BASE = "/api/management/plants";
 
 export async function fetchPlants(): Promise<Plant[]> {
     const response = await fetch(API_BASE);

@@ -7,5 +7,3 @@ export { DeleteConfirmDialog } from "./DeleteConfirmDialog.tsx";
 export { FilterBar } from "./FilterBar.tsx";
 export { usePlantFilters } from "./usePlantFilters.ts";
 export type { PlantFilters } from "./usePlantFilters.ts";
-export { usePlantsQuery } from "./usePlantsQuery.ts";
-export { useCreatePlant, useUpdatePlant, useDeletePlants } from "./usePlantMutations.ts";

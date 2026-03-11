@@ -6,4 +6,4 @@
 | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
 | Modular monolith with Squide local modules; every feature area registers via `ModuleRegisterFunction` | [ADR-0001](0001-squide-local-modules.md)          |
 | Each domain area and shared packages layer has its own Storybook instance                             | [ADR-0002](0002-domain-scoped-storybooks.md)      |
-| MSW + TanStack Query for data layer; in-memory DB with REST API patterns, no backend server required  | [ADR-0003](0003-msw-tanstack-query-data-layer.md) |
+| No backend server — MSW as API layer with BFF-per-module ownership (handlers, hooks, URLs per module) | [ADR-0003](0003-msw-tanstack-query-data-layer.md) |

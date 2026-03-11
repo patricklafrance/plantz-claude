@@ -19,6 +19,11 @@ function registerRoutes(runtime: FireflyRuntime) {
     });
 }
 
-export const registerManagementPlants: ModuleRegisterFunction<FireflyRuntime> = (runtime) => {
+export const registerManagementPlants: ModuleRegisterFunction<FireflyRuntime> = async (runtime) => {
     registerRoutes(runtime);
+
+    if (runtime.isMswEnabled) {
+        const { managementPlantHandlers } = await import("./mocks/index.ts");
+        runtime.registerRequestHandlers(managementPlantHandlers);
+    }
 };

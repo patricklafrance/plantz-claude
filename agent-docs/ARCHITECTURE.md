@@ -58,6 +58,20 @@ A packages-layer Storybook (`packages/storybook/`) covers shared packages. A uni
 
 See [ADR-0002](adr/0002-domain-scoped-storybooks.md) for rationale.
 
+## Data layer — BFF-per-module
+
+There is no backend server. MSW intercepts browser `fetch()` calls and serves from a shared in-memory database. TanStack Query provides data-fetching hooks. In production, MSW would be swapped for real API endpoints — the rest stays the same.
+
+Each module owns its full API surface (a "BFF-per-module" model):
+
+- **Handlers** — MSW request handlers live in the module's `mocks/` folder, scoped to `/api/<domain>/<entity>` URLs (e.g., `/api/management/plants`, `/api/today/plants`).
+- **API client & hooks** — `fetch()` wrappers and TanStack Query hooks live in the module's `api/` folder. Query keys are module-scoped (e.g., `["management", "plants", "list"]`).
+- **Shared DB** — All modules read/write the same in-memory store, exposed via `@packages/plants-core/db`. This is the only shared data dependency.
+
+Modules never share handlers or hooks. If two modules need the same entity, each defines its own handlers, hooks, and URL namespace. This mirrors how real BFFs work: each frontend surface has its own backend-for-frontend that shapes data for its needs.
+
+See [ADR-0003](adr/0003-msw-tanstack-query-data-layer.md) for rationale. See `msw-tanstack-query.md` in `.claude/skills/plantz-sdlc-*/references/` for implementation details.
+
 ## Technology stack
 
 For exact versions, read the root `package.json` (`engines`, `packageManager`, `devDependencies`).

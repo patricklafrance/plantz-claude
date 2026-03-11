@@ -31,7 +31,7 @@ This skill runs in one of two modes, determined by the inputs:
 1. Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, `agent-docs/odr/index.md`, and all files in this skill's `references/` directory.
 2. Load the `accessibility`, `shadcn`, `frontend-design`, `workleap-react-best-practices`, and `workleap-squide` skills for design guidance.
 3. **Draft mode:** Analyze the feature requirements and determine which packages/modules are affected.
-   **Revision mode:** Read the existing plan and the escalation file. Understand what was attempted, what failed structurally, and the proposed alternative. Focus the revision on the structural issue — don't rewrite sections that aren't affected.
+   **Revision mode:** Read the existing plan (at the existing plan path input) and the escalation file (at the escalation path input). Understand what was attempted, what failed structurally, and the proposed alternative. Focus the revision on the structural issue — don't rewrite sections that aren't affected.
 4. If a new module or storybook needs to be scaffolded, note it in the plan. Do NOT scaffold during planning — that happens during the coding phase.
 5. Draft (or revise) the plan following the **plan output format** below.
 6. Write the plan to `./tmp/runs/[run-uuid]/plan.md`.
@@ -79,8 +79,25 @@ and gotchas to watch for]
 
 ## Acceptance criteria
 
-[How to verify the feature works — specific, testable statements]
+[Each criterion is a specific, testable statement with a verification tag.]
+
+- `[static]` Criterion verified by lint, typecheck, or module validation
+- `[visual]` Criterion that requires launching the app and visually inspecting the UI
+- `[interactive]` Criterion that requires clicking, typing, or navigating in the browser
+
+Example:
+
+- `[static]` PlantListItem accepts optional `onDelete` prop without type errors
+- `[visual]` Today's list renders without delete buttons
+- `[interactive]` Clicking a plant row in Today opens the detail dialog
 ```
+
+### Acceptance criteria rules
+
+- Every criterion MUST have exactly one tag: `[static]`, `[visual]`, or `[interactive]`.
+- `[visual]` and `[interactive]` criteria drive browser verification during the test phase — be specific enough that an agent with Chrome DevTools can verify them (e.g., "dialog has readable text on dark background" not "dark mode looks good").
+- `[static]` criteria are verified by the test phase (lint, typecheck, module validation).
+- Aim for at least one criterion per planned file change. UI/UX changes should have mostly `[visual]` and `[interactive]` criteria.
 
 ## Hard Constraints
 

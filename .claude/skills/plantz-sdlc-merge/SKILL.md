@@ -12,11 +12,12 @@ Handle committing, pushing, opening a PR, and monitoring CI. Uses a **single sub
 
 ## Inputs (provided by orchestrator)
 
-| Input       | Description                                   |
-| ----------- | --------------------------------------------- |
-| `run-uuid`  | Run folder identifier                         |
-| Branch name | The branch created in the orchestrator step 2 |
-| Commit type | `feat`, `fix`, `chore`, `docs`, or `refactor` |
+| Input       | Description                                                      |
+| ----------- | ---------------------------------------------------------------- |
+| `run-uuid`  | Run folder identifier                                            |
+| Branch name | The branch created in the orchestrator step 2                    |
+| Commit type | `feat`, `fix`, `chore`, `docs`, or `refactor`                    |
+| Plan path   | `./tmp/runs/[run-uuid]/plan.md` — needed for acceptance criteria |
 
 ## Step 1 — Commit
 
@@ -47,19 +48,44 @@ gh pr list --head {branch-name} --json number --jq '.[0].number'
 # If no PR exists, create one:
 gh pr create --title "{type}: {description}" --body "$(cat <<'EOF'
 ## Summary
-[2-5 bullet points summarizing the feature, derived from changes-*.md files]
+[One bullet per logical change, derived from changes-*.md files]
 
 ## Quality checks
 - [x] Lint
 - [x] Module validation
 - [x] Accessibility
+- [x] Visual/interactive verification
+
+## Verified acceptance criteria
+[Read plan.md and the latest changes-*.md. For each acceptance criterion in the plan,
+copy the criterion with its tag and the pass/fail result from the verification results section.
+Example:]
+- ✅ `[visual]` Today's list renders without delete buttons
+- ✅ `[interactive]` Clicking a plant row opens the detail dialog
+- ✅ `[static]` PlantListItem accepts optional onDelete prop
+
+[If the plan has no acceptance criteria or no verification results, write "No acceptance criteria defined."]
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
 )"
 ```
 
-The quality check boxes should reflect actual test results — mark as `[x]` only checks that passed during the test phase.
+**IMPORTANT: Use EXACTLY this template structure.** Do not add, remove, or rename sections. The section headers must be `## Summary`, `## Quality checks`, and `## Verified acceptance criteria` — no other sections are permitted. Do not invent a "Test plan" section or any other section. The quality check boxes should reflect actual test results — mark as `[x]` only checks that passed during the test phase.
+
+**How to populate acceptance criteria:**
+
+- `[visual]` and `[interactive]` criteria: copy the pass/fail result from the `## Verification results` section in the latest `changes-*.md` file.
+- `[static]` criteria: mark as ✅ if the test phase passed (no `test-issues-*.md` exists for the final iteration, or it was empty). The test phase validates static criteria via lint, typecheck, and module validation — individual static criteria don't have per-item results.
+- If the plan has no acceptance criteria, write "No acceptance criteria defined."
+
+### Post-creation validation
+
+After `gh pr create`, read back the PR body with `gh pr view --json body`. Verify:
+
+1. The body contains exactly three `##` sections: Summary, Quality checks, Verified acceptance criteria.
+2. No extra sections were added.
+   If the body doesn't match, edit it with `gh pr edit --body` to conform.
 
 ## Step 3 — Monitor PR
 

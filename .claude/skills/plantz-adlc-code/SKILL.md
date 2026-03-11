@@ -1,12 +1,12 @@
 ---
-name: plantz-sdlc-code
+name: plantz-adlc-code
 description: |
     Implement a feature plan or fix issues reported by the test phase. Writes code to the repo and outputs a changes summary file.
-    Use when asked to "implement the plan", "code the feature", "fix test issues", or as part of the SDLC orchestrator's coding phase.
+    Use when asked to "implement the plan", "code the feature", "fix test issues", or as part of the ADLC orchestrator's coding phase.
 license: MIT
 ---
 
-# SDLC Code
+# ADLC Code
 
 Implement the plan or fix issues reported by the test phase or CI.
 

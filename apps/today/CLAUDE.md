@@ -4,7 +4,7 @@ Local modules for the daily plant care view.
 
 ## Stories
 
-Never write stories without first loading the `plantz-sdlc-code` skill for storybook conventions that apply to all domains.
+Never write stories without first loading the `plantz-adlc-code` skill for storybook conventions that apply to all domains.
 
 Every page and component must have a co-located `.stories.tsx` file. A feature without stories is not complete.
 
@@ -33,7 +33,7 @@ Modules in this domain own their API surface under `/api/today/`. Each module ha
 
 Components read with `useLiveQuery` and write with actions from `createTodayPlantActions`. No `api/` folder — the collection handles data fetching internally via `queryCollectionOptions`.
 
-See `msw-tanstack-query.md` in `.claude/skills/plantz-sdlc-*/references/` for implementation patterns.
+See `msw-tanstack-query.md` in `.claude/skills/plantz-adlc-*/references/` for implementation patterns.
 
 ## Adding a Module
 

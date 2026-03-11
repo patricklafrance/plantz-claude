@@ -1,12 +1,12 @@
 ---
-name: plantz-sdlc-test
+name: plantz-adlc-test
 description: |
     Validate code quality and verify visual/interactive acceptance criteria. The single validation gate for static checks (lint, module structure, accessibility) and browser-based verification.
-    Use when asked to "test the feature", "validate code quality", "run checks", or as part of the SDLC orchestrator's test phase.
+    Use when asked to "test the feature", "validate code quality", "run checks", or as part of the ADLC orchestrator's test phase.
 license: MIT
 ---
 
-# SDLC Test
+# ADLC Test
 
 The single validation gate for all code quality. Runs static checks (lint, modules, accessibility) and browser verification (`[visual]`/`[interactive]` acceptance criteria). Does NOT fix issues — only reports them.
 

@@ -41,9 +41,9 @@ Node 24+, pnpm 10, TypeScript 7 (tsgo), Rsbuild, Tailwind CSS 4, TanStack DB, St
 
 Four pillars make this repo fully agent-driven. Each section links to the implementation files.
 
-### 1. SDLC skills — end-to-end feature development
+### 1. ADLC skills — end-to-end feature development
 
-Six skills that form a complete Software Development Lifecycle. The orchestrator (`/plantz-sdlc-orchestrator`) is the sole entry point for feature development — it spawns subagents for each phase and coordinates them through file-based handoffs in `./tmp/runs/[uuid]/`.
+Six skills that form a complete Agent Development Life Cycle (ADLC). The orchestrator (`/plantz-adlc-orchestrator`) is the sole entry point for feature development — it spawns subagents for each phase and coordinates them through file-based handoffs in `./tmp/runs/[uuid]/`.
 
 ```
 User: "Add watering schedules to the management domain"
@@ -59,12 +59,12 @@ User: "Add watering schedules to the management domain"
 
 | Skill                      | What it does                                                                                                   |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `plantz-sdlc-orchestrator` | Entry point. Generates a run UUID, creates a branch, and runs steps 1-9 sequentially                           |
-| `plantz-sdlc-plan`         | Drafts a structured technical plan with tagged acceptance criteria (`[static]`, `[visual]`, `[interactive]`)   |
-| `plantz-sdlc-code`         | Implements the plan or fixes issues. Uses Chrome DevTools MCP for visual feedback while coding                 |
-| `plantz-sdlc-test`         | Single validation gate — static checks (lint, modules, accessibility) and browser verification of all criteria |
-| `plantz-sdlc-document`     | Audits agent-docs and CLAUDE.md for drift, creates ADRs/ODRs if new decisions were made                        |
-| `plantz-sdlc-merge`        | Commits, pushes, opens a PR with strict template, monitors CI. Returns control on failures                     |
+| `plantz-adlc-orchestrator` | Entry point. Generates a run UUID, creates a branch, and runs steps 1-9 sequentially                           |
+| `plantz-adlc-plan`         | Drafts a structured technical plan with tagged acceptance criteria (`[static]`, `[visual]`, `[interactive]`)   |
+| `plantz-adlc-code`         | Implements the plan or fixes issues. Uses Chrome DevTools MCP for visual feedback while coding                 |
+| `plantz-adlc-test`         | Single validation gate — static checks (lint, modules, accessibility) and browser verification of all criteria |
+| `plantz-adlc-document`     | Audits agent-docs and CLAUDE.md for drift, creates ADRs/ODRs if new decisions were made                        |
+| `plantz-adlc-merge`        | Commits, pushes, opens a PR with strict template, monitors CI. Returns control on failures                     |
 
 Key design decisions:
 
@@ -76,7 +76,7 @@ Key design decisions:
 
 #### Run folder artifacts
 
-Every SDLC run produces files in `./tmp/runs/[uuid]/` that flow between subagents:
+Every ADLC run produces files in `./tmp/runs/[uuid]/` that flow between subagents:
 
 ```
 ./tmp/runs/[uuid]/
@@ -92,7 +92,7 @@ Every SDLC run produces files in `./tmp/runs/[uuid]/` that flow between subagent
 
 The folder is deleted on successful completion and preserved on failure for post-mortem.
 
-**Files:** [`.claude/skills/plantz-sdlc-*/`](.claude/skills/)
+**Files:** [`.claude/skills/plantz-adlc-*/`](.claude/skills/)
 
 ### 2. Guardrails
 
@@ -135,7 +135,7 @@ The audit workflow is self-healing — it detects when docs drift from reality a
 
 ### 3. Supporting skills
 
-The SDLC skills don't work alone — they load project-specific utility skills and shared external skills at runtime.
+The ADLC skills don't work alone — they load project-specific utility skills and shared external skills at runtime.
 
 **Utility skills** (prefixed with `plantz-`):
 
@@ -143,7 +143,6 @@ The SDLC skills don't work alone — they load project-specific utility skills a
 | ---------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `plantz-scaffold-domain-module`    | Scaffolds a new Squide module — creates files, registers in host, wires Storybook, adds dev script |
 | `plantz-scaffold-domain-storybook` | Scaffolds a domain Storybook with Chromatic CI integration                                         |
-| `plantz-seed-plants`               | Resets the MSW in-memory plant database by reloading the page via Chrome DevTools MCP              |
 | `plantz-audit-agent-docs`          | 3-pass audit of all docs against the live codebase (structural, accuracy, instruction quality)     |
 | `plantz-validate-modules`          | Validates every module conforms to the expected structure (12 checks)                              |
 | `plantz-smoke-tests`               | Smoke-tests every app by starting dev servers and verifying pages load in a browser                |
@@ -169,7 +168,7 @@ Utility skills use a **reference module pattern** — instead of hardcoding depe
 
 ### 4. ADRs and ODRs (decision logs)
 
-Formal logs of _why_ decisions were made — not just what was decided. Agents check these before making changes to prevent contradictory work. The `plantz-sdlc-document` skill creates new records when implementation introduces new architectural or operational decisions.
+Formal logs of _why_ decisions were made — not just what was decided. Agents check these before making changes to prevent contradictory work. The `plantz-adlc-document` skill creates new records when implementation introduces new architectural or operational decisions.
 
 | Record   | Decision                                                        |
 | -------- | --------------------------------------------------------------- |
@@ -208,8 +207,6 @@ pnpm install
 ### Seed data
 
 Plant data lives in an MSW in-memory database (`plantsDb` from `@packages/plants-core`). On page load, the host app calls `plantsDb.reset(defaultSeedPlants)` which populates ~250 plants automatically. Data resets on every reload — no manual seeding needed.
-
-**With Claude Code**: run `/seed-plants` to reload the page and reset the in-memory database via Chrome DevTools MCP.
 
 **To regenerate the static seed file** (used as the default data source):
 

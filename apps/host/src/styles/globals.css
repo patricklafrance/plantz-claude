@@ -2,5 +2,6 @@
 @import "@packages/components/globals.css";
 
 @source "../../../../packages/components/src/**/*.{ts,tsx}";
+@source "../../../../packages/plants-core/src/**/*.{ts,tsx}";
 @source "../../../management/plants/src/**/*.{ts,tsx}";
 @source "../../../today/landing-page/src/**/*.{ts,tsx}";

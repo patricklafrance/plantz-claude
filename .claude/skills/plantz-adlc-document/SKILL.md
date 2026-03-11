@@ -1,12 +1,12 @@
 ---
-name: plantz-sdlc-document
+name: plantz-adlc-document
 description: |
     Audit agent documentation for drift after implementation and fix any issues found. Updates agent-docs, ADRs, ODRs, and CLAUDE.md files.
-    Use when asked to "update docs after implementation", "audit agent-docs", "fix doc drift", or as part of the SDLC orchestrator's documentation phase.
+    Use when asked to "update docs after implementation", "audit agent-docs", "fix doc drift", or as part of the ADLC orchestrator's documentation phase.
 license: MIT
 ---
 
-# SDLC Document
+# ADLC Document
 
 Audit agent documentation for drift after implementation and fix any issues found.
 

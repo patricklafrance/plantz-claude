@@ -36,6 +36,6 @@ Add a cancel button at the bottom of the create plant modal alongside the existi
 
 The update plant modal has incorrect contrast in dark mode. Fix the relevant colors, surfaces, and text so it is readable and consistent.
 
-## Use the SDLC orchestrator
+## Use the ADLC orchestrator
 
-Build this task using the `plantz-sdlc-orchestrator` skill.
+Build this task using the `plantz-adlc-orchestrator` skill.

@@ -32,4 +32,4 @@ This mirrors a real BFF (backend-for-frontend) architecture: each frontend surfa
 - TanStack DB is beta — pin exact versions and monitor for breaking changes.
 - Domain modules need a `storybook.setup.ts` wiring `initializeFireflyForStorybook` and `withModuleDecorator` from `@packages/core-squide/storybook`.
 
-See `msw-tanstack-query.md` in `.claude/skills/plantz-sdlc-*/references/` for all implementation patterns.
+See `msw-tanstack-query.md` in `.claude/skills/plantz-adlc-*/references/` for all implementation patterns.

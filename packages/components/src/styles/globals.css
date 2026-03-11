@@ -45,7 +45,25 @@
     --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* Restore cursor: pointer for interactive elements (Tailwind v4 removed it). */
+a,
+button,
+label,
+select,
+summary,
+[role="button"],
+[role="checkbox"],
+[role="switch"],
+[type="button"],
+[type="reset"],
+[type="submit"],
+[type="checkbox"],
+[type="radio"] {
+    cursor: pointer;
+}
+
 :root {
+    font-size: 18px;
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);

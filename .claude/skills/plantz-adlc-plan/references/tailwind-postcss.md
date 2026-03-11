@@ -19,12 +19,15 @@ For Rslib (library) configs, import `RslibConfigTransformer` from `@workleap/rsl
 
 ## Cross-package class scanning
 
-Consuming apps use `@source` directives in their CSS to tell Tailwind where to find utility classes used in `@packages/components`:
+The `@import "tailwindcss"` directive lives inside `packages/components/src/styles/globals.css`. Consuming apps import it transitively via `@import "@packages/components/globals.css"` — they must **not** add a separate `@import "tailwindcss"` line.
+
+Consuming apps also use `@source` directives to tell Tailwind where to find utility classes in workspace packages:
 
 ```css
-@import "tailwindcss";
 @import "@packages/components/globals.css";
+
 @source "../../../../packages/components/src/**/*.{ts,tsx}";
+@source "../../../../packages/plants-core/src/**/*.{ts,tsx}";
 ```
 
-If you add new source directories under `packages/components/src/`, add a corresponding `@source` directive in consuming apps.
+If you add a new workspace package whose components are rendered in the host app, add a corresponding `@source` directive in `apps/host/src/styles/globals.css`. Domain-module source paths (e.g., `management/plants`, `today/landing-page`) also need their own `@source` entries there.

@@ -22,7 +22,7 @@
         "react-dom": "19.2.4",
         "react-router": "7.12.0",
         "storybook": "10.2.15",
-        "storybook-react-rsbuild": "3.3.1"
+        "storybook-react-rsbuild": "https://pkg.pr.new/storybook-react-rsbuild@8453ba8"
     },
     "devDependencies": {
         "@rsbuild/core": "1.7.2",

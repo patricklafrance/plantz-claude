@@ -45,6 +45,17 @@ jobs:
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
 
+            - name: Add node_modules/.bin to PATH
+              run: echo "$PWD/node_modules/.bin" >> $GITHUB_PATH
+
+            - name: Install browser dependencies
+              run: agent-browser install --with-deps
+
+            - name: Warm up browser
+              run: |
+                  agent-browser open about:blank
+                  agent-browser close
+
             - name: Restore Turborepo cache
               id: cache-turborepo-restore
               uses: actions/cache/restore@v5

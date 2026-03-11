@@ -1,39 +1,42 @@
 ---
-name: plantz-sdlc-plan
+name: plantz-adlc-plan
 description: |
     Draft a technical plan for a feature. Analyzes requirements, identifies affected packages, and outputs a structured plan file.
-    Use when asked to "plan a feature", "draft a technical plan", "design the approach", or as part of the SDLC orchestrator's planning phase.
+    Use when asked to "plan a feature", "draft a technical plan", "design the approach", or as part of the ADLC orchestrator's planning phase.
 license: MIT
 ---
 
-# SDLC Plan
+# ADLC Plan
 
 Draft the technical approach for a feature and output it to a plan file.
 
 ## Inputs (provided by orchestrator)
 
-| Input               | Description                                                                                                         |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `run-uuid`          | Run folder identifier                                                                                               |
-| Feature description | What the user wants built                                                                                           |
-| Escalation path     | `null` on first plan. On revision: path to `escalation-[iteration].md` — explains what the previous plan got wrong. |
-| Existing plan path  | `null` on first plan. On revision: path to the current `plan.md` to revise.                                         |
+| Input               | Description                                                                                                        |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `run-uuid`          | Run folder identifier                                                                                              |
+| `mode`              | `draft`, `review`, or `revision`                                                                                   |
+| Feature description | What the user wants built                                                                                          |
+| Escalation path     | `null` except in `revision` mode: path to `escalation-[iteration].md` — explains what the previous plan got wrong. |
+| Existing plan path  | `null` in `draft` mode. In `review` and `revision` modes: path to the current `plan.md`.                           |
 
 ## Mode
 
-This skill runs in one of two modes, determined by the inputs:
+This skill runs in one of three modes, determined by the `mode` input:
 
-- **Draft mode** (escalation path is `null`): Create a plan from scratch based on the feature description.
-- **Revision mode** (escalation path provided): Revise the existing plan to address the structural issue described in the escalation file.
+- **Draft**: Create a plan from scratch based on the feature description.
+- **Review**: The orchestrator already wrote the user's plan to `plan.md`. Only Subagent B runs — validate format, challenge gaps, and improve. See Subagent Pattern below.
+- **Revision**: Revise the existing plan to address the structural issue described in the escalation file.
 
 ## Procedure
 
 1. Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, `agent-docs/odr/index.md`, and all files in this skill's `references/` directory.
 2. Load the `accessibility`, `shadcn`, `frontend-design`, `workleap-react-best-practices`, and `workleap-squide` skills for design guidance.
 3. **Draft mode:** Analyze the feature requirements and determine which packages/modules are affected.
+   **Review mode:** Read the existing plan at the plan path. This plan was written by the user — treat it as the starting point. Proceed directly to step 5 (validate and improve).
    **Revision mode:** Read the existing plan (at the existing plan path input) and the escalation file (at the escalation path input). Understand what was attempted, what failed structurally, and the proposed alternative. Focus the revision on the structural issue — don't rewrite sections that aren't affected.
 4. If a new module or storybook needs to be scaffolded, note it in the plan. Do NOT scaffold during planning — that happens during the coding phase.
-5. Draft (or revise) the plan following the **plan output format** below.
+5. Draft, revise, or validate and improve the plan following the **plan output format** below.
 6. Write the plan to `./tmp/runs/[run-uuid]/plan.md`.
 
 ## Plan Output Format
@@ -107,6 +110,6 @@ Example:
 
 ## Subagent Pattern
 
-In **draft mode**, Subagent A drafts the plan from scratch and writes `plan.md`. In **revision mode**, A reads the existing plan and the escalation file, then revises `plan.md` to address the structural issue — keeping sections that aren't affected.
+In **draft mode**, Subagent A drafts the plan from scratch and writes `plan.md`. In **revision mode**, A reads the existing plan and the escalation file, then revises `plan.md` to address the structural issue — keeping sections that aren't affected. In **review mode**, Subagent A is skipped entirely — only B runs.
 
-Subagent B reads the plan, challenges it — checking for missing affected packages, unrealistic scope, incorrect patterns, missing stories, or accessibility gaps — and edits `plan.md` directly to improve it. B does not append concerns; it rewrites sections that need improvement.
+Subagent B reads the plan, challenges it — checking for missing affected packages, unrealistic scope, incorrect patterns, missing stories, or accessibility gaps — and edits `plan.md` directly to improve it. B does not append concerns; it rewrites sections that need improvement. In **review mode**, B also ensures the plan follows the expected output format. If sections are missing, B adds them. If acceptance criteria lack tags, B infers and adds the correct tag (`[static]`, `[visual]`, or `[interactive]`).

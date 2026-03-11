@@ -2,7 +2,7 @@
 
 1. Before changing a module API or architectural pattern, check `agent-docs/adr/index.md`.
 2. Before changing build tooling, CI, or dev workflows, check `agent-docs/odr/index.md`.
-3. For feature development, load the `plantz-sdlc-orchestrator` skill. It coordinates the full lifecycle.
+3. For feature development, load the `plantz-adlc-orchestrator` skill. It coordinates the full lifecycle.
 4. Never report a task as complete without running `git status --short` and checking every changed or new file against the index below. If a file touches a topic listed in the index, open that doc and fix any line that no longer matches reality.
 
 ## Index

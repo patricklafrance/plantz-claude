@@ -48,6 +48,19 @@ PRs require the `run chromatic` label to trigger `chromatic.yml`. Without it, th
 
 **Tool scoping:** The agent's Bash access is restricted to specific CLIs (`pnpm`, `node`, `mkdir`, `rm`, `lsof`, `kill`, `agent-browser`). On failure, screenshots are uploaded as GitHub Actions artifacts for diagnosis.
 
+## Netlify preview deploys
+
+Netlify automatically deploys a preview for every pull request:
+
+- **Host app** — a full build of `apps/host/` accessible at a unique Netlify preview URL.
+- **Unified Storybook** — a full build of `apps/storybook/` accessible at a separate Netlify preview URL.
+
+Preview URLs are posted as PR status checks by the Netlify GitHub integration.
+
+When a PR is merged into `main`, Netlify automatically deploys the Host app to production.
+
+These deploys are independent of the GitHub Actions workflows listed above — Netlify manages its own build pipeline triggered by git push events.
+
 ## Turbo cache strategy
 
 Four workflows (ci, chromatic, claude, smoke-tests) share a Turbo cache pattern with restore-key prefixes (`${{ runner.os }}-turbo-`) that allow cross-workflow cache hits. `code-review.yml` and `audit-agent-docs.yml` do not use Turbo cache.

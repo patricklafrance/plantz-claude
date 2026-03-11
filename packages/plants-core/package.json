@@ -27,7 +27,7 @@
         "@types/react-dom": "19.2.3",
         "@typescript/native-preview": "7.0.0-dev.20260303.1",
         "@workleap/typescript-configs": "3.0.7",
-        "storybook-react-rsbuild": "https://pkg.pr.new/storybook-react-rsbuild@8453ba8",
+        "storybook-react-rsbuild": "3.3.2",
         "typescript": "5.9.3"
     },
     "peerDependencies": {

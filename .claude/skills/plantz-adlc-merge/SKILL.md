@@ -1,12 +1,12 @@
 ---
-name: plantz-sdlc-merge
+name: plantz-adlc-merge
 description: |
     Commit, push, open a PR, and monitor CI. Handles CI failures and PR comments by returning control to the orchestrator.
-    Use when asked to "commit and push", "open a PR", "merge the feature", or as part of the SDLC orchestrator's merge phase.
+    Use when asked to "commit and push", "open a PR", "merge the feature", or as part of the ADLC orchestrator's merge phase.
 license: MIT
 ---
 
-# SDLC Merge
+# ADLC Merge
 
 Handle committing, pushing, opening a PR, and monitoring CI. Uses a **single subagent** — concurrent git operations would conflict.
 

@@ -1,4 +1,4 @@
-<\!-- Canonical source: plantz-sdlc-plan. Keep in sync with plantz-sdlc-code, plantz-sdlc-test. -->
+<\!-- Canonical source: plantz-adlc-plan. Keep in sync with plantz-adlc-code, plantz-adlc-test. -->
 
 # Tailwind CSS / PostCSS
 

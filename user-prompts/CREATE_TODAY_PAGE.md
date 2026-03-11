@@ -16,6 +16,6 @@ The current list item stacks secondary info (watering quantity, type, location) 
 
 Once the today page exists, make the plants list page the home page of the application. Navigating to `/` should land on the plants list.
 
-## Use the SDLC orchestrator
+## Use the ADLC orchestrator
 
-Build this feature using the `plantz-sdlc-orchestrator` skill.
+Build this feature using the `plantz-adlc-orchestrator` skill.

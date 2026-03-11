@@ -22,7 +22,8 @@ apps/
   storybook/                   # Packages-layer Storybook
 packages/
   components/                  # Shared UI — shadcn/ui (Base UI) + Tailwind v4
-  squide-core/                 # Shared Squide utilities
+  core-squide/                 # Shared Squide utilities
+  plants-core/                 # Shared plants data layer (MSW handlers, TanStack DB, seed data)
   storybook/                   # Shared Storybook config
 ```
 
@@ -38,45 +39,68 @@ Node 24+, pnpm 10, TypeScript 7 (tsgo), Rsbuild, Tailwind CSS 4, TanStack DB, St
 
 ## Agent harness
 
-Five pillars make this repo fully agent-driven. Each section links to the implementation files.
+Four pillars make this repo fully agent-driven. Each section links to the implementation files.
 
-### 1. SDLC skills — end-to-end feature development
+### 1. ADLC skills — end-to-end feature development
 
-Six skills that form a complete Software Development Lifecycle. The orchestrator (`/plantz-sdlc-orchestrator`) is the sole entry point for feature development — it spawns subagents for each phase and coordinates them through file-based handoffs in `./tmp/runs/[uuid]/`.
+Six skills that form a complete Agent Development Life Cycle (ADLC). The orchestrator (`/plantz-adlc-orchestrator`) is the sole entry point for feature development — it spawns subagents for each phase and coordinates them through file-based handoffs in `./tmp/runs/[uuid]/`.
 
 ```
 User: "Add watering schedules to the management domain"
   └─ Orchestrator (step 1-9)
-       ├─ Plan    → plan.md
-       ├─ Code    → changes-1.md  (scaffolds modules, implements features)
-       ├─ Test    → test-issues-1.md or ∅  (lint, modules, visual, smoke)
-       │    └─ Fix loop: Code → Test → Code → Test  (max 3 iterations)
+       ├─ Plan     → plan.md  (acceptance criteria with [static]/[visual]/[interactive] tags)
+       ├─ Code     → changes-1.md  (scaffolds modules, implements features, uses browser for feedback)
        ├─ Simplify → /simplify on changed files
+       ├─ Test     → test-issues-1.md or ∅  (lint, modules, accessibility, browser verification)
+       │    └─ Fix loop: Code → Test → Code → Test  (max 3 iterations)
        ├─ Document → audits agent-docs for drift
-       └─ Merge   → commit, PR, monitor CI
+       └─ Merge    → commit, PR, monitor CI
 ```
 
-| Skill                      | What it does                                                                                     |
-| -------------------------- | ------------------------------------------------------------------------------------------------ |
-| `plantz-sdlc-orchestrator` | Entry point. Generates a run UUID, creates a branch, and runs steps 1-9 sequentially             |
-| `plantz-sdlc-plan`         | Drafts a structured technical plan (affected packages, file changes, acceptance criteria)        |
-| `plantz-sdlc-code`         | Implements the plan or fixes issues from the test phase. Scaffolds modules on iteration 1        |
-| `plantz-sdlc-test`         | Validates code quality — lint, module structure, quality gates, visual verification, smoke tests |
-| `plantz-sdlc-document`     | Audits agent-docs and CLAUDE.md for drift, creates ADRs/ODRs if new decisions were made          |
-| `plantz-sdlc-merge`        | Commits, pushes, opens a PR, monitors CI. Returns control to orchestrator if fixes are needed    |
+| Skill                      | What it does                                                                                                   |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `plantz-adlc-orchestrator` | Entry point. Generates a run UUID, creates a branch, and runs steps 1-9 sequentially                           |
+| `plantz-adlc-plan`         | Drafts a structured technical plan with tagged acceptance criteria (`[static]`, `[visual]`, `[interactive]`)   |
+| `plantz-adlc-code`         | Implements the plan or fixes issues. Uses Chrome DevTools MCP for visual feedback while coding                 |
+| `plantz-adlc-test`         | Single validation gate — static checks (lint, modules, accessibility) and browser verification of all criteria |
+| `plantz-adlc-document`     | Audits agent-docs and CLAUDE.md for drift, creates ADRs/ODRs if new decisions were made                        |
+| `plantz-adlc-merge`        | Commits, pushes, opens a PR with strict template, monitors CI. Returns control on failures                     |
 
 Key design decisions:
 
 - **Self-contained**: plan, code, and test skills each embed their own `references/` files (tech-stack rules, styling conventions, accessibility requirements). Subagents never need to read another skill's files.
-- **Subagent protocol**: Every multi-agent step uses a drafter/reviewer pair. The orchestrator spawns both — subagents never spawn further subagents.
-- **File-based coordination**: All inter-step communication goes through files in `./tmp/runs/[uuid]/` (plan.md, changes-N.md, test-issues-N.md). This makes handoffs explicit and debuggable.
-- **Automated quality gates**: Visual verification uses `agent-browser` to screenshot pages in light/dark mode, inspect the accessibility tree, and test keyboard navigation — no human reviewer in the loop.
+- **Subagent protocol**: Every multi-agent step uses a drafter/reviewer pair (A drafts, B reviews and improves). The orchestrator spawns both — subagents never spawn further subagents.
+- **File-based coordination**: All inter-step communication goes through files in `./tmp/runs/[uuid]/`. This makes handoffs explicit and debuggable (see "Run folder artifacts" below).
+- **Test as the single gate**: The test skill owns all verification — both static (lint, modules, accessibility) and visual/interactive (browser screenshots via Chrome DevTools MCP). The code skill writes code; the test skill validates it.
+- **Acceptance criteria flow**: Plan tags each criterion. Test verifies them and writes results to `changes-*.md`. Merge reads results and populates the PR with pass/fail status.
 
-**Files:** [`.claude/skills/plantz-sdlc-*/`](.claude/skills/)
+#### Run folder artifacts
 
-### 2. Hooks (`.claude/hooks/`)
+Every ADLC run produces files in `./tmp/runs/[uuid]/` that flow between subagents:
 
-Shell scripts that run automatically before or after agent tool calls, enforcing architectural guardrails in real time. These fire on every agent action — they are the hard constraints that skills cannot bypass.
+```
+./tmp/runs/[uuid]/
+  ├─ orchestrator-state.md    # Orchestrator writes after each step (recovery on context compaction)
+  ├─ plan.md                  # Plan skill writes → Code, Test, Merge read
+  ├─ changes-1.md             # Code writes → Test appends verification results → Merge reads for PR
+  ├─ changes-2.md             # (iteration 2, if test found issues)
+  ├─ test-issues-1.md         # Test writes (only if failures) → Code reads on next fix iteration
+  ├─ escalation-1.md          # Code B writes (only if structural) → Orchestrator judges
+  ├─ ci-issues-1.md           # Merge writes (only if CI fails) → Code reads for fix
+  └─ failure-summary.md       # Orchestrator writes on unrecoverable failure
+```
+
+The folder is deleted on successful completion and preserved on failure for post-mortem.
+
+**Files:** [`.claude/skills/plantz-adlc-*/`](.claude/skills/)
+
+### 2. Guardrails
+
+Hard constraints that skills cannot bypass — enforced at the tool level (hooks) and on every push (CI/CD).
+
+#### Hooks
+
+Shell scripts that run automatically before or after agent tool calls, enforcing architectural rules in real time.
 
 | Hook                                           | Trigger           | What it does                                                        |
 | ---------------------------------------------- | ----------------- | ------------------------------------------------------------------- |
@@ -92,9 +116,26 @@ Hook names follow the `{event}--{what}.sh` convention so it's clear at a glance 
 
 **Files:** [`.claude/hooks/`](.claude/hooks/), [`.claude/settings.json`](.claude/settings.json)
 
+#### CI/CD
+
+Six GitHub Actions workflows, four of which involve Claude Code:
+
+| Workflow               | Trigger                         | Purpose                                                                   |
+| ---------------------- | ------------------------------- | ------------------------------------------------------------------------- |
+| `ci.yml`               | Push to main, PRs               | Build, lint (oxlint, oxfmt, typecheck, syncpack), test                    |
+| `chromatic.yml`        | Push to main, labeled PRs       | Visual regression testing — only affected Storybooks                      |
+| `claude.yml`           | `@claude` mention in issues/PRs | Claude Code agent responds to issues and PR comments                      |
+| `code-review.yml`      | PRs opened/updated              | Automated code review by Claude (read-only tools)                         |
+| `smoke-tests.yml`      | PRs to main                     | Smoke-tests all apps via Claude (scoped Bash, artifact upload on failure) |
+| `audit-agent-docs.yml` | Weekly cron + manual            | Runs the audit skill, creates PRs for Critical/High findings              |
+
+The audit workflow is self-healing — it detects when docs drift from reality and opens PRs to fix them. The smoke-tests workflow loads the `plantz-smoke-tests` skill, which starts each dev server, verifies it in a headless browser via `agent-browser`, and posts results as a PR comment.
+
+**Files:** [`.github/workflows/`](.github/workflows/), [`.github/prompts/`](.github/prompts/)
+
 ### 3. Supporting skills
 
-The SDLC skills don't work alone — they load project-specific utility skills and shared external skills at runtime.
+The ADLC skills don't work alone — they load project-specific utility skills and shared external skills at runtime.
 
 **Utility skills** (prefixed with `plantz-`):
 
@@ -102,7 +143,6 @@ The SDLC skills don't work alone — they load project-specific utility skills a
 | ---------------------------------- | -------------------------------------------------------------------------------------------------- |
 | `plantz-scaffold-domain-module`    | Scaffolds a new Squide module — creates files, registers in host, wires Storybook, adds dev script |
 | `plantz-scaffold-domain-storybook` | Scaffolds a domain Storybook with Chromatic CI integration                                         |
-| `plantz-seed-plants`               | Generates seed data and injects it into localStorage via Chrome DevTools MCP                       |
 | `plantz-audit-agent-docs`          | 3-pass audit of all docs against the live codebase (structural, accuracy, instruction quality)     |
 | `plantz-validate-modules`          | Validates every module conforms to the expected structure (12 checks)                              |
 | `plantz-smoke-tests`               | Smoke-tests every app by starting dev servers and verifying pages load in a browser                |
@@ -126,9 +166,9 @@ Utility skills use a **reference module pattern** — instead of hardcoding depe
 
 **Files:** [`.claude/skills/`](.claude/skills/), [`.agents/skills/`](.agents/skills/)
 
-### 4. ADRs and ODRs
+### 4. ADRs and ODRs (decision logs)
 
-Formal logs of _why_ decisions were made — not just what was decided. Agents check these before making changes to prevent contradictory work. The `plantz-sdlc-document` skill creates new records when implementation introduces new architectural or operational decisions.
+Formal logs of _why_ decisions were made — not just what was decided. Agents check these before making changes to prevent contradictory work. The `plantz-adlc-document` skill creates new records when implementation introduces new architectural or operational decisions.
 
 | Record   | Decision                                                        |
 | -------- | --------------------------------------------------------------- |
@@ -140,23 +180,6 @@ Formal logs of _why_ decisions were made — not just what was decided. Agents c
 | ODR-0004 | JIT packages — no pre-build needed for dev                      |
 
 **Files:** [`agent-docs/adr/`](agent-docs/adr/), [`agent-docs/odr/`](agent-docs/odr/)
-
-### 5. CI/CD workflows (`.github/workflows/`)
-
-Six GitHub Actions workflows, four of which involve Claude Code:
-
-| Workflow               | Trigger                         | Purpose                                                                   |
-| ---------------------- | ------------------------------- | ------------------------------------------------------------------------- |
-| `ci.yml`               | Push to main, PRs               | Build, lint (oxlint, oxfmt, typecheck, syncpack), test                    |
-| `chromatic.yml`        | Push to main, labeled PRs       | Visual regression testing — only affected Storybooks                      |
-| `claude.yml`           | `@claude` mention in issues/PRs | Claude Code agent responds to issues and PR comments                      |
-| `code-review.yml`      | PRs opened/updated              | Automated code review by Claude (read-only tools)                         |
-| `smoke-tests.yml`      | PRs to main                     | Smoke-tests all apps via Claude (scoped Bash, artifact upload on failure) |
-| `audit-agent-docs.yml` | Weekly cron + manual            | Runs the audit skill, creates PRs for Critical/High findings              |
-
-The audit workflow is self-healing — it detects when docs drift from reality and opens PRs to fix them. The smoke-tests workflow loads the `plantz-smoke-tests` skill, which starts each dev server, verifies it in a headless browser via `agent-browser`, and posts results as a PR comment.
-
-**Files:** [`.github/workflows/`](.github/workflows/), [`.github/prompts/`](.github/prompts/)
 
 ---
 
@@ -183,22 +206,12 @@ pnpm install
 
 ### Seed data
 
-The app stores plant data in localStorage via TanStack DB. Without seeding, the plant list will be empty.
+Plant data lives in an MSW in-memory database (`plantsDb` from `@packages/plants-core`). On page load, the host app calls `plantsDb.reset(defaultSeedPlants)` which populates ~250 plants automatically. Data resets on every reload — no manual seeding needed.
 
-**With Claude Code** (recommended): run `/seed-plants`. The skill generates data, injects it into localStorage via Chrome DevTools MCP, and reloads the page automatically.
-
-**Manually:**
+**To regenerate the static seed file** (used as the default data source):
 
 ```bash
 pnpm seed-plants      # Generates apps/host/public/seed-plants.json
-```
-
-Then start the dev server, open DevTools in the browser, and run:
-
-```js
-const data = await fetch("/seed-plants.json").then((r) => r.text());
-localStorage.setItem("plantz-plants", data);
-location.reload();
 ```
 
 ### Run the app

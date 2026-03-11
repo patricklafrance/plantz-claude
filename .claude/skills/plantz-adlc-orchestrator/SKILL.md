@@ -1,14 +1,14 @@
 ---
-name: plantz-sdlc-orchestrator
+name: plantz-adlc-orchestrator
 description: |
-    Entry point for end-to-end feature development. Leads the SDLC process by spawning subagents for planning, coding, testing, documenting, and merging.
-    Use when asked to "build a feature", "develop end-to-end", "full SDLC", "implement feature from scratch", or any request that requires coordinated planning, implementation, testing, and PR creation.
+    Entry point for end-to-end feature development. Leads the ADLC (Agent Development Life Cycle) process by spawning subagents for planning, coding, testing, documenting, and merging.
+    Use when asked to "build a feature", "develop end-to-end", "full ADLC", "implement feature from scratch", or any request that requires coordinated planning, implementation, testing, and PR creation.
 license: MIT
 ---
 
-# SDLC Orchestrator
+# ADLC Orchestrator
 
-Coordinates the full software development lifecycle for a feature by spawning specialized subagents sequentially. Each step must complete before the next begins.
+Coordinates the full Agent Development Life Cycle for a feature by spawning specialized subagents sequentially. Each step must complete before the next begins.
 
 ## Subagent Protocol
 
@@ -17,7 +17,7 @@ Coordinates the full software development lifecycle for a feature by spawning sp
 
 The **orchestrator** spawns both subagents directly — subagents never spawn further subagents. Only one subagent writes to the repo or output file at a time (A finishes before B starts).
 
-The two subagents exist to produce better output through collaboration. The real validation gate is the `plantz-sdlc-test` phase — not the reviewer subagent. B's job is to catch what it can and improve quality before that gate.
+The two subagents exist to produce better output through collaboration. The real validation gate is the `plantz-adlc-test` phase — not the reviewer subagent. B's job is to catch what it can and improve quality before that gate.
 
 **Subagent lifecycle:** Claude Code subagents are stateless. Each spawned subagent starts fresh. Context is passed between iterations via files in `./tmp/runs/[run-uuid]/`. Always spawn new subagents with the relevant file paths — never refer to "existing subagents."
 
@@ -79,13 +79,15 @@ git checkout -b {type}/{short-description}
 
 ### Step 3 — Plan
 
-Spawn two subagents using the `plantz-sdlc-plan` skill (following the subagent protocol).
-Pass: `run-uuid`, feature description.
+**If an inline plan was provided in the prompt:** Write it to `./tmp/runs/[run-uuid]/plan.md`. Then spawn only **Subagent B** using the `plantz-adlc-plan` skill. Pass: `run-uuid`, `mode=review`, feature description, and the plan path. B validates the format, challenges gaps, and improves the plan. Skip Subagent A entirely.
+
+**Otherwise:** Spawn two subagents using the `plantz-adlc-plan` skill (following the subagent protocol). Pass: `run-uuid`, `mode=draft`, feature description. Existing plan path and escalation path are `null`.
+
 When done, verify `./tmp/runs/[run-uuid]/plan.md` exists. If not, fail the run.
 
 ### Step 4 — Code
 
-Spawn two subagents using the `plantz-sdlc-code` skill.
+Spawn two subagents using the `plantz-adlc-code` skill.
 Pass: `run-uuid`, `iteration=1`, plan path. Issues path and changes path are `null` for iteration 1.
 When done, verify `./tmp/runs/[run-uuid]/changes-1.md` exists. If not, fail the run.
 
@@ -97,34 +99,34 @@ Spawn **one** subagent to run the `/simplify` skill — review the uncommitted c
 
 ### Step 6 — Test and iterate
 
-Spawn two subagents using the `plantz-sdlc-test` skill.
+Spawn two subagents using the `plantz-adlc-test` skill.
 Pass: `run-uuid`, `iteration=1`.
 
 - If `./tmp/runs/[run-uuid]/test-issues-[iteration].md` is produced with issues:
     - Increment the iteration number. Update `orchestrator-state.md` with the new iteration and sub-phase (`code`).
-    - Spawn new `plantz-sdlc-code` subagents. Pass: `run-uuid`, the new `iteration`, plan path, the previous iteration's issues file path, and the previous iteration's changes file path. They produce `changes-[iteration].md`.
+    - Spawn new `plantz-adlc-code` subagents. Pass: `run-uuid`, the new `iteration`, plan path, the previous iteration's issues file path, and the previous iteration's changes file path. They produce `changes-[iteration].md`.
     - **Escalation check:** After the code subagent returns, follow the escalation check procedure (see "Escalation check" below).
     - **Health check (iteration 3):** Before running the final test, compare `changes-[iteration].md` to the previous iteration. If the current iteration modified more files than the previous, and the same files appear in both iterations' test issues, the fix cycle is expanding rather than converging — follow the failure handling procedure instead of spending the last iteration.
     - Update `orchestrator-state.md` sub-phase to `test`.
-    - Spawn new `plantz-sdlc-test` subagents. Pass: `run-uuid`, the new `iteration`.
+    - Spawn new `plantz-adlc-test` subagents. Pass: `run-uuid`, the new `iteration`.
     - Repeat until no issues or max iterations reached.
 - **Maximum 3 iterations.** If issues persist after 3 test-fix cycles, stop the run and follow the failure handling procedure (write `failure-summary.md` with the unresolved issues, set status to failed).
 - If no issues file is produced (or it's empty), proceed.
 
 ### Step 7 — Document
 
-Spawn two subagents using the `plantz-sdlc-document` skill (following the subagent protocol).
+Spawn two subagents using the `plantz-adlc-document` skill (following the subagent protocol).
 Pass: `run-uuid`, the final iteration number.
 
 ### Step 8 — Merge
 
-Spawn **one** subagent using the `plantz-sdlc-merge` skill. This step uses a single subagent only — concurrent git operations would conflict.
+Spawn **one** subagent using the `plantz-adlc-merge` skill. This step uses a single subagent only — concurrent git operations would conflict.
 Pass: `run-uuid`, the branch name from step 2, the commit type from step 2, the plan path (`./tmp/runs/[run-uuid]/plan.md`).
 
 The merge subagent may return control in these cases:
 
-- **CI failure:** Update `orchestrator-state.md` sub-phase to `ci-fix` and increment `CI fix attempts`. The merge subagent writes `ci-issues-[attempt].md` and returns. The orchestrator spawns `plantz-sdlc-code` subagents (2 subagents, following the subagent protocol) with: `run-uuid`, `iteration` continuing from where the test phase left off, plan path, the CI issues file, and the latest changes file. After the code subagent returns, run the escalation check (see "Escalation Check"). If no escalation, run `pnpm lint` to catch regressions before pushing again. Then spawn a new merge subagent to commit, push, and resume monitoring. **Maximum 3 CI fix attempts** — if CI still fails, follow the failure handling procedure.
-- **PR comments:** Update `orchestrator-state.md` sub-phase to `pr-comments` and increment `PR comment cycles`. The merge subagent writes `pr-comments-[attempt].md` and returns. The orchestrator spawns `plantz-sdlc-code` and/or `plantz-sdlc-document` subagents (2 subagents each, following the subagent protocol) to address legitimate comments. After the fix, spawn a new merge subagent to commit, push, resolve comments, and resume monitoring. **Maximum 3 PR comment cycles** — if comments keep coming, follow the failure handling procedure.
+- **CI failure:** Update `orchestrator-state.md` sub-phase to `ci-fix` and increment `CI fix attempts`. The merge subagent writes `ci-issues-[attempt].md` and returns. The orchestrator spawns `plantz-adlc-code` subagents (2 subagents, following the subagent protocol) with: `run-uuid`, `iteration` continuing from where the test phase left off, plan path, the CI issues file, and the latest changes file. After the code subagent returns, run the escalation check (see "Escalation Check"). If no escalation, run `pnpm lint` to catch regressions before pushing again. Then spawn a new merge subagent to commit, push, and resume monitoring. **Maximum 3 CI fix attempts** — if CI still fails, follow the failure handling procedure.
+- **PR comments:** Update `orchestrator-state.md` sub-phase to `pr-comments` and increment `PR comment cycles`. The merge subagent writes `pr-comments-[attempt].md` and returns. The orchestrator spawns `plantz-adlc-code` and/or `plantz-adlc-document` subagents (2 subagents each, following the subagent protocol) to address legitimate comments. After the fix, spawn a new merge subagent to commit, push, resolve comments, and resume monitoring. **Maximum 3 PR comment cycles** — if comments keep coming, follow the failure handling procedure.
 
 ### Step 9 — Clean up
 
@@ -168,7 +170,7 @@ Referenced from Step 4, Step 6, and Step 8. After any code subagent returns, che
 
 1. Read `orchestrator-state.md` to check whether `Plan revised` is already `yes`. If so, this is a second escalation — follow the failure handling procedure immediately.
 2. Read the escalation file and judge whether the issue is genuinely structural (the plan's approach is fundamentally wrong) or whether the code agent is being too cautious about a fixable problem.
-3. **If justified:** Spawn new `plantz-sdlc-plan` subagents (following the subagent protocol) with the original feature description, the current `plan.md` path, and the escalation file path. They revise `plan.md`. After the plan subagents finish, delete all `escalation-*.md`, `changes-*.md`, `test-issues-*.md`, and `ci-issues-*.md` files from the run folder. Then reset the working tree and undo any commits from the failed approach:
+3. **If justified:** Spawn new `plantz-adlc-plan` subagents (following the subagent protocol) with `mode=revision`, the original feature description, the current `plan.md` path, and the escalation file path. They revise `plan.md`. After the plan subagents finish, delete all `escalation-*.md`, `changes-*.md`, `test-issues-*.md`, and `ci-issues-*.md` files from the run folder. Then reset the working tree and undo any commits from the failed approach:
     ```bash
     # If escalation happened during Step 8 (code was already committed), undo the commit:
     # git reset HEAD~1

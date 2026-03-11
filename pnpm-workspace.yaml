@@ -3,9 +3,11 @@ packages:
     - packages/**
 
 onlyBuiltDependencies:
+    - agent-browser
     - "@parcel/watcher"
     - core-js
     - esbuild
+    - msw
     - netlify-cli
     - protobufjs
     - sharp

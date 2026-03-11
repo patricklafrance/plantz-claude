@@ -1,6 +1,6 @@
-# Create SDLC Agent Skills
+# Create ADLC Agent Skills
 
-Create a collection of agent skills that map the Software Development Lifecycle. These skills will be used by an orchestrator agent and specialized subagents to develop a feature end-to-end.
+Create a collection of agent skills that map the Agent Development Life Cycle (ADLC). These skills will be used by an orchestrator agent and specialized subagents to develop a feature end-to-end.
 
 All agent skills must be created using the `skill-creator` agent skill with 2 subagents to assist and challenge each other.
 
@@ -8,28 +8,28 @@ All agent skills must be created using the `skill-creator` agent skill with 2 su
 
 | Skill                      | Purpose                                                                                       |
 | -------------------------- | --------------------------------------------------------------------------------------------- |
-| `plantz-sdlc-orchestrator` | Entry point. Leads the feature development, spawns subagents, coordinates steps sequentially. |
-| `plantz-sdlc-plan`         | Drafts the technical plan and outputs it to a file.                                           |
-| `plantz-sdlc-code`         | Implements the plan or fixes issues, outputs a changes summary file.                          |
-| `plantz-sdlc-test`         | Validates code quality — lint, module structure, quality gates, smoke tests.                  |
-| `plantz-sdlc-document`     | Audits and fixes drift in agent-docs and CLAUDE.md after implementation.                      |
-| `plantz-sdlc-merge`        | Commits, pushes, opens a PR, and monitors CI.                                                 |
+| `plantz-adlc-orchestrator` | Entry point. Leads the feature development, spawns subagents, coordinates steps sequentially. |
+| `plantz-adlc-plan`         | Drafts the technical plan and outputs it to a file.                                           |
+| `plantz-adlc-code`         | Implements the plan or fixes issues, outputs a changes summary file.                          |
+| `plantz-adlc-test`         | Validates code quality — lint, module structure, quality gates, smoke tests.                  |
+| `plantz-adlc-document`     | Audits and fixes drift in agent-docs and CLAUDE.md after implementation.                      |
+| `plantz-adlc-merge`        | Commits, pushes, opens a PR, and monitors CI.                                                 |
 
 ---
 
 ## Shared tech-stack constraints
 
-> **IMPORTANT — self-contained skills.** The constraints below apply to `plantz-sdlc-plan`, `plantz-sdlc-code`, and `plantz-sdlc-test`. Each skill must embed the tech-stack content in its own `references/` subfiles so it is fully self-contained at runtime — subagents are stateless and should never need to read another skill's files. The skill-creator writes the content once (in `plantz-sdlc-plan`) then copies the reference files to `plantz-sdlc-code` and `plantz-sdlc-test`. Each copied reference file must include a comment at the top: `<!-- Canonical source: plantz-sdlc-plan. Keep in sync with plantz-sdlc-code, plantz-sdlc-test. -->`.
+> **IMPORTANT — self-contained skills.** The constraints below apply to `plantz-adlc-plan`, `plantz-adlc-code`, and `plantz-adlc-test`. Each skill must embed the tech-stack content in its own `references/` subfiles so it is fully self-contained at runtime — subagents are stateless and should never need to read another skill's files. The skill-creator writes the content once (in `plantz-adlc-plan`) then copies the reference files to `plantz-adlc-code` and `plantz-adlc-test`. Each copied reference file must include a comment at the top: `<!-- Canonical source: plantz-adlc-plan. Keep in sync with plantz-adlc-code, plantz-adlc-test. -->`.
 
 ### One-time migration tasks for skill-creator
 
 > **These instructions are for the skill-creator only — do NOT embed any of the following in the generated skill files.** These are one-time setup actions that happen when the skills are first created.
 
-> The following `agent-docs/references/` files contain content that belongs in these SDLC skills: `color-mode.md`, `responsive-layout.md`, `tanstack-db.md`, `storybook.md`, `shadcn.md`, `quality-gates.md`, `tailwind-postcss.md`. Absorb their content into the skill's own `references/` subfiles (the skill-creator decides the file structure — one file per topic, merged files, whatever makes sense). After absorbing each file:
+> The following `agent-docs/references/` files contain content that belongs in these ADLC skills: `color-mode.md`, `responsive-layout.md`, `tanstack-db.md`, `storybook.md`, `shadcn.md`, `quality-gates.md`, `tailwind-postcss.md`. Absorb their content into the skill's own `references/` subfiles (the skill-creator decides the file structure — one file per topic, merged files, whatever makes sense). After absorbing each file:
 >
 > 1. Delete the original from `agent-docs/references/`.
 > 2. Remove its entry from the root `CLAUDE.md` index.
-> 3. Update nested `CLAUDE.md` files that reference the deleted file — replace the reference with "load the `plantz-sdlc-code` skill for [topic] conventions." Known files to update:
+> 3. Update nested `CLAUDE.md` files that reference the deleted file — replace the reference with "load the `plantz-adlc-code` skill for [topic] conventions." Known files to update:
 >     - `packages/components/CLAUDE.md` — references `storybook.md`, `shadcn.md`
 >     - `apps/management/CLAUDE.md` — references `storybook.md`
 >     - `apps/today/CLAUDE.md` — references `storybook.md`
@@ -86,7 +86,7 @@ Every orchestrator step must include this fallback: if a subagent fails to produ
 
 ---
 
-## plantz-sdlc-orchestrator
+## plantz-adlc-orchestrator
 
 Entry point for developing a new feature. Leads the process, spawns subagents, and coordinates their work sequentially.
 
@@ -103,35 +103,35 @@ Entry point for developing a new feature. Leads the process, spawns subagents, a
    Use the conventional commit type matching the feature intent: `feat`, `fix`, `chore`, `docs`, `refactor`.
    Example: `feat/add-watering-schedules`.
 
-3. **Plan** — Spawn two subagents using the `plantz-sdlc-plan` skill (following the subagent protocol).
+3. **Plan** — Spawn two subagents using the `plantz-adlc-plan` skill (following the subagent protocol).
    Pass: `run-uuid`, feature description.
    When done, verify `./tmp/runs/[run-uuid]/plan.md` exists. If not, fail the run.
 
-4. **Code** — Spawn two subagents using the `plantz-sdlc-code` skill.
+4. **Code** — Spawn two subagents using the `plantz-adlc-code` skill.
    Pass: `run-uuid`, `iteration=1`, plan path. Issues path and changes path are `null` for iteration 1.
    When done, verify `./tmp/runs/[run-uuid]/changes-1.md` exists. If not, fail the run.
 
-5. **Test and iterate** — Spawn two subagents using the `plantz-sdlc-test` skill.
+5. **Test and iterate** — Spawn two subagents using the `plantz-adlc-test` skill.
    Pass: `run-uuid`, `iteration=1`, `run-smoke-tests=true`.
     - If `./tmp/runs/[run-uuid]/test-issues-[iteration].md` is produced with issues:
         - Increment the iteration number. Update `orchestrator-state.md` with the new iteration and sub-phase (`code`).
-        - Spawn new `plantz-sdlc-code` subagents. Pass: `run-uuid`, the new `iteration`, plan path, the previous iteration's issues file path, and the previous iteration's changes file path. They produce `changes-[iteration].md`.
+        - Spawn new `plantz-adlc-code` subagents. Pass: `run-uuid`, the new `iteration`, plan path, the previous iteration's issues file path, and the previous iteration's changes file path. They produce `changes-[iteration].md`.
         - Update `orchestrator-state.md` sub-phase to `test`. Determine `run-smoke-tests`: set to `true` if the previous `test-issues-*.md` contained findings under "Visual verification", "Accessibility", or "Keyboard navigation" sections; otherwise `false`.
-        - Spawn new `plantz-sdlc-test` subagents. Pass: `run-uuid`, the new `iteration`, the determined `run-smoke-tests` value.
+        - Spawn new `plantz-adlc-test` subagents. Pass: `run-uuid`, the new `iteration`, the determined `run-smoke-tests` value.
         - Repeat until no issues or max iterations reached.
     - **Maximum 3 iterations.** If issues persist after 3 test-fix cycles, stop the run and report the unresolved issues to the user.
     - If no issues file is produced (or it's empty), proceed.
 
 6. **Simplify** — Run the `/simplify` skill on all files listed across `./tmp/runs/[run-uuid]/changes-*.md` to review for dead code, redundant abstractions, and over-engineering. After simplification completes, run `pnpm lint` to verify nothing was broken. If lint fails, fix the issues before proceeding.
 
-7. **Document** — Spawn two subagents using the `plantz-sdlc-document` skill (following the subagent protocol).
+7. **Document** — Spawn two subagents using the `plantz-adlc-document` skill (following the subagent protocol).
    Pass: `run-uuid`, the final iteration number.
 
-8. **Merge** — Spawn one subagent using the `plantz-sdlc-merge` skill. This step uses a single subagent only — concurrent git operations would conflict.
+8. **Merge** — Spawn one subagent using the `plantz-adlc-merge` skill. This step uses a single subagent only — concurrent git operations would conflict.
    Pass: `run-uuid`, the branch name from step 2, the commit type from step 2.
    The merge subagent may return control in these cases:
-    - **CI failure:** The merge subagent writes `ci-issues-[attempt].md` and returns. The orchestrator spawns `plantz-sdlc-code` subagents (2 subagents, following the subagent protocol) with: `run-uuid`, `iteration` continuing from where the test phase left off, plan path, the CI issues file, and the latest changes file. After the fix, spawn a new merge subagent to commit, push, and resume monitoring. **Maximum 2 CI fix attempts** — if CI still fails, stop and report to the user.
-    - **PR comments:** The merge subagent writes `pr-comments-[attempt].md` and returns. The orchestrator spawns `plantz-sdlc-code` and/or `plantz-sdlc-document` subagents to address legitimate comments. After the fix, spawn a new merge subagent to commit, push, resolve comments, and resume monitoring.
+    - **CI failure:** The merge subagent writes `ci-issues-[attempt].md` and returns. The orchestrator spawns `plantz-adlc-code` subagents (2 subagents, following the subagent protocol) with: `run-uuid`, `iteration` continuing from where the test phase left off, plan path, the CI issues file, and the latest changes file. After the fix, spawn a new merge subagent to commit, push, and resume monitoring. **Maximum 2 CI fix attempts** — if CI still fails, stop and report to the user.
+    - **PR comments:** The merge subagent writes `pr-comments-[attempt].md` and returns. The orchestrator spawns `plantz-adlc-code` and/or `plantz-adlc-document` subagents to address legitimate comments. After the fix, spawn a new merge subagent to commit, push, resolve comments, and resume monitoring.
 
 9. **Clean up** — Delete the `./tmp/runs/[run-uuid]/` folder.
 
@@ -166,7 +166,7 @@ The orchestrator maintains the iteration counter (starting at 1). Each test-fix 
 
 ---
 
-## plantz-sdlc-plan
+## plantz-adlc-plan
 
 Drafts the technical approach for the feature.
 
@@ -233,7 +233,7 @@ Spawn two subagents following the subagent protocol: one drafts the plan, the ot
 
 ---
 
-## plantz-sdlc-code
+## plantz-adlc-code
 
 Implements the plan or fixes issues reported by the test phase.
 
@@ -288,7 +288,7 @@ Spawn two subagents following the subagent protocol: Subagent A implements the f
 
 ---
 
-## plantz-sdlc-test
+## plantz-adlc-test
 
 Validates that the generated code meets quality standards. Does NOT fix issues — only reports them.
 
@@ -364,7 +364,7 @@ Subagent A runs all checks (1-5) sequentially and writes the test issues file. S
 
 ---
 
-## plantz-sdlc-document
+## plantz-adlc-document
 
 Audits agent documentation for drift after implementation and fixes any issues found.
 
@@ -390,7 +390,7 @@ One subagent performs the audit and applies fixes. A second subagent reviews the
 
 ---
 
-## plantz-sdlc-merge
+## plantz-adlc-merge
 
 Handles committing, pushing, opening a PR, and monitoring CI. Uses a **single subagent** — concurrent git operations would conflict.
 
@@ -464,7 +464,7 @@ All skills must include YAML frontmatter matching the pattern used by existing `
 
 ```yaml
 ---
-name: plantz-sdlc-{name}
+name: plantz-adlc-{name}
 description: |
     {1-2 sentence description}
 disable-model-invocation: true
@@ -474,13 +474,13 @@ license: MIT
 
 ## Skill file location
 
-All new skills must be created under `.claude/skills/plantz-sdlc-{name}/SKILL.md`. The tech-stack reference files are duplicated across `plantz-sdlc-plan`, `plantz-sdlc-code`, and `plantz-sdlc-test` so each skill is self-contained. The skill-creator writes the references once (in `plantz-sdlc-plan`), then copies them to the other two skills with a sync comment at the top of each copy.
+All new skills must be created under `.claude/skills/plantz-adlc-{name}/SKILL.md`. The tech-stack reference files are duplicated across `plantz-adlc-plan`, `plantz-adlc-code`, and `plantz-adlc-test` so each skill is self-contained. The skill-creator writes the references once (in `plantz-adlc-plan`), then copies them to the other two skills with a sync comment at the top of each copy.
 
 ## Content placement guide
 
 Where shared content goes in the generated skill files:
 
-- **Subagent protocol, failure handling, state persistence, iteration tracking** → `plantz-sdlc-orchestrator` SKILL.md only. Individual skills have their own "Subagent pattern" section describing roles, which is sufficient for subagents.
+- **Subagent protocol, failure handling, state persistence, iteration tracking** → `plantz-adlc-orchestrator` SKILL.md only. Individual skills have their own "Subagent pattern" section describing roles, which is sufficient for subagents.
 - **Pre-read requirements** (ARCHITECTURE.md, ADR, ODR) → embedded in the procedure of each skill that needs them (plan, code, test, document).
 - **Technology rules** → embedded in each skill's `references/` subfiles (plan, code, test). The `references/` files should include both the absorbed content AND the "load skill X" instructions (e.g., "load the `workleap-react-best-practices` skill for React conventions"). This way, when the procedure says "read all files in this skill's `references/` directory", the agent discovers both the reference content and the skills to load.
-- **Scaffolding instructions** → embedded in `plantz-sdlc-plan` (notes scaffolding in the plan) and `plantz-sdlc-code` (executes scaffolding on iteration 1).
+- **Scaffolding instructions** → embedded in `plantz-adlc-plan` (notes scaffolding in the plan) and `plantz-adlc-code` (executes scaffolding on iteration 1).

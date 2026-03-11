@@ -9,6 +9,7 @@ pnpx skills add https://github.com/antfu/skills --skill pnpm -a claude-code -y
 pnpx skills add https://github.com/vercel/turborepo --skill turborepo -a claude-code -y
 pnpx skills add https://github.com/anthropics/skills --skill frontend-design -a claude-code -y
 pnpx skills add https://github.com/shadcn/ui --skill shadcn -a codex claude-code -y
+pnpx skills add https://github.com/netlify/context-and-tools --skill netlify-cli-and-deploy -a codex claude-code -y
 
 pnpx skills add https://github.com/workleap/wl-web-configs --skill workleap-chromatic-best-practices -a codex --full-depth -y
 pnpx skills add https://github.com/addyosmani/web-quality-skills --skill best-practices -a codex -y

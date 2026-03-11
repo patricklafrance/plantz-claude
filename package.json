@@ -39,6 +39,7 @@
         "@workleap/typescript-configs": "3.0.7",
         "agent-browser": "0.17.1",
         "cross-env": "10.1.0",
+        "netlify-cli": "24.0.1",
         "oxfmt": "0.36.0",
         "oxlint": "1.51.0",
         "syncpack": "14.0.0",
@@ -53,7 +54,14 @@
     "pnpm": {
         "onlyBuiltDependencies": [
             "agent-browser",
-            "msw"
+            "@parcel/watcher",
+            "core-js",
+            "esbuild",
+            "msw",
+            "netlify-cli",
+            "protobufjs",
+            "sharp",
+            "unix-dgram"
         ]
     },
     "msw": {

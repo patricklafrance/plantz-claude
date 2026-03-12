@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
+import { PlantListHeader } from "./PlantListHeader.tsx";
 import { PlantListItem } from "./PlantListItem.tsx";
 import type { Plant } from "./plantSchema.ts";
 
@@ -43,7 +44,7 @@ const meta = {
     },
     decorators: [
         (Story) => (
-            <div className="border-border w-full max-w-[900px] rounded-lg border">
+            <div className="border-border w-full max-w-[1200px] rounded-lg border">
                 <Story />
             </div>
         ),
@@ -108,16 +109,6 @@ export const MinimalFields: Story = {
     },
 };
 
-export const DueToday: Story = {
-    args: {
-        // Use FAR_PAST — a plant due "today" would be non-deterministic across runs,
-        // so we test the "due" visual state with a clearly past date instead.
-        plant: makePlant({
-            nextWateringDate: FAR_PAST,
-        }),
-    },
-};
-
 export const NoEditButton: Story = {
     args: {
         plant: makePlant(),
@@ -150,4 +141,16 @@ export const ClickOnly: Story = {
         onDelete: undefined,
         selected: undefined,
     },
+};
+
+export const WithHeader: Story = {
+    args: {
+        plant: makePlant(),
+    },
+    render: (args) => (
+        <div>
+            <PlantListHeader showCheckbox showActions />
+            <PlantListItem {...args} />
+        </div>
+    ),
 };

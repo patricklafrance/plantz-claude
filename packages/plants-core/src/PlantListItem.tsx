@@ -4,6 +4,7 @@ import { memo, useCallback, type MouseEvent } from "react";
 import { Button, Checkbox } from "@packages/components";
 
 import { locations, wateringTypes } from "./constants.ts";
+import { PLANT_LIST_GRID } from "./plantListLayout.ts";
 import type { Plant } from "./plantSchema.ts";
 import { getOptionLabel, isDueForWatering } from "./plantUtils.ts";
 
@@ -65,21 +66,22 @@ export const PlantListItem = memo(function PlantListItem({ plant, selected = fal
                     <Checkbox checked={selected} onCheckedChange={handleToggleSelect} aria-label={`Select ${plant.name}`} />
                 </span>
             )}
-            <div className="flex min-w-0 flex-1 items-center gap-4">
-                <div className="flex min-w-0 flex-1 flex-col md:flex-row md:items-center md:gap-4">
-                    <div className="flex items-center gap-2">
-                        <span className="truncate text-sm font-medium">{plant.name}</span>
-                        {due && (
-                            <>
-                                <Droplets className="text-destructive size-3.5 shrink-0" aria-hidden="true" />
-                                <span className="sr-only">Due for watering</span>
-                            </>
-                        )}
-                    </div>
-                    <span className="text-muted-foreground truncate text-xs whitespace-nowrap">
-                        {plant.wateringQuantity} · {getOptionLabel(wateringTypes, plant.wateringType)} · {getOptionLabel(locations, plant.location)}
-                    </span>
+            <div className={`flex min-w-0 flex-1 flex-col gap-0.5 ${PLANT_LIST_GRID} md:items-center md:gap-4`}>
+                <div className="flex w-full items-center gap-2">
+                    <span className="truncate text-sm font-medium">{plant.name}</span>
+                    {due && (
+                        <>
+                            <Droplets className="text-destructive size-3.5 shrink-0" aria-hidden="true" />
+                            <span className="sr-only">Due for watering</span>
+                        </>
+                    )}
                 </div>
+                <span className="text-muted-foreground w-full truncate text-xs whitespace-nowrap md:hidden">
+                    {plant.wateringQuantity} · {getOptionLabel(wateringTypes, plant.wateringType)} · {getOptionLabel(locations, plant.location)}
+                </span>
+                <span className="text-muted-foreground hidden truncate text-xs md:block">{plant.wateringQuantity}</span>
+                <span className="text-muted-foreground hidden truncate text-xs md:block">{getOptionLabel(wateringTypes, plant.wateringType)}</span>
+                <span className="text-muted-foreground hidden truncate text-xs md:block">{getOptionLabel(locations, plant.location)}</span>
             </div>
             <div className="flex shrink-0 items-center gap-1">
                 {onEdit && (

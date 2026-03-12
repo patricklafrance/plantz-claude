@@ -34,7 +34,7 @@ export const Number = {
 } satisfies Story;
 
 export const File = {
-    args: { type: "file", placeholder: undefined },
+    args: { type: "file", placeholder: undefined, "aria-label": "Upload file" },
 } satisfies Story;
 
 export const Disabled = {
@@ -64,11 +64,11 @@ export const AllVariants: Story = {
                 ))}
                 <div className="flex flex-col gap-2">
                     <span className="text-muted-foreground text-sm font-medium">file</span>
-                    <Input type="file" />
+                    <Input type="file" aria-label="Upload file" />
                 </div>
                 <div className="flex flex-col gap-2">
                     <span className="text-muted-foreground text-sm font-medium">disabled</span>
-                    <Input disabled defaultValue="Disabled input" />
+                    <Input disabled defaultValue="Disabled input" aria-label="Disabled input" />
                 </div>
                 <div className="flex flex-col gap-2">
                     <span className="text-muted-foreground text-sm font-medium">with label</span>

@@ -1,5 +1,5 @@
 import { Check, Droplets, Pencil, Trash2 } from "lucide-react";
-import { memo, useCallback, type MouseEvent } from "react";
+import { memo, useCallback } from "react";
 
 import { Button, Checkbox } from "@packages/components";
 
@@ -7,10 +7,6 @@ import { locations, wateringTypes } from "./constants.ts";
 import { PLANT_LIST_GRID } from "./plantListLayout.ts";
 import type { Plant } from "./plantSchema.ts";
 import { getOptionLabel, isDueForWatering } from "./plantUtils.ts";
-
-function stopPropagation(e: MouseEvent) {
-    e.stopPropagation();
-}
 
 interface PlantListItemProps {
     plant: Plant;
@@ -28,41 +24,14 @@ export const PlantListItem = memo(function PlantListItem({ plant, selected = fal
 
     const handleToggleSelect = useCallback(() => onToggleSelect?.(plant.id), [onToggleSelect, plant.id]);
     const handleClick = useCallback(() => (onClick ?? onEdit)?.(plant), [onClick, onEdit, plant]);
-    const handleEdit = useCallback(
-        (e: MouseEvent) => {
-            e.stopPropagation();
-            onEdit?.(plant);
-        },
-        [onEdit, plant],
-    );
-    const handleDelete = useCallback(
-        (e: MouseEvent) => {
-            e.stopPropagation();
-            onDelete?.(plant);
-        },
-        [onDelete, plant],
-    );
+    const handleEdit = useCallback(() => onEdit?.(plant), [onEdit, plant]);
+    const handleDelete = useCallback(() => onDelete?.(plant), [onDelete, plant]);
 
     return (
-        <div
-            className={`border-border flex h-full items-center gap-3 border-b px-4 py-2.5 transition-colors ${due ? "bg-destructive/5" : "hover:bg-muted/50"}`}
-            role={isClickable ? "button" : undefined}
-            tabIndex={isClickable ? 0 : undefined}
-            onClick={isClickable ? handleClick : undefined}
-            onKeyDown={
-                isClickable
-                    ? (e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                              e.preventDefault();
-                              handleClick();
-                          }
-                      }
-                    : undefined
-            }
-        >
+        <div className={`border-border relative flex h-full items-center gap-3 border-b px-4 py-2.5 transition-colors ${due ? "bg-destructive/5" : "hover:bg-muted/50"}`}>
+            {isClickable && <button type="button" onClick={handleClick} aria-label={`View ${plant.name}`} className="focus-visible:outline-ring absolute inset-0 z-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-[-2px]" />}
             {onToggleSelect && (
-                // oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- stopPropagation prevents row click; checkbox handles its own keyboard events
-                <span onClick={stopPropagation}>
+                <span className="relative z-10">
                     <Checkbox checked={selected} onCheckedChange={handleToggleSelect} aria-label={`Select ${plant.name}`} />
                 </span>
             )}
@@ -86,7 +55,7 @@ export const PlantListItem = memo(function PlantListItem({ plant, selected = fal
                 <span className="hidden md:block">{plant.mistLeaves && <Check className="text-muted-foreground size-3.5" aria-label="Mist leaves" />}</span>
             </div>
             {(onEdit || onDelete) && (
-                <div className="flex shrink-0 items-center gap-1">
+                <div className="relative z-10 flex shrink-0 items-center gap-1">
                     {onEdit && (
                         <Button variant="ghost" size="icon-xs" onClick={handleEdit} aria-label={`Edit ${plant.name}`}>
                             <Pencil />

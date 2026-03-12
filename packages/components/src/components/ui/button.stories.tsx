@@ -60,19 +60,19 @@ export const SizeLg = {
 } satisfies Story;
 
 export const Icon = {
-    args: { size: "icon", children: <Leaf /> },
+    args: { size: "icon", children: <Leaf />, "aria-label": "Add leaf" },
 } satisfies Story;
 
 export const IconXs = {
-    args: { size: "icon-xs", children: <Leaf /> },
+    args: { size: "icon-xs", children: <Leaf />, "aria-label": "Add leaf" },
 } satisfies Story;
 
 export const IconSm = {
-    args: { size: "icon-sm", children: <Leaf /> },
+    args: { size: "icon-sm", children: <Leaf />, "aria-label": "Add leaf" },
 } satisfies Story;
 
 export const IconLg = {
-    args: { size: "icon-lg", children: <Leaf /> },
+    args: { size: "icon-lg", children: <Leaf />, "aria-label": "Add leaf" },
 } satisfies Story;
 
 const variants = ["default", "outline", "secondary", "ghost", "destructive", "link"] as const;
@@ -92,7 +92,7 @@ export const AllVariants: Story = {
                             </Button>
                         ))}
                         {iconSizes.map((size) => (
-                            <Button key={size} variant={variant} size={size}>
+                            <Button key={size} variant={variant} size={size} aria-label={`${variant} ${size}`}>
                                 <Leaf />
                             </Button>
                         ))}

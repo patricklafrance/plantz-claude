@@ -6,6 +6,9 @@ import { Label } from "./label.tsx";
 const meta = {
     title: "Components/Checkbox",
     component: Checkbox,
+    args: {
+        "aria-label": "Toggle",
+    },
 } satisfies Meta<typeof Checkbox>;
 
 export default meta;

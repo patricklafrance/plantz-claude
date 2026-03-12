@@ -44,16 +44,27 @@ Four pillars make this repo fully agent-driven. Each section links to the implem
 
 Six skills that form a complete Agent Development Life Cycle (ADLC). The orchestrator (`/plantz-adlc-orchestrator`) is the sole entry point for feature development — it spawns subagents for each phase and coordinates them through file-based handoffs in `./tmp/runs/[uuid]/`.
 
-```
-User: "Add watering schedules to the management domain"
-  └─ Orchestrator (step 1-9)
-       ├─ Plan     → plan.md  (acceptance criteria with [static]/[visual]/[interactive] tags)
-       ├─ Code     → changes-1.md  (scaffolds modules, implements features, uses browser for feedback)
-       ├─ Simplify → /simplify on changed files
-       ├─ Test     → test-issues-1.md or ∅  (lint, modules, accessibility, browser verification)
-       │    └─ Fix loop: Code → Test → Code → Test  (max 3 iterations)
-       ├─ Document → audits agent-docs for drift
-       └─ Merge    → commit, PR, monitor CI
+```mermaid
+flowchart TD
+    Start([User request]) --> Orch
+
+    subgraph Orch["Orchestrator"]
+        direction TB
+        Plan["<b>Plan</b><br/>A drafts · B reviews"] -- "plan.md" -->
+        Code["<b>Code</b><br/>A implements · B reviews"] -- "changes.md" -->
+        Simplify["<b>Simplify</b>"] -->
+        Test["<b>Test</b><br/>A validates · B reviews"]
+        Test -- "issues found" --> Code
+        Test -- "all passed" -->
+        Document["<b>Document</b><br/>A audits · B reviews"] -->
+        Merge["<b>Merge</b><br/>commit, PR, CI"]
+    end
+
+    Merge --> Done([PR ready])
+
+    style Start fill:#4ade80,stroke:#16a34a,color:#000
+    style Done fill:#4ade80,stroke:#16a34a,color:#000
+    style Orch fill:#f0f9ff,stroke:#0284c7
 ```
 
 | Skill                      | What it does                                                                                                   |

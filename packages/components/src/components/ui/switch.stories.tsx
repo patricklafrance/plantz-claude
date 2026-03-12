@@ -6,6 +6,9 @@ import { Switch } from "./switch.tsx";
 const meta = {
     title: "Components/Switch",
     component: Switch,
+    args: {
+        "aria-label": "Toggle",
+    },
     argTypes: {
         size: {
             control: "select",
@@ -56,20 +59,20 @@ export const AllVariants: Story = {
                         <span className="text-muted-foreground text-sm font-medium">{size}</span>
                         <div className="flex items-center gap-4">
                             <div className="flex items-center gap-2">
-                                <Switch size={size} />
-                                <Label>Unchecked</Label>
+                                <Switch id={`${size}-unchecked`} size={size} />
+                                <Label htmlFor={`${size}-unchecked`}>Unchecked</Label>
                             </div>
                             <div className="flex items-center gap-2">
-                                <Switch size={size} defaultChecked />
-                                <Label>Checked</Label>
+                                <Switch id={`${size}-checked`} size={size} defaultChecked />
+                                <Label htmlFor={`${size}-checked`}>Checked</Label>
                             </div>
                             <div className="flex items-center gap-2">
-                                <Switch size={size} disabled />
-                                <Label>Disabled</Label>
+                                <Switch id={`${size}-disabled`} size={size} disabled />
+                                <Label htmlFor={`${size}-disabled`}>Disabled</Label>
                             </div>
                             <div className="flex items-center gap-2">
-                                <Switch size={size} disabled defaultChecked />
-                                <Label>Disabled Checked</Label>
+                                <Switch id={`${size}-disabled-checked`} size={size} disabled defaultChecked />
+                                <Label htmlFor={`${size}-disabled-checked`}>Disabled Checked</Label>
                             </div>
                         </div>
                     </div>

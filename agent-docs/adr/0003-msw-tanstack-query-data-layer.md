@@ -12,11 +12,7 @@ A standalone local API server (e.g., json-server) was rejected because it adds p
 
 ### Per-module collections
 
-Each module creates its own TanStack DB collection singleton during Squide registration using the `createPlantsCollection` factory from `@packages/plants-core/collection`. The host creates `QueryClient` first and passes it to module registration functions. Components access the collection via a module-level getter (e.g., `getManagementPlantsCollection()`). No React context or providers are needed for the collection — it operates as a plain module singleton.
-
-### HMR cleanup
-
-Collection singletons use `import.meta.hot.dispose` to reset on HMR, and init functions are idempotent (early-return if already initialized). This prevents duplicate collections or stale state during development.
+Each module creates its own TanStack DB collection during Squide registration using the `createPlantsCollection` factory from `@packages/plants-core/collection`. The host creates `QueryClient` first and passes it to module registration functions. The collection is provided to components via React Context (e.g., `ManagementPlantsCollectionProvider` / `useManagementPlantsCollection()`). In Storybook, a `CollectionDecorator` creates a fresh `QueryClient` and collection per story via `useMemo`.
 
 ### BFF-per-module constraint
 
@@ -30,6 +26,6 @@ This mirrors a real BFF (backend-for-frontend) architecture: each frontend surfa
 - Adding a new module requires creating its own `plantsCollection.ts` and `mocks/` folder with module-scoped handlers and collection — even if the entity already exists in another module.
 - URL namespaces must not collide between modules.
 - TanStack DB is beta — pin exact versions and monitor for breaking changes.
-- Domain modules need a `storybook.setup.ts` wiring `initializeFireflyForStorybook` and `withModuleDecorator` from `@packages/core-squide/storybook`.
+- Domain modules need a `storybook.setup.tsx` wiring `initializeFireflyForStorybook` + `withFireflyDecorator` from `@squide/firefly-rsbuild-storybook`, and a `CollectionDecorator` for per-story collection context. MSW is managed globally via `msw-storybook-addon` in preview.tsx.
 
 See `msw-tanstack-query.md` in `.claude/skills/plantz-adlc-*/references/` for all implementation patterns.

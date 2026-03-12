@@ -6,7 +6,7 @@ import { applyPlantFilters, FilterBar, isDueForWatering, PlantListItem, usePlant
 import type { Plant } from "@packages/plants-core";
 
 import { PlantDetailDialog } from "./PlantDetailDialog.tsx";
-import { getTodayPlantsCollection } from "./plantsCollection.ts";
+import { useTodayPlantsCollection } from "./TodayPlantsContext.tsx";
 
 const scrollContainerStyle = { height: "calc(100vh - 340px)" };
 
@@ -15,7 +15,7 @@ export function LandingPage() {
     const [detailPlant, setDetailPlant] = useState<Plant | null>(null);
     const parentRef = useRef<HTMLDivElement>(null);
 
-    const collection = getTodayPlantsCollection();
+    const collection = useTodayPlantsCollection();
     const { data: allPlants, isReady } = useLiveQuery((q) => q.from({ plant: collection }));
 
     const plants = useMemo(() => {

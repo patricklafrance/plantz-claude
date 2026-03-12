@@ -21,7 +21,7 @@
         "zod": "^4.3.6"
     },
     "devDependencies": {
-        "@packages/core-squide": "workspace:*",
+        "@squide/firefly-rsbuild-storybook": "2.1.0",
         "@types/react": "19.2.9",
         "@types/react-dom": "19.2.3",
         "@typescript/native-preview": "7.0.0-dev.20260303.1",

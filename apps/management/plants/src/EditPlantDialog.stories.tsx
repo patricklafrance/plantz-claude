@@ -1,52 +1,21 @@
-import { http, HttpResponse } from "msw";
 import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
-import type { Plant } from "@packages/plants-core";
+import { makePlant, FAR_PAST, FAR_FUTURE } from "@packages/plants-core/test-utils";
 
 import { EditPlantDialog } from "./EditPlantDialog.tsx";
-import { moduleDecorator } from "./storybook.setup.ts";
-
-// Fixed dates for deterministic Chromatic snapshots.
-const FIXED_NOW = new Date(2026, 2, 10, 12, 0, 0, 0);
-const FIXED_FUTURE = new Date(2026, 2, 17, 0, 0, 0, 0);
-const FIXED_PAST = new Date(2026, 2, 8, 0, 0, 0, 0);
-
-function makePlant(overrides: Partial<Plant> = {}): Plant {
-    return {
-        id: "test-edit-1",
-        name: "Monstera Deliciosa",
-        description: "A tropical plant with large fenestrated leaves",
-        family: "Araceae",
-        location: "living-room",
-        luminosity: "medium",
-        mistLeaves: true,
-        soilType: "Well-draining mix",
-        wateringFrequency: "1-week",
-        wateringQuantity: "200ml",
-        wateringType: "surface",
-        nextWateringDate: FIXED_FUTURE,
-        creationDate: FIXED_NOW,
-        lastUpdateDate: FIXED_NOW,
-        ...overrides,
-    };
-}
+import { createManagementPlantHandlers } from "./mocks/index.ts";
+import { collectionDecorator, fireflyDecorator } from "./storybook.setup.tsx";
 
 const meta = {
     title: "Management/Plants/Components/EditPlantDialog",
     component: EditPlantDialog,
-    decorators: [moduleDecorator],
+    decorators: [collectionDecorator, fireflyDecorator],
     parameters: {
         chromatic: { viewports: [375, 768, 1280] },
-        msw: {
-            handlers: [
-                // Provide a handler for the debounced auto-save so it doesn't produce network errors
-                http.put("/api/management/plants/:id", async ({ request }) => {
-                    const body = (await request.json()) as Record<string, unknown>;
-
-                    return HttpResponse.json({ ...body, lastUpdateDate: "2025-01-15T00:00:00.000Z" });
-                }),
-            ],
-        },
+        // The dialog auto-saves via PUT — provide empty plants so the factory
+        // stubs PUT with 200 instead of the plantsDb-backed defaults where
+        // test plant IDs don't exist.
+        msw: { handlers: createManagementPlantHandlers([]) },
     },
     args: {
         open: true,
@@ -61,16 +30,22 @@ type Story = StoryObj<typeof meta>;
 
 export const WithPlant: Story = {
     args: {
-        plant: makePlant(),
+        plant: makePlant({
+            id: "test-edit-1",
+            name: "Monstera Deliciosa",
+            description: "A tropical plant with large fenestrated leaves",
+            family: "Araceae",
+            soilType: "Well-draining mix",
+            nextWateringDate: FAR_FUTURE,
+        }),
     },
 };
 
 export const MinimalPlant: Story = {
     args: {
         plant: makePlant({
-            description: undefined,
-            family: undefined,
-            soilType: undefined,
+            id: "test-edit-2",
+            name: "Monstera Deliciosa",
         }),
     },
 };
@@ -78,6 +53,8 @@ export const MinimalPlant: Story = {
 export const AllOptionalFieldsFilled: Story = {
     args: {
         plant: makePlant({
+            id: "test-edit-3",
+            name: "Monstera Deliciosa",
             description: "Beautiful tropical plant known for its distinctive split leaves and aerial roots. Thrives in indirect light.",
             family: "Araceae",
             soilType: "Peat moss, perlite, and orchid bark mix",
@@ -87,19 +64,28 @@ export const AllOptionalFieldsFilled: Story = {
 
 export const DueForWatering: Story = {
     args: {
-        plant: makePlant({ nextWateringDate: FIXED_PAST }),
+        plant: makePlant({
+            id: "test-edit-4",
+            name: "Monstera Deliciosa",
+            nextWateringDate: FAR_PAST,
+        }),
     },
 };
 
 export const MistLeavesFalse: Story = {
     args: {
-        plant: makePlant({ mistLeaves: false }),
+        plant: makePlant({
+            id: "test-edit-5",
+            name: "Monstera Deliciosa",
+            mistLeaves: false,
+        }),
     },
 };
 
 export const LongFieldValues: Story = {
     args: {
         plant: makePlant({
+            id: "test-edit-6",
             name: "Philodendron Birkin Variegated Extra Special Limited Edition Tropical Houseplant Collection Premium Series",
             description:
                 "This is an exceptionally rare and beautiful tropical plant that has been carefully cultivated over many generations. Known for its distinctive pinstripe variegation patterns on dark green leaves, it thrives in indirect light conditions and requires consistent moisture without overwatering. Originally native to the tropical forests of South America.",
@@ -118,7 +104,10 @@ export const NullPlant: Story = {
 
 export const Closed: Story = {
     args: {
-        plant: makePlant(),
+        plant: makePlant({
+            id: "test-edit-1",
+            name: "Monstera Deliciosa",
+        }),
         open: false,
     },
 };

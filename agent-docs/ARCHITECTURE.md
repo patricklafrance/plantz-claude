@@ -21,7 +21,6 @@ plantz-claude/
     components/                    # Shared UI components — shadcn/ui + Tailwind v4 (@packages/components)
     plants-core/                   # Shared plant domain types, utilities, and components (@packages/plants-core)
     storybook/                     # Packages-layer Storybook runner for shared package stories (@apps/packages-storybook)
-    core-squide/                   # Squide integration utilities — Storybook helpers for MSW, collections, and module decorators (@packages/core-squide)
   tooling/                         # Build scripts (getAffectedStorybooks.ts)
   agent-docs/                      # Agent documentation (this folder)
   .agents/skills/                  # Shared agent skills (git-commit, etc.)
@@ -38,7 +37,7 @@ plantz-claude/
 | `apps/<domain>/<feature>` | `@modules/*`  | `@modules/management-plants` |
 | `packages/*`              | `@packages/*` | `@packages/plants-core`      |
 
-> **Exception:** `packages/storybook` uses `@apps/packages-storybook` (historical convention — Storybook runner apps always use `@apps/*`). Other packages like `packages/core-squide` follow the standard `@packages/*` scope.
+> **Exception:** `packages/storybook` uses `@apps/packages-storybook` (historical convention — Storybook runner apps always use `@apps/*`).
 
 ## Squide host/module topology
 
@@ -57,7 +56,7 @@ Two domain areas, each with independent Storybooks and Chromatic tokens:
 - **management** — Plant management features (`apps/management/`)
 - **today** — Daily watering view (`apps/today/`)
 
-A packages-layer Storybook (`packages/storybook/`, `@apps/packages-storybook`) is purely a runner for shared package stories — it contains no exported utilities. Storybook utilities (MSW integration, module decorators, collection helpers) live in `@packages/core-squide/storybook`. A unified Storybook (`apps/storybook/`) aggregates all stories across the entire repo.
+A packages-layer Storybook (`packages/storybook/`, `@apps/packages-storybook`) is purely a runner for shared package stories — it contains no exported utilities. Storybook infrastructure (MSW via `msw-storybook-addon`, Squide runtime via `@squide/firefly-rsbuild-storybook`, collection context) is configured per-domain in each module's `storybook.setup.tsx`. A unified Storybook (`apps/storybook/`) aggregates all stories across the entire repo.
 
 See [ADR-0002](adr/0002-domain-scoped-storybooks.md) for rationale.
 
@@ -67,7 +66,7 @@ There is no backend server. MSW intercepts browser `fetch()` calls and serves fr
 
 Each module owns its full API surface (a "BFF-per-module" model):
 
-- **Collection** — Each module creates a TanStack DB collection singleton during Squide registration via a factory from `@packages/plants-core/collection`. The host passes `QueryClient` to module registration functions. Components read data with `useLiveQuery` and write with `createOptimisticAction`.
+- **Collection** — Each module creates a TanStack DB collection during Squide registration via a factory from `@packages/plants-core/collection` and provides it to components via React Context. The host passes `QueryClient` to module registration functions. Components read data with `useLiveQuery` and write with `createOptimisticAction`.
 - **Handlers** — MSW request handlers live in the module's `mocks/` folder, scoped to `/api/<domain>/<entity>` URLs (e.g., `/api/management/plants`, `/api/today/plants`).
 - **Shared DB** — All modules read/write the same in-memory store, exposed via `@packages/plants-core/db`. This is the only shared data dependency. Cross-module visibility works through the shared DB, not shared client-side collections.
 

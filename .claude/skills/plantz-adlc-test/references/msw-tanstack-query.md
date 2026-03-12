@@ -12,7 +12,7 @@
 
 ## Data Flow
 
-1. Modules create a TanStack DB collection singleton during Squide registration via `createPlantsCollection` factory from `@packages/plants-core/collection`
+1. Modules create a TanStack DB collection during Squide registration via `createPlantsCollection` factory from `@packages/plants-core/collection`, provided to components via React Context
 2. Components read data with `useLiveQuery((q) => q.from({ plant: collection }))` — returns `{ data, isReady }`
 3. Components write data with `createOptimisticAction` — applies optimistic update instantly, then persists to server
 4. The collection's `queryFn` calls plain `fetch()` against domain-scoped endpoints (`/api/management/plants` or `/api/today/plants`)
@@ -36,18 +36,16 @@ const collection = createPlantsCollection({
 
 ## Per-Module Collections
 
-Each module has a `plantsCollection.ts` that creates a singleton during registration:
+Each module has a `plantsCollection.ts` with a factory function that creates a fresh collection:
 
 ### Management (`apps/management/plants/src/plantsCollection.ts`)
 
-- `initManagementPlantsCollection(queryClient)` — creates the collection singleton
-- `getManagementPlantsCollection()` — returns the singleton for use in components
+- `createManagementPlantsCollection(queryClient)` — creates a collection instance (called once during registration, provided to components via `ManagementPlantsCollectionProvider` React Context)
 - `createManagementPlantActions(collection)` — returns `{ insertPlant, updatePlant, deletePlant, deletePlants }`
 
 ### Today (`apps/today/landing-page/src/plantsCollection.ts`)
 
-- `initTodayPlantsCollection(queryClient)` — creates the collection singleton
-- `getTodayPlantsCollection()` — returns the singleton
+- `createTodayPlantsCollection(queryClient)` — creates a collection instance (provided via `TodayPlantsCollectionProvider` React Context)
 - `createTodayPlantActions(collection)` — returns `{ deletePlants }` (read + delete only)
 
 ## Optimistic Mutations
@@ -93,12 +91,12 @@ const runtime = initializeFirefly({
 
 ## Module Registration
 
-Each module accepts `(runtime, queryClient)` and initializes its collection:
+Each module accepts `(runtime, queryClient)`, creates its collection, and provides it via React Context:
 
 ```typescript
 export async function registerManagementPlants(runtime: FireflyRuntime, queryClient: QueryClient) {
-    initManagementPlantsCollection(queryClient);
-    registerRoutes(runtime);
+    const collection = createManagementPlantsCollection(queryClient);
+    registerRoutes(runtime, collection);
 
     if (runtime.isMswEnabled) {
         const { managementPlantHandlers } = await import("./mocks/index.ts");
@@ -126,46 +124,63 @@ Each module defines its own MSW handlers in a local `mocks/` folder:
 
 ## Storybook Setup
 
-Domain storybooks use per-story-file setup via utilities from `@packages/core-squide/storybook`:
-
-- `initializeFireflyForStorybook(handlers)` — starts MSW worker singleton with the provided request handlers, returns `{ worker, mswReady }`
-- `withModuleDecorator(config)` — creates a Storybook decorator handling MSW reset, db reset, module registration, per-story overrides, QueryClientProvider, and Suspense
-
-Each domain has a `storybook.setup.ts` file shared by all its story files:
+MSW is managed globally via `msw-storybook-addon` in each storybook's `preview.tsx`:
 
 ```typescript
-import { initializeFireflyForStorybook, withModuleDecorator } from "@packages/core-squide/storybook";
-import { managementPlantHandlers, plantsDb, defaultSeedPlants } from "./mocks/index.ts";
-import { initManagementPlantsCollection } from "./plantsCollection.ts";
-
-const queryClient = new QueryClient({
-    defaultOptions: { queries: { retry: false, staleTime: Infinity } },
-});
-
-const { worker, mswReady } = initializeFireflyForStorybook(managementPlantHandlers);
-
-export const moduleDecorator = withModuleDecorator({
-    worker,
-    mswReady,
-    handlers: managementPlantHandlers,
-    queryClient,
-    resetDb: () => plantsDb.reset(defaultSeedPlants),
-    register: () => initManagementPlantsCollection(queryClient),
-});
+import { initialize, mswLoader } from "msw-storybook-addon";
+initialize({ onUnhandledRequest: "bypass" });
+const preview: Preview = { loaders: [mswLoader] };
+export default preview;
 ```
 
-Story files import `moduleDecorator` and add it to meta:
+Each domain has a `storybook.setup.tsx` file shared by all its story files. It provides two decorators:
+
+- `fireflyDecorator` — Squide runtime via `initializeFireflyForStorybook()` + `withFireflyDecorator()` from `@squide/firefly-rsbuild-storybook`
+- `collectionDecorator` — fresh `QueryClient` + TanStack DB collection context per story via `useMemo` in a `CollectionDecorator` component
 
 ```typescript
-import { moduleDecorator } from "./storybook.setup.ts";
+import { initializeFireflyForStorybook, withFireflyDecorator } from "@squide/firefly-rsbuild-storybook";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useMemo, type ReactNode } from "react";
+import type { Decorator } from "storybook-react-rsbuild";
+
+import { ManagementPlantsCollectionProvider } from "./ManagementPlantsContext.tsx";
+import { createManagementPlantsCollection } from "./plantsCollection.ts";
+
+const runtime = await initializeFireflyForStorybook();
+export const fireflyDecorator = withFireflyDecorator(runtime);
+
+function CollectionDecorator({ children }: { children: ReactNode }) {
+    const queryClient = useMemo(() => new QueryClient({
+        defaultOptions: { queries: { retry: false, staleTime: Infinity } },
+    }), []);
+    const collection = useMemo(() => createManagementPlantsCollection(queryClient), [queryClient]);
+    return (
+        <QueryClientProvider client={queryClient}>
+            <ManagementPlantsCollectionProvider collection={collection}>
+                {children}
+            </ManagementPlantsCollectionProvider>
+        </QueryClientProvider>
+    );
+}
+
+export const collectionDecorator: Decorator = story => <CollectionDecorator>{story()}</CollectionDecorator>;
+```
+
+Story files import both decorators:
+
+```typescript
+import { collectionDecorator, fireflyDecorator } from "./storybook.setup.tsx";
 
 const meta = {
-    decorators: [moduleDecorator],
-    // ...
+    decorators: [collectionDecorator, fireflyDecorator],
+    parameters: {
+        msw: { handlers: managementPlantHandlers },
+    },
 };
 ```
 
-Domain storybook `preview.tsx` files are minimal (CSS import only). The packages storybook does not need MSW or collections since it only tests presentational components.
+The packages storybook does not need MSW or collections since it only tests presentational components.
 
 ### Per-Story Handler Overrides
 

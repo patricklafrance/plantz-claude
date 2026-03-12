@@ -9,7 +9,8 @@ import type { Plant } from "@packages/plants-core";
 
 import { CreatePlantDialog } from "./CreatePlantDialog.tsx";
 import { EditPlantDialog } from "./EditPlantDialog.tsx";
-import { getManagementPlantsCollection, createManagementPlantActions } from "./plantsCollection.ts";
+import { useManagementPlantsCollection } from "./ManagementPlantsContext.tsx";
+import { createManagementPlantActions } from "./plantsCollection.ts";
 
 const scrollContainerStyle = { height: "calc(100vh - 340px)" };
 
@@ -22,7 +23,7 @@ export function PlantsPage() {
     const [deleteTarget, setDeleteTarget] = useState<Plant[] | null>(null);
     const parentRef = useRef<HTMLDivElement>(null);
 
-    const collection = getManagementPlantsCollection();
+    const collection = useManagementPlantsCollection();
     const actions = useMemo(() => createManagementPlantActions(collection), [collection]);
     const { data: allPlants, isReady } = useLiveQuery((q) => q.from({ plant: collection }));
 

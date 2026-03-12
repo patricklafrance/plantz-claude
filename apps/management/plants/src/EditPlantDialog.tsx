@@ -5,7 +5,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button,
 import { locations, luminosities, wateringFrequencies, wateringTypes } from "@packages/plants-core";
 import type { Plant } from "@packages/plants-core";
 
-import { getManagementPlantsCollection, createManagementPlantActions } from "./plantsCollection.ts";
+import { useManagementPlantsCollection } from "./ManagementPlantsContext.tsx";
+import { createManagementPlantActions } from "./plantsCollection.ts";
 
 interface EditPlantDialogProps {
     plant: Plant | null;
@@ -29,7 +30,7 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const plantIdRef = useRef<string | null>(null);
 
-    const collection = getManagementPlantsCollection();
+    const collection = useManagementPlantsCollection();
     const actions = useMemo(() => createManagementPlantActions(collection), [collection]);
 
     useEffect(() => {

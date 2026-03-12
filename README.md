@@ -22,7 +22,6 @@ apps/
   storybook/                   # Packages-layer Storybook
 packages/
   components/                  # Shared UI — shadcn/ui (Base UI) + Tailwind v4
-  core-squide/                 # Shared Squide utilities
   plants-core/                 # Shared plants data layer (MSW handlers, TanStack DB, seed data)
   storybook/                   # Shared Storybook config
 ```
@@ -115,6 +114,16 @@ Shell scripts that run automatically before or after agent tool calls, enforcing
 Hook names follow the `{event}--{what}.sh` convention so it's clear at a glance when a hook fires and what it does.
 
 **Files:** [`.claude/hooks/`](.claude/hooks/), [`.claude/settings.json`](.claude/settings.json)
+
+#### Static analysis
+
+Three tools run on every `pnpm lint` and in CI, catching issues before code is merged:
+
+| Tool     | What it enforces                                                                                        |
+| -------- | ------------------------------------------------------------------------------------------------------- |
+| oxlint   | Fast JS/TS linter — catches bugs, accessibility issues, and perf anti-patterns                          |
+| tsgo     | Native TypeScript type checker (`@typescript/native-preview`) — ensures type safety across all packages |
+| syncpack | Dependency version consistency — apps pin exact versions, packages use `^` ranges                       |
 
 #### CI/CD
 

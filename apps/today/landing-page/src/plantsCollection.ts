@@ -18,31 +18,11 @@ async function fetchPlants(): Promise<Plant[]> {
     return data.map((item) => plantSchema.parse(item));
 }
 
-let collection: PlantsCollection | undefined;
-
-export function initTodayPlantsCollection(queryClient: QueryClient) {
-    if (collection) return;
-
-    collection = createPlantsCollection({
+export function createTodayPlantsCollection(queryClient: QueryClient): PlantsCollection {
+    return createPlantsCollection({
         queryKey: ["today", "plants", "list"],
         queryFn: fetchPlants,
         queryClient,
-    });
-}
-
-export function getTodayPlantsCollection(): PlantsCollection {
-    if (!collection) {
-        throw new Error("Collection not initialized. Call initTodayPlantsCollection() first.");
-    }
-
-    return collection;
-}
-
-// Reset singleton on HMR so the collection is re-created with fresh references.
-// oxlint-disable @typescript-eslint/no-explicit-any -- import.meta.hot is provided by the bundler at runtime
-if ((import.meta as any).hot) {
-    (import.meta as any).hot.dispose(() => {
-        collection = undefined;
     });
 }
 

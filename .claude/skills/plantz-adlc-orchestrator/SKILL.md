@@ -121,12 +121,13 @@ Pass: `run-uuid`, the final iteration number.
 ### Step 8 — Merge
 
 Spawn **one** subagent using the `plantz-adlc-merge` skill. This step uses a single subagent only — concurrent git operations would conflict.
-Pass: `run-uuid`, the branch name from step 2, the commit type from step 2, the plan path (`./tmp/runs/[run-uuid]/plan.md`).
+Pass: `run-uuid`, the branch name from step 2, the commit type from step 2, the plan path (`./tmp/runs/[run-uuid]/plan.md`), and `CI attempt` (starts at `1`).
 
-The merge subagent may return control in these cases:
+The merge subagent returns in one of three ways:
 
-- **CI failure:** Update `orchestrator-state.md` sub-phase to `ci-fix` and increment `CI fix attempts`. The merge subagent writes `ci-issues-[attempt].md` and returns. The orchestrator spawns `plantz-adlc-code` subagents (2 subagents, following the subagent protocol) with: `run-uuid`, `iteration` continuing from where the test phase left off, plan path, the CI issues file, and the latest changes file. After the code subagent returns, run the escalation check (see "Escalation Check"). If no escalation, run `pnpm lint` to catch regressions before pushing again. Then spawn a new merge subagent to commit, push, and resume monitoring. **Maximum 3 CI fix attempts** — if CI still fails, follow the failure handling procedure.
-- **PR comments:** Update `orchestrator-state.md` sub-phase to `pr-comments` and increment `PR comment cycles`. The merge subagent writes `pr-comments-[attempt].md` and returns. The orchestrator spawns `plantz-adlc-code` and/or `plantz-adlc-document` subagents (2 subagents each, following the subagent protocol) to address legitimate comments. After the fix, spawn a new merge subagent to commit, push, resolve comments, and resume monitoring. **Maximum 3 PR comment cycles** — if comments keep coming, follow the failure handling procedure.
+- **Success:** All CI checks passed and Chromatic succeeded. Proceed to Step 9.
+- **CI failure:** The merge subagent writes `ci-issues-[attempt].md` and stops. Update `orchestrator-state.md` sub-phase to `ci-fix` and increment `CI fix attempts`. Spawn `plantz-adlc-code` subagents (2 subagents, following the subagent protocol) with: `run-uuid`, `iteration` continuing from where the test phase left off, plan path, the CI issues file, and the latest changes file. After the code subagent returns, run the escalation check (see "Escalation Check"). If no escalation, run `pnpm lint` to catch regressions before pushing again. Then spawn a new merge subagent (passing the incremented `CI attempt`) to commit, push, and resume monitoring. **Maximum 3 CI fix attempts** — if CI still fails, follow the failure handling procedure.
+- **Chromatic failure:** The merge subagent tagged maintainers in the PR and stopped. No `ci-issues` file is produced — Chromatic failures are visual regressions requiring human review. Report this to the user and follow the failure handling procedure (set status to failed, preserve artifacts).
 
 ### Step 9 — Clean up
 
@@ -144,10 +145,9 @@ After completing each step, write the current state to `./tmp/runs/[run-uuid]/or
 - Commit type: [type]
 - Current step: [step number]
 - Iteration: [current iteration number]
-- Sub-phase: [code/test/none] (within step 6 only; within step 8: ci-fix/pr-comments/none)
+- Sub-phase: [code/test/none] (within step 6 only; within step 8: ci-fix/none)
 - Plan revised: [yes/no]
 - CI fix attempts: [0-3] (within step 8 only)
-- PR comment cycles: [0-3] (within step 8 only)
 - Status: [completed/in-progress/failed]
 ```
 

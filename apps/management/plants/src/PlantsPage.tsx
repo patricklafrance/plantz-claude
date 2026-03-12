@@ -12,7 +12,8 @@ import { EditPlantDialog } from "./EditPlantDialog.tsx";
 import { useManagementPlantsCollection } from "./ManagementPlantsContext.tsx";
 import { createManagementPlantActions } from "./plantsCollection.ts";
 
-const scrollContainerStyle = { height: "calc(100vh - 376px)" };
+const scrollbarGutterStyle = { scrollbarGutter: "stable" as const };
+const scrollContainerStyle = { height: "calc(100vh - 376px)", ...scrollbarGutterStyle };
 
 export function PlantsPage() {
     const { filters, updateFilter, clearFilters, hasActiveFilters } = usePlantFilters();
@@ -162,7 +163,9 @@ export function PlantsPage() {
             </div>
 
             <div className="border-border flex-1 overflow-hidden rounded-lg border">
-                <PlantListHeader showActions selectAllChecked={allSelected} onToggleSelectAll={toggleAll} />
+                <div className="overflow-y-auto" style={scrollbarGutterStyle}>
+                    <PlantListHeader showActions selectAllChecked={allSelected} onToggleSelectAll={toggleAll} />
+                </div>
                 <div ref={parentRef} className="overflow-auto" style={scrollContainerStyle}>
                     <div role="list" aria-label="Plants" style={virtualizerContainerStyle}>
                         {virtualizer.getVirtualItems().map((virtualRow) => {

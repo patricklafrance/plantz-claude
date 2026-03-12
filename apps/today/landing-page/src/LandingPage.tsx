@@ -77,7 +77,7 @@ export function LandingPage() {
             </div>
 
             <div className="border-border flex-1 overflow-hidden rounded-lg border">
-                <div className="bg-muted/50 overflow-y-auto" style={scrollbarGutterStyle}>
+                <div className="bg-muted/50 overflow-y-auto [&>div]:bg-transparent" style={scrollbarGutterStyle}>
                     <PlantListHeader />
                 </div>
                 <div ref={parentRef} className="overflow-auto" style={scrollContainerStyle}>

@@ -12,10 +12,12 @@ The single validation gate for all code quality. Runs static checks (lint, modul
 
 ## Inputs (provided by orchestrator)
 
-| Input       | Description              |
-| ----------- | ------------------------ |
-| `run-uuid`  | Run folder identifier    |
-| `iteration` | Current iteration number |
+| Input                | Description                                                                                                                                 |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `run-uuid`           | Run folder identifier                                                                                                                       |
+| `iteration`          | Current iteration number                                                                                                                    |
+| Plan path            | `./tmp/runs/[run-uuid]/plan.md` — needed for acceptance criteria                                                                            |
+| Previous issues path | `null` on iteration 1. On iteration > 1: path to `test-issues-[iteration-1].md`. May not exist if the previous iteration passed all checks. |
 
 ## Procedure
 
@@ -25,7 +27,20 @@ The single validation gate for all code quality. Runs static checks (lint, modul
 4. Load the `plantz-validate-modules` skill and validate all modules. Record any failures.
 5. **Accessibility review** (static): Load the `accessibility` skill. Review every changed file for WCAG AA violations — focus on semantic HTML, interactive element labelling, form error associations, color-only indicators, and live regions. For each failure, include the file path and element reference so the code skill can act on it.
 6. **Browser verification**: Read `plan.md` and extract all `[visual]` and `[interactive]` acceptance criteria. If any exist, follow the browser verification procedure (below) to verify them. Record pass/fail for each criterion.
-7. **Always** write the final `## Verification results` section into the latest `changes-[iteration].md` file (add it after `## Notes`), regardless of whether checks passed or failed. The merge skill needs this section to populate the PR.
+7. **Regression check** (iteration > 1 only): If a previous issues path was provided and that file exists, compare the current iteration's issues with the previous iteration's issues. Any issue in the current run that was NOT present in the previous iteration is a regression introduced by the fix cycle. Prefix these with `⚠️ REGRESSION:` in the issues file so the code skill knows to revert the offending change rather than pile on more fixes. If the previous issues file doesn't exist (previous iteration passed), treat all current issues as regressions.
+8. **Always** write the final `## Verification results` section into the latest `changes-[iteration].md` file (add it after `## Notes`), regardless of whether checks passed or failed. The merge skill needs this section to populate the PR. End the section with the completion marker `<!-- test-complete -->` as the very last line — this is how the orchestrator distinguishes "all checks passed" from "subagent crashed." Use this format:
+
+    ```markdown
+    ## Verification results
+
+    - ✅ `[static]` criterion text
+    - ✅ `[visual]` criterion text
+    - ❌ `[visual]` criterion text — what was observed
+    - ✅ `[interactive]` criterion text
+    - ❌ `[interactive]` criterion text — what was observed
+
+    <!-- test-complete -->
+    ```
 
 ### Browser verification procedure
 
@@ -33,23 +48,14 @@ The single validation gate for all code quality. Runs static checks (lint, modul
 
 - **Iteration 1:** Verify ALL `[visual]` and `[interactive]` criteria from the plan.
 - **Iteration > 1:** Verify only criteria related to files changed in this iteration. Carry forward passing results from the previous iteration's `changes-*.md` for criteria you did not re-verify — copy them with a note "(carried from iteration N)".
-- **Indirect regressions:** If this iteration changed shared styles, layouts, or utility components, re-verify all criteria that render those shared elements — not just criteria directly tied to the changed files.
+- **Indirect regressions:** If this iteration changed shared styles/layouts/utilities, re-verify all criteria that render those elements.
 
 **Server startup:**
 
-1. Decide which server to start: if criteria reference a Storybook story, start the domain Storybook (`pnpm --filter {storybook-package} dev`). If criteria reference an app route, start the host app (`pnpm dev`).
-2. Run the server command in the background.
-3. Poll the server URL (e.g., `curl -s -o /dev/null -w '%{http_code}' http://localhost:8080`) every 5 seconds, with a 60-second timeout.
-4. If the server fails to start within 60 seconds, skip browser verification, note the failure in `## Verification results` ("Server failed to start — verification skipped"), and proceed.
+Start the appropriate dev server (Storybook for story criteria, host app for route criteria). Wait for it to be ready (up to 60 seconds). If it fails to start, skip browser verification and note the failure in `## Verification results`.
 
 **Dark mode verification:**
-For criteria that reference dark mode, use Chrome DevTools MCP `evaluate_script` to toggle the class:
-
-```js
-document.documentElement.classList.toggle("dark");
-```
-
-Take a screenshot in each mode as needed. Toggle back when done.
+For dark mode criteria, toggle the `dark` class on the document element via Chrome DevTools MCP, verify the criterion, then toggle back.
 
 **For each criterion:**
 
@@ -63,7 +69,7 @@ Take a screenshot in each mode as needed. Toggle back when done.
 
 ## Output
 
-- If **all checks pass** (static and browser): do NOT create an output file (absence of the file signals success to the orchestrator).
+- If **all checks pass** (static and browser): do NOT create an issues file. The orchestrator uses the `<!-- test-complete -->` marker in `changes-[iteration].md` (written in step 8) to confirm the test ran to completion.
 - If **any check fails**: write the issues to `./tmp/runs/[run-uuid]/test-issues-[iteration].md` with this format:
 
 ```markdown
@@ -97,4 +103,6 @@ Take a screenshot in each mode as needed. Toggle back when done.
 
 1. **Static report review.** Spot-check a sample of A's findings against actual file contents — remove false positives, add missed issues, and correct inaccurate descriptions. Edit the test issues file directly.
 
-2. **Browser verification.** If the plan has `[visual]` or `[interactive]` criteria, follow the browser verification procedure (above). Record results in the test issues file and write the final `## Verification results` section into `changes-[iteration].md`. B owns browser verification — every `[visual]` and `[interactive]` criterion must have a pass/fail result when B is done.
+2. **Browser verification.** If the plan has `[visual]` or `[interactive]` criteria, follow the browser verification procedure (above). Record results in the test issues file. B owns browser verification — every `[visual]` and `[interactive]` criterion must have a pass/fail result when B is done.
+
+3. **Write the completion marker.** B **always** writes the final `## Verification results` section (including the `<!-- test-complete -->` marker) into `changes-[iteration].md` — even if there were no `[visual]`/`[interactive]` criteria to verify. This is how the orchestrator confirms B completed normally.

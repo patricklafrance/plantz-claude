@@ -9,7 +9,7 @@ Six GitHub Actions workflows in `.github/workflows/`:
 | `claude.yml`           | Claude Code agent for issue/PR comments             |
 | `code-review.yml`      | Automated PR code review via Claude                 |
 | `audit-agent-docs.yml` | Weekly agent-docs freshness audit                   |
-| `smoke-tests.yml`      | Smoke-test all apps on PRs via Claude               |
+| `smoke-tests.yml`      | Smoke-test the host app on PRs via Claude           |
 
 Read the YAML files directly for triggers, steps, and concurrency rules.
 
@@ -42,7 +42,7 @@ PRs require the `run chromatic` label to trigger `chromatic.yml`. Without it, th
 
 ## Smoke tests
 
-`smoke-tests.yml` runs on PRs to `main`. It uses `claude-code-action` to load the `plantz-smoke-tests` skill, which starts each app's dev server, verifies it in a headless browser via `agent-browser`, then stops with port cleanup. Results are posted as a PR comment. 30-minute timeout with concurrency group (`cancel-in-progress`).
+`smoke-tests.yml` runs on PRs to `main`. It uses `claude-code-action` to load the `plantz-smoke-tests` skill, which starts the host app's dev server, verifies it in a headless browser via `agent-browser`, then stops with port cleanup. Results are posted as a PR comment. 30-minute timeout with concurrency group (`cancel-in-progress`).
 
 **Workflow validation caveat:** `claude-code-action` requires the workflow file on the PR branch to match the version on `main`. If the workflow is new or modified in the PR, the action silently no-ops and the job reports success without running the skill. The skill only executes once the workflow file is merged to `main`.
 

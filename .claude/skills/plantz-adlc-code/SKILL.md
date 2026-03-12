@@ -12,14 +12,14 @@ Implement the plan or fix issues reported by the test phase or CI.
 
 ## Inputs (provided by orchestrator)
 
-| Input              | Description                                                                                                                                                                                                                                   |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `run-uuid`         | Run folder identifier                                                                                                                                                                                                                         |
-| `iteration`        | Current iteration number (starts at 1). This is the iteration the agent will **write** to (`changes-[iteration].md`).                                                                                                                         |
-| Plan path          | Always provided — `./tmp/runs/[run-uuid]/plan.md`                                                                                                                                                                                             |
-| Issues path        | `null` on iteration 1. On fix cycles: the path to the issues file — either `test-issues-*.md` (from test phase) or `ci-issues-*.md` (from CI failures).                                                                                       |
-| Changes path       | `null` on iteration 1. On fix cycles: the explicit path to the **previous** iteration's changes file (e.g., `changes-1.md` when `iteration=2`).                                                                                               |
-| Escalation context | `null` unless the orchestrator rejected a previous escalation. If provided: path to the escalation file from a prior iteration — read it to understand what was tried and why the orchestrator disagreed, then proceed with the fix normally. |
+| Input              | Description                                                                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `run-uuid`         | Run folder identifier                                                                                                                                   |
+| `iteration`        | Current iteration number (starts at 1). This is the iteration the agent will **write** to (`changes-[iteration].md`).                                   |
+| Plan path          | Always provided — `./tmp/runs/[run-uuid]/plan.md`                                                                                                       |
+| Issues path        | `null` on iteration 1. On fix cycles: the path to the issues file — either `test-issues-*.md` (from test phase) or `ci-issues-*.md` (from CI failures). |
+| Changes path       | `null` on iteration 1. On fix cycles: the explicit path to the **previous** iteration's changes file (e.g., `changes-1.md` when `iteration=2`).         |
+| Escalation context | `null` unless the orchestrator rejected a previous escalation. If provided: path to the rejected escalation file from a prior iteration.                |
 
 ## Mode
 
@@ -33,10 +33,7 @@ This skill runs in one of two modes, determined by the inputs:
 1. Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, `agent-docs/odr/index.md`, and all files in this skill's `references/` directory.
 2. Load the `accessibility`, `shadcn`, `frontend-design`, `workleap-react-best-practices`, and `workleap-squide` skills for implementation guidance.
 3. Read the plan file for architectural context. In **fix mode**, also read the issues file and previous changes file to understand what was done and what failed. If an escalation context path is provided, read it to understand what was tried and why the orchestrator disagreed.
-4. **Fix mode only — triage before coding.** Classify each issue in the issues file:
-    - **Mechanical**: Wrong import path, missing export, missing prop, missing aria-label, syntax error. Fix directly.
-    - **Structural**: The fix requires a fundamentally different approach — not just more effort. Concrete signals: the plan assumed a component decomposition or data flow that doesn't work, a library or pattern choice is fighting the framework, or the fix requires cross-module imports the plan didn't anticipate. A single `as any` or a tricky generic is not structural — it's annoying but fixable.
-    - If any issue looks structural, note it in `changes-[iteration].md` under **Notes** so Subagent B can evaluate it. Fix all mechanical issues normally. **Only Subagent B writes escalation files** — A never escalates directly.
+4. **Fix mode only — assess before coding.** Read every issue in the issues file and attempt all fixes. For any fix where the plan's approach seems fundamentally mismatched — the plan assumed a component decomposition or data flow that doesn't work, a library choice is fighting the framework, or the fix requires cross-module access the plan didn't anticipate — explain the specific concern in `changes-[iteration].md` under **Notes** (what about the plan is wrong, not just "this is hard"). Fix the issue anyway to the best of your ability. **Only Subagent B writes escalation files** — A never escalates directly.
 5. **Plan mode only:** If the plan requires scaffolding a new module, load and use the `plantz-scaffold-domain-module` skill. If it requires a new Storybook, use `plantz-scaffold-domain-storybook`.
 6. **Start the dev server or Storybook before implementing.** Run the appropriate root script for the affected package — `pnpm dev-host` for app routes, or the matching `pnpm dev-{domain}-storybook` for stories (e.g., `pnpm dev-today-storybook`). Use Chrome DevTools MCP tools to see what you're building as you go. Implement the changes with the browser open — navigate to relevant pages, take screenshots to check your work, and course-correct as you code. Follow all technology rules from this skill's `references/` files.
 7. Write a summary of all changes to `./tmp/runs/[run-uuid]/changes-[iteration].md`.
@@ -69,17 +66,38 @@ This skill runs in one of two modes, determined by the inputs:
 
 ## Hard Constraints
 
-- **Subagent A MUST have the dev server or Storybook running during implementation.** Start the server before writing code and use Chrome DevTools MCP to visually check your work as you go. Do not implement blindly and verify afterward — use the browser as a feedback loop while coding. Stop the server when implementation is complete to avoid orphan processes.
+- **Subagent A MUST have the dev server or Storybook running during implementation** (see Procedure step 6). Stop the server when implementation is complete to avoid orphan processes.
 - **Modules MUST NOT import from each other.** No direct imports, no subpath exports, no re-exports, no workarounds. This is absolute — no exceptions.
 - If you discover that code needs to be shared between modules during implementation: prefer duplication if the surface area is small; extract to a package under `packages/` (e.g., `@packages/plants-core`) when it's large enough to justify the indirection. Never create an import from one `@modules/*` package to another.
-- When fixing issues, if the fix would require a cross-module import, restructure to use a shared package instead.
 
 ## Subagent Pattern
 
-**Subagent A** implements the full change set and writes `changes-[iteration].md`. A focuses entirely on writing correct code. If any issue looks structural, A notes it in `changes-[iteration].md` under **Notes** so B can evaluate it. **A never writes escalation files.**
+**Subagent A** implements the full change set and writes `changes-[iteration].md`. If A encounters plan-level concerns in fix mode, it flags them in the **Notes** section for B to evaluate.
 
 **Subagent B** has two responsibilities, in order:
 
 1. **Code review.** Read every changed file listed in `changes-[iteration].md`. Fix mechanical issues (semicolons, import paths, missing exports) and substantive issues (component structure, accessibility gaps, missing dark mode variants, incorrect patterns). Update `changes-[iteration].md` to reflect modifications. Do not defer fixable concerns — resolve them.
 
-2. **Escalation check.** Watch for brute-force signals: type suppressions (`as any`, `@ts-ignore`), lint-disable comments, wrapper components that exist only to bridge a bad abstraction, or growing complexity relative to the problem being solved. If B identifies a structural issue that cannot be resolved by editing code — the plan's approach is fundamentally wrong, not just hard — B writes `./tmp/runs/[run-uuid]/escalation-[iteration].md` explaining what is wrong and proposing an alternative. **Only B can write escalation files.**
+2. **Escalation check.** Read the **Notes** section of `changes-[iteration].md` for any plan-level concerns A flagged, then investigate the code for brute-force signals: type suppressions (`as any`, `@ts-ignore`), lint-disable comments, wrapper components that exist only to bridge a bad abstraction, or growing complexity relative to the problem being solved. These are indicators to investigate for underlying plan problems, not automatic escalation triggers — a pragmatic `as any` bridging an external library's type gap is not a plan problem.
+
+    **Escalation threshold:** Escalate only when the plan's approach is fundamentally wrong and no amount of code editing can fix it. Examples: the plan decomposed components in a way that makes the required data flow impossible; the plan chose a library that conflicts with the framework; the plan assumed module boundaries that force a cross-module import. Do NOT escalate for: difficulty, missing details the code agent can infer, suboptimal but workable approaches, or issues that the test phase will catch.
+
+    If B identifies a structural issue meeting this threshold, B writes `./tmp/runs/[run-uuid]/escalation-[iteration].md` using this format:
+
+    ```markdown
+    # Escalation — Iteration [N]
+
+    ## Problem
+
+    [What about the plan's approach is fundamentally wrong — be specific]
+
+    ## Evidence
+
+    [Code locations, failed patterns, or data flow conflicts that demonstrate the problem]
+
+    ## Proposed alternative
+
+    [How the plan should be revised to fix the structural issue]
+    ```
+
+    **Only B can write escalation files.**

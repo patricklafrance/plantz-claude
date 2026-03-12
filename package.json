@@ -18,6 +18,8 @@
         "build-storybook": "turbo run build-storybook --filter=@apps/storybook",
         "serve-host": "turbo run serve-build --filter=@apps/host",
         "serve-storybook": "turbo run serve-storybook --filter=@apps/storybook",
+        "install-playwright": "playwright install chromium",
+        "test": "turbo run test",
         "lint": "turbo run lint --continue",
         "typecheck": "tsgo",
         "oxlint": "oxlint --react-plugin --import-plugin --jsx-a11y-plugin --react-perf-plugin --promise-plugin --vitest-plugin",
@@ -28,9 +30,9 @@
         "reset": "pnpm run --sequential \"/^reset:.*/\"",
         "reset:clean": "pnpm clean",
         "reset:delete-node-modules": "pnpm -r --parallel --include-workspace-root exec pnpm dlx rimraf node_modules pnpm-lock.yaml",
-        "list-outdated-deps": "pnpm outdated -r --format list !storybook-react-rsbuild",
+        "list-outdated-deps": "pnpm outdated -r --format list",
         "update-outdated-deps": "pnpm run --sequential \"/^update-outdated-deps:.*/\"",
-        "update-outdated-deps:update-versions": "pnpm update -r --latest !storybook-react-rsbuild",
+        "update-outdated-deps:update-versions": "pnpm update -r --latest",
         "update-outdated-deps:update-peers": "syncpack fix"
     },
     "devDependencies": {
@@ -42,6 +44,7 @@
         "netlify-cli": "24.0.1",
         "oxfmt": "0.36.0",
         "oxlint": "1.51.0",
+        "playwright": "1.52.0",
         "syncpack": "14.0.0",
         "tsx": "4.21.0",
         "turbo": "2.8.12"

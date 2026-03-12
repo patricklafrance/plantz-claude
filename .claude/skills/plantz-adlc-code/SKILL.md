@@ -78,13 +78,13 @@ This skill runs in one of two modes, determined by the inputs:
 
 1. **Code review.** Read every changed file listed in `changes-[iteration].md`. Fix mechanical issues (semicolons, import paths, missing exports) and substantive issues (component structure, accessibility gaps, missing dark mode variants, incorrect patterns). Update `changes-[iteration].md` to reflect modifications. Do not defer fixable concerns — resolve them.
 
-2. **Accessibility verification (Storybook a11y).** Run the Storybook Vitest a11y tests for each affected domain Storybook:
+2. **Run workspace tests.** Run all workspace tests from the workspace root:
 
     ```bash
-    pnpm vitest run --project {domain}-storybook
+    pnpm test
     ```
 
-    Replace `{domain}` with the affected domain (e.g., `management`, `today`, `packages`). Run the full project — vitest is fast and domain Storybooks are already scoped. If multiple domains are affected, run each separately.
+    This runs `turbo run test`, which executes every package's test task. Turborepo caching ensures unchanged packages are skipped. Each domain Storybook has its own `vitest.config.ts` with the `storybookTest` plugin that runs axe-core a11y checks.
 
     For each a11y violation reported:
 

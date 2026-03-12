@@ -52,8 +52,11 @@
         "//#syncpack": {
             "inputs": [".syncpackrc.js", "package.json", "packages/**/package.json", "apps/**/package.json"]
         },
+        "//#install-playwright": {
+            "outputs": []
+        },
         "test": {
-            "dependsOn": ["transit"],
+            "dependsOn": ["//#install-playwright"],
             "outputs": ["node_modules/.cache/vitest/**"]
         }
     }

@@ -1,13 +1,13 @@
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 
-import type { StorybookConfig } from "storybook-react-rsbuild";
+import type { StorybookConfig } from "@storybook/react-vite";
 
 const require = createRequire(import.meta.url);
 
 const storybookConfig: StorybookConfig = {
-    framework: getAbsolutePath("storybook-react-rsbuild"),
-    addons: [getAbsolutePath("@storybook/addon-a11y")],
+    framework: getAbsolutePath("@storybook/react-vite"),
+    addons: [getAbsolutePath("@storybook/addon-a11y"), getAbsolutePath("@storybook/addon-vitest")],
     stories: ["../../landing-page/src/**/*.stories.tsx"],
     staticDirs: ["./public"],
 };

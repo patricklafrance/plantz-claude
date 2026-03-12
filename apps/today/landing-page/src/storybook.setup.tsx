@@ -1,7 +1,8 @@
-import { initializeFireflyForStorybook, withFireflyDecorator } from "@squide/firefly-rsbuild-storybook";
+import type { Decorator } from "@storybook/react-vite";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMemo, type ReactNode } from "react";
-import type { Decorator } from "storybook-react-rsbuild";
+
+import { initializeFireflyForStorybook, withFireflyDecorator } from "@apps/packages-storybook/firefly";
 
 import { createTodayPlantsCollection } from "./plantsCollection.ts";
 import { TodayPlantsCollectionProvider } from "./TodayPlantsContext.tsx";

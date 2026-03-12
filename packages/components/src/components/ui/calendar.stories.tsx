@@ -1,6 +1,6 @@
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import * as React from "react";
 import type { DateRange } from "react-day-picker";
-import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
 import { Calendar } from "./calendar.tsx";
 

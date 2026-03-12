@@ -4,7 +4,7 @@ Shared story conventions for all domain modules. For `packages/components/` stor
 
 ## Format
 
-- Use CSF3 format with types from `storybook-react-rsbuild`.
+- Use CSF3 format with types from `@storybook/react-vite`.
 - Local imports must include the `.tsx` or `.ts` file extension (e.g., `import { Foo } from "./Foo.tsx"`).
 - Use the type annotation pattern: `export const Foo: Story = { ... };`
 
@@ -52,7 +52,7 @@ Without these directives, Tailwind will not generate utility classes used by tho
 ## Isolation
 
 - Stories must render without Squide runtime or React Router. If a component depends on these, extract a presentational sub-component that takes data via props and write stories for that instead.
-- MSW is managed globally via `msw-storybook-addon` (`initialize()` + `mswLoader` in preview.tsx). Each domain module has a `storybook.setup.tsx` that imports `initializeFireflyForStorybook` + `withFireflyDecorator` from `@squide/firefly-rsbuild-storybook` and creates a `CollectionDecorator` providing a fresh `QueryClient` + collection context per story. Story files import `collectionDecorator` and `fireflyDecorator` from `./storybook.setup.tsx` and add both to `decorators: [collectionDecorator, fireflyDecorator]`. Per-story handler overrides are applied via `parameters.msw.handlers`.
+- MSW is managed globally via `msw-storybook-addon` (`initialize()` + `mswLoader` in preview.tsx). Each domain module has a `storybook.setup.tsx` that imports `initializeFireflyForStorybook` + `withFireflyDecorator` from `@apps/packages-storybook/firefly` and creates a `CollectionDecorator` providing a fresh `QueryClient` + collection context per story. Story files import `collectionDecorator` and `fireflyDecorator` from `./storybook.setup.tsx` and add both to `decorators: [collectionDecorator, fireflyDecorator]`. Per-story handler overrides are applied via `parameters.msw.handlers`.
 - The packages storybook (`packages/storybook/`) does not need MSW, collections, or QueryClient since it only tests presentational components.
 - Stories that need data use `parameters.msw.handlers` for per-story handler overrides. See `msw-tanstack-query.md` reference for the full pattern.
 

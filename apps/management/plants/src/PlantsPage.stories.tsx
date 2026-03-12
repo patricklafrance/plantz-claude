@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "storybook-react-rsbuild";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { makePlant, FAR_PAST, FAR_FUTURE } from "@packages/plants-core/test-utils";
 

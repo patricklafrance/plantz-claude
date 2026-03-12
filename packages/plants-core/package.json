@@ -24,11 +24,11 @@
         "zod": "^4.3.6"
     },
     "devDependencies": {
+        "@storybook/react-vite": "10.2.15",
         "@types/react": "19.2.9",
         "@types/react-dom": "19.2.3",
         "@typescript/native-preview": "7.0.0-dev.20260303.1",
         "@workleap/typescript-configs": "3.0.7",
-        "storybook-react-rsbuild": "3.3.2",
         "typescript": "5.9.3"
     },
     "peerDependencies": {

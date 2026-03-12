@@ -1,5 +1,5 @@
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Leaf } from "lucide-react";
-import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
 import { Button } from "./button.tsx";
 

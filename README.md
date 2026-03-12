@@ -32,7 +32,7 @@ Each domain is fully isolated — modules never import from each other. Each has
 
 ### Tech stack
 
-Node 24+, pnpm 10, TypeScript 7 (tsgo), Rsbuild, Tailwind CSS 4, TanStack DB, Storybook 10, Chromatic, Vitest, oxlint, oxfmt, syncpack.
+Node 24+, pnpm 10, TypeScript 7 (tsgo), Rsbuild, Vite (Storybooks), Tailwind CSS 4, TanStack DB, Storybook 10, Chromatic, Vitest, Playwright, oxlint, oxfmt, syncpack.
 
 ---
 
@@ -124,6 +124,16 @@ Three tools run on every `pnpm lint` and in CI, catching issues before code is m
 | oxlint   | Fast JS/TS linter — catches bugs, accessibility issues, and perf anti-patterns                          |
 | tsgo     | Native TypeScript type checker (`@typescript/native-preview`) — ensures type safety across all packages |
 | syncpack | Dependency version consistency — apps pin exact versions, packages use `^` ranges                       |
+
+#### Storybook a11y testing
+
+Every domain Storybook doubles as an automated accessibility test suite. Each has a `vitest.config.ts` with the `@storybook/addon-vitest` plugin that transforms stories into Vitest tests running in a real Chromium browser (via Playwright). Combined with `@storybook/addon-a11y`, this catches axe-core violations — including color contrast — that static analysis cannot detect.
+
+```bash
+pnpm test           # Runs all workspace tests (including Storybook a11y) via Turborepo
+```
+
+Playwright browser installation is handled by a root-level Turborepo task (`//#install-playwright`) that runs automatically before any `test` task.
 
 #### CI/CD
 
@@ -249,6 +259,7 @@ pnpm dev-today-storybook         # Today domain
 
 ```bash
 pnpm lint          # ESLint (per-package, via Turborepo)
+pnpm test          # Storybook a11y tests (Vitest + Playwright, via Turborepo)
 pnpm oxlint        # oxlint (custom config in oxlintrc.json)
 pnpm oxfmt         # Formatter check (oxfmt with Tailwind class sorting)
 pnpm typecheck     # TypeScript (tsgo)

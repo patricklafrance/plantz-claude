@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "storybook-react-rsbuild";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Checkbox } from "./checkbox.tsx";
 import { Input } from "./input.tsx";

@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  playwright-core@1.52.0:
+    hash: 338d739cd62e115da061251cb16c2174a0e0741d95a2232e6ee4d17320146c7d
+    path: patches/playwright-core@1.52.0.patch
+
 importers:
 
   .:
@@ -14394,13 +14399,13 @@ snapshots:
       mlly: 1.8.1
       pathe: 2.0.3
 
-  playwright-core@1.52.0: {}
+  playwright-core@1.52.0(patch_hash=338d739cd62e115da061251cb16c2174a0e0741d95a2232e6ee4d17320146c7d): {}
 
   playwright-core@1.58.2: {}
 
   playwright@1.52.0:
     dependencies:
-      playwright-core: 1.52.0
+      playwright-core: 1.52.0(patch_hash=338d739cd62e115da061251cb16c2174a0e0741d95a2232e6ee4d17320146c7d)
     optionalDependencies:
       fsevents: 2.3.2
 

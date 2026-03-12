@@ -13,3 +13,6 @@ onlyBuiltDependencies:
     - protobufjs
     - sharp
     - unix-dgram
+
+patchedDependencies:
+    playwright-core@1.52.0: patches/playwright-core@1.52.0.patch

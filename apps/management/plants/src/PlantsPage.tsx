@@ -163,7 +163,7 @@ export function PlantsPage() {
             </div>
 
             <div className="border-border flex-1 overflow-hidden rounded-lg border">
-                <div className="overflow-y-auto" style={scrollbarGutterStyle}>
+                <div className="bg-muted/50 overflow-y-auto" style={scrollbarGutterStyle}>
                     <PlantListHeader showActions selectAllChecked={allSelected} onToggleSelectAll={toggleAll} />
                 </div>
                 <div ref={parentRef} className="overflow-auto" style={scrollContainerStyle}>

@@ -115,6 +115,16 @@ Hook names follow the `{event}--{what}.sh` convention so it's clear at a glance 
 
 **Files:** [`.claude/hooks/`](.claude/hooks/), [`.claude/settings.json`](.claude/settings.json)
 
+#### Static analysis
+
+Three tools run on every `pnpm lint` and in CI, catching issues before code is merged:
+
+| Tool     | What it enforces                                                                                        |
+| -------- | ------------------------------------------------------------------------------------------------------- |
+| oxlint   | Fast JS/TS linter — catches bugs, accessibility issues, and perf anti-patterns                          |
+| tsgo     | Native TypeScript type checker (`@typescript/native-preview`) — ensures type safety across all packages |
+| syncpack | Dependency version consistency — apps pin exact versions, packages use `^` ranges                       |
+
 #### CI/CD
 
 Six GitHub Actions workflows, four of which involve Claude Code:

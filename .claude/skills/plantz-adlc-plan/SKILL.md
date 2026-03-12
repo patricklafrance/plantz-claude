@@ -82,27 +82,29 @@ and gotchas to watch for]
 
 ## Acceptance criteria
 
-[Each criterion is a specific, testable statement with a verification tag.]
+RULES (apply to every criterion below):
 
-- `[static]` Criterion verified by lint, typecheck, or module validation
-- `[visual]` Criterion that requires launching the app and visually inspecting the UI
-- `[interactive]` Criterion that requires clicking, typing, or navigating in the browser
+1. Every criterion MUST have exactly one tag: [static], [visual], or [interactive].
+2. There MUST be at least one criterion per planned file change.
+3. UI/UX changes MUST have mostly [visual] and [interactive] criteria.
+4. [visual] and [interactive] criteria MUST be specific enough for an agent with Chrome DevTools to verify (e.g., "dialog has readable text on dark background" NOT "dark mode looks good").
 
-Example:
+Tag definitions:
 
-- `[static]` PlantListItem accepts optional `onDelete` prop without type errors
-- `[visual]` Today's list renders without delete buttons
-- `[interactive]` Clicking a plant row in Today opens the detail dialog
+- [static] — verified by lint, typecheck, or module validation
+- [visual] — verified by launching the app and visually inspecting the UI
+- [interactive] — verified by clicking, typing, or navigating in the browser
+
+Criteria:
+
+- [static] PlantListItem accepts optional `onDelete` prop without type errors
+- [visual] Today's list renders without delete buttons
+- [interactive] Clicking a plant row in Today opens the detail dialog
 ```
 
-### Acceptance criteria rules
-
-- Every criterion MUST have exactly one tag: `[static]`, `[visual]`, or `[interactive]`.
-- `[visual]` and `[interactive]` criteria drive browser verification during the test phase — be specific enough that an agent with Chrome DevTools can verify them (e.g., "dialog has readable text on dark background" not "dark mode looks good").
-- `[static]` criteria are verified by the test phase (lint, typecheck, module validation).
-- Aim for at least one criterion per planned file change. UI/UX changes should have mostly `[visual]` and `[interactive]` criteria.
-
 ## Hard Constraints
+
+- **Every plan MUST include acceptance criteria with tagged items.** A plan with an empty or missing acceptance criteria section is invalid. Every criterion MUST have exactly one tag: `[static]`, `[visual]`, or `[interactive]`.
 
 - **Modules MUST NOT import from each other.** No direct imports, no subpath exports, no re-exports, no workarounds. This is absolute — no exceptions.
 - When two modules need shared code: prefer duplication if the surface area is small; extract to a package under `packages/` when it's large enough to justify the indirection. For plant domain code, use `@packages/plants-core`. For new domains, create a new `@packages/<domain>-core` package.
@@ -112,4 +114,12 @@ Example:
 
 In **draft mode**, Subagent A drafts the plan from scratch and writes `plan.md`. In **revision mode**, A reads the existing plan and the escalation file, then revises `plan.md` to address the structural issue — keeping sections that aren't affected. In **review mode**, Subagent A is skipped entirely — only B runs.
 
-Subagent B reads the plan, challenges it — checking for missing affected packages, unrealistic scope, incorrect patterns, missing stories, or accessibility gaps — and edits `plan.md` directly to improve it. B does not append concerns; it rewrites sections that need improvement. In **review mode**, B also ensures the plan follows the expected output format. If sections are missing, B adds them. If acceptance criteria lack tags, B infers and adds the correct tag (`[static]`, `[visual]`, or `[interactive]`).
+Subagent B reads the plan, challenges it — checking for missing affected packages, unrealistic scope, incorrect patterns, missing stories, or accessibility gaps — and edits `plan.md` directly to improve it. B does not append concerns; it rewrites sections that need improvement. In **review mode**, B also ensures the plan follows the expected output format. If sections are missing, B adds them.
+
+**B MUST validate acceptance criteria before finishing.** Check:
+
+1. The `## Acceptance criteria` section exists and is not empty.
+2. Every criterion has exactly one tag: `[static]`, `[visual]`, or `[interactive]`.
+3. There is at least one criterion per file in the `## File changes` section.
+4. UI/UX file changes have at least one `[visual]` or `[interactive]` criterion.
+   If any check fails, B fixes the acceptance criteria directly — adding missing criteria, adding missing tags, or rewriting vague criteria to be Chrome DevTools-verifiable.

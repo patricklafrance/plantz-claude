@@ -38,7 +38,7 @@ This skill runs in one of two modes, determined by the inputs:
     - **Structural**: The fix requires a fundamentally different approach — not just more effort. Concrete signals: the plan assumed a component decomposition or data flow that doesn't work, a library or pattern choice is fighting the framework, or the fix requires cross-module imports the plan didn't anticipate. A single `as any` or a tricky generic is not structural — it's annoying but fixable.
     - If any issue looks structural, note it in `changes-[iteration].md` under **Notes** so Subagent B can evaluate it. Fix all mechanical issues normally. **Only Subagent B writes escalation files** — A never escalates directly.
 5. **Plan mode only:** If the plan requires scaffolding a new module, load and use the `plantz-scaffold-domain-module` skill. If it requires a new Storybook, use `plantz-scaffold-domain-storybook`.
-6. Implement the changes. Follow all technology rules from this skill's `references/` files. **Use the browser while coding** — start the dev server or Storybook and use Chrome DevTools MCP tools to see what you're building. Visual feedback leads to better code.
+6. **Start the dev server or Storybook before implementing.** Run the appropriate root script for the affected package — `pnpm dev-host` for app routes, or the matching `pnpm dev-{domain}-storybook` for stories (e.g., `pnpm dev-today-storybook`). Use Chrome DevTools MCP tools to see what you're building as you go. Implement the changes with the browser open — navigate to relevant pages, take screenshots to check your work, and course-correct as you code. Follow all technology rules from this skill's `references/` files.
 7. Write a summary of all changes to `./tmp/runs/[run-uuid]/changes-[iteration].md`.
 
 ## Changes File Format
@@ -69,6 +69,7 @@ This skill runs in one of two modes, determined by the inputs:
 
 ## Hard Constraints
 
+- **Subagent A MUST have the dev server or Storybook running during implementation.** Start the server before writing code and use Chrome DevTools MCP to visually check your work as you go. Do not implement blindly and verify afterward — use the browser as a feedback loop while coding. Stop the server when implementation is complete to avoid orphan processes.
 - **Modules MUST NOT import from each other.** No direct imports, no subpath exports, no re-exports, no workarounds. This is absolute — no exceptions.
 - If you discover that code needs to be shared between modules during implementation: prefer duplication if the surface area is small; extract to a package under `packages/` (e.g., `@packages/plants-core`) when it's large enough to justify the indirection. Never create an import from one `@modules/*` package to another.
 - When fixing issues, if the fix would require a cross-module import, restructure to use a shared package instead.

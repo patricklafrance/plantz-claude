@@ -1,16 +1,21 @@
 import type { FireflyRuntime } from "@squide/firefly";
 import type { QueryClient } from "@tanstack/react-query";
 
-import { initManagementPlantsCollection } from "./plantsCollection.ts";
+import { ManagementPlantsCollectionProvider } from "./ManagementPlantsContext.tsx";
+import { createManagementPlantsCollection } from "./plantsCollection.ts";
 
-function registerRoutes(runtime: FireflyRuntime) {
+function registerRoutes(runtime: FireflyRuntime, collection: ReturnType<typeof createManagementPlantsCollection>) {
     runtime.registerRoute({
         path: "/management/plants",
         lazy: async () => {
             const { PlantsPage } = await import("./PlantsPage.tsx");
 
             return {
-                element: <PlantsPage />,
+                element: (
+                    <ManagementPlantsCollectionProvider collection={collection}>
+                        <PlantsPage />
+                    </ManagementPlantsCollectionProvider>
+                ),
             };
         },
     });
@@ -24,8 +29,8 @@ function registerRoutes(runtime: FireflyRuntime) {
 }
 
 export async function registerManagementPlants(runtime: FireflyRuntime, queryClient: QueryClient) {
-    initManagementPlantsCollection(queryClient);
-    registerRoutes(runtime);
+    const collection = createManagementPlantsCollection(queryClient);
+    registerRoutes(runtime, collection);
 
     if (runtime.isMswEnabled) {
         const { managementPlantHandlers } = await import("./mocks/index.ts");

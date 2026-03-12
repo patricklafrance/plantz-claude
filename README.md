@@ -22,7 +22,6 @@ apps/
   storybook/                   # Packages-layer Storybook
 packages/
   components/                  # Shared UI — shadcn/ui (Base UI) + Tailwind v4
-  core-squide/                 # Shared Squide utilities
   plants-core/                 # Shared plants data layer (MSW handlers, TanStack DB, seed data)
   storybook/                   # Shared Storybook config
 ```

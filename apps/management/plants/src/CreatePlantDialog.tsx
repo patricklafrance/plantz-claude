@@ -3,7 +3,8 @@ import { useState, useMemo, type FormEvent } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button, Input, Textarea, Label, Switch, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, DatePicker } from "@packages/components";
 import { locations, luminosities, wateringFrequencies, wateringTypes } from "@packages/plants-core";
 
-import { getManagementPlantsCollection, createManagementPlantActions } from "./plantsCollection.ts";
+import { useManagementPlantsCollection } from "./ManagementPlantsContext.tsx";
+import { createManagementPlantActions } from "./plantsCollection.ts";
 
 interface CreatePlantDialogProps {
     open: boolean;
@@ -31,7 +32,7 @@ export function CreatePlantDialog({ open, onOpenChange, defaultFirstWateringDate
     const [wateringType, setWateringType] = useState("surface");
     const [firstWateringDate, setFirstWateringDate] = useState<Date | undefined>(defaultFirstWateringDate ?? tomorrow());
 
-    const collection = getManagementPlantsCollection();
+    const collection = useManagementPlantsCollection();
     const actions = useMemo(() => createManagementPlantActions(collection), [collection]);
 
     const isValid = name.trim() !== "" && wateringQuantity.trim() !== "" && firstWateringDate !== undefined;

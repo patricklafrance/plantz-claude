@@ -1,14 +1,19 @@
 import type { FireflyRuntime } from "@squide/firefly";
 import type { QueryClient } from "@tanstack/react-query";
 
-import { initTodayPlantsCollection } from "./plantsCollection.ts";
+import { createTodayPlantsCollection } from "./plantsCollection.ts";
+import { TodayPlantsCollectionProvider } from "./TodayPlantsContext.tsx";
 
-function registerRoutes(runtime: FireflyRuntime) {
+function registerRoutes(runtime: FireflyRuntime, collection: ReturnType<typeof createTodayPlantsCollection>) {
     const lazy = async () => {
         const { LandingPage } = await import("./LandingPage.tsx");
 
         return {
-            element: <LandingPage />,
+            element: (
+                <TodayPlantsCollectionProvider collection={collection}>
+                    <LandingPage />
+                </TodayPlantsCollectionProvider>
+            ),
         };
     };
 
@@ -31,8 +36,8 @@ function registerRoutes(runtime: FireflyRuntime) {
 }
 
 export async function registerTodayLandingPage(runtime: FireflyRuntime, queryClient: QueryClient) {
-    initTodayPlantsCollection(queryClient);
-    registerRoutes(runtime);
+    const collection = createTodayPlantsCollection(queryClient);
+    registerRoutes(runtime, collection);
 
     if (runtime.isMswEnabled) {
         const { todayPlantHandlers } = await import("./mocks/index.ts");

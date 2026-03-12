@@ -16,7 +16,7 @@ Every page and component must have a co-located `.stories.tsx` file. A feature w
 
 ## Storybook Setup
 
-Each module has a `storybook.setup.ts` that imports `initializeFireflyForStorybook` and `withModuleDecorator` from `@packages/core-squide/storybook`. Story files import `moduleDecorator` from `./storybook.setup.ts` and add it to `decorators`. Presentational component stories don't need the decorator.
+Each module has a `storybook.setup.tsx` that imports `initializeFireflyForStorybook` and `withFireflyDecorator` from `@squide/firefly-rsbuild-storybook`, and creates a `CollectionDecorator` providing a fresh `QueryClient` + collection context per story. Story files import `collectionDecorator` and `fireflyDecorator` from `./storybook.setup.tsx` and add both to `decorators: [collectionDecorator, fireflyDecorator]`. MSW is managed globally via `msw-storybook-addon` in preview.tsx; per-story handlers use `parameters.msw.handlers`. Presentational component stories don't need the decorators.
 
 ## Storybook Wiring
 
@@ -28,7 +28,7 @@ Story globs in `.storybook/main.ts` must include every module in this domain. Wh
 
 Modules in this domain own their API surface under `/api/today/`. Each module has:
 
-- `src/plantsCollection.ts` — TanStack DB collection singleton (init during registration) + optimistic actions via `createOptimisticAction`
+- `src/plantsCollection.ts` — TanStack DB collection factory (`createTodayPlantsCollection`) called during registration + optimistic actions via `createOptimisticAction`. The collection is provided to components via `TodayPlantsCollectionProvider` React Context.
 - `src/mocks/` — MSW handlers scoped to `/api/today/<entity>`
 
 Components read with `useLiveQuery` and write with actions from `createTodayPlantActions`. No `api/` folder — the collection handles data fetching internally via `queryCollectionOptions`.

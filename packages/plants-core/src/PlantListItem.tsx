@@ -1,4 +1,4 @@
-import { Droplets, Pencil, Trash2 } from "lucide-react";
+import { Check, Droplets, Pencil, Trash2 } from "lucide-react";
 import { memo, useCallback, type MouseEvent } from "react";
 
 import { Button, Checkbox } from "@packages/components";
@@ -78,23 +78,27 @@ export const PlantListItem = memo(function PlantListItem({ plant, selected = fal
                 </div>
                 <span className="text-muted-foreground w-full truncate text-xs whitespace-nowrap md:hidden">
                     {plant.wateringQuantity} · {getOptionLabel(wateringTypes, plant.wateringType)} · {getOptionLabel(locations, plant.location)}
+                    {plant.mistLeaves ? " · Mist" : ""}
                 </span>
                 <span className="text-muted-foreground hidden truncate text-xs md:block">{plant.wateringQuantity}</span>
                 <span className="text-muted-foreground hidden truncate text-xs md:block">{getOptionLabel(wateringTypes, plant.wateringType)}</span>
                 <span className="text-muted-foreground hidden truncate text-xs md:block">{getOptionLabel(locations, plant.location)}</span>
+                <span className="hidden md:block">{plant.mistLeaves && <Check className="text-muted-foreground size-3.5" aria-label="Mist leaves" />}</span>
             </div>
-            <div className="flex shrink-0 items-center gap-1">
-                {onEdit && (
-                    <Button variant="ghost" size="icon-xs" onClick={handleEdit} aria-label={`Edit ${plant.name}`}>
-                        <Pencil />
-                    </Button>
-                )}
-                {onDelete && (
-                    <Button variant="ghost" size="icon-xs" onClick={handleDelete} aria-label={`Delete ${plant.name}`}>
-                        <Trash2 />
-                    </Button>
-                )}
-            </div>
+            {(onEdit || onDelete) && (
+                <div className="flex shrink-0 items-center gap-1">
+                    {onEdit && (
+                        <Button variant="ghost" size="icon-xs" onClick={handleEdit} aria-label={`Edit ${plant.name}`}>
+                            <Pencil />
+                        </Button>
+                    )}
+                    {onDelete && (
+                        <Button variant="ghost" size="icon-xs" onClick={handleDelete} aria-label={`Delete ${plant.name}`}>
+                            <Trash2 />
+                        </Button>
+                    )}
+                </div>
+            )}
         </div>
     );
 });

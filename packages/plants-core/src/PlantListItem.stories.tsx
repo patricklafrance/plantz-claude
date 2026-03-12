@@ -143,6 +143,12 @@ export const ClickOnly: Story = {
     },
 };
 
+export const MistLeavesFalse: Story = {
+    args: {
+        plant: makePlant({ mistLeaves: false }),
+    },
+};
+
 export const WithHeader: Story = {
     args: {
         plant: makePlant(),

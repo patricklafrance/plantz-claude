@@ -23,9 +23,17 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const WithCheckboxSpace: Story = {
+export const WithCheckbox: Story = {
     args: {
-        showCheckbox: true,
+        selectAllChecked: false,
+        onToggleSelectAll: () => {},
+    },
+};
+
+export const WithCheckboxChecked: Story = {
+    args: {
+        selectAllChecked: true,
+        onToggleSelectAll: () => {},
     },
 };
 
@@ -37,7 +45,8 @@ export const WithActions: Story = {
 
 export const WithCheckboxAndActions: Story = {
     args: {
-        showCheckbox: true,
         showActions: true,
+        selectAllChecked: false,
+        onToggleSelectAll: () => {},
     },
 };

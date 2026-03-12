@@ -2,13 +2,13 @@ import { useLiveQuery } from "@tanstack/react-db";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useState, useRef, useMemo, useCallback } from "react";
 
-import { applyPlantFilters, FilterBar, isDueForWatering, PlantListItem, usePlantFilters } from "@packages/plants-core";
+import { applyPlantFilters, FilterBar, isDueForWatering, PlantListHeader, PlantListItem, usePlantFilters } from "@packages/plants-core";
 import type { Plant } from "@packages/plants-core";
 
 import { PlantDetailDialog } from "./PlantDetailDialog.tsx";
 import { useTodayPlantsCollection } from "./TodayPlantsContext.tsx";
 
-const scrollContainerStyle = { height: "calc(100vh - 340px)" };
+const scrollContainerStyle = { height: "calc(100vh - 376px)" };
 
 export function LandingPage() {
     const { filters, updateFilter, clearFilters, hasActiveFilters } = usePlantFilters();
@@ -76,6 +76,7 @@ export function LandingPage() {
             </div>
 
             <div className="border-border flex-1 overflow-hidden rounded-lg border">
+                <PlantListHeader />
                 <div ref={parentRef} className="overflow-auto" style={scrollContainerStyle}>
                     <div role="list" aria-label="Plants due for watering" style={virtualizerContainerStyle}>
                         {virtualizer.getVirtualItems().map((virtualRow) => {

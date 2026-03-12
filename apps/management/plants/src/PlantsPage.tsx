@@ -4,7 +4,7 @@ import { Plus } from "lucide-react";
 import { useState, useRef, useMemo, useCallback } from "react";
 
 import { Button, Checkbox } from "@packages/components";
-import { applyPlantFilters, DeleteConfirmDialog, FilterBar, PlantListItem, usePlantFilters } from "@packages/plants-core";
+import { applyPlantFilters, DeleteConfirmDialog, FilterBar, PlantListHeader, PlantListItem, usePlantFilters } from "@packages/plants-core";
 import type { Plant } from "@packages/plants-core";
 
 import { CreatePlantDialog } from "./CreatePlantDialog.tsx";
@@ -12,7 +12,7 @@ import { EditPlantDialog } from "./EditPlantDialog.tsx";
 import { useManagementPlantsCollection } from "./ManagementPlantsContext.tsx";
 import { createManagementPlantActions } from "./plantsCollection.ts";
 
-const scrollContainerStyle = { height: "calc(100vh - 340px)" };
+const scrollContainerStyle = { height: "calc(100vh - 376px)" };
 
 export function PlantsPage() {
     const { filters, updateFilter, clearFilters, hasActiveFilters } = usePlantFilters();
@@ -168,6 +168,7 @@ export function PlantsPage() {
                         Select all
                     </span>
                 </div>
+                <PlantListHeader showCheckbox showActions />
                 <div ref={parentRef} className="overflow-auto" style={scrollContainerStyle}>
                     <div role="list" aria-label="Plants" style={virtualizerContainerStyle}>
                         {virtualizer.getVirtualItems().map((virtualRow) => {

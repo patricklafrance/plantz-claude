@@ -104,22 +104,15 @@ Criteria:
 
 ## Hard Constraints
 
-- **Every plan MUST include acceptance criteria with tagged items.** A plan with an empty or missing acceptance criteria section is invalid. Every criterion MUST have exactly one tag: `[static]`, `[visual]`, or `[interactive]`.
-
 - **Modules MUST NOT import from each other.** No direct imports, no subpath exports, no re-exports, no workarounds. This is absolute — no exceptions.
-- When two modules need shared code: prefer duplication if the surface area is small; extract to a package under `packages/` when it's large enough to justify the indirection. For plant domain code, use `@packages/plants-core`. For new domains, create a new `@packages/<domain>-core` package.
-- If a feature request implies cross-module imports, redesign the approach to use a shared package instead. Never plan a module-to-module dependency.
+- When two modules need shared code: prefer duplication if the surface area is small; extract to a package under `packages/` when it's large enough to justify the indirection. Check `packages/` for an existing `@packages/<domain>-core` package before creating a new one.
 
 ## Subagent Pattern
 
 In **draft mode**, Subagent A drafts the plan from scratch and writes `plan.md`. In **revision mode**, A reads the existing plan and the escalation file, then revises `plan.md` to address the structural issue — keeping sections that aren't affected. In **review mode**, Subagent A is skipped entirely — only B runs.
 
+In **revision mode**, Subagent B reviews A's revisions — challenges the revised approach, validates that the structural issue from the escalation file is genuinely addressed (not just papered over), and validates acceptance criteria. B should verify that the revised plan doesn't introduce new cross-module dependencies or contradict existing ADRs.
+
 Subagent B reads the plan, challenges it — checking for missing affected packages, unrealistic scope, incorrect patterns, missing stories, or accessibility gaps — and edits `plan.md` directly to improve it. B does not append concerns; it rewrites sections that need improvement. In **review mode**, B also ensures the plan follows the expected output format. If sections are missing, B adds them.
 
-**B MUST validate acceptance criteria before finishing.** Check:
-
-1. The `## Acceptance criteria` section exists and is not empty.
-2. Every criterion has exactly one tag: `[static]`, `[visual]`, or `[interactive]`.
-3. There is at least one criterion per file in the `## File changes` section.
-4. UI/UX file changes have at least one `[visual]` or `[interactive]` criterion.
-   If any check fails, B fixes the acceptance criteria directly — adding missing criteria, adding missing tags, or rewriting vague criteria to be Chrome DevTools-verifiable.
+**B MUST validate acceptance criteria against the RULES in the plan output format.** If any rule is violated, B fixes the criteria directly.

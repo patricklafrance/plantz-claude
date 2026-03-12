@@ -1,5 +1,6 @@
 import type { Decorator } from "@storybook/react-vite";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { NoopLogger } from "@workleap/logging";
 import { useMemo, type ReactNode } from "react";
 
 import { initializeFireflyForStorybook, withFireflyDecorator } from "@apps/packages-storybook/firefly";
@@ -7,7 +8,9 @@ import { initializeFireflyForStorybook, withFireflyDecorator } from "@apps/packa
 import { ManagementPlantsCollectionProvider } from "./ManagementPlantsContext.tsx";
 import { createManagementPlantsCollection } from "./plantsCollection.ts";
 
-const runtime = await initializeFireflyForStorybook();
+const runtime = await initializeFireflyForStorybook({
+    loggers: [new NoopLogger()],
+});
 
 export const fireflyDecorator = withFireflyDecorator(runtime);
 

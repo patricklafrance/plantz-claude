@@ -50,22 +50,42 @@ The single validation gate for all code quality. Runs static checks (lint, modul
 - **Iteration > 1:** Verify only criteria related to files changed in this iteration. Carry forward passing results from the previous iteration's `changes-*.md` for criteria you did not re-verify — copy them with a note "(carried from iteration N)".
 - **Indirect regressions:** If this iteration changed shared styles/layouts/utilities, re-verify all criteria that render those elements.
 
-**Server startup:**
+**Phase 0 — Server startup and viewport:**
 
-Start the appropriate dev server (Storybook for story criteria, host app for route criteria). Wait for it to be ready (up to 60 seconds). If it fails to start, skip browser verification and note the failure in `## Verification results`.
+Start the appropriate dev server (Storybook for story criteria, host app for route criteria). Wait for it to be ready (up to 60 seconds). If it fails to start, skip browser verification and note the failure in `## Verification results`. Set a consistent desktop viewport size before verifying — screenshots vary between runs without one.
 
 **Dark mode verification:**
 For dark mode criteria, toggle the `dark` class on the document element via Chrome DevTools MCP, verify the criterion, then toggle back.
 
-**For each criterion:**
+**Phase 1 — `[visual]` criteria:**
 
-1. Navigate to the relevant page using `navigate_page`.
-2. For `[interactive]` criteria: perform the interaction (click, type, resize) using the appropriate MCP tool.
-3. Take a screenshot using `take_screenshot`.
-4. Assess pass/fail based on what is visible.
-5. Record the result — do NOT fix code. This skill only reports issues.
+Navigate to each relevant page, screenshot, and assess pass/fail. For alignment or spacing criteria, zoom into the relevant area — don't rely on a full-page screenshot alone. Record results only — do NOT fix code.
 
-**Cleanup:** Stop the dev server when all verifications are complete. Kill the process to avoid orphan servers.
+**Phase 2 — `[interactive]` criteria:**
+
+Navigate to each relevant page, perform the interaction, screenshot the result, and assess pass/fail. Record results only — do NOT fix code.
+
+**Phase 3 — Storybook a11y verification:**
+
+Run the Storybook Vitest a11y tests as a gate check. The code skill already attempted fixes during implementation, so remaining violations are either intentionally suppressed (with justification) or regressions the code skill missed.
+
+1. Build the list of affected domain Storybooks from the cumulative changed files (step 1).
+2. For each affected domain Storybook, run:
+
+    ```bash
+    pnpm vitest run --project {domain}-storybook
+    ```
+
+    Replace `{domain}` with the affected domain (e.g., `management`, `today`, `packages`). Run the full project — vitest is fast and domain Storybooks are already scoped.
+
+3. If violations are reported, add them to the test issues file under `## Storybook a11y`. For each violation include: story name, rule ID, element selector, and the violation description.
+4. If a violation was already reported in the previous iteration's test issues and the code skill attempted a fix: prefix with `⚠️ PERSISTENT:` to signal the code skill to suppress rather than retry.
+5. If no violations, record "Pass" in the `## Storybook a11y` section.
+6. If the Storybook Vitest a11y project is not configured for the affected domain, record "Skipped — Storybook a11y not configured for {domain}."
+
+**Phase 4 — Cleanup:**
+
+Stop the dev server when all verifications are complete. Kill the process to avoid orphan servers.
 
 ## Output
 
@@ -93,6 +113,12 @@ For dark mode criteria, toggle the `dark` class on the document element via Chro
 - `[interactive]` {criterion text} — ❌ fail — {what was observed}
 - [Or "Pass" if all visual/interactive criteria passed]
 - [Or "No visual/interactive criteria in plan." if none exist]
+
+## Storybook a11y
+
+- `StoryName` — {rule-id}: {element selector} — {violation description}
+- [Or "Pass" if no violations]
+- [Or "Skipped — Storybook a11y not configured for {domain}." if not configured]
 ```
 
 ## Subagent Pattern
@@ -103,6 +129,8 @@ For dark mode criteria, toggle the `dark` class on the document element via Chro
 
 1. **Static report review.** Spot-check a sample of A's findings against actual file contents — remove false positives, add missed issues, and correct inaccurate descriptions. Edit the test issues file directly.
 
-2. **Browser verification.** If the plan has `[visual]` or `[interactive]` criteria, follow the browser verification procedure (above). Record results in the test issues file. B owns browser verification — every `[visual]` and `[interactive]` criterion must have a pass/fail result when B is done.
+2. **Browser verification.** If the plan has `[visual]` or `[interactive]` criteria, follow the browser verification procedure (above) — executing Phase 0 through Phase 2 in order. Record results in the test issues file. B owns browser verification — every `[visual]` and `[interactive]` criterion must have a pass/fail result when B is done.
 
-3. **Write the completion marker.** B **always** writes the final `## Verification results` section (including the `<!-- test-complete -->` marker) into `changes-[iteration].md` — even if there were no `[visual]`/`[interactive]` criteria to verify. This is how the orchestrator confirms B completed normally.
+3. **Storybook a11y verification.** Follow Phase 3 (above) to run Storybook Vitest a11y tests on changed stories. Record results in the test issues file under `## Storybook a11y`. B owns this phase.
+
+4. **Write the completion marker.** B **always** writes the final `## Verification results` section (including the `<!-- test-complete -->` marker) into `changes-[iteration].md` — even if there were no `[visual]`/`[interactive]` criteria to verify. This is how the orchestrator confirms B completed normally.

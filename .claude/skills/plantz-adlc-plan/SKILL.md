@@ -88,18 +88,19 @@ RULES (apply to every criterion below):
 2. There MUST be at least one criterion per planned file change.
 3. UI/UX changes MUST have mostly [visual] and [interactive] criteria.
 4. [visual] and [interactive] criteria MUST be specific enough for an agent with Chrome DevTools to verify (e.g., "dialog has readable text on dark background" NOT "dark mode looks good").
+5. When a feature adds, removes, or modifies columns/rows in a grid or table layout, include a [visual] criterion that explicitly compares header column positions to body column positions (e.g., "each header label's left edge is directly above the corresponding body value's left edge with no visible horizontal offset").
 
 Tag definitions:
 
 - [static] — verified by lint, typecheck, or module validation
-- [visual] — verified by launching the app and visually inspecting the UI
+- [visual] — verified by launching the app and visually inspecting a screenshot (color, presence, text content, layout structure)
 - [interactive] — verified by clicking, typing, or navigating in the browser
 
 Criteria:
 
-- [static] PlantListItem accepts optional `onDelete` prop without type errors
-- [visual] Today's list renders without delete buttons
-- [interactive] Clicking a plant row in Today opens the detail dialog
+- [static] Component accepts new prop without type errors
+- [visual] List renders with the expected columns and no visual offset between header and body
+- [interactive] Clicking a row opens the detail dialog
 ```
 
 ## Hard Constraints

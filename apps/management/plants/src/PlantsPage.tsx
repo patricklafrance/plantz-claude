@@ -1,5 +1,5 @@
 import { useLiveQuery } from "@tanstack/react-db";
-import { useVirtualizer } from "@tanstack/react-virtual";
+import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { Plus } from "lucide-react";
 import { useState, useRef, useMemo, useCallback } from "react";
 
@@ -12,9 +12,6 @@ import { EditPlantDialog } from "./EditPlantDialog.tsx";
 import { useManagementPlantsCollection } from "./ManagementPlantsContext.tsx";
 import { createManagementPlantActions } from "./plantsCollection.ts";
 
-const scrollbarGutterStyle = { scrollbarGutter: "stable" as const };
-const scrollContainerStyle = { height: "calc(100vh - 376px)", ...scrollbarGutterStyle };
-
 export function PlantsPage() {
     const { filters, updateFilter, clearFilters, hasActiveFilters } = usePlantFilters();
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -22,7 +19,7 @@ export function PlantsPage() {
     const [editPlant, setEditPlant] = useState<Plant | null>(null);
     const [editOpen, setEditOpen] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState<Plant[] | null>(null);
-    const parentRef = useRef<HTMLDivElement>(null);
+    const listRef = useRef<HTMLDivElement>(null);
 
     const collection = useManagementPlantsCollection();
     const actions = useMemo(() => createManagementPlantActions(collection), [collection]);
@@ -35,11 +32,11 @@ export function PlantsPage() {
         return applyPlantFilters(sorted, filters);
     }, [allPlants, filters]);
 
-    const virtualizer = useVirtualizer({
+    const virtualizer = useWindowVirtualizer({
         count: plants.length,
-        getScrollElement: () => parentRef.current,
         estimateSize: () => 49,
         overscan: 10,
+        scrollMargin: (listRef.current?.getBoundingClientRect().top ?? 0) + window.scrollY,
     });
 
     const allSelected = plants.length > 0 && plants.every((p) => selectedIds.has(p.id));
@@ -129,14 +126,14 @@ export function PlantsPage() {
 
     if (!isReady) {
         return (
-            <div className="flex h-full items-center justify-center p-6">
+            <div className="flex items-center justify-center p-6">
                 <p className="text-muted-foreground text-sm">Loading plants...</p>
             </div>
         );
     }
 
     return (
-        <div className="flex h-full flex-col gap-4 p-6">
+        <div className="flex flex-col gap-4 p-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-xl font-semibold">Plants</h1>
                 <div className="flex items-center gap-2">
@@ -162,30 +159,26 @@ export function PlantsPage() {
                 {plants.length} plant{plants.length !== 1 ? "s" : ""}
             </div>
 
-            <div className="border-border flex-1 overflow-hidden rounded-lg border">
-                <div className="bg-muted/50 overflow-y-auto [&>div]:bg-transparent" style={scrollbarGutterStyle}>
-                    <PlantListHeader showActions selectAllChecked={allSelected} onToggleSelectAll={toggleAll} />
-                </div>
-                <div ref={parentRef} className="overflow-auto" style={scrollContainerStyle}>
-                    <div role="list" aria-label="Plants" style={virtualizerContainerStyle}>
-                        {virtualizer.getVirtualItems().map((virtualRow) => {
-                            const plant = plants[virtualRow.index]!;
-                            // oxlint-disable-next-line react-perf/jsx-no-new-object-as-prop -- Virtual row positioning requires per-item inline styles
-                            const rowStyle = {
-                                position: "absolute" as const,
-                                top: 0,
-                                left: 0,
-                                width: "100%",
-                                height: `${virtualRow.size}px`,
-                                transform: `translateY(${virtualRow.start}px)`,
-                            };
-                            return (
-                                <div key={plant.id} role="listitem" style={rowStyle}>
-                                    <PlantListItem plant={plant} selected={selectedIds.has(plant.id)} onToggleSelect={toggleSelect} onEdit={handleEditPlant} onDelete={handleDeleteSingle} />
-                                </div>
-                            );
-                        })}
-                    </div>
+            <div className="border-border rounded-lg border">
+                <PlantListHeader showActions selectAllChecked={allSelected} onToggleSelectAll={toggleAll} />
+                <div ref={listRef} role="list" aria-label="Plants" style={virtualizerContainerStyle}>
+                    {virtualizer.getVirtualItems().map((virtualRow) => {
+                        const plant = plants[virtualRow.index]!;
+                        // oxlint-disable-next-line react-perf/jsx-no-new-object-as-prop -- Virtual row positioning requires per-item inline styles
+                        const rowStyle = {
+                            position: "absolute" as const,
+                            top: 0,
+                            left: 0,
+                            width: "100%",
+                            height: `${virtualRow.size}px`,
+                            transform: `translateY(${virtualRow.start - virtualizer.options.scrollMargin}px)`,
+                        };
+                        return (
+                            <div key={plant.id} role="listitem" style={rowStyle}>
+                                <PlantListItem plant={plant} selected={selectedIds.has(plant.id)} onToggleSelect={toggleSelect} onEdit={handleEditPlant} onDelete={handleDeleteSingle} />
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 

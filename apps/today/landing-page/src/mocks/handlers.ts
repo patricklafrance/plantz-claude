@@ -1,10 +1,16 @@
 import { http, HttpResponse } from "msw";
 
-import { plantsDb } from "@packages/plants-core/db";
+import { getUserId, plantsDb } from "@packages/plants-core/db";
 
 export const todayPlantHandlers = [
-    http.get("/api/today/plants", () => {
-        const plants = plantsDb.getAll();
+    http.get("/api/today/plants", ({ request }) => {
+        const userId = getUserId(request);
+
+        if (!userId) {
+            return new HttpResponse(null, { status: 401 });
+        }
+
+        const plants = plantsDb.getAllByUser(userId);
 
         return HttpResponse.json(plants);
     }),

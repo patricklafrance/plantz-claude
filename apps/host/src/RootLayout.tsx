@@ -3,6 +3,7 @@ import { Link, Outlet } from "react-router";
 
 import { ColorModeToggle } from "./ColorModeToggle.tsx";
 import { PlantzLogo } from "./PlantzLogo.tsx";
+import { UserRibbon } from "./UserRibbon.tsx";
 
 const renderItem: RenderItemFunction = (item, key) => {
     if (!isNavigationLink(item)) {
@@ -42,6 +43,7 @@ export function RootLayout() {
                 <nav aria-label="Main" className="flex-1">
                     {navigationElements}
                 </nav>
+                <UserRibbon />
                 <ColorModeToggle />
             </header>
             <main id="main-content" className="flex-1">

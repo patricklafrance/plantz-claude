@@ -1,13 +1,15 @@
 import { createOptimisticAction } from "@tanstack/db";
 import type { QueryClient } from "@tanstack/react-query";
 
-import { plantSchema, type Plant } from "@packages/plants-core";
+import { getAuthHeaders, plantSchema, type Plant } from "@packages/plants-core";
 import { createPlantsCollection, type PlantsCollection } from "@packages/plants-core/collection";
 
 const API_BASE = "/api/today/plants";
 
 async function fetchPlants(): Promise<Plant[]> {
-    const response = await fetch(API_BASE);
+    const response = await fetch(API_BASE, {
+        headers: getAuthHeaders(),
+    });
 
     if (!response.ok) {
         throw new Error(`Failed to fetch plants: ${response.status}`);
@@ -36,7 +38,7 @@ export function createTodayPlantActions(plantsCollection: PlantsCollection) {
         mutationFn: async (ids) => {
             const response = await fetch(API_BASE, {
                 method: "DELETE",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", ...getAuthHeaders() },
                 body: JSON.stringify({ ids }),
             });
 

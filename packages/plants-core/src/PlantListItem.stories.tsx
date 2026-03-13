@@ -13,6 +13,7 @@ const FIXED_CREATION = new Date(2025, 0, 1, 0, 0, 0, 0);
 function makePlant(overrides: Partial<Plant> = {}): Plant {
     return {
         id: "test-1",
+        userId: "user-alice",
         name: "Monstera Deliciosa",
         description: "A tropical plant",
         family: "Araceae",

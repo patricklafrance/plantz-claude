@@ -1,4 +1,4 @@
-export const AUTH_TOKEN_KEY = "plantz-auth-token";
+import { AUTH_TOKEN_KEY } from "./authTokenKey.ts";
 
 export function getAuthHeaders(): Record<string, string> {
     const token = sessionStorage.getItem(AUTH_TOKEN_KEY);
@@ -8,4 +8,8 @@ export function getAuthHeaders(): Record<string, string> {
     }
 
     return { Authorization: `Bearer ${token}` };
+}
+
+export function getCurrentUserId(): string | null {
+    return sessionStorage.getItem(AUTH_TOKEN_KEY);
 }

@@ -1,6 +1,6 @@
 import { createContext, useContext, type ReactNode } from "react";
 
-import { AUTH_TOKEN_KEY, getAuthHeaders } from "@packages/plants-core";
+import { getAuthHeaders } from "@packages/plants-core";
 
 import { AuthError } from "./AuthError.ts";
 
@@ -13,13 +13,8 @@ export interface Session {
 export function sessionQueryOptions() {
     return {
         queryKey: ["/api/auth/session"],
+        retry: false,
         queryFn: async () => {
-            const token = sessionStorage.getItem(AUTH_TOKEN_KEY);
-
-            if (!token) {
-                throw new AuthError(401);
-            }
-
             const res = await fetch("/api/auth/session", {
                 headers: getAuthHeaders(),
             });

@@ -1,6 +1,6 @@
 export { plantSchema, type Plant } from "./plantSchema.ts";
 export { userSchema, type User } from "./userSchema.ts";
-export { AUTH_TOKEN_KEY, getAuthHeaders } from "./authHeader.ts";
+export { getAuthHeaders, getCurrentUserId } from "./authHeader.ts";
 export { getOptionLabel, isDueForWatering, applyPlantFilters } from "./plantUtils.ts";
 export { locations, luminosities, wateringFrequencies, wateringTypes } from "./constants.ts";
 export type { LocationId, LuminosityId, WateringFrequencyId, WateringTypeId } from "./constants.ts";

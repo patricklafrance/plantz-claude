@@ -3,7 +3,6 @@ import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
 
 import { Button, Input, Label } from "@packages/components";
-import { AUTH_TOKEN_KEY } from "@packages/plants-core";
 
 import { sessionQueryOptions } from "./SessionContext.tsx";
 
@@ -33,8 +32,6 @@ export function LoginPage() {
                 return;
             }
 
-            const data = (await response.json()) as { token: string };
-            sessionStorage.setItem(AUTH_TOKEN_KEY, data.token);
             await queryClient.fetchQuery(sessionQueryOptions());
             navigate("/", { replace: true });
         } catch {

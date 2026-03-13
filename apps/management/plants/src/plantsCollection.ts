@@ -1,7 +1,7 @@
 import { createOptimisticAction } from "@tanstack/db";
 import type { QueryClient } from "@tanstack/react-query";
 
-import { AUTH_TOKEN_KEY, getAuthHeaders, plantSchema, type Plant } from "@packages/plants-core";
+import { getCurrentUserId, getAuthHeaders, plantSchema, type Plant } from "@packages/plants-core";
 import { createPlantsCollection, type PlantsCollection } from "@packages/plants-core/collection";
 
 const API_BASE = "/api/management/plants";
@@ -34,7 +34,7 @@ export function createManagementPlantActions(plantsCollection: PlantsCollection)
             plantsCollection.insert({
                 ...data,
                 id: crypto.randomUUID(),
-                userId: sessionStorage.getItem(AUTH_TOKEN_KEY) ?? "",
+                userId: getCurrentUserId() ?? "",
                 creationDate: new Date(),
                 lastUpdateDate: new Date(),
             } as Plant);

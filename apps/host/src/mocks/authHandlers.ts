@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 
-import { getUserId, usersDb } from "@packages/plants-core/db";
+import { AUTH_TOKEN_KEY, getUserId, usersDb } from "@packages/plants-core/db";
 
 export const authHandlers = [
     http.post("/api/auth/login", async ({ request }) => {
@@ -11,7 +11,15 @@ export const authHandlers = [
             return new HttpResponse(null, { status: 401 });
         }
 
+        sessionStorage.setItem(AUTH_TOKEN_KEY, user.id);
+
         return HttpResponse.json({ token: user.id });
+    }),
+
+    http.post("/api/auth/logout", () => {
+        sessionStorage.removeItem(AUTH_TOKEN_KEY);
+
+        return new HttpResponse(null, { status: 200 });
     }),
 
     http.get("/api/auth/session", ({ request }) => {

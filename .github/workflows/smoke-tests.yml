@@ -44,17 +44,12 @@ jobs:
 
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
-              env:
-                  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
 
             - name: Add node_modules/.bin to PATH
               run: echo "$PWD/node_modules/.bin" >> $GITHUB_PATH
 
             - name: Install browser
-              # PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD on the install step prevents playwright's
-              # post-install from downloading all browsers. We then install only chromium
-              # (with system deps) to match the root playwright version that agent-browser uses.
-              run: npx playwright install --with-deps chromium
+              run: agent-browser install --with-deps
 
             - name: Warm up browser
               run: |

@@ -57,7 +57,7 @@
         },
         "test": {
             "dependsOn": ["//#install-playwright"],
-            "outputs": ["node_modules/.cache/vitest/**"]
+            "outputs": ["node_modules/.cache/vitest/**", "node_modules/.cache/storybook/**"]
         }
     }
 }

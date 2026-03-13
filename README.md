@@ -215,7 +215,7 @@ Formal logs of _why_ decisions were made — not just what was decided. Agents c
 
 ### Other notable patterns
 
-**Selective Chromatic runs** — a custom TypeScript utility ([`tooling/getAffectedStorybooks.ts`](tooling/getAffectedStorybooks.ts)) that detects which Storybooks were affected by code changes. Unaffected Storybooks skip their Chromatic build entirely.
+**Selective Chromatic runs** — a custom TypeScript utility ([`scripts/getAffectedStorybooks.ts`](scripts/getAffectedStorybooks.ts)) that detects which Storybooks were affected by code changes. Unaffected Storybooks skip their Chromatic build entirely.
 
 **Instruction authoring principles** — a framework for writing agent instructions that actually get followed. Key insight: agents ignore advisory framing ("you should...") but follow prohibition framing ("never..."). See [`agent-docs/references/writing-agent-instructions.md`](agent-docs/references/writing-agent-instructions.md).
 
@@ -237,12 +237,6 @@ pnpm install
 ### Seed data
 
 Plant data lives in an MSW in-memory database (`plantsDb` from `@packages/plants-core`). On page load, the host app calls `plantsDb.reset(defaultSeedPlants)` which populates ~250 plants automatically. Data resets on every reload — no manual seeding needed.
-
-**To regenerate the static seed file** (used as the default data source):
-
-```bash
-pnpm seed-plants      # Generates apps/host/public/seed-plants.json
-```
 
 ### Run the app
 

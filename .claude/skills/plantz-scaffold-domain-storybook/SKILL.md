@@ -152,7 +152,7 @@ Follow the existing comment-section pattern visible in the file.
 
 ### Step 5 — Add affected-detection entry
 
-In `tooling/getAffectedStorybooks.ts`, add a new entry to the `StorybookDependencies` object:
+In `scripts/getAffectedStorybooks.ts`, add a new entry to the `StorybookDependencies` object:
 
 ```ts
 "@apps/{domain}-storybook": [
@@ -194,7 +194,7 @@ Run `pnpm install` to link the new workspace package.
 1. Confirm all 9 storybook files exist under `apps/{domain}/storybook/` (including `.storybook/storybook.css`, `.storybook/vitest.setup.ts`, and `vitest.config.ts`).
 2. Confirm root `package.json` has the `dev-{domain}-storybook` script.
 3. Confirm `apps/storybook/.storybook/main.ts` includes the new story globs.
-4. Confirm `tooling/getAffectedStorybooks.ts` includes the new `StorybookDependencies` entry.
+4. Confirm `scripts/getAffectedStorybooks.ts` includes the new `StorybookDependencies` entry.
 5. Confirm `.github/workflows/chromatic.yml` has the new Chromatic step.
 6. Run `pnpm syncpack` — fix any version mismatches.
 7. Run `pnpm typecheck` — fix any type errors.

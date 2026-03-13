@@ -13,6 +13,7 @@ export interface Session {
 export function sessionQueryOptions() {
     return {
         queryKey: ["/api/auth/session"],
+        retry: false,
         queryFn: async () => {
             const res = await fetch("/api/auth/session", {
                 headers: getAuthHeaders(),

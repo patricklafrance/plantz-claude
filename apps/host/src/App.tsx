@@ -2,42 +2,23 @@ import { AppRouter, useIsActiveRouteProtected, useIsBootstrapping, useProtectedD
 import { createBrowserRouter, Navigate, Outlet } from "react-router";
 import { RouterProvider } from "react-router/dom";
 
-import { AUTH_TOKEN_KEY, getAuthHeaders } from "@packages/plants-core";
-
 import { AuthError } from "./AuthError.ts";
-import { SessionProvider, type Session } from "./SessionContext.tsx";
+import { SessionProvider, sessionQueryOptions } from "./SessionContext.tsx";
 
 function BootstrappingRoute() {
-    const [session] = useProtectedDataQueries(
-        [
-            {
-                queryKey: ["/api/auth/session"],
-                queryFn: async () => {
-                    const token = sessionStorage.getItem(AUTH_TOKEN_KEY);
-
-                    if (!token) {
-                        throw new AuthError(401);
-                    }
-
-                    const res = await fetch("/api/auth/session", {
-                        headers: getAuthHeaders(),
-                    });
-
-                    if (!res.ok) {
-                        throw new AuthError(res.status);
-                    }
-
-                    return (await res.json()) as Session;
-                },
-            },
-        ],
-        (error) => error instanceof AuthError && error.status === 401,
-    );
+    const [session] = useProtectedDataQueries([sessionQueryOptions()], (error) => error instanceof AuthError && error.status === 401);
 
     const isActiveRouteProtected = useIsActiveRouteProtected(true, { throwWhenThereIsNoMatch: false });
 
     if (useIsBootstrapping()) {
-        return <div>Loading...</div>;
+        return (
+            <div className="bg-background flex min-h-screen items-center justify-center">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
+                    <p className="text-muted-foreground text-sm">Loading...</p>
+                </div>
+            </div>
+        );
     }
 
     // On public routes (e.g. /login), render without requiring a session.

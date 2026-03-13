@@ -5,6 +5,8 @@ import { useNavigate } from "react-router";
 import { Button, Input, Label } from "@packages/components";
 import { AUTH_TOKEN_KEY } from "@packages/plants-core";
 
+import { sessionQueryOptions } from "./SessionContext.tsx";
+
 export function LoginPage() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -33,8 +35,8 @@ export function LoginPage() {
 
             const data = (await response.json()) as { token: string };
             sessionStorage.setItem(AUTH_TOKEN_KEY, data.token);
-            await queryClient.invalidateQueries({ queryKey: ["/api/auth/session"] });
-            navigate("/");
+            await queryClient.fetchQuery(sessionQueryOptions());
+            navigate("/", { replace: true });
         } catch {
             setError("An unexpected error occurred.");
         } finally {

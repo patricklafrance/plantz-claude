@@ -44,12 +44,20 @@ jobs:
 
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
+              env:
+                  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
 
             - name: Add node_modules/.bin to PATH
               run: echo "$PWD/node_modules/.bin" >> $GITHUB_PATH
 
             - name: Install browser
-              run: agent-browser install --with-deps
+              # agent-browser uses npx to resolve playwright internally. When the workspace
+              # contains playwright (from storybooks), npx picks up that version instead of
+              # the one matching agent-browser's playwright-core. Install explicitly using
+              # the correct version.
+              run: |
+                  AB_PW=$(node -p "require(require.resolve('playwright-core/package.json',{paths:[require.resolve('agent-browser')]})).version")
+                  npx -y playwright@${AB_PW} install --with-deps chromium
 
             - name: Warm up browser
               run: |

@@ -6,7 +6,16 @@ const meta = {
     title: "Management/Plants/Components/DeleteConfirmDialog",
     component: DeleteConfirmDialog,
     parameters: {
-        chromatic: { viewports: [375, 768, 1280] },
+        chromatic: {
+            modes: {
+                "light mobile": { globals: { theme: "light" }, viewport: 375 },
+                "light tablet": { globals: { theme: "light" }, viewport: 768 },
+                "light desktop": { globals: { theme: "light" }, viewport: 1280 },
+                "dark mobile": { globals: { theme: "dark" }, viewport: 375 },
+                "dark tablet": { globals: { theme: "dark" }, viewport: 768 },
+                "dark desktop": { globals: { theme: "dark" }, viewport: 1280 },
+            },
+        },
     },
     args: {
         open: true,

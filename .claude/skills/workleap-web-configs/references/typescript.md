@@ -8,18 +8,18 @@
 
 ## Available Configurations
 
-| Config                    | Use Case                          |
-| ------------------------- | --------------------------------- |
-| `web-application.json`    | React web applications            |
-| `library.json`            | Libraries (with or without React) |
-| `monorepo-workspace.json` | Monorepo workspace root           |
+| Config | Use Case |
+|--------|----------|
+| `web-application.json` | React web applications |
+| `library.json` | Libraries (with or without React) |
+| `monorepo-workspace.json` | Monorepo workspace root |
 
 ### Advanced Composition Pieces
 
-| Config       | Description                       |
-| ------------ | --------------------------------- |
-| `core.json`  | Basic rules shared by all configs |
-| `react.json` | React-specific rules              |
+| Config | Description |
+|--------|-------------|
+| `core.json` | Basic rules shared by all configs |
+| `react.json` | React-specific rules |
 
 ## Installation
 
@@ -151,9 +151,7 @@ For React projects needing custom setup:
 ```json
 {
     "extends": "@workleap/typescript-configs/react",
-    "compilerOptions": {
-        /* custom options */
-    },
+    "compilerOptions": { /* custom options */ },
     "exclude": ["dist", "node_modules"]
 }
 ```
@@ -163,9 +161,7 @@ For non-React projects:
 ```json
 {
     "extends": "@workleap/typescript-configs/core",
-    "compilerOptions": {
-        /* custom options */
-    },
+    "compilerOptions": { /* custom options */ },
     "exclude": ["dist", "node_modules"]
 }
 ```

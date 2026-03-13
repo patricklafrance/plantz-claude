@@ -105,8 +105,8 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
                 <DialogHeader>
                     <div className="flex items-center gap-2">
                         <DialogTitle>Edit plant</DialogTitle>
-                        <span role="status" aria-live="polite">
-                            {saved && <span className="text-muted-foreground animate-in fade-in text-xs">Saved</span>}
+                        <span role="status" aria-live="polite" className={`text-muted-foreground text-xs transition-opacity ${saved ? "opacity-100" : "opacity-0"}`}>
+                            Saved
                         </span>
                     </div>
                 </DialogHeader>

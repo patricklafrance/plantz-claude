@@ -51,11 +51,11 @@ patches/
 
 ```json
 {
-    "pnpm": {
-        "patchedDependencies": {
-            "express@4.18.2": "patches/express@4.18.2.patch"
-        }
+  "pnpm": {
+    "patchedDependencies": {
+      "express@4.18.2": "patches/express@4.18.2.patch"
     }
+  }
 }
 ```
 
@@ -100,12 +100,11 @@ pnpm patch-commit <path>
 ```bash
 pnpm patch-remove <pkg>@<version>
 
-# Example
+# Example  
 pnpm patch-remove express@4.18.2
 ```
 
 Or manually:
-
 1. Delete the patch file from `patches/`
 2. Remove entry from `patchedDependencies` in `package.json`
 3. Run `pnpm install`
@@ -116,11 +115,11 @@ Or manually:
 
 ```json
 {
-    "pnpm": {
-        "patchedDependencies": {
-            "express@4.18.2": "custom-patches/my-express-fix.patch"
-        }
+  "pnpm": {
+    "patchedDependencies": {
+      "express@4.18.2": "custom-patches/my-express-fix.patch"
     }
+  }
 }
 ```
 
@@ -128,13 +127,13 @@ Or manually:
 
 ```json
 {
-    "pnpm": {
-        "patchedDependencies": {
-            "express@4.18.2": "patches/express@4.18.2.patch",
-            "lodash@4.17.21": "patches/lodash@4.17.21.patch",
-            "@types/node@20.10.0": "patches/@types__node@20.10.0.patch"
-        }
+  "pnpm": {
+    "patchedDependencies": {
+      "express@4.18.2": "patches/express@4.18.2.patch",
+      "lodash@4.17.21": "patches/lodash@4.17.21.patch",
+      "@types/node@20.10.0": "patches/@types__node@20.10.0.patch"
     }
+  }
 }
 ```
 
@@ -145,11 +144,11 @@ Patches are shared across the workspace. Define in the root `package.json`:
 ```json
 // Root package.json
 {
-    "pnpm": {
-        "patchedDependencies": {
-            "express@4.18.2": "patches/express@4.18.2.patch"
-        }
+  "pnpm": {
+    "patchedDependencies": {
+      "express@4.18.2": "patches/express@4.18.2.patch"
     }
+  }
 }
 ```
 
@@ -160,12 +159,11 @@ All workspace packages using `express@4.18.2` will have the patch applied.
 1. **Version specificity**: Patches are tied to exact versions. Update patches when upgrading dependencies.
 
 2. **Document patches**: Add comments explaining why the patch exists:
-
-    ```bash
-    # In patches/README.md
-    ## express@4.18.2.patch
-    Fixes timeout issue. PR pending: https://github.com/expressjs/express/pull/1234
-    ```
+   ```bash
+   # In patches/README.md
+   ## express@4.18.2.patch
+   Fixes timeout issue. PR pending: https://github.com/expressjs/express/pull/1234
+   ```
 
 3. **Minimize patches**: Keep patches small and focused. Large patches are hard to maintain.
 
@@ -182,7 +180,6 @@ ERR_PNPM_PATCH_FAILED  Cannot apply patch
 ```
 
 The package version changed. Recreate the patch:
-
 ```bash
 pnpm patch-remove express@4.18.2
 pnpm patch express@4.18.2
@@ -193,11 +190,10 @@ pnpm patch-commit <path>
 ### Patch not applied
 
 Ensure:
-
 1. Version in `patchedDependencies` matches installed version exactly
 2. Run `pnpm install` after adding patch configuration
 
-<!--
+<!-- 
 Source references:
 - https://pnpm.io/cli/patch
 - https://pnpm.io/cli/patch-commit

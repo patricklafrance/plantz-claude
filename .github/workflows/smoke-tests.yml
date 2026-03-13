@@ -49,8 +49,12 @@ jobs:
             - name: Add node_modules/.bin to PATH
               run: echo "$PWD/node_modules/.bin" >> $GITHUB_PATH
 
-            - name: Install browser dependencies
-              run: agent-browser install --with-deps
+            - name: Install agent-browser
+              run: agent-browser install
+
+            - name: Install Playwright Chromium
+              # Not using "agent-browser install --with-deps" because Playwright is already installed and it's causing issue.
+              run: pnpm dlx playwright install-deps chromium
 
             - name: Warm up browser
               run: |

@@ -13,10 +13,10 @@ Store callbacks in refs when used in effects that shouldn't re-subscribe on call
 
 ```tsx
 function useWindowEvent(event: string, handler: (e) => void) {
-    useEffect(() => {
-        window.addEventListener(event, handler);
-        return () => window.removeEventListener(event, handler);
-    }, [event, handler]);
+  useEffect(() => {
+    window.addEventListener(event, handler)
+    return () => window.removeEventListener(event, handler)
+  }, [event, handler])
 }
 ```
 
@@ -24,16 +24,16 @@ function useWindowEvent(event: string, handler: (e) => void) {
 
 ```tsx
 function useWindowEvent(event: string, handler: (e) => void) {
-    const handlerRef = useRef(handler);
-    useEffect(() => {
-        handlerRef.current = handler;
-    }, [handler]);
+  const handlerRef = useRef(handler)
+  useEffect(() => {
+    handlerRef.current = handler
+  }, [handler])
 
-    useEffect(() => {
-        const listener = (e) => handlerRef.current(e);
-        window.addEventListener(event, listener);
-        return () => window.removeEventListener(event, listener);
-    }, [event]);
+  useEffect(() => {
+    const listener = (e) => handlerRef.current(e)
+    window.addEventListener(event, listener)
+    return () => window.removeEventListener(event, listener)
+  }, [event])
 }
 ```
 
@@ -49,25 +49,25 @@ Do not put app-wide initialization that must run once per app load inside `useEf
 
 ```tsx
 function Comp() {
-    useEffect(() => {
-        loadFromStorage();
-        checkAuthToken();
-    }, []);
+  useEffect(() => {
+    loadFromStorage()
+    checkAuthToken()
+  }, [])
 }
 ```
 
 **Correct (once per app load):**
 
 ```tsx
-let didInit = false;
+let didInit = false
 
 function Comp() {
-    useEffect(() => {
-        if (didInit) return;
-        didInit = true;
-        loadFromStorage();
-        checkAuthToken();
-    }, []);
+  useEffect(() => {
+    if (didInit) return
+    didInit = true
+    loadFromStorage()
+    checkAuthToken()
+  }, [])
 }
 ```
 
@@ -83,12 +83,12 @@ Access latest values in callbacks without adding them to dependency arrays. Prev
 
 ```tsx
 function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
-    const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('')
 
-    useEffect(() => {
-        const timeout = setTimeout(() => onSearch(query), 300);
-        return () => clearTimeout(timeout);
-    }, [query, onSearch]);
+  useEffect(() => {
+    const timeout = setTimeout(() => onSearch(query), 300)
+    return () => clearTimeout(timeout)
+  }, [query, onSearch])
 }
 ```
 
@@ -96,16 +96,14 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 
 ```tsx
 function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
-    const [query, setQuery] = useState("");
-    const onSearchRef = useRef(onSearch);
-    useEffect(() => {
-        onSearchRef.current = onSearch;
-    }, [onSearch]);
+  const [query, setQuery] = useState('')
+  const onSearchRef = useRef(onSearch)
+  useEffect(() => { onSearchRef.current = onSearch }, [onSearch])
 
-    useEffect(() => {
-        const timeout = setTimeout(() => onSearchRef.current(query), 300);
-        return () => clearTimeout(timeout);
-    }, [query]);
+  useEffect(() => {
+    const timeout = setTimeout(() => onSearchRef.current(query), 300)
+    return () => clearTimeout(timeout)
+  }, [query])
 }
 ```
 
@@ -114,15 +112,15 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 When `useEffectEvent` ships in a stable React release, it will provide a cleaner API:
 
 ```tsx
-import { useEffectEvent } from "react";
+import { useEffectEvent } from 'react'
 
 function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
-    const [query, setQuery] = useState("");
-    const onSearchEvent = useEffectEvent(onSearch);
+  const [query, setQuery] = useState('')
+  const onSearchEvent = useEffectEvent(onSearch)
 
-    useEffect(() => {
-        const timeout = setTimeout(() => onSearchEvent(query), 300);
-        return () => clearTimeout(timeout);
-    }, [query]);
+  useEffect(() => {
+    const timeout = setTimeout(() => onSearchEvent(query), 300)
+    return () => clearTimeout(timeout)
+  }, [query])
 }
 ```

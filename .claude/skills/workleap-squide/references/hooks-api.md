@@ -1,7 +1,6 @@
 # Squide Hooks API Reference
 
 ## Table of Contents
-
 - [Routing Hooks](#routing-hooks) — useNavigationItems, useRenderedNavigationItems, useRoutes, useIsBootstrapping, useIsRouteProtected, useRouteMatch
 - [Data Fetching Hooks](#data-fetching-hooks) — usePublicDataQueries, useProtectedDataQueries, usePublicDataHandler, useProtectedDataHandler
 - [Registration Hooks](#registration-hooks) — useDeferredRegistrations
@@ -15,7 +14,6 @@
 ## Routing Hooks
 
 ### useNavigationItems(options?)
-
 Retrieve registered navigation items.
 
 ```ts
@@ -31,11 +29,9 @@ const customItems = useNavigationItems({ menuId: "custom-menu" });
 **Returns:** `Array<NavigationLink | NavigationSection>`
 
 ### useRenderedNavigationItems(items, renderItem, renderSection)
-
 Transform navigation items into React elements.
 
 **Function Signatures (fixed, no custom parameters):**
-
 - `RenderItemFunction`: `(item: NavigationItemRenderProps, key: string, index: number, level: number) => ReactNode`
 - `RenderSectionFunction`: `(elements: ReactNode[], key: string, index: number, level: number) => ReactNode`
 
@@ -67,7 +63,6 @@ const elements = useRenderedNavigationItems(items, renderItem, renderSection);
 ```
 
 ### useRoutes()
-
 Retrieve registered routes (prefer using `AppRouter` instead).
 
 ```ts
@@ -76,7 +71,6 @@ const routes = useRoutes();
 ```
 
 ### useIsBootstrapping()
-
 Check if application is still bootstrapping.
 
 ```ts
@@ -88,7 +82,6 @@ if (useIsBootstrapping()) {
 ```
 
 ### useIsRouteProtected(route)
-
 Check if the given route is protected.
 
 ```ts
@@ -102,7 +95,6 @@ const isActiveRouteProtected = useIsRouteProtected(route);
 ```
 
 ### useRouteMatch(locationArg, options?)
-
 Match a location against registered routes using React Router's matching algorithm.
 
 ```ts
@@ -116,21 +108,20 @@ const activeRoute = useRouteMatch(location);
 // Using window.location
 const activeRoute = useRouteMatch(window.location);
 
-// With throwWhenThereIsNoMatch option
-const activeRoute = useRouteMatch(location, { throwWhenThereIsNoMatch: true });
+// Opting out of the default throw behavior
+const activeRoute = useRouteMatch(location, { throwWhenThereIsNoMatch: false });
+// activeRoute is Route | undefined
 ```
 
 **Parameters:**
-
 - `locationArg`: The location to match against routes
-- `options.throwWhenThereIsNoMatch`: If true, throws an Error when no route matches (default: false)
+- `options.throwWhenThereIsNoMatch`: If true, throws an Error when no route matches (default: true)
 
-**Returns:** A `Route` object if there's a match, `undefined` otherwise (or throws if `throwWhenThereIsNoMatch` is true)
+**Returns:** A `Route` object if there's a match. Throws by default when no route matches; returns `undefined` instead if `throwWhenThereIsNoMatch` is set to `false`.
 
 ## Data Fetching Hooks
 
 ### usePublicDataQueries(queries)
-
 Fetch global public data. Used for data needed on all pages.
 
 ```ts
@@ -142,51 +133,45 @@ const [data1, data2] = usePublicDataQueries([
         queryFn: async () => {
             const response = await fetch("/api/config");
             return response.json();
-        },
+        }
     },
     {
         queryKey: ["/api/translations"],
         queryFn: async () => {
             const response = await fetch("/api/translations");
             return response.json();
-        },
-    },
+        }
+    }
 ]);
 ```
 
 **Note:** Requires `<AppRouter waitForPublicData>` to delay rendering.
 
 ### useProtectedDataQueries(queries, isUnauthorizedError)
-
 Fetch global protected data. Only fetched for protected routes.
 
 ```ts
 import { useProtectedDataQueries } from "@squide/firefly";
 
-const [session] = useProtectedDataQueries(
-    [
-        {
-            queryKey: ["/api/session"],
-            queryFn: async () => {
-                const response = await fetch("/api/session");
-                if (!response.ok) throw new ApiError(response.status);
-                return response.json();
-            },
-        },
-    ],
-    (error) => isApiError(error) && error.status === 401,
-);
+const [session] = useProtectedDataQueries([
+    {
+        queryKey: ["/api/session"],
+        queryFn: async () => {
+            const response = await fetch("/api/session");
+            if (!response.ok) throw new ApiError(response.status);
+            return response.json();
+        }
+    }
+], error => isApiError(error) && error.status === 401);
 ```
 
 **Parameters:**
-
 - `queries`: Array of TanStack Query configurations
 - `isUnauthorizedError`: Function to detect 401 errors (triggers redirect to login)
 
 **Note:** Requires `<AppRouter waitForProtectedData>` to delay rendering.
 
 ### usePublicDataHandler(handler)
-
 Execute the specified handler once the modules are ready and, when applicable, MSW is also ready.
 
 ```ts
@@ -198,7 +183,6 @@ usePublicDataHandler(() => {
 ```
 
 ### useProtectedDataHandler(handler)
-
 Execute the specified handler once the modules are ready, the active route is protected and, when applicable, MSW is also ready.
 
 ```ts
@@ -212,7 +196,6 @@ useProtectedDataHandler(() => {
 ## Registration Hooks
 
 ### useDeferredRegistrations(data?)
-
 Execute deferred registration functions.
 
 ```ts
@@ -231,7 +214,6 @@ useDeferredRegistrations();
 ## Messaging Hooks
 
 ### useEventBusListener(eventName, handler, options?)
-
 Listen to events from the event bus.
 
 ```ts
@@ -250,7 +232,6 @@ useEventBusListener("init-complete", handleEvent, { once: true });
 ```
 
 ### useEventBusDispatcher()
-
 Get a function to dispatch events.
 
 ```ts
@@ -265,7 +246,6 @@ dispatch("user-updated", { id: 123, name: "John" });
 ## Environment & Configuration Hooks
 
 ### useEnvironmentVariable(key)
-
 Get a single environment variable.
 
 ```ts
@@ -274,7 +254,6 @@ const apiUrl = useEnvironmentVariable("apiBaseUrl");
 ```
 
 ### useEnvironmentVariables()
-
 Get all environment variables.
 
 ```ts
@@ -283,7 +262,6 @@ const variables = useEnvironmentVariables();
 ```
 
 ### useFeatureFlag(key, defaultValue)
-
 Get a LaunchDarkly feature flag value.
 
 ```ts
@@ -294,7 +272,6 @@ const isEnabled = useFeatureFlag("new-feature", false);
 ```
 
 ### useFeatureFlags()
-
 Get all feature flags. Returns a memoized object that only changes when a flag value updates.
 
 ```ts
@@ -307,7 +284,6 @@ const flags = useFeatureFlags();
 **Note:** Unlike the LaunchDarkly SDK client which returns a new object on every invocation, this hook returns a memoized object.
 
 ### useLaunchDarklyClient()
-
 Get the LaunchDarkly client instance.
 
 ```ts
@@ -324,7 +300,6 @@ if (isEditableLaunchDarklyClient(client)) {
 ## Logging Hooks
 
 ### useLogger()
-
 Get the runtime logger instance.
 
 ```ts
@@ -343,7 +318,6 @@ logger.critical("Critical");
 ## Runtime Hooks
 
 ### useRuntime()
-
 Get the FireflyRuntime instance.
 
 ```ts
@@ -352,7 +326,6 @@ const runtime = useRuntime();
 ```
 
 ### useRuntimeMode()
-
 Get the current runtime mode.
 
 ```ts
@@ -363,7 +336,6 @@ const mode = useRuntimeMode(); // "development" | "production"
 ## Plugin Hooks
 
 ### usePlugin(name)
-
 Get a registered plugin by name.
 
 ```ts
@@ -376,7 +348,6 @@ const plugin = usePlugin(MyPlugin.name) as MyPlugin;
 ## i18next Hooks (from `@squide/i18next`)
 
 ### useI18nextInstance(key)
-
 Get a registered i18next instance by key.
 
 ```ts
@@ -395,7 +366,6 @@ const { t } = useTranslation("a-namespace", { i18n: instance });
 ```
 
 ### useCurrentLanguage()
-
 Get the current language.
 
 ```ts
@@ -404,7 +374,6 @@ const language = useCurrentLanguage();
 ```
 
 ### useChangeLanguage()
-
 Get function to change language.
 
 ```ts

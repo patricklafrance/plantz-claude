@@ -50,14 +50,12 @@ pnpm import
 pnpm is strict about dependencies. If code imports a package not in `package.json`, it will fail.
 
 **Problem:**
-
 ```js
 // Works with npm (hoisted), fails with pnpm
-import lodash from "lodash"; // Not in dependencies, installed by another package
+import lodash from 'lodash' // Not in dependencies, installed by another package
 ```
 
 **Solution:** Add missing dependencies explicitly:
-
 ```bash
 pnpm add lodash
 ```
@@ -67,27 +65,24 @@ pnpm add lodash
 pnpm reports peer dependency issues by default.
 
 **Option 1:** Let pnpm auto-install:
-
 ```ini
 # .npmrc (default in pnpm v8+)
 auto-install-peers=true
 ```
 
 **Option 2:** Install manually:
-
 ```bash
 pnpm add react react-dom
 ```
 
 **Option 3:** Suppress warnings if acceptable:
-
 ```json
 {
-    "pnpm": {
-        "peerDependencyRules": {
-            "ignoreMissing": ["react"]
-        }
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": ["react"]
     }
+  }
 }
 ```
 
@@ -125,61 +120,55 @@ pnpm install
 ### From npm Workspaces
 
 1. Create `pnpm-workspace.yaml`:
-
-    ```yaml
-    packages:
-        - "packages/*"
-    ```
+   ```yaml
+   packages:
+     - 'packages/*'
+   ```
 
 2. Update internal dependencies to use workspace protocol:
-
-    ```json
-    {
-        "dependencies": {
-            "@myorg/utils": "workspace:^"
-        }
-    }
-    ```
+   ```json
+   {
+     "dependencies": {
+       "@myorg/utils": "workspace:^"
+     }
+   }
+   ```
 
 3. Install:
-    ```bash
-    rm -rf node_modules packages/*/node_modules package-lock.json
-    pnpm install
-    ```
+   ```bash
+   rm -rf node_modules packages/*/node_modules package-lock.json
+   pnpm install
+   ```
 
 ### From Yarn Workspaces
 
 1. Remove Yarn-specific files:
-
-    ```bash
-    rm yarn.lock .yarnrc.yml
-    rm -rf .yarn
-    ```
+   ```bash
+   rm yarn.lock .yarnrc.yml
+   rm -rf .yarn
+   ```
 
 2. Create `pnpm-workspace.yaml` matching `workspaces` in package.json:
-
-    ```yaml
-    packages:
-        - "packages/*"
-    ```
+   ```yaml
+   packages:
+     - 'packages/*'
+   ```
 
 3. Update `package.json` - remove Yarn workspace config if not needed:
-
-    ```json
-    {
-        // Remove "workspaces" field (optional, pnpm uses pnpm-workspace.yaml)
-    }
-    ```
+   ```json
+   {
+     // Remove "workspaces" field (optional, pnpm uses pnpm-workspace.yaml)
+   }
+   ```
 
 4. Convert workspace references:
-
-    ```json
-    // From Yarn
-    "@myorg/utils": "*"
-
-    // To pnpm
-    "@myorg/utils": "workspace:*"
-    ```
+   ```json
+   // From Yarn
+   "@myorg/utils": "*"
+   
+   // To pnpm
+   "@myorg/utils": "workspace:*"
+   ```
 
 ### From Lerna
 
@@ -195,7 +184,7 @@ pnpm -r run build
 # Lerna: run in specific package
 lerna run build --scope=@myorg/app
 
-# pnpm equivalent
+# pnpm equivalent  
 pnpm --filter @myorg/app run build
 
 # Lerna: publish
@@ -233,17 +222,17 @@ Most scripts work unchanged. Update pnpm-specific patterns:
 
 ```json
 {
-    "scripts": {
-        // npm: recursive scripts
-        "build:all": "npm run build --workspaces",
-        // pnpm: use -r flag
-        "build:all": "pnpm -r run build",
-
-        // npm: run in specific workspace
-        "dev:app": "npm run dev -w packages/app",
-        // pnpm: use --filter
-        "dev:app": "pnpm --filter @myorg/app run dev"
-    }
+  "scripts": {
+    // npm: recursive scripts
+    "build:all": "npm run build --workspaces",
+    // pnpm: use -r flag
+    "build:all": "pnpm -r run build",
+    
+    // npm: run in specific workspace  
+    "dev:app": "npm run dev -w packages/app",
+    // pnpm: use --filter
+    "dev:app": "pnpm --filter @myorg/app run dev"
+  }
 }
 ```
 
@@ -261,10 +250,9 @@ Update CI configuration:
 ```
 
 Add to `package.json` for Corepack:
-
 ```json
 {
-    "packageManager": "pnpm@9.0.0"
+  "packageManager": "pnpm@9.0.0"
 }
 ```
 
@@ -295,7 +283,7 @@ yarn install
 
 Keep old lockfile in git history for easy rollback.
 
-<!--
+<!-- 
 Source references:
 - https://pnpm.io/installation
 - https://pnpm.io/cli/import

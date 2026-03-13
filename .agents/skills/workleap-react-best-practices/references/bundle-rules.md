@@ -12,40 +12,40 @@ Split your application by route so each page loads only the code it needs. This 
 **Incorrect (all routes in main bundle):**
 
 ```tsx
-import Dashboard from "./pages/Dashboard";
-import Settings from "./pages/Settings";
-import Profile from "./pages/Profile";
+import Dashboard from './pages/Dashboard'
+import Settings from './pages/Settings'
+import Profile from './pages/Profile'
 
 function AppRoutes() {
-    return (
-        <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/profile" element={<Profile />} />
-        </Routes>
-    );
+  return (
+    <Routes>
+      <Route path="/" element={<Dashboard />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/profile" element={<Profile />} />
+    </Routes>
+  )
 }
 ```
 
 **Correct (each route lazy-loaded):**
 
 ```tsx
-import { lazy, Suspense } from "react";
+import { lazy, Suspense } from 'react'
 
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const Settings = lazy(() => import("./pages/Settings"));
-const Profile = lazy(() => import("./pages/Profile"));
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Settings = lazy(() => import('./pages/Settings'))
+const Profile = lazy(() => import('./pages/Profile'))
 
 function AppRoutes() {
-    return (
-        <Suspense fallback={<PageSkeleton />}>
-            <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/profile" element={<Profile />} />
-            </Routes>
-        </Suspense>
-    );
+  return (
+    <Suspense fallback={<PageSkeleton />}>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/profile" element={<Profile />} />
+      </Routes>
+    </Suspense>
+  )
 }
 ```
 
@@ -64,22 +64,22 @@ Popular icon and component libraries can have **up to 10,000 re-exports** in the
 **Incorrect (imports entire library via barrel file):**
 
 ```tsx
-import { IconCheck, IconX, IconMenu } from "icon-library";
+import { IconCheck, IconX, IconMenu } from 'icon-library'
 // Loads thousands of modules, adds 200-800ms to cold starts
 
-import { Button, TextField } from "component-library";
+import { Button, TextField } from 'component-library'
 // Same problem with component libraries
 ```
 
 **Correct (imports only what you need):**
 
 ```tsx
-import IconCheck from "icon-library/icons/check";
-import IconX from "icon-library/icons/x";
-import IconMenu from "icon-library/icons/menu";
+import IconCheck from 'icon-library/icons/check'
+import IconX from 'icon-library/icons/x'
+import IconMenu from 'icon-library/icons/menu'
 
-import Button from "component-library/Button";
-import TextField from "component-library/TextField";
+import Button from 'component-library/Button'
+import TextField from 'component-library/TextField'
 ```
 
 Direct imports provide 15-70% faster dev boot, 28% faster builds, 40% faster cold starts, and significantly faster HMR.
@@ -93,26 +93,28 @@ Use `React.lazy` with `Suspense` to lazy-load large components not needed on ini
 **Incorrect (Monaco bundles with main chunk ~300KB):**
 
 ```tsx
-import { MonacoEditor } from "./monaco-editor";
+import { MonacoEditor } from './monaco-editor'
 
 function CodePanel({ code }: { code: string }) {
-    return <MonacoEditor value={code} />;
+  return <MonacoEditor value={code} />
 }
 ```
 
 **Correct (Monaco loads on demand):**
 
 ```tsx
-import { lazy, Suspense } from "react";
+import { lazy, Suspense } from 'react'
 
-const MonacoEditor = lazy(() => import("./monaco-editor").then((m) => ({ default: m.MonacoEditor })));
+const MonacoEditor = lazy(() =>
+  import('./monaco-editor').then(m => ({ default: m.MonacoEditor }))
+)
 
 function CodePanel({ code }: { code: string }) {
-    return (
-        <Suspense fallback={<div>Loading editor...</div>}>
-            <MonacoEditor value={code} />
-        </Suspense>
-    );
+  return (
+    <Suspense fallback={<div>Loading editor...</div>}>
+      <MonacoEditor value={code} />
+    </Suspense>
+  )
 }
 ```
 
@@ -125,17 +127,22 @@ Load large data or modules only when a feature is activated.
 **Example (lazy-load animation frames):**
 
 ```tsx
-function AnimationPlayer({ enabled, setEnabled }: { enabled: boolean; setEnabled: React.Dispatch<React.SetStateAction<boolean>> }) {
-    const [frames, setFrames] = useState<Frame[] | null>(null);
+function AnimationPlayer({ enabled, setEnabled }: {
+  enabled: boolean
+  setEnabled: React.Dispatch<React.SetStateAction<boolean>>
+}) {
+  const [frames, setFrames] = useState<Frame[] | null>(null)
 
-    useEffect(() => {
-        if (enabled && !frames) {
-            import("./animation-frames.js").then((mod) => setFrames(mod.frames)).catch(() => setEnabled(false));
-        }
-    }, [enabled, frames, setEnabled]);
+  useEffect(() => {
+    if (enabled && !frames) {
+      import('./animation-frames.js')
+        .then(mod => setFrames(mod.frames))
+        .catch(() => setEnabled(false))
+    }
+  }, [enabled, frames, setEnabled])
 
-    if (!frames) return <Skeleton />;
-    return <Canvas frames={frames} />;
+  if (!frames) return <Skeleton />
+  return <Canvas frames={frames} />
 }
 ```
 
@@ -149,15 +156,19 @@ Preload heavy bundles before they're needed to reduce perceived latency.
 
 ```tsx
 function EditorButton({ onClick }: { onClick: () => void }) {
-    const preload = () => {
-        void import("./monaco-editor");
-    };
+  const preload = () => {
+    void import('./monaco-editor')
+  }
 
-    return (
-        <button onMouseEnter={preload} onFocus={preload} onClick={onClick}>
-            Open Editor
-        </button>
-    );
+  return (
+    <button
+      onMouseEnter={preload}
+      onFocus={preload}
+      onClick={onClick}
+    >
+      Open Editor
+    </button>
+  )
 }
 ```
 
@@ -165,12 +176,16 @@ function EditorButton({ onClick }: { onClick: () => void }) {
 
 ```tsx
 function FlagsProvider({ children, flags }: Props) {
-    useEffect(() => {
-        if (flags.editorEnabled) {
-            void import("./monaco-editor").then((mod) => mod.init());
-        }
-    }, [flags.editorEnabled]);
+  useEffect(() => {
+    if (flags.editorEnabled) {
+      void import('./monaco-editor').then(mod => mod.init())
+    }
+  }, [flags.editorEnabled])
 
-    return <FlagsContext.Provider value={flags}>{children}</FlagsContext.Provider>;
+  return (
+    <FlagsContext.Provider value={flags}>
+      {children}
+    </FlagsContext.Provider>
+  )
 }
 ```

@@ -74,11 +74,45 @@ This skill runs in one of two modes, determined by the inputs:
 
 **Subagent A** implements the full change set and writes `changes-[iteration].md`. If A encounters plan-level concerns in fix mode, it flags them in the **Notes** section for B to evaluate.
 
-**Subagent B** has two responsibilities, in order:
+**Subagent B** has three responsibilities, in order:
 
 1. **Code review.** Read every changed file listed in `changes-[iteration].md`. Fix mechanical issues (semicolons, import paths, missing exports) and substantive issues (component structure, accessibility gaps, missing dark mode variants, incorrect patterns). Update `changes-[iteration].md` to reflect modifications. Do not defer fixable concerns — resolve them.
 
-2. **Escalation check.** Read the **Notes** section of `changes-[iteration].md` for any plan-level concerns A flagged, then investigate the code for brute-force signals: type suppressions (`as any`, `@ts-ignore`), lint-disable comments, wrapper components that exist only to bridge a bad abstraction, or growing complexity relative to the problem being solved. These are indicators to investigate for underlying plan problems, not automatic escalation triggers — a pragmatic `as any` bridging an external library's type gap is not a plan problem.
+2. **Run workspace tests.** Run all workspace tests from the workspace root:
+
+    ```bash
+    pnpm test
+    ```
+
+    This runs `turbo run test`, which executes every package's test task. Turborepo caching ensures unchanged packages are skipped. Each domain Storybook has its own `vitest.config.ts` with the `storybookTest` plugin that runs axe-core a11y checks.
+
+    For each a11y violation reported:
+
+    a. **Fix first.** Attempt to fix the violation in the source code — adjust colors, add ARIA attributes, fix contrast ratios, improve semantic HTML, etc.
+    b. **Re-run.** Run the a11y tests again on the affected stories.
+    c. **Suppress only if the fix didn't work.** If the **same violation** (same rule ID on the same element) persists after one fix attempt, add a per-story rule suppression with a justification comment:
+
+    ```tsx
+    export const SomeStory: Story = {
+        parameters: {
+            a11y: {
+                config: {
+                    rules: [
+                        // a11y-suppressed: color-contrast — third-party DatePicker internal element, cannot override
+                        { id: "color-contrast", enabled: false },
+                    ],
+                },
+            },
+        },
+    };
+    ```
+
+    d. **Never** suppress rules globally in `preview.tsx`. **Never** suppress without a justification comment. **Never** suppress on the first encounter — always attempt a fix first.
+    e. Update `changes-[iteration].md` to reflect any a11y fixes or suppressions added.
+
+    If the Storybook Vitest a11y project is not configured for the affected domain, skip this step and note it in `changes-[iteration].md` under **Notes**.
+
+3. **Escalation check.** Read the **Notes** section of `changes-[iteration].md` for any plan-level concerns A flagged, then investigate the code for brute-force signals: type suppressions (`as any`, `@ts-ignore`), lint-disable comments, wrapper components that exist only to bridge a bad abstraction, or growing complexity relative to the problem being solved. These are indicators to investigate for underlying plan problems, not automatic escalation triggers — a pragmatic `as any` bridging an external library's type gap is not a plan problem.
 
     **Escalation threshold:** Escalate only when the plan's approach is fundamentally wrong and no amount of code editing can fix it. Examples: the plan decomposed components in a way that makes the required data flow impossible; the plan chose a library that conflicts with the framework; the plan assumed module boundaries that force a cross-module import. Do NOT escalate for: difficulty, missing details the code agent can infer, suboptimal but workable approaches, or issues that the test phase will catch.
 

@@ -1,5 +1,5 @@
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import { TriangleAlertIcon } from "lucide-react";
-import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogMedia, AlertDialogTitle, AlertDialogTrigger } from "./alert-dialog.tsx";
 import { Button } from "./button.tsx";

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "storybook-react-rsbuild";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectSeparator, SelectTrigger, SelectValue } from "./select.tsx";
 
@@ -14,7 +14,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
     render: () => (
         <Select>
-            <SelectTrigger>
+            <SelectTrigger aria-label="Fruit">
                 <SelectValue placeholder="Select a fruit" />
             </SelectTrigger>
             <SelectContent>
@@ -31,7 +31,7 @@ export const Default: Story = {
 export const SmallSize: Story = {
     render: () => (
         <Select>
-            <SelectTrigger size="sm">
+            <SelectTrigger size="sm" aria-label="Fruit">
                 <SelectValue placeholder="Select a fruit" />
             </SelectTrigger>
             <SelectContent>
@@ -48,7 +48,7 @@ export const SmallSize: Story = {
 export const WithGroups: Story = {
     render: () => (
         <Select>
-            <SelectTrigger>
+            <SelectTrigger aria-label="Food">
                 <SelectValue placeholder="Select a food" />
             </SelectTrigger>
             <SelectContent>
@@ -73,7 +73,7 @@ export const WithGroups: Story = {
 export const WithDisabledItems: Story = {
     render: () => (
         <Select>
-            <SelectTrigger>
+            <SelectTrigger aria-label="Fruit">
                 <SelectValue placeholder="Select a fruit" />
             </SelectTrigger>
             <SelectContent>
@@ -92,7 +92,7 @@ export const WithDisabledItems: Story = {
 export const Disabled: Story = {
     render: () => (
         <Select disabled>
-            <SelectTrigger>
+            <SelectTrigger aria-label="Fruit">
                 <SelectValue placeholder="Select a fruit" />
             </SelectTrigger>
             <SelectContent>
@@ -111,7 +111,7 @@ export const AllVariants: Story = {
             <div className="flex flex-col gap-2">
                 <span className="text-muted-foreground text-sm font-medium">Default size</span>
                 <Select>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Default size">
                         <SelectValue placeholder="Default size" />
                     </SelectTrigger>
                     <SelectContent>
@@ -125,7 +125,7 @@ export const AllVariants: Story = {
             <div className="flex flex-col gap-2">
                 <span className="text-muted-foreground text-sm font-medium">Small size</span>
                 <Select>
-                    <SelectTrigger size="sm">
+                    <SelectTrigger size="sm" aria-label="Small size">
                         <SelectValue placeholder="Small size" />
                     </SelectTrigger>
                     <SelectContent>
@@ -139,7 +139,7 @@ export const AllVariants: Story = {
             <div className="flex flex-col gap-2">
                 <span className="text-muted-foreground text-sm font-medium">With groups and labels</span>
                 <Select>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Grouped items">
                         <SelectValue placeholder="Grouped items" />
                     </SelectTrigger>
                     <SelectContent>
@@ -160,7 +160,7 @@ export const AllVariants: Story = {
             <div className="flex flex-col gap-2">
                 <span className="text-muted-foreground text-sm font-medium">Disabled</span>
                 <Select disabled>
-                    <SelectTrigger>
+                    <SelectTrigger aria-label="Disabled">
                         <SelectValue placeholder="Disabled" />
                     </SelectTrigger>
                     <SelectContent>

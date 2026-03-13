@@ -1,6 +1,10 @@
 import "./storybook.css";
-import type { Preview } from "storybook-react-rsbuild";
+import type { Preview } from "@storybook/react-vite";
 
-const preview: Preview = {};
+const preview: Preview = {
+    parameters: {
+        a11y: { test: "error" },
+    },
+};
 
 export default preview;

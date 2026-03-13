@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "storybook-react-rsbuild";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { makePlant, FAR_PAST, FAR_FUTURE } from "@packages/plants-core/test-utils";
 
@@ -6,16 +6,26 @@ import { EditPlantDialog } from "./EditPlantDialog.tsx";
 import { createManagementPlantHandlers } from "./mocks/index.ts";
 import { collectionDecorator, fireflyDecorator } from "./storybook.setup.tsx";
 
+// The dialog auto-saves via PUT after a 500ms debounce. The collection must
+// contain every plant referenced by the stories so the optimistic update in
+// `plantsCollection.update(id, …)` finds the item. Without this the debounce
+// fires after the collection loads and throws a CollectionOperationError.
+const editPlants = [
+    makePlant({ id: "test-edit-1", name: "Monstera Deliciosa" }),
+    makePlant({ id: "test-edit-2", name: "Monstera Deliciosa" }),
+    makePlant({ id: "test-edit-3", name: "Monstera Deliciosa" }),
+    makePlant({ id: "test-edit-4", name: "Monstera Deliciosa" }),
+    makePlant({ id: "test-edit-5", name: "Monstera Deliciosa" }),
+    makePlant({ id: "test-edit-6", name: "Monstera Deliciosa" }),
+];
+
 const meta = {
     title: "Management/Plants/Components/EditPlantDialog",
     component: EditPlantDialog,
     decorators: [collectionDecorator, fireflyDecorator],
     parameters: {
         chromatic: { viewports: [375, 768, 1280] },
-        // The dialog auto-saves via PUT — provide empty plants so the factory
-        // stubs PUT with 200 instead of the plantsDb-backed defaults where
-        // test plant IDs don't exist.
-        msw: { handlers: createManagementPlantHandlers([]) },
+        msw: { handlers: createManagementPlantHandlers(editPlants) },
     },
     args: {
         open: true,

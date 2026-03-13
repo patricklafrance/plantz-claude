@@ -1,6 +1,6 @@
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import * as React from "react";
 import type { DateRange } from "react-day-picker";
-import type { Meta, StoryObj } from "storybook-react-rsbuild";
 
 import { Calendar } from "./calendar.tsx";
 
@@ -91,27 +91,27 @@ export const AllVariants: Story = {
         <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
                 <span className="text-muted-foreground text-sm font-medium">Default (single)</span>
-                <Calendar mode="single" month={FIXED_MONTH} today={FIXED_TODAY} selected={new Date(2026, 2, 6)} />
+                <Calendar mode="single" month={FIXED_MONTH} today={FIXED_TODAY} selected={new Date(2026, 2, 6)} labels={{ labelNav: () => "Single selection navigation" }} />
             </div>
             <div className="flex flex-col gap-2">
                 <span className="text-muted-foreground text-sm font-medium">Range selection</span>
-                <Calendar mode="range" month={FIXED_MONTH} today={FIXED_TODAY} selected={{ from: new Date(2026, 2, 6), to: new Date(2026, 2, 12) }} />
+                <Calendar mode="range" month={FIXED_MONTH} today={FIXED_TODAY} selected={{ from: new Date(2026, 2, 6), to: new Date(2026, 2, 12) }} labels={{ labelNav: () => "Range selection navigation" }} />
             </div>
             <div className="flex flex-col gap-2">
                 <span className="text-muted-foreground text-sm font-medium">Multiple months</span>
-                <Calendar mode="single" month={FIXED_MONTH} today={FIXED_TODAY} numberOfMonths={2} />
+                <Calendar mode="single" month={FIXED_MONTH} today={FIXED_TODAY} numberOfMonths={2} labels={{ labelNav: () => "Multiple months navigation" }} />
             </div>
             <div className="flex flex-col gap-2">
                 <span className="text-muted-foreground text-sm font-medium">Dropdown caption</span>
-                <Calendar mode="single" month={FIXED_MONTH} today={FIXED_TODAY} captionLayout="dropdown" startMonth={new Date(2020, 0)} endMonth={new Date(2030, 11)} />
+                <Calendar mode="single" month={FIXED_MONTH} today={FIXED_TODAY} captionLayout="dropdown" startMonth={new Date(2020, 0)} endMonth={new Date(2030, 11)} labels={{ labelNav: () => "Dropdown caption navigation" }} />
             </div>
             <div className="flex flex-col gap-2">
                 <span className="text-muted-foreground text-sm font-medium">Outside days hidden</span>
-                <Calendar mode="single" month={FIXED_MONTH} today={FIXED_TODAY} showOutsideDays={false} />
+                <Calendar mode="single" month={FIXED_MONTH} today={FIXED_TODAY} showOutsideDays={false} labels={{ labelNav: () => "Outside days hidden navigation" }} />
             </div>
             <div className="flex flex-col gap-2">
                 <span className="text-muted-foreground text-sm font-medium">With week numbers</span>
-                <Calendar mode="single" month={FIXED_MONTH} today={FIXED_TODAY} showWeekNumber />
+                <Calendar mode="single" month={FIXED_MONTH} today={FIXED_TODAY} showWeekNumber labels={{ labelNav: () => "Week numbers navigation" }} />
             </div>
         </div>
     ),

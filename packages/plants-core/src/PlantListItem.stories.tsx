@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "storybook-react-rsbuild";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { PlantListHeader } from "./PlantListHeader.tsx";
 import { PlantListItem } from "./PlantListItem.tsx";
@@ -140,6 +140,12 @@ export const ClickOnly: Story = {
         onEdit: undefined,
         onDelete: undefined,
         selected: undefined,
+    },
+};
+
+export const MistLeavesFalse: Story = {
+    args: {
+        plant: makePlant({ mistLeaves: false }),
     },
 };
 

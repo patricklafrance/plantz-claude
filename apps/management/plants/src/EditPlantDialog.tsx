@@ -55,24 +55,29 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
         if (!name.trim() || !wateringQuantity.trim()) return;
         const id = plantIdRef.current;
 
-        const tx = actions.updatePlant({
-            id,
-            name: name.trim(),
-            description: description.trim() || undefined,
-            family: family.trim() || undefined,
-            location,
-            luminosity,
-            mistLeaves,
-            soilType: soilType.trim() || undefined,
-            wateringFrequency,
-            wateringQuantity: wateringQuantity.trim(),
-            wateringType,
-        });
+        try {
+            const tx = actions.updatePlant({
+                id,
+                name: name.trim(),
+                description: description.trim() || undefined,
+                family: family.trim() || undefined,
+                location,
+                luminosity,
+                mistLeaves,
+                soilType: soilType.trim() || undefined,
+                wateringFrequency,
+                wateringQuantity: wateringQuantity.trim(),
+                wateringType,
+            });
 
-        tx.isPersisted.promise.then(() => {
-            setSaved(true);
-            setTimeout(() => setSaved(false), 2000);
-        });
+            tx.isPersisted.promise.then(() => {
+                setSaved(true);
+                setTimeout(() => setSaved(false), 2000);
+            });
+        } catch {
+            // The collection may not contain the plant yet (e.g. initial fetch
+            // still in flight). The next debounce cycle will retry.
+        }
     }, [name, description, family, location, luminosity, mistLeaves, soilType, wateringFrequency, wateringQuantity, wateringType, actions]);
 
     useEffect(() => {
@@ -100,8 +105,8 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
                 <DialogHeader>
                     <div className="flex items-center gap-2">
                         <DialogTitle>Edit plant</DialogTitle>
-                        <span role="status" aria-live="polite">
-                            {saved && <span className="text-muted-foreground animate-in fade-in text-xs">Saved</span>}
+                        <span role="status" aria-live="polite" className={`text-muted-foreground text-xs transition-opacity ${saved ? "opacity-100" : "opacity-0"}`}>
+                            Saved
                         </span>
                     </div>
                 </DialogHeader>

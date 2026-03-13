@@ -13,11 +13,11 @@ Many browsers don't have hardware acceleration for CSS3 animations on SVG elemen
 
 ```tsx
 function LoadingSpinner() {
-    return (
-        <svg className="animate-spin" width="24" height="24" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" />
-        </svg>
-    );
+  return (
+    <svg className="animate-spin" width="24" height="24" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" />
+    </svg>
+  )
 }
 ```
 
@@ -25,13 +25,13 @@ function LoadingSpinner() {
 
 ```tsx
 function LoadingSpinner() {
-    return (
-        <div className="animate-spin">
-            <svg width="24" height="24" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" />
-            </svg>
-        </div>
-    );
+  return (
+    <div className="animate-spin">
+      <svg width="24" height="24" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" />
+      </svg>
+    </div>
+  )
 }
 ```
 
@@ -47,8 +47,8 @@ Apply `content-visibility: auto` to defer off-screen rendering.
 
 ```css
 .message-item {
-    content-visibility: auto;
-    contain-intrinsic-size: 0 80px;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 80px;
 }
 ```
 
@@ -56,16 +56,16 @@ Apply `content-visibility: auto` to defer off-screen rendering.
 
 ```tsx
 function MessageList({ messages }: { messages: Message[] }) {
-    return (
-        <div className="overflow-y-auto h-screen">
-            {messages.map((msg) => (
-                <div key={msg.id} className="message-item">
-                    <Avatar user={msg.author} />
-                    <div>{msg.content}</div>
-                </div>
-            ))}
+  return (
+    <div className="overflow-y-auto h-screen">
+      {messages.map(msg => (
+        <div key={msg.id} className="message-item">
+          <Avatar user={msg.author} />
+          <div>{msg.content}</div>
         </div>
-    );
+      ))}
+    </div>
+  )
 }
 ```
 
@@ -81,21 +81,31 @@ Extract static JSX outside components to avoid re-creation.
 
 ```tsx
 function LoadingSkeleton() {
-    return <div className="animate-pulse h-20 bg-gray-200" />;
+  return <div className="animate-pulse h-20 bg-gray-200" />
 }
 
 function Container() {
-    return <div>{loading && <LoadingSkeleton />}</div>;
+  return (
+    <div>
+      {loading && <LoadingSkeleton />}
+    </div>
+  )
 }
 ```
 
 **Correct (reuses same element):**
 
 ```tsx
-const loadingSkeleton = <div className="animate-pulse h-20 bg-gray-200" />;
+const loadingSkeleton = (
+  <div className="animate-pulse h-20 bg-gray-200" />
+)
 
 function Container() {
-    return <div>{loading && loadingSkeleton}</div>;
+  return (
+    <div>
+      {loading && loadingSkeleton}
+    </div>
+  )
 }
 ```
 
@@ -121,6 +131,7 @@ Reduce SVG coordinate precision to decrease file size.
 <path d="M 10.3 20.8 L 30.9 40.2" />
 ```
 
+
 ---
 
 ## Use Activity Component for Show/Hide (Experimental)
@@ -131,25 +142,25 @@ Reduce SVG coordinate precision to decrease file size.
 
 ```tsx
 function Dropdown({ isOpen }: Props) {
-    return (
-        <div style={{ display: isOpen ? "block" : "none" }}>
-            <ExpensiveMenu />
-        </div>
-    );
+  return (
+    <div style={{ display: isOpen ? 'block' : 'none' }}>
+      <ExpensiveMenu />
+    </div>
+  )
 }
 ```
 
 **With React experimental builds:**
 
 ```tsx
-import { Activity } from "react";
+import { Activity } from 'react'
 
 function Dropdown({ isOpen }: Props) {
-    return (
-        <Activity mode={isOpen ? "visible" : "hidden"}>
-            <ExpensiveMenu />
-        </Activity>
-    );
+  return (
+    <Activity mode={isOpen ? 'visible' : 'hidden'}>
+      <ExpensiveMenu />
+    </Activity>
+  )
 }
 ```
 
@@ -165,7 +176,11 @@ Use explicit ternary operators (`? :`) instead of `&&` for conditional rendering
 
 ```tsx
 function Badge({ count }: { count: number }) {
-    return <div>{count && <span className="badge">{count}</span>}</div>;
+  return (
+    <div>
+      {count && <span className="badge">{count}</span>}
+    </div>
+  )
 }
 // When count = 0, renders: <div>0</div>
 ```
@@ -174,7 +189,11 @@ function Badge({ count }: { count: number }) {
 
 ```tsx
 function Badge({ count }: { count: number }) {
-    return <div>{count > 0 ? <span className="badge">{count}</span> : null}</div>;
+  return (
+    <div>
+      {count > 0 ? <span className="badge">{count}</span> : null}
+    </div>
+  )
 }
 ```
 
@@ -188,59 +207,58 @@ Use `useTransition` instead of manual `useState` for loading states.
 
 ```tsx
 function SearchResults() {
-    const [query, setQuery] = useState("");
-    const [results, setResults] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
 
-    const handleSearch = async (value: string) => {
-        setIsLoading(true);
-        setQuery(value);
-        const data = await fetchResults(value);
-        setResults(data);
-        setIsLoading(false);
-    };
+  const handleSearch = async (value: string) => {
+    setIsLoading(true)
+    setQuery(value)
+    const data = await fetchResults(value)
+    setResults(data)
+    setIsLoading(false)
+  }
 
-    return (
-        <>
-            <input onChange={(e) => handleSearch(e.target.value)} />
-            {isLoading && <Spinner />}
-            <ResultsList results={results} />
-        </>
-    );
+  return (
+    <>
+      <input onChange={(e) => handleSearch(e.target.value)} />
+      {isLoading && <Spinner />}
+      <ResultsList results={results} />
+    </>
+  )
 }
 ```
 
 **Correct (useTransition with built-in pending state):**
 
 ```tsx
-import { useTransition, useState } from "react";
+import { useTransition, useState } from 'react'
 
 function SearchResults() {
-    const [query, setQuery] = useState("");
-    const [results, setResults] = useState([]);
-    const [isPending, startTransition] = useTransition();
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState([])
+  const [isPending, startTransition] = useTransition()
 
-    const handleSearch = (value: string) => {
-        setQuery(value);
+  const handleSearch = (value: string) => {
+    setQuery(value)
 
-        startTransition(async () => {
-            const data = await fetchResults(value);
-            setResults(data);
-        });
-    };
+    startTransition(async () => {
+      const data = await fetchResults(value)
+      setResults(data)
+    })
+  }
 
-    return (
-        <>
-            <input onChange={(e) => handleSearch(e.target.value)} />
-            {isPending && <Spinner />}
-            <ResultsList results={results} />
-        </>
-    );
+  return (
+    <>
+      <input onChange={(e) => handleSearch(e.target.value)} />
+      {isPending && <Spinner />}
+      <ResultsList results={results} />
+    </>
+  )
 }
 ```
 
 **Benefits:**
-
 - Automatic pending state management
 - Error resilience: pending state correctly resets even if the transition throws
 - Better responsiveness: keeps the UI responsive during updates

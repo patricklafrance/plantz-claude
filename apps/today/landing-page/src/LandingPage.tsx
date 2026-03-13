@@ -8,7 +8,8 @@ import type { Plant } from "@packages/plants-core";
 import { PlantDetailDialog } from "./PlantDetailDialog.tsx";
 import { useTodayPlantsCollection } from "./TodayPlantsContext.tsx";
 
-const scrollContainerStyle = { height: "calc(100vh - 376px)" };
+const scrollbarGutterStyle = { scrollbarGutter: "stable" as const };
+const scrollContainerStyle = { height: "calc(100vh - 376px)", ...scrollbarGutterStyle };
 
 export function LandingPage() {
     const { filters, updateFilter, clearFilters, hasActiveFilters } = usePlantFilters();
@@ -76,7 +77,9 @@ export function LandingPage() {
             </div>
 
             <div className="border-border flex-1 overflow-hidden rounded-lg border">
-                <PlantListHeader />
+                <div className="bg-muted/50 overflow-y-auto [&>div]:bg-transparent" style={scrollbarGutterStyle}>
+                    <PlantListHeader />
+                </div>
                 <div ref={parentRef} className="overflow-auto" style={scrollContainerStyle}>
                     <div role="list" aria-label="Plants due for watering" style={virtualizerContainerStyle}>
                         {virtualizer.getVirtualItems().map((virtualRow) => {

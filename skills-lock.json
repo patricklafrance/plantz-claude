@@ -1,80 +1,85 @@
 {
-    "version": 1,
-    "skills": {
-        "accessibility": {
-            "source": "addyosmani/web-quality-skills",
-            "sourceType": "github",
-            "computedHash": "3f390c14d09ca45da332b6c421b3195d12da099ec24ee549f80e666ec48dc89b"
-        },
-        "agent-browser": {
-            "source": "vercel-labs/agent-browser",
-            "sourceType": "github",
-            "computedHash": "948f56ca9ffdef1f71b5333e9a3ffa9b47279a928498f660568648f504b5add8"
-        },
-        "best-practices": {
-            "source": "addyosmani/web-quality-skills",
-            "sourceType": "github",
-            "computedHash": "f5d58f0adf9cc9646b35daf2241377e1ad7b8ab094e54c9792a826af1e0dca5b"
-        },
-        "frontend-design": {
-            "source": "anthropics/skills",
-            "sourceType": "github",
-            "computedHash": "516bd2154eb843a8240e43d5b285229129853114ad7075a5e141e1c08e408c84"
-        },
-        "git-commit": {
-            "source": "github/awesome-copilot",
-            "sourceType": "github",
-            "computedHash": "2607fc60629b82b257136dd2a7a373f0a4466c0b49df7746d845d59313c99b21"
-        },
-        "netlify-cli-and-deploy": {
-            "source": "netlify/context-and-tools",
-            "sourceType": "github",
-            "computedHash": "da8d047061a0d94a58a6426591d28257f2951f15b56dcf1e571c38c3d54ddb60"
-        },
-        "pnpm": {
-            "source": "antfu/skills",
-            "sourceType": "github",
-            "computedHash": "d473204df25defd08a7d47b55c6d124b41ebde440b774995952b65223d0d8d6f"
-        },
-        "shadcn": {
-            "source": "shadcn/ui",
-            "sourceType": "github",
-            "computedHash": "b1cc1defe03f0e8f78652b7d20e4d4e6421babc2b45835d4f361afe684dc47a2"
-        },
-        "turborepo": {
-            "source": "vercel/turborepo",
-            "sourceType": "github",
-            "computedHash": "395681d1b200eafbafe829beeda87adb7e37654c4718e5b825489ccf3a7b2133"
-        },
-        "vitest": {
-            "source": "antfu/skills",
-            "sourceType": "github",
-            "computedHash": "0efd9cf8c56aada060d418d009cfe621a7915d0c73a958fe611985bc0c2fa4b8"
-        },
-        "workleap-chromatic-best-practices": {
-            "source": "workleap/wl-web-configs",
-            "sourceType": "github",
-            "computedHash": "023948810149bc78bce486b3caafc7672c8ab0bfe138b0c9798fb0d897bc213c"
-        },
-        "workleap-logging": {
-            "source": "workleap/wl-logging",
-            "sourceType": "github",
-            "computedHash": "6fe6c5b84ba8bbd480c924bfc58ddb3eef0d2458ae63e1a0695a9145092ed9dd"
-        },
-        "workleap-react-best-practices": {
-            "source": "workleap/wl-web-configs",
-            "sourceType": "github",
-            "computedHash": "9f42af7a0842f7174c9357e688b12fc02516bbd9f440f87496a195ab78cab536"
-        },
-        "workleap-squide": {
-            "source": "workleap/wl-squide",
-            "sourceType": "github",
-            "computedHash": "8b9c517f06d7883078d8ba08b012d8da22a1c08c6df593ef0e29dfa25f9501ba"
-        },
-        "workleap-web-configs": {
-            "source": "workleap/wl-web-configs",
-            "sourceType": "github",
-            "computedHash": "76b96597068934d5c4b2c7477cbe8f1ceeb84b2333bdf57b0203f76baaf9943e"
-        }
+  "version": 1,
+  "skills": {
+    "accessibility": {
+      "source": "addyosmani/web-quality-skills",
+      "sourceType": "github",
+      "computedHash": "3f390c14d09ca45da332b6c421b3195d12da099ec24ee549f80e666ec48dc89b"
+    },
+    "agent-browser": {
+      "source": "vercel-labs/agent-browser",
+      "sourceType": "github",
+      "computedHash": "9745dcb4ef3ffc3c38c00c9649cb4734203a0e93327e0b5b895b4e7a7a20de45"
+    },
+    "best-practices": {
+      "source": "addyosmani/web-quality-skills",
+      "sourceType": "github",
+      "computedHash": "f5d58f0adf9cc9646b35daf2241377e1ad7b8ab094e54c9792a826af1e0dca5b"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "516bd2154eb843a8240e43d5b285229129853114ad7075a5e141e1c08e408c84"
+    },
+    "git-commit": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "computedHash": "2607fc60629b82b257136dd2a7a373f0a4466c0b49df7746d845d59313c99b21"
+    },
+    "netlify-cli-and-deploy": {
+      "source": "netlify/context-and-tools",
+      "sourceType": "github",
+      "computedHash": "da8d047061a0d94a58a6426591d28257f2951f15b56dcf1e571c38c3d54ddb60"
+    },
+    "pnpm": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "computedHash": "d473204df25defd08a7d47b55c6d124b41ebde440b774995952b65223d0d8d6f"
+    },
+    "shadcn": {
+      "source": "shadcn/ui",
+      "sourceType": "github",
+      "computedHash": "b1cc1defe03f0e8f78652b7d20e4d4e6421babc2b45835d4f361afe684dc47a2"
+    },
+    "turborepo": {
+      "source": "vercel/turborepo",
+      "sourceType": "github",
+      "computedHash": "3705c951f18dc9018c0079373c108ba254dc873f7fdfce024fcd00424655299e"
+    },
+    "vite": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "computedHash": "f406fceb1b9020cd759a728d8424de7ffd8dfe5874bd97be2724571741e54852"
+    },
+    "vitest": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "computedHash": "0efd9cf8c56aada060d418d009cfe621a7915d0c73a958fe611985bc0c2fa4b8"
+    },
+    "workleap-chromatic-best-practices": {
+      "source": "workleap/wl-web-configs",
+      "sourceType": "github",
+      "computedHash": "023948810149bc78bce486b3caafc7672c8ab0bfe138b0c9798fb0d897bc213c"
+    },
+    "workleap-logging": {
+      "source": "workleap/wl-logging",
+      "sourceType": "github",
+      "computedHash": "6fe6c5b84ba8bbd480c924bfc58ddb3eef0d2458ae63e1a0695a9145092ed9dd"
+    },
+    "workleap-react-best-practices": {
+      "source": "workleap/wl-web-configs",
+      "sourceType": "github",
+      "computedHash": "9f42af7a0842f7174c9357e688b12fc02516bbd9f440f87496a195ab78cab536"
+    },
+    "workleap-squide": {
+      "source": "workleap/wl-squide",
+      "sourceType": "github",
+      "computedHash": "841182c9a942891e2107cc1c1860636867360c691ab9acae24dff16870cf649a"
+    },
+    "workleap-web-configs": {
+      "source": "workleap/wl-web-configs",
+      "sourceType": "github",
+      "computedHash": "76b96597068934d5c4b2c7477cbe8f1ceeb84b2333bdf57b0203f76baaf9943e"
     }
+  }
 }

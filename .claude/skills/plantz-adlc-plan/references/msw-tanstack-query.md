@@ -135,14 +135,14 @@ export default preview;
 
 Each domain has a `storybook.setup.tsx` file shared by all its story files. It provides two decorators:
 
-- `fireflyDecorator` — Squide runtime via `initializeFireflyForStorybook()` + `withFireflyDecorator()` from `@squide/firefly-rsbuild-storybook`
+- `fireflyDecorator` — Squide runtime via `initializeFireflyForStorybook()` + `withFireflyDecorator()` from `@apps/packages-storybook/firefly`
 - `collectionDecorator` — fresh `QueryClient` + TanStack DB collection context per story via `useMemo` in a `CollectionDecorator` component
 
 ```typescript
-import { initializeFireflyForStorybook, withFireflyDecorator } from "@squide/firefly-rsbuild-storybook";
+import { initializeFireflyForStorybook, withFireflyDecorator } from "@apps/packages-storybook/firefly";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMemo, type ReactNode } from "react";
-import type { Decorator } from "storybook-react-rsbuild";
+import type { Decorator } from "@storybook/react-vite";
 
 import { ManagementPlantsCollectionProvider } from "./ManagementPlantsContext.tsx";
 import { createManagementPlantsCollection } from "./plantsCollection.ts";

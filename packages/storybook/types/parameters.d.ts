@@ -1,6 +1,6 @@
 import type { A11yParameters } from "@storybook/addon-a11y";
 
-declare module "storybook-react-rsbuild" {
+declare module "@storybook/react-vite" {
     interface Parameters {
         chromatic?: {
             diffThreshold?: number;

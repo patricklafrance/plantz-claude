@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "storybook-react-rsbuild";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Label } from "./label.tsx";
 import { Textarea } from "./textarea.tsx";
@@ -43,11 +43,11 @@ export const AllVariants: Story = {
             </div>
             <div className="flex flex-col gap-2">
                 <span className="text-muted-foreground text-sm font-medium">with value</span>
-                <Textarea defaultValue="This textarea has pre-filled content." />
+                <Textarea defaultValue="This textarea has pre-filled content." aria-label="Pre-filled content" />
             </div>
             <div className="flex flex-col gap-2">
                 <span className="text-muted-foreground text-sm font-medium">disabled</span>
-                <Textarea disabled defaultValue="Disabled textarea" />
+                <Textarea disabled defaultValue="Disabled textarea" aria-label="Disabled textarea" />
             </div>
             <div className="flex flex-col gap-2">
                 <span className="text-muted-foreground text-sm font-medium">with label</span>

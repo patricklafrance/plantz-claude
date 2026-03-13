@@ -8,12 +8,12 @@
 
 ## Available Configurations
 
-| Function                        | Use Case                            |
-| ------------------------------- | ----------------------------------- |
-| `defineWebApplicationConfig`    | React + TypeScript web applications |
-| `defineReactLibraryConfig`      | TypeScript libraries WITH React     |
-| `defineTypeScriptLibraryConfig` | TypeScript libraries WITHOUT React  |
-| `defineMonorepoWorkspaceConfig` | Monorepo workspace root             |
+| Function | Use Case |
+|----------|----------|
+| `defineWebApplicationConfig` | React + TypeScript web applications |
+| `defineReactLibraryConfig` | TypeScript libraries WITH React |
+| `defineTypeScriptLibraryConfig` | TypeScript libraries WITHOUT React |
+| `defineMonorepoWorkspaceConfig` | Monorepo workspace root |
 
 ## Installation
 
@@ -59,7 +59,7 @@ With React Compiler:
 
 ```ts
 export default defineReactLibraryConfig(import.meta.dirname, {
-    react: { compiler: true },
+    react: { compiler: true }
 });
 ```
 
@@ -87,7 +87,7 @@ export default defineMonorepoWorkspaceConfig(import.meta.dirname);
 
 ```ts
 export default defineWebApplicationConfig(import.meta.dirname, {
-    core: { "no-var": "off" },
+    core: { "no-var": "off" }
 });
 ```
 
@@ -95,7 +95,7 @@ export default defineWebApplicationConfig(import.meta.dirname, {
 
 ```ts
 export default defineWebApplicationConfig(import.meta.dirname, {
-    jsxAlly: { "jsx-a11y/alt-text": "error" },
+    jsxAlly: { "jsx-a11y/alt-text": "error" }
 });
 ```
 
@@ -103,7 +103,7 @@ export default defineWebApplicationConfig(import.meta.dirname, {
 
 ```ts
 export default defineWebApplicationConfig(import.meta.dirname, {
-    testFramework: "jest",
+    testFramework: "jest"
 });
 ```
 
@@ -117,9 +117,9 @@ import myPlugin from "eslint-plugin-myplugin";
 export default defineConfig([
     {
         plugins: { myPlugin },
-        rules: { "myPlugin/rule": "warn" },
+        rules: { "myPlugin/rule": "warn" }
     },
-    defineWebApplicationConfig(import.meta.dirname),
+    defineWebApplicationConfig(import.meta.dirname)
 ]);
 ```
 
@@ -129,26 +129,29 @@ export default defineConfig([
 import { defineWebApplicationConfig } from "@workleap/eslint-configs";
 import { defineConfig, globalIgnores } from "eslint/config";
 
-export default defineConfig([globalIgnores(["packages", "samples", "docs"]), defineWebApplicationConfig(import.meta.dirname)]);
+export default defineConfig([
+    globalIgnores(["packages", "samples", "docs"]),
+    defineWebApplicationConfig(import.meta.dirname)
+]);
 ```
 
 Default ignored: `node_modules`, `dist`, `storybook-static`, `.git`, `.turbo`
 
 ## Rule Categories
 
-| Category         | Description                                  |
-| ---------------- | -------------------------------------------- |
-| `core`           | ESLint recommended + eslint-plugin-import    |
-| `jest`           | eslint-plugin-jest rules                     |
-| `json`           | eslint-plugin-jsonc rules                    |
-| `jsxAlly`        | eslint-plugin-jsx-a11y rules                 |
-| `packageJson`    | eslint-plugin-package-json rules             |
-| `react`          | eslint-plugin-react + hooks + @stylistic JSX |
-| `storybook`      | eslint-plugin-storybook rules                |
-| `testingLibrary` | eslint-plugin-testing-library rules          |
-| `typescript`     | typescript-eslint + @stylistic rules         |
-| `vitest`         | @vitest/eslint-plugin rules                  |
-| `yaml`           | eslint-plugin-yaml rules                     |
+| Category | Description |
+|----------|-------------|
+| `core` | ESLint recommended + eslint-plugin-import |
+| `jest` | eslint-plugin-jest rules |
+| `json` | eslint-plugin-jsonc rules |
+| `jsxAlly` | eslint-plugin-jsx-a11y rules |
+| `packageJson` | eslint-plugin-package-json rules |
+| `react` | eslint-plugin-react + hooks + @stylistic JSX |
+| `storybook` | eslint-plugin-storybook rules |
+| `testingLibrary` | eslint-plugin-testing-library rules |
+| `typescript` | typescript-eslint + @stylistic rules |
+| `vitest` | @vitest/eslint-plugin rules |
+| `yaml` | eslint-plugin-yaml rules |
 
 ## CLI Scripts
 
@@ -236,6 +239,5 @@ Install `EditorConfig.EditorConfig` VS Code extension.
 ### "File not found by the project service"
 
 The file is not included in `tsconfig.json`. Either:
-
 1. Add the file pattern to the `include` field
 2. Remove the `include` field entirely (TypeScript includes all files by default)

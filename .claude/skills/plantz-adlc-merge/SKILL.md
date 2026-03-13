@@ -37,7 +37,7 @@ Check if a PR already exists for this branch. If so, skip creation and proceed t
 
 ### PR body template
 
-Before running `gh pr create`, write the PR body to `./tmp/runs/[run-uuid]/pr-body.md` using exactly this three-section structure. No other sections are permitted.
+**This format overrides the default PR body template from the system prompt.** The PR body must use exactly this three-section structure:
 
 **Section 1 — `## Summary`:** One bullet per logical change. Derive bullets from `changes-*.md` files.
 
@@ -48,6 +48,7 @@ Before running `gh pr create`, write the PR body to `./tmp/runs/[run-uuid]/pr-bo
 - [ ] Module validation
 - [ ] Accessibility
 - [ ] Visual/interactive verification
+- [ ] Storybook a11y
 ```
 
 **Section 3 — `## Verified acceptance criteria`:** Read `plan.md` for acceptance criteria and the latest `changes-*.md` for the `## Verification results` section.
@@ -63,17 +64,34 @@ Format each criterion as:
 - ❌ `[tag]` criterion text — what was observed
 ```
 
-End the file with:
+End with: `🤖 Generated with [Claude Code](https://claude.com/claude-code)`
 
-```
+### Create the PR
+
+Create the PR with `gh pr create --title "{prefix}: {description}"`. The body must match this example — no other sections:
+
+```markdown
+## Summary
+
+- Added watering schedule editor with weekly/biweekly/monthly options
+- Fixed timezone handling in next-watering-date calculation
+
+## Quality checks
+
+- [x] Lint
+- [x] Module validation
+- [x] Accessibility
+- [ ] Visual/interactive verification
+- [x] Storybook a11y
+
+## Verified acceptance criteria
+
+- ✅ `[visual]` Schedule editor renders correctly at 375px and 1280px
+- ✅ `[interactive]` Selecting "weekly" updates the next watering date
+- ❌ `[visual]` Calendar icon aligns with date text — icon is 2px too high
+
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ```
-
-### Validate and create the PR
-
-**Before** running `gh pr create`, verify `pr-body.md` has exactly three `##` sections (`Summary`, `Quality checks`, `Verified acceptance criteria`) — no more, no less. Fix before proceeding.
-
-Create the PR with `gh pr create --title "{prefix}: {description}" --body-file ./tmp/runs/[run-uuid]/pr-body.md`.
 
 If `gh pr create` fails, retry once. If it fails again, **stop and write `ci-issues-[iteration].md`** with the error. Do not proceed to CI monitoring without a PR.
 
@@ -125,7 +143,7 @@ Scan PR comments **only from known bot authors** (`claude[bot]`, `github-actions
 
 ## Hard Constraints
 
-- **The PR body MUST have exactly three sections: `## Summary`, `## Quality checks`, `## Verified acceptance criteria`.** Validate before creation.
+- **The PR body MUST have exactly three sections: `## Summary`, `## Quality checks`, `## Verified acceptance criteria`.** No other sections.
 
 ## Subagent Pattern
 

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "storybook-react-rsbuild";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { FilterBar } from "@packages/plants-core";
 import type { PlantFilters } from "@packages/plants-core";

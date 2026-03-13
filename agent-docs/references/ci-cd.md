@@ -19,7 +19,7 @@ PRs require the `run chromatic` label to trigger `chromatic.yml`. Without it, th
 
 ## Affected Storybook detection
 
-`tooling/getAffectedStorybooks.ts` determines which Storybooks need Chromatic runs:
+`scripts/getAffectedStorybooks.ts` determines which Storybooks need Chromatic runs:
 
 1. Runs `pnpm turbo ls --filter=...[<baseSha>] --output=json` to find affected packages.
 2. Checks each Storybook's dependency list (hardcoded in `StorybookDependencies`) against the affected set.

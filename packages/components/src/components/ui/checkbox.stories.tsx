@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "storybook-react-rsbuild";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Checkbox } from "./checkbox.tsx";
 import { Label } from "./label.tsx";
@@ -6,6 +6,9 @@ import { Label } from "./label.tsx";
 const meta = {
     title: "Components/Checkbox",
     component: Checkbox,
+    args: {
+        "aria-label": "Toggle",
+    },
 } satisfies Meta<typeof Checkbox>;
 
 export default meta;

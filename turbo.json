@@ -52,9 +52,12 @@
         "//#syncpack": {
             "inputs": [".syncpackrc.js", "package.json", "packages/**/package.json", "apps/**/package.json"]
         },
+        "//#install-playwright": {
+            "outputs": []
+        },
         "test": {
-            "dependsOn": ["transit"],
-            "outputs": ["node_modules/.cache/vitest/**"]
+            "dependsOn": ["//#install-playwright"],
+            "outputs": ["node_modules/.cache/vitest/**", "node_modules/.cache/storybook/**"]
         }
     }
 }

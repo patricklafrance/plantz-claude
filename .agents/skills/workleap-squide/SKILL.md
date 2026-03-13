@@ -1,17 +1,17 @@
 ---
 name: workleap-squide
 description: |
-    Squide (@squide/firefly) — Workleap's React modular application shell. Use when:
-    (1) Working with FireflyRuntime, initializeFirefly, AppRouter, or FireflyProvider
-    (2) Creating or modifying Squide host applications or modules
-    (3) Registering routes, navigation items, or MSW request handlers
-    (4) Squide integrations with TanStack Query, i18next, LaunchDarkly, Honeycomb, MSW, or Storybook
-    (5) Deferred registrations or conditional navigation items
-    (6) Global data fetching: usePublicDataQueries, useProtectedDataQueries
-    (7) Squide hooks for event bus, environment variables, feature flags, logging, or bootstrapping state
-    (8) Error boundaries or modular architecture in Squide applications
+  Squide (@squide/firefly) — Workleap's React modular application shell. Use when:
+  (1) Working with FireflyRuntime, initializeFirefly, AppRouter, or FireflyProvider
+  (2) Creating or modifying Squide host applications or modules
+  (3) Registering routes, navigation items, or MSW request handlers
+  (4) Squide integrations with TanStack Query, i18next, LaunchDarkly, Honeycomb, MSW, or Storybook
+  (5) Deferred registrations or conditional navigation items
+  (6) Global data fetching: usePublicDataQueries, useProtectedDataQueries
+  (7) Squide hooks for event bus, environment variables, feature flags, logging, or bootstrapping state
+  (8) Error boundaries or modular architecture in Squide applications
 metadata:
-    version: 1.6
+  version: 1.8
 ---
 
 # Squide Framework
@@ -38,7 +38,7 @@ import { App } from "./App.tsx";
 import { registerHost } from "./register.tsx";
 
 const runtime = initializeFirefly({
-    localModules: [registerHost],
+    localModules: [registerHost]
 });
 
 const queryClient = new QueryClient();
@@ -49,7 +49,7 @@ root.render(
         <QueryClientProvider client={queryClient}>
             <App />
         </QueryClientProvider>
-    </FireflyProvider>,
+    </FireflyProvider>
 );
 ```
 
@@ -71,20 +71,13 @@ export function App() {
         <AppRouter>
             {({ rootRoute, registeredRoutes, routerProps, routerProviderProps }) => (
                 <RouterProvider
-                    router={createBrowserRouter(
-                        [
-                            {
-                                element: rootRoute,
-                                children: [
-                                    {
-                                        element: <BootstrappingRoute />,
-                                        children: registeredRoutes,
-                                    },
-                                ],
-                            },
-                        ],
-                        routerProps,
-                    )}
+                    router={createBrowserRouter([{
+                        element: rootRoute,
+                        children: [{
+                            element: <BootstrappingRoute />,
+                            children: registeredRoutes
+                        }]
+                    }], routerProps)}
                     {...routerProviderProps}
                 />
             )}
@@ -98,14 +91,11 @@ export function App() {
 import { PublicRoutes, ProtectedRoutes, type ModuleRegisterFunction, type FireflyRuntime } from "@squide/firefly";
 import { RootLayout } from "./RootLayout.tsx";
 
-export const registerHost: ModuleRegisterFunction<FireflyRuntime> = (runtime) => {
-    runtime.registerRoute(
-        {
-            element: <RootLayout />,
-            children: [PublicRoutes, ProtectedRoutes],
-        },
-        { hoist: true },
-    );
+export const registerHost: ModuleRegisterFunction<FireflyRuntime> = runtime => {
+    runtime.registerRoute({
+        element: <RootLayout />,
+        children: [PublicRoutes, ProtectedRoutes]
+    }, { hoist: true });
 
     // HomePage and NotFoundPage are local page components
     runtime.registerRoute({ index: true, element: <HomePage /> });
@@ -119,7 +109,10 @@ export const registerHost: ModuleRegisterFunction<FireflyRuntime> = (runtime) =>
 
 ```tsx
 import { Link, Outlet } from "react-router";
-import { useNavigationItems, useRenderedNavigationItems, isNavigationLink, type RenderItemFunction, type RenderSectionFunction } from "@squide/firefly";
+import {
+    useNavigationItems, useRenderedNavigationItems, isNavigationLink,
+    type RenderItemFunction, type RenderSectionFunction
+} from "@squide/firefly";
 
 // Signature: (item, key, index, level) => ReactNode
 const renderItem: RenderItemFunction = (item, key, index, level) => {
@@ -127,15 +120,15 @@ const renderItem: RenderItemFunction = (item, key, index, level) => {
     const { label, linkProps, additionalProps } = item;
     return (
         <li key={key}>
-            <Link {...linkProps} {...additionalProps}>
-                {label}
-            </Link>
+            <Link {...linkProps} {...additionalProps}>{label}</Link>
         </li>
     );
 };
 
 // Signature: (elements, key, index, level) => ReactNode
-const renderSection: RenderSectionFunction = (elements, key, index, level) => <ul key={key}>{elements}</ul>;
+const renderSection: RenderSectionFunction = (elements, key, index, level) => (
+    <ul key={key}>{elements}</ul>
+);
 
 export function RootLayout() {
     const navigationItems = useNavigationItems();
@@ -157,19 +150,14 @@ import { useProtectedDataQueries, useIsBootstrapping, AppRouter } from "@squide/
 
 // ApiError and isApiError are app-specific; define them to match your API's error shape
 function BootstrappingRoute() {
-    const [session] = useProtectedDataQueries(
-        [
-            {
-                queryKey: ["/api/session"],
-                queryFn: async () => {
-                    const response = await fetch("/api/session");
-                    if (!response.ok) throw new ApiError(response.status);
-                    return response.json();
-                },
-            },
-        ],
-        (error) => isApiError(error) && error.status === 401,
-    );
+    const [session] = useProtectedDataQueries([{
+        queryKey: ["/api/session"],
+        queryFn: async () => {
+            const response = await fetch("/api/session");
+            if (!response.ok) throw new ApiError(response.status);
+            return response.json();
+        }
+    }], error => isApiError(error) && error.status === 401);
 
     if (useIsBootstrapping()) return <div>Loading...</div>;
 
@@ -181,7 +169,7 @@ function BootstrappingRoute() {
 }
 
 // In App component, set waitForProtectedData
-<AppRouter waitForProtectedData>...</AppRouter>;
+<AppRouter waitForProtectedData>...</AppRouter>
 ```
 
 ```tsx
@@ -193,7 +181,7 @@ const [data] = usePublicDataQueries([{ queryKey: [...], queryFn: ... }]);
 ### Deferred Navigation Items
 
 ```tsx
-export const register: ModuleRegisterFunction<FireflyRuntime, unknown, DeferredRegistrationData> = (runtime) => {
+export const register: ModuleRegisterFunction<FireflyRuntime, unknown, DeferredRegistrationData> = runtime => {
     // Always register routes
     runtime.registerRoute({ path: "/feature", element: <FeaturePage /> });
 
@@ -203,7 +191,7 @@ export const register: ModuleRegisterFunction<FireflyRuntime, unknown, DeferredR
             deferredRuntime.registerNavigationItem({
                 $id: "feature",
                 $label: "Feature",
-                to: "/feature",
+                to: "/feature"
             });
         }
     };

@@ -3,7 +3,7 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import { Plus } from "lucide-react";
 import { useState, useRef, useMemo, useCallback } from "react";
 
-import { Button, Checkbox } from "@packages/components";
+import { Button } from "@packages/components";
 import { applyPlantFilters, DeleteConfirmDialog, FilterBar, PlantListHeader, PlantListItem, usePlantFilters } from "@packages/plants-core";
 import type { Plant } from "@packages/plants-core";
 
@@ -12,7 +12,8 @@ import { EditPlantDialog } from "./EditPlantDialog.tsx";
 import { useManagementPlantsCollection } from "./ManagementPlantsContext.tsx";
 import { createManagementPlantActions } from "./plantsCollection.ts";
 
-const scrollContainerStyle = { height: "calc(100vh - 376px)" };
+const scrollbarGutterStyle = { scrollbarGutter: "stable" as const };
+const scrollContainerStyle = { height: "calc(100vh - 376px)", ...scrollbarGutterStyle };
 
 export function PlantsPage() {
     const { filters, updateFilter, clearFilters, hasActiveFilters } = usePlantFilters();
@@ -162,13 +163,9 @@ export function PlantsPage() {
             </div>
 
             <div className="border-border flex-1 overflow-hidden rounded-lg border">
-                <div className="bg-muted/50 border-border flex items-center gap-3 border-b px-4 py-2">
-                    <Checkbox checked={allSelected} onCheckedChange={toggleAll} aria-label="Select all plants" />
-                    <span className="text-muted-foreground min-w-0 flex-1 text-xs font-medium" aria-hidden="true">
-                        Select all
-                    </span>
+                <div className="bg-muted/50 overflow-y-auto [&>div]:bg-transparent" style={scrollbarGutterStyle}>
+                    <PlantListHeader showActions selectAllChecked={allSelected} onToggleSelectAll={toggleAll} />
                 </div>
-                <PlantListHeader showCheckbox showActions />
                 <div ref={parentRef} className="overflow-auto" style={scrollContainerStyle}>
                     <div role="list" aria-label="Plants" style={virtualizerContainerStyle}>
                         {virtualizer.getVirtualItems().map((virtualRow) => {

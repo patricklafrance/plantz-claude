@@ -2,7 +2,9 @@
 
 # Tailwind CSS / PostCSS
 
-Tailwind v4 is integrated via `@tailwindcss/postcss`. Both library packages (`@packages/components`) and app packages (`@apps/host`) add it through a config transformer:
+Tailwind v4 is integrated via `@tailwindcss/postcss`. The host app and library packages use an Rsbuild/Rslib config transformer. Storybooks use a plain `vite.config.ts`.
+
+### Host app & library packages (Rsbuild/Rslib)
 
 ```ts
 const tailwindPostCss: RsbuildConfigTransformer = (config) => {
@@ -18,6 +20,25 @@ const tailwindPostCss: RsbuildConfigTransformer = (config) => {
 ```
 
 For Rslib (library) configs, import `RslibConfigTransformer` from `@workleap/rslib-configs`. For Rsbuild (app) configs, import `RsbuildConfigTransformer` from `@workleap/rsbuild-configs`.
+
+### Storybooks (Vite)
+
+Domain and packages Storybooks use `vite.config.ts` with `@tailwindcss/postcss` as a PostCSS plugin:
+
+```ts
+import tailwindcss from "@tailwindcss/postcss";
+import { defineConfig } from "vite";
+
+export default defineConfig({
+    css: {
+        postcss: {
+            plugins: [tailwindcss()],
+        },
+    },
+});
+```
+
+No `@workleap/rsbuild-configs` or `defineStorybookConfig` is needed for Storybooks.
 
 ## Cross-package class scanning
 

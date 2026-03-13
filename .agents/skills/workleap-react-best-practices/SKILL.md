@@ -2,7 +2,7 @@
 name: workleap-react-best-practices
 description: React performance optimization guidelines for Single Page Applications (SPA) at Workleap. Use when writing, reviewing, or refactoring React SPA code. Covers async waterfall elimination, bundle size reduction, re-render optimization, rendering efficiency, JS micro-optimizations, and advanced patterns. Activate even for small component changes — performance regressions compound silently. Does not cover SSR, Next.js, or server components.
 metadata:
-    version: 1.1
+  version: 1.1
 ---
 
 # Workleap React Best Practices
@@ -12,7 +12,6 @@ Performance optimization guide for React Single Page Applications (SPA), tailore
 ## When to Apply
 
 Reference these guidelines when:
-
 - Writing new React components
 - Reviewing code for performance issues
 - Refactoring existing React code
@@ -21,14 +20,14 @@ Reference these guidelines when:
 
 ## Rule Categories by Priority
 
-| Priority | Category                 | Impact     | Reference                                           |
-| -------- | ------------------------ | ---------- | --------------------------------------------------- |
-| 1        | Eliminating Waterfalls   | CRITICAL   | [async-rules.md](references/async-rules.md)         |
-| 2        | Bundle Size Optimization | CRITICAL   | [bundle-rules.md](references/bundle-rules.md)       |
-| 3        | Re-render Optimization   | MEDIUM     | [rerender-rules.md](references/rerender-rules.md)   |
-| 4        | Rendering Performance    | MEDIUM     | [rendering-rules.md](references/rendering-rules.md) |
-| 5        | JavaScript Performance   | LOW-MEDIUM | [js-rules.md](references/js-rules.md)               |
-| 6        | Advanced Patterns        | LOW        | [advanced-rules.md](references/advanced-rules.md)   |
+| Priority | Category | Impact | Reference |
+|----------|----------|--------|-----------|
+| 1 | Eliminating Waterfalls | CRITICAL | [async-rules.md](references/async-rules.md) |
+| 2 | Bundle Size Optimization | CRITICAL | [bundle-rules.md](references/bundle-rules.md) |
+| 3 | Re-render Optimization | MEDIUM | [rerender-rules.md](references/rerender-rules.md) |
+| 4 | Rendering Performance | MEDIUM | [rendering-rules.md](references/rendering-rules.md) |
+| 5 | JavaScript Performance | LOW-MEDIUM | [js-rules.md](references/js-rules.md) |
+| 6 | Advanced Patterns | LOW | [advanced-rules.md](references/advanced-rules.md) |
 
 ## Quick Reference
 

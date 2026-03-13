@@ -1,11 +1,14 @@
 import "./storybook.css";
+import type { Preview } from "@storybook/react-vite";
 import { initialize, mswLoader } from "msw-storybook-addon";
-import type { Preview } from "storybook-react-rsbuild";
 
-initialize({ onUnhandledRequest: "bypass" });
+initialize({ onUnhandledRequest: "bypass", quiet: true });
 
 const preview: Preview = {
     loaders: [mswLoader],
+    parameters: {
+        a11y: { test: "error" },
+    },
 };
 
 export default preview;

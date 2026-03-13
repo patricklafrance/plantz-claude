@@ -32,7 +32,7 @@ Each domain is fully isolated — modules never import from each other. Each has
 
 ### Tech stack
 
-Node 24+, pnpm 10, TypeScript 7 (tsgo), Rsbuild, Tailwind CSS 4, TanStack DB, Storybook 10, Chromatic, Vitest, oxlint, oxfmt, syncpack.
+Node 24+, pnpm 10, TypeScript 7 (tsgo), Rsbuild, Vite (Storybooks), Tailwind CSS 4, TanStack DB, Storybook 10, Chromatic, Vitest, Playwright, oxlint, oxfmt, syncpack.
 
 ---
 
@@ -44,16 +44,27 @@ Four pillars make this repo fully agent-driven. Each section links to the implem
 
 Six skills that form a complete Agent Development Life Cycle (ADLC). The orchestrator (`/plantz-adlc-orchestrator`) is the sole entry point for feature development — it spawns subagents for each phase and coordinates them through file-based handoffs in `./tmp/runs/[uuid]/`.
 
-```
-User: "Add watering schedules to the management domain"
-  └─ Orchestrator (step 1-9)
-       ├─ Plan     → plan.md  (acceptance criteria with [static]/[visual]/[interactive] tags)
-       ├─ Code     → changes-1.md  (scaffolds modules, implements features, uses browser for feedback)
-       ├─ Simplify → /simplify on changed files
-       ├─ Test     → test-issues-1.md or ∅  (lint, modules, accessibility, browser verification)
-       │    └─ Fix loop: Code → Test → Code → Test  (max 3 iterations)
-       ├─ Document → audits agent-docs for drift
-       └─ Merge    → commit, PR, monitor CI
+```mermaid
+flowchart TD
+    Start([User request]) --> Orch
+
+    subgraph Orch["Orchestrator"]
+        direction TB
+        Plan["<b>Plan</b><br/>A drafts · B reviews"] -- "plan.md" -->
+        Code["<b>Code</b><br/>A implements · B reviews"] -- "changes.md" -->
+        Simplify["<b>Simplify</b>"] -->
+        Test["<b>Test</b><br/>A validates · B reviews"]
+        Test -- "issues found" --> Code
+        Test -- "all passed" -->
+        Document["<b>Document</b><br/>A audits · B reviews"] -->
+        Merge["<b>Merge</b><br/>commit, PR, CI"]
+    end
+
+    Merge --> Done([PR ready])
+
+    style Start fill:#4ade80,stroke:#16a34a,color:#000
+    style Done fill:#4ade80,stroke:#16a34a,color:#000
+    style Orch fill:#f0f9ff,stroke:#0284c7
 ```
 
 | Skill                      | What it does                                                                                                   |
@@ -125,6 +136,16 @@ Three tools run on every `pnpm lint` and in CI, catching issues before code is m
 | tsgo     | Native TypeScript type checker (`@typescript/native-preview`) — ensures type safety across all packages |
 | syncpack | Dependency version consistency — apps pin exact versions, packages use `^` ranges                       |
 
+#### Storybook a11y testing
+
+Every domain Storybook doubles as an automated accessibility test suite. Each has a `vitest.config.ts` with the `@storybook/addon-vitest` plugin that transforms stories into Vitest tests running in a real Chromium browser (via Playwright). Combined with `@storybook/addon-a11y`, this catches axe-core violations — including color contrast — that static analysis cannot detect.
+
+```bash
+pnpm test           # Runs all workspace tests (including Storybook a11y) via Turborepo
+```
+
+Playwright browser installation is handled by a root-level Turborepo task (`//#install-playwright`) that runs automatically before any `test` task.
+
 #### CI/CD
 
 Six GitHub Actions workflows, four of which involve Claude Code:
@@ -194,7 +215,7 @@ Formal logs of _why_ decisions were made — not just what was decided. Agents c
 
 ### Other notable patterns
 
-**Selective Chromatic runs** — a custom TypeScript utility ([`tooling/getAffectedStorybooks.ts`](tooling/getAffectedStorybooks.ts)) that detects which Storybooks were affected by code changes. Unaffected Storybooks skip their Chromatic build entirely.
+**Selective Chromatic runs** — a custom TypeScript utility ([`scripts/getAffectedStorybooks.ts`](scripts/getAffectedStorybooks.ts)) that detects which Storybooks were affected by code changes. Unaffected Storybooks skip their Chromatic build entirely.
 
 **Instruction authoring principles** — a framework for writing agent instructions that actually get followed. Key insight: agents ignore advisory framing ("you should...") but follow prohibition framing ("never..."). See [`agent-docs/references/writing-agent-instructions.md`](agent-docs/references/writing-agent-instructions.md).
 
@@ -216,12 +237,6 @@ pnpm install
 ### Seed data
 
 Plant data lives in an MSW in-memory database (`plantsDb` from `@packages/plants-core`). On page load, the host app calls `plantsDb.reset(defaultSeedPlants)` which populates ~250 plants automatically. Data resets on every reload — no manual seeding needed.
-
-**To regenerate the static seed file** (used as the default data source):
-
-```bash
-pnpm seed-plants      # Generates apps/host/public/seed-plants.json
-```
 
 ### Run the app
 
@@ -249,6 +264,7 @@ pnpm dev-today-storybook         # Today domain
 
 ```bash
 pnpm lint          # ESLint (per-package, via Turborepo)
+pnpm test          # Storybook a11y tests (Vitest + Playwright, via Turborepo)
 pnpm oxlint        # oxlint (custom config in oxlintrc.json)
 pnpm oxfmt         # Formatter check (oxfmt with Tailwind class sorting)
 pnpm typecheck     # TypeScript (tsgo)

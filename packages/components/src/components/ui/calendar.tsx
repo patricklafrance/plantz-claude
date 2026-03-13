@@ -25,9 +25,9 @@ function CalendarChevron({ className: chevronClassName, orientation, ...chevronP
 
 function CalendarWeekNumber({ children, ...weekNumberProps }: WeekNumberProps) {
     return (
-        <td {...weekNumberProps}>
+        <th {...weekNumberProps}>
             <div className="flex size-(--cell-size) items-center justify-center text-center">{children}</div>
-        </td>
+        </th>
     );
 }
 

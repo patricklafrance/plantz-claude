@@ -3,8 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NoopLogger } from "@workleap/logging";
 import { useMemo, type ReactNode } from "react";
 
-import { initializeFireflyForStorybook, withFireflyDecorator } from "@apps/packages-storybook/firefly";
-
+import { initializeFireflyForStorybook, withFireflyDecorator } from "../../storybook/firefly.tsx";
 import { ManagementPlantsCollectionProvider } from "./ManagementPlantsContext.tsx";
 import { createManagementPlantsCollection } from "./plantsCollection.ts";
 

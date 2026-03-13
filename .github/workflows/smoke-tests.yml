@@ -18,6 +18,7 @@ jobs:
         timeout-minutes: 30
         env:
             TURBO_TELEMETRY_DISABLED: "1"
+            PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
         permissions:
             contents: read
             pull-requests: write
@@ -48,12 +49,10 @@ jobs:
             - name: Add node_modules/.bin to PATH
               run: echo "$PWD/node_modules/.bin" >> $GITHUB_PATH
 
-            - name: Install agent-browser
-              run: agent-browser install
-
-            - name: Install Playwright Chromium
-              # Not using "agent-browser install --with-deps" because Playwright is already installed and it's causing issue.
-              run: pnpm dlx playwright install-deps chromium
+            - name: Install browser
+              # PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD prevents the playwright post-install from
+              # downloading browsers during pnpm install, avoiding conflicts with agent-browser.
+              run: agent-browser install --with-deps
 
             - name: Warm up browser
               run: |

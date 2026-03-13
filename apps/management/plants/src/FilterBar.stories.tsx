@@ -18,7 +18,16 @@ const meta = {
     title: "Management/Plants/Components/FilterBar",
     component: FilterBar,
     parameters: {
-        chromatic: { viewports: [375, 768, 1280] },
+        chromatic: {
+            modes: {
+                "light mobile": { theme: "light", viewport: 375 },
+                "light tablet": { theme: "light", viewport: 768 },
+                "light desktop": { theme: "light", viewport: 1280 },
+                "dark mobile": { theme: "dark", viewport: 375 },
+                "dark tablet": { theme: "dark", viewport: 768 },
+                "dark desktop": { theme: "dark", viewport: 1280 },
+            },
+        },
     },
     args: {
         onFilterChange: () => {},

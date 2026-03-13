@@ -4,6 +4,7 @@
 2. Before changing build tooling, CI, or dev workflows, check `agent-docs/odr/index.md`.
 3. For feature development, load the `plantz-adlc-orchestrator` skill. It coordinates the full lifecycle.
 4. Never report a task as complete without running `git status --short` and checking every changed or new file against the index below. If a file touches a topic listed in the index, open that doc and fix any line that no longer matches reality.
+5. Never add dependencies to the root `package.json` unless they are global workspace tools (turbo, syncpack, oxlint, tsx, cross-env, etc.). Domain-specific deps belong in the `package.json` of the app or package that uses them.
 
 ## Index
 

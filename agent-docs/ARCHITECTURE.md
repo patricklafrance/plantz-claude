@@ -56,7 +56,7 @@ Two domain areas, each with independent Storybooks and Chromatic tokens:
 - **management** — Plant management features (`apps/management/`)
 - **today** — Daily watering view (`apps/today/`)
 
-A packages-layer Storybook (`packages/storybook/`, `@apps/packages-storybook`) is purely a runner for shared package stories — it contains no exported utilities. Storybook infrastructure (MSW via `msw-storybook-addon`, Squide runtime via `@apps/packages-storybook/firefly`, collection context) is configured per-domain in each module's `storybook.setup.tsx`. A unified Storybook (`apps/storybook/`) aggregates all stories across the entire repo.
+A packages-layer Storybook (`packages/storybook/`, `@apps/packages-storybook`) is purely a runner for shared package stories — it contains no exported utilities. Storybook infrastructure (MSW via `msw-storybook-addon`, Squide runtime via a `firefly.tsx` in each domain storybook app, collection context) is configured per-domain in each module's `storybook.setup.tsx`. A unified Storybook (`apps/storybook/`) aggregates all stories across the entire repo.
 
 See [ADR-0002](adr/0002-domain-scoped-storybooks.md) for rationale.
 

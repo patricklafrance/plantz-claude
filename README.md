@@ -1,8 +1,6 @@
 # plantz-claude
 
-A plants watering app used as a proof-of-concept for a **Claude Code agent harness** — a structured setup that lets AI agents scaffold features, audit documentation, smoke-test apps, and maintain architectural consistency without human hand-holding.
-
-The app itself is intentionally simple. The interesting part is the agent infrastructure around it.
+A plants watering app used as a proof-of-concept for a **Claude Code agent harness** — a structured setup that lets AI agents scaffold sfeatures.
 
 ## What's in this repo
 
@@ -27,8 +25,6 @@ packages/
 ```
 
 Each domain is fully isolated — modules never import from each other. Each has its own Storybook and Chromatic token for independent visual regression testing.
-
-**Packages are JIT** — they expose source via `exports` fields and consumers compile them directly. No pre-build step needed for dev.
 
 ### Tech stack
 
@@ -78,7 +74,7 @@ flowchart TD
 
 Key design decisions:
 
-- **Self-contained**: plan, code, and test skills each embed their own `references/` files (tech-stack rules, styling conventions, accessibility requirements). Subagents never need to read another skill's files.
+- **Self-contained**: Plan, code, and test skills each embed their own `references/` files (tech-stack rules, styling conventions, accessibility requirements).
 - **Subagent protocol**: Every multi-agent step uses a drafter/reviewer pair (A drafts, B reviews and improves). The orchestrator spawns both — subagents never spawn further subagents.
 - **File-based coordination**: All inter-step communication goes through files in `./tmp/runs/[uuid]/`. This makes handoffs explicit and debuggable (see "Run folder artifacts" below).
 - **Test as the single gate**: The test skill owns all verification — both static (lint, modules, accessibility) and visual/interactive (browser screenshots via Chrome DevTools MCP). The code skill writes code; the test skill validates it.
@@ -138,28 +134,23 @@ Three tools run on every `pnpm lint` and in CI, catching issues before code is m
 
 #### Storybook a11y testing
 
-Every domain Storybook doubles as an automated accessibility test suite. Each has a `vitest.config.ts` with the `@storybook/addon-vitest` plugin that transforms stories into Vitest tests running in a real Chromium browser (via Playwright). Combined with `@storybook/addon-a11y`, this catches axe-core violations — including color contrast — that static analysis cannot detect.
+Every domain Storybook doubles as an automated accessibility test suite in a real Chromium browser (via Playwright).
 
 ```bash
 pnpm test           # Runs all workspace tests (including Storybook a11y) via Turborepo
 ```
 
-Playwright browser installation is handled by a root-level Turborepo task (`//#install-playwright`) that runs automatically before any `test` task.
-
 #### CI/CD
 
 Six GitHub Actions workflows, four of which involve Claude Code:
 
-| Workflow               | Trigger                         | Purpose                                                                   |
-| ---------------------- | ------------------------------- | ------------------------------------------------------------------------- |
-| `ci.yml`               | Push to main, PRs               | Build, lint (oxlint, oxfmt, typecheck, syncpack), test                    |
-| `chromatic.yml`        | Push to main, labeled PRs       | Visual regression testing — only affected Storybooks                      |
-| `claude.yml`           | `@claude` mention in issues/PRs | Claude Code agent responds to issues and PR comments                      |
-| `code-review.yml`      | PRs opened/updated              | Automated code review by Claude (read-only tools)                         |
-| `smoke-tests.yml`      | PRs to main                     | Smoke-tests all apps via Claude (scoped Bash, artifact upload on failure) |
-| `audit-agent-docs.yml` | Weekly cron + manual            | Runs the audit skill, creates PRs for Critical/High findings              |
-
-The audit workflow is self-healing — it detects when docs drift from reality and opens PRs to fix them. The smoke-tests workflow loads the `plantz-smoke-tests` skill, which starts each dev server, verifies it in a headless browser via `agent-browser`, and posts results as a PR comment.
+| Workflow          | Trigger                         | Purpose                                                                   |
+| ----------------- | ------------------------------- | ------------------------------------------------------------------------- |
+| `ci.yml`          | Push to main, PRs               | Build, lint (oxlint, oxfmt, typecheck, syncpack), test                    |
+| `chromatic.yml`   | Push to main, labeled PRs       | Visual regression testing — only affected Storybooks                      |
+| `claude.yml`      | `@claude` mention in issues/PRs | Claude Code agent responds to issues and PR comments                      |
+| `code-review.yml` | PRs opened/updated              | Automated code review by Claude (read-only tools)                         |
+| `smoke-tests.yml` | PRs to main                     | Smoke-tests all apps via Claude (scoped Bash, artifact upload on failure) |
 
 **Files:** [`.github/workflows/`](.github/workflows/), [`.github/prompts/`](.github/prompts/)
 
@@ -236,7 +227,7 @@ pnpm install
 
 ### Seed data
 
-Plant data lives in an MSW in-memory database (`plantsDb` from `@packages/plants-core`). On page load, the host app calls `plantsDb.reset(defaultSeedPlants)` which populates ~250 plants automatically. Data resets on every reload — no manual seeding needed.
+Plant data lives in an MSW in-memory database. Data resets on every reload — no manual seeding needed.
 
 ### Run the app
 

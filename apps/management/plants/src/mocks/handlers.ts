@@ -1,11 +1,17 @@
 import { http, HttpResponse } from "msw";
 
 import type { Plant } from "@packages/plants-core";
-import { plantsDb } from "@packages/plants-core/db";
+import { getUserId, plantsDb } from "@packages/plants-core/db";
 
 export const managementPlantHandlers = [
-    http.get("/api/management/plants", () => {
-        const plants = plantsDb.getAll();
+    http.get("/api/management/plants", ({ request }) => {
+        const userId = getUserId(request);
+
+        if (!userId) {
+            return new HttpResponse(null, { status: 401 });
+        }
+
+        const plants = plantsDb.getAllByUser(userId);
 
         return HttpResponse.json(plants);
     }),
@@ -22,6 +28,12 @@ export const managementPlantHandlers = [
     }),
 
     http.post("/api/management/plants", async ({ request }) => {
+        const userId = getUserId(request);
+
+        if (!userId) {
+            return new HttpResponse(null, { status: 401 });
+        }
+
         const body = (await request.json()) as Record<string, unknown>;
         const now = new Date();
 
@@ -30,6 +42,7 @@ export const managementPlantHandlers = [
         const plant = plantsDb.insert({
             ...(body as Record<string, unknown>),
             id,
+            userId,
             creationDate: now,
             lastUpdateDate: now,
         } as Plant);

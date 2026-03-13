@@ -1,8 +1,8 @@
-import { useNavigationItems, useRenderedNavigationItems, isNavigationLink, type RenderItemFunction, type RenderSectionFunction } from "@squide/firefly";
+import { useNavigationItems, useRenderedNavigationItems, useIsActiveRouteProtected, isNavigationLink, type RenderItemFunction, type RenderSectionFunction } from "@squide/firefly";
 import { Link, Outlet } from "react-router";
 
-import { ColorModeToggle } from "./ColorModeToggle.tsx";
 import { PlantzLogo } from "./PlantzLogo.tsx";
+import { UserMenu } from "./UserMenu.tsx";
 
 const renderItem: RenderItemFunction = (item, key) => {
     if (!isNavigationLink(item)) {
@@ -29,6 +29,15 @@ const renderSection: RenderSectionFunction = (elements, key) => (
 export function RootLayout() {
     const navigationItems = useNavigationItems();
     const navigationElements = useRenderedNavigationItems(navigationItems, renderItem, renderSection);
+    const isActiveRouteProtected = useIsActiveRouteProtected(true, { throwWhenThereIsNoMatch: false });
+
+    if (!isActiveRouteProtected) {
+        return (
+            <main className="bg-background text-foreground flex min-h-screen items-center justify-center">
+                <Outlet />
+            </main>
+        );
+    }
 
     return (
         <div className="bg-background text-foreground flex min-h-screen flex-col">
@@ -42,7 +51,7 @@ export function RootLayout() {
                 <nav aria-label="Main" className="flex-1">
                     {navigationElements}
                 </nav>
-                <ColorModeToggle />
+                <UserMenu />
             </header>
             <main id="main-content" className="flex-1">
                 <Outlet />

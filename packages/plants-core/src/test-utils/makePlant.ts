@@ -8,6 +8,7 @@ export const FIXED_CREATION = new Date(2025, 0, 1, 0, 0, 0, 0);
 
 export function makePlant(overrides: Partial<Plant> & { id: string; name: string }): Plant {
     return {
+        userId: "user-alice",
         description: undefined,
         family: undefined,
         location: "living-room",

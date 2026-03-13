@@ -1,13 +1,15 @@
 import { createOptimisticAction } from "@tanstack/db";
 import type { QueryClient } from "@tanstack/react-query";
 
-import { plantSchema, type Plant } from "@packages/plants-core";
+import { AUTH_TOKEN_KEY, getAuthHeaders, plantSchema, type Plant } from "@packages/plants-core";
 import { createPlantsCollection, type PlantsCollection } from "@packages/plants-core/collection";
 
 const API_BASE = "/api/management/plants";
 
 async function fetchPlants(): Promise<Plant[]> {
-    const response = await fetch(API_BASE);
+    const response = await fetch(API_BASE, {
+        headers: getAuthHeaders(),
+    });
 
     if (!response.ok) {
         throw new Error(`Failed to fetch plants: ${response.status}`);
@@ -27,11 +29,12 @@ export function createManagementPlantsCollection(queryClient: QueryClient): Plan
 }
 
 export function createManagementPlantActions(plantsCollection: PlantsCollection) {
-    const insertPlant = createOptimisticAction<Omit<Plant, "id" | "creationDate" | "lastUpdateDate">>({
+    const insertPlant = createOptimisticAction<Omit<Plant, "id" | "userId" | "creationDate" | "lastUpdateDate">>({
         onMutate: (data) => {
             plantsCollection.insert({
                 ...data,
                 id: crypto.randomUUID(),
+                userId: sessionStorage.getItem(AUTH_TOKEN_KEY) ?? "",
                 creationDate: new Date(),
                 lastUpdateDate: new Date(),
             } as Plant);
@@ -39,7 +42,7 @@ export function createManagementPlantActions(plantsCollection: PlantsCollection)
         mutationFn: async (data) => {
             const response = await fetch(API_BASE, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", ...getAuthHeaders() },
                 body: JSON.stringify(data),
             });
 
@@ -60,7 +63,7 @@ export function createManagementPlantActions(plantsCollection: PlantsCollection)
         mutationFn: async ({ id, ...data }) => {
             const response = await fetch(`${API_BASE}/${id}`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", ...getAuthHeaders() },
                 body: JSON.stringify(data),
             });
 
@@ -79,6 +82,7 @@ export function createManagementPlantActions(plantsCollection: PlantsCollection)
         mutationFn: async (id) => {
             const response = await fetch(`${API_BASE}/${id}`, {
                 method: "DELETE",
+                headers: getAuthHeaders(),
             });
 
             if (!response.ok) {
@@ -98,7 +102,7 @@ export function createManagementPlantActions(plantsCollection: PlantsCollection)
         mutationFn: async (ids) => {
             const response = await fetch(API_BASE, {
                 method: "DELETE",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", ...getAuthHeaders() },
                 body: JSON.stringify({ ids }),
             });
 

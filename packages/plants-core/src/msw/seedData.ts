@@ -109,7 +109,7 @@ function generateId(): string {
     return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 }
 
-export function generatePlants(count?: number): Plant[] {
+export function generatePlants(count?: number, userId?: string): Plant[] {
     const total = count ?? 220 + Math.floor(Math.random() * 60);
     const plants: Plant[] = [];
 
@@ -123,6 +123,7 @@ export function generatePlants(count?: number): Plant[] {
 
         plants.push({
             id: generateId(),
+            userId: userId ?? "user-alice",
             name: `${species.name}${suffix}`,
             description: Math.random() > 0.3 ? `A beautiful ${species.name.toLowerCase()} plant.` : undefined,
             family: species.family,
@@ -143,7 +144,7 @@ export function generatePlants(count?: number): Plant[] {
 }
 
 // Pre-generated stable seed data for consistent dev experience
-export const defaultSeedPlants: Plant[] = generatePlants(250);
+export const defaultSeedPlants: Plant[] = generatePlants(125, "user-alice").concat(generatePlants(125, "user-bob"));
 
 // Small focused data sets for story variants
 export const emptyPlants: Plant[] = [];
@@ -151,6 +152,7 @@ export const emptyPlants: Plant[] = [];
 export const singlePlant: Plant[] = [
     {
         id: "single-plant-1",
+        userId: "user-alice",
         name: "Monstera Deliciosa",
         description: "A beautiful tropical plant with large fenestrated leaves.",
         family: "Araceae",
@@ -170,6 +172,7 @@ export const singlePlant: Plant[] = [
 export const manyDueForWatering: Plant[] = [
     {
         id: "due-1",
+        userId: "user-alice",
         name: "Aloe Vera",
         description: "A succulent plant known for its healing properties.",
         family: "Asphodelaceae",
@@ -186,6 +189,7 @@ export const manyDueForWatering: Plant[] = [
     },
     {
         id: "due-2",
+        userId: "user-alice",
         name: "Boston Fern",
         description: "A lush fern with cascading fronds.",
         family: "Nephrolepidaceae",
@@ -202,6 +206,7 @@ export const manyDueForWatering: Plant[] = [
     },
     {
         id: "due-3",
+        userId: "user-alice",
         name: "Calathea Orbifolia",
         description: "Stunning round leaves with silver-green stripes.",
         family: "Marantaceae",
@@ -218,6 +223,7 @@ export const manyDueForWatering: Plant[] = [
     },
     {
         id: "due-4",
+        userId: "user-alice",
         name: "Dracaena Marginata",
         description: "A tall plant with slender red-edged leaves.",
         family: "Asparagaceae",
@@ -234,6 +240,7 @@ export const manyDueForWatering: Plant[] = [
     },
     {
         id: "due-5",
+        userId: "user-alice",
         name: "English Ivy",
         description: "A classic trailing vine with lobed leaves.",
         family: "Araliaceae",
@@ -250,6 +257,7 @@ export const manyDueForWatering: Plant[] = [
     },
     {
         id: "due-6",
+        userId: "user-alice",
         name: "Fiddle Leaf Fig",
         description: "Large violin-shaped leaves on a tall trunk.",
         family: "Moraceae",
@@ -266,6 +274,7 @@ export const manyDueForWatering: Plant[] = [
     },
     {
         id: "due-7",
+        userId: "user-alice",
         name: "Golden Barrel Cactus",
         family: "Cactaceae",
         location: "basement",
@@ -281,6 +290,7 @@ export const manyDueForWatering: Plant[] = [
     },
     {
         id: "due-8",
+        userId: "user-alice",
         name: "Hoya Carnosa",
         description: "A waxy-leaved trailing plant that produces fragrant clusters of star-shaped flowers.",
         family: "Apocynaceae",

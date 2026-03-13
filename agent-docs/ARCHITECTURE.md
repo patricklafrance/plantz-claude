@@ -41,7 +41,7 @@ plantz-claude/
 
 ## Squide host/module topology
 
-- **Host** (`apps/host/`): Thin shell that bootstraps Squide via `FireflyRuntime` and renders `AppRouter`. Creates `QueryClient` before `initializeFirefly` and passes it to module registrations. Contains no domain logic.
+- **Host** (`apps/host/`): Bootstraps Squide via `FireflyRuntime` and renders `AppRouter`. Creates `QueryClient` before `initializeFirefly` and passes it to module registrations. The host owns cross-cutting auth/session infrastructure: a `/login` public route, `SessionContext` (provided after session fetch in `BootstrappingRoute` via `useProtectedDataQueries`), `UserMenu` in the header, and MSW auth handlers (`/api/auth/*`). Domain logic lives in modules, not the host.
 - **Modules**: Each feature area registers via `(runtime, queryClient) => Promise<void>`. The host wraps these in closures matching Squide's `ModuleRegisterFunction` signature. Modules are isolated — they never import from each other. When two modules need to share domain code: prefer duplication if the surface area is small; extract to a shared package under `packages/` (e.g., `@packages/plants-core`) when it's large enough to justify the indirection.
 - **Module registry**: `apps/host/src/getActiveModules.tsx` maps module path keys to their register functions. The host loads only modules present in this map.
 - **Shared packages**: Cross-cutting utilities live in `packages/` and are consumed by both host and modules.
@@ -71,6 +71,8 @@ Each module owns its full API surface (a "BFF-per-module" model):
 - **Shared DB** — All modules read/write the same in-memory store, exposed via `@packages/plants-core/db`. This is the only shared data dependency. Cross-module visibility works through the shared DB, not shared client-side collections.
 
 Modules never share handlers or collections. If two modules need the same entity, each defines its own handlers, collection, and URL namespace. This mirrors how real BFFs work: each frontend surface has its own backend-for-frontend that shapes data for its needs.
+
+**Auth layer** — The host owns `/api/auth/*` MSW handlers (login, session) as a cross-cutting concern. Module handlers read the `Authorization: Bearer <userId>` header to scope data per user. The auth token is stored in `sessionStorage` and attached to fetch calls via `getAuthHeaders()` from `@packages/plants-core`.
 
 See [ADR-0003](adr/0003-msw-tanstack-query-data-layer.md) for rationale. See `msw-tanstack-query.md` in `.claude/skills/plantz-adlc-*/references/` for implementation details.
 

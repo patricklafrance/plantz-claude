@@ -3,7 +3,7 @@ import { PublicRoutes, ProtectedRoutes, type ModuleRegisterFunction, type Firefl
 import { NotFoundPage } from "./NotFoundPage.tsx";
 import { RootLayout } from "./RootLayout.tsx";
 
-export const registerHost: ModuleRegisterFunction<FireflyRuntime> = (runtime) => {
+export const registerHost: ModuleRegisterFunction<FireflyRuntime> = async (runtime) => {
     runtime.registerRoute(
         {
             element: <RootLayout />,
@@ -13,7 +13,21 @@ export const registerHost: ModuleRegisterFunction<FireflyRuntime> = (runtime) =>
     );
 
     runtime.registerPublicRoute({
+        path: "/login",
+        lazy: async () => {
+            const { LoginPage } = await import("./LoginPage.tsx");
+
+            return { element: <LoginPage /> };
+        },
+    });
+
+    runtime.registerPublicRoute({
         path: "*",
         element: <NotFoundPage />,
     });
+
+    if (runtime.isMswEnabled) {
+        const { authHandlers } = await import("./mocks/authHandlers.ts");
+        runtime.registerRequestHandlers(authHandlers);
+    }
 };

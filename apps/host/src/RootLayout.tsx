@@ -1,4 +1,4 @@
-import { useNavigationItems, useRenderedNavigationItems, isNavigationLink, type RenderItemFunction, type RenderSectionFunction } from "@squide/firefly";
+import { useNavigationItems, useRenderedNavigationItems, useIsActiveRouteProtected, isNavigationLink, type RenderItemFunction, type RenderSectionFunction } from "@squide/firefly";
 import { Link, Outlet } from "react-router";
 
 import { ColorModeToggle } from "./ColorModeToggle.tsx";
@@ -30,6 +30,15 @@ const renderSection: RenderSectionFunction = (elements, key) => (
 export function RootLayout() {
     const navigationItems = useNavigationItems();
     const navigationElements = useRenderedNavigationItems(navigationItems, renderItem, renderSection);
+    const isActiveRouteProtected = useIsActiveRouteProtected(true, { throwWhenThereIsNoMatch: false });
+
+    if (!isActiveRouteProtected) {
+        return (
+            <main className="bg-background text-foreground flex min-h-screen items-center justify-center">
+                <Outlet />
+            </main>
+        );
+    }
 
     return (
         <div className="bg-background text-foreground flex min-h-screen flex-col">

@@ -33,7 +33,7 @@ export function LoginPage() {
 
             const data = (await response.json()) as { token: string };
             sessionStorage.setItem(AUTH_TOKEN_KEY, data.token);
-            queryClient.removeQueries({ queryKey: ["/api/auth/session"] });
+            await queryClient.invalidateQueries({ queryKey: ["/api/auth/session"] });
             navigate("/");
         } catch {
             setError("An unexpected error occurred.");
@@ -62,6 +62,17 @@ export function LoginPage() {
                 <Button type="submit" className="w-full" disabled={isSubmitting}>
                     {isSubmitting ? "Logging in..." : "Log in"}
                 </Button>
+                <div className="text-muted-foreground rounded-md border p-3 text-sm">
+                    <p className="mb-1 font-medium">Demo accounts:</p>
+                    <ul className="space-y-1">
+                        <li>
+                            <code>alice@example.com</code> / <code>password</code>
+                        </li>
+                        <li>
+                            <code>bob@example.com</code> / <code>password</code>
+                        </li>
+                    </ul>
+                </div>
             </form>
         </div>
     );

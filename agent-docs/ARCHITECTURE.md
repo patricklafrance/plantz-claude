@@ -72,7 +72,7 @@ Each module owns its full API surface (a "BFF-per-module" model):
 
 Modules never share handlers or collections. If two modules need the same entity, each defines its own handlers, collection, and URL namespace. This mirrors how real BFFs work: each frontend surface has its own backend-for-frontend that shapes data for its needs.
 
-**Auth layer** — The host owns `/api/auth/*` MSW handlers (login, session) as a cross-cutting concern. Module handlers read the `Authorization: Bearer <userId>` header to scope data per user. The auth token is stored in `sessionStorage` and attached to fetch calls via `getAuthHeaders()` from `@packages/plants-core`.
+**Auth layer** — The host owns `/api/auth/*` MSW handlers (login, logout, session) as a cross-cutting concern. The login handler stores the auth token in `sessionStorage`; the logout handler clears it. App code never reads or writes `sessionStorage` directly for auth — only transport-layer utilities (`getAuthHeaders()` and `getCurrentUserId()`) from `@packages/plants-core` read the token to attach headers or derive the current user ID. Module handlers read this header to scope data per user.
 
 See [ADR-0003](adr/0003-msw-tanstack-query-data-layer.md) for rationale. See `msw-tanstack-query.md` in `.claude/skills/plantz-adlc-*/references/` for implementation details.
 

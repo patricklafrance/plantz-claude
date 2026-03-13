@@ -3,7 +3,6 @@ import { LogOutIcon } from "lucide-react";
 import { useNavigate } from "react-router";
 
 import { Button, Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger, Separator } from "@packages/components";
-import { AUTH_TOKEN_KEY } from "@packages/plants-core";
 
 import { ColorModeToggle } from "./ColorModeToggle.tsx";
 import { useSession } from "./SessionContext.tsx";
@@ -27,10 +26,13 @@ export function UserMenu() {
         return null;
     }
 
-    function handleLogout() {
-        sessionStorage.removeItem(AUTH_TOKEN_KEY);
-        queryClient.clear();
-        navigate("/login");
+    async function handleLogout() {
+        try {
+            await fetch("/api/auth/logout", { method: "POST" });
+        } finally {
+            queryClient.clear();
+            navigate("/login");
+        }
     }
 
     return (

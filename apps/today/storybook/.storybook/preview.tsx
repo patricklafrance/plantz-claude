@@ -21,8 +21,8 @@ const preview: Preview = {
         a11y: { test: "error" },
         chromatic: {
             modes: {
-                light: { globals: { theme: "light" } },
-                dark: { globals: { theme: "dark" } },
+                light: { theme: "light" },
+                dark: { theme: "dark" },
             },
         },
     },

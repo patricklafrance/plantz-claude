@@ -51,9 +51,10 @@ jobs:
               run: echo "$PWD/node_modules/.bin" >> $GITHUB_PATH
 
             - name: Install browser
-              # PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD prevents the playwright post-install from
-              # downloading browsers during pnpm install, avoiding conflicts with agent-browser.
-              run: agent-browser install --with-deps
+              # PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD on the install step prevents playwright's
+              # post-install from downloading all browsers. We then install only chromium
+              # (with system deps) to match the root playwright version that agent-browser uses.
+              run: npx playwright install --with-deps chromium
 
             - name: Warm up browser
               run: |

@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { LogOutIcon } from "lucide-react";
+import { LogOutIcon, UserPenIcon } from "lucide-react";
 import { useNavigate } from "react-router";
 
 import { Button, Popover, PopoverContent, PopoverDescription, PopoverHeader, PopoverTitle, PopoverTrigger, Separator } from "@packages/components";
@@ -45,6 +45,11 @@ export function UserMenu() {
                     <PopoverTitle>{session.name}</PopoverTitle>
                     <PopoverDescription>{session.email}</PopoverDescription>
                 </PopoverHeader>
+                <Separator />
+                <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => navigate("/profile")}>
+                    <UserPenIcon data-icon="inline-start" />
+                    Edit profile
+                </Button>
                 <Separator />
                 <div className="flex flex-col gap-1">
                     <p className="text-muted-foreground px-1 text-xs font-medium">Appearance</p>

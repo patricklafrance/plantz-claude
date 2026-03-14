@@ -21,6 +21,15 @@ export const registerHost: ModuleRegisterFunction<FireflyRuntime> = async (runti
         },
     });
 
+    runtime.registerRoute({
+        path: "/profile",
+        lazy: async () => {
+            const { ProfilePage } = await import("./ProfilePage.tsx");
+
+            return { element: <ProfilePage /> };
+        },
+    });
+
     runtime.registerPublicRoute({
         path: "*",
         element: <NotFoundPage />,

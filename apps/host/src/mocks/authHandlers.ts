@@ -22,6 +22,23 @@ export const authHandlers = [
         return new HttpResponse(null, { status: 200 });
     }),
 
+    http.put("/api/auth/profile", async ({ request }) => {
+        const userId = getUserId(request);
+
+        if (!userId) {
+            return new HttpResponse(null, { status: 401 });
+        }
+
+        const body = (await request.json()) as { name: string };
+        const user = usersDb.updateName(userId, body.name);
+
+        if (!user) {
+            return new HttpResponse(null, { status: 404 });
+        }
+
+        return HttpResponse.json({ id: user.id, name: user.name, email: user.email });
+    }),
+
     http.get("/api/auth/session", ({ request }) => {
         const userId = getUserId(request);
 

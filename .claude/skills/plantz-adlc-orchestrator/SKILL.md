@@ -79,7 +79,7 @@ Spawn two subagents using the `plantz-adlc-test` skill.
 Pass: `run-uuid`, `iteration=1`, plan path (`./tmp/runs/[run-uuid]/plan.md`), previous issues path (`null` for iteration 1).
 
 - If `./tmp/runs/[run-uuid]/test-issues-[test iteration].md` is produced with issues:
-    - Check `Test iteration` in `orchestrator-state.md` — if ≥ 3, follow the failure handling procedure (maximum 3 test iterations).
+    - Check `Test iteration` in `orchestrator-state.md` — if ≥ 5, follow the failure handling procedure (maximum 5 test iterations).
     - Increment `Test iteration`. Update `orchestrator-state.md` with the new value and set `Current step: 6-code`.
     - Spawn new `plantz-adlc-code` subagents. Pass: `run-uuid`, `iteration` = `Test iteration`, plan path, the previous iteration's issues file path (`test-issues-[test iteration - 1].md`), the previous iteration's changes file path (`changes-[test iteration - 1].md`), and escalation context (the rejected escalation file path if one was rejected earlier, otherwise `null`). They produce `changes-[test iteration].md`.
     - **Escalation check:** After the code subagent returns, follow the escalation check procedure (see "Escalation check" below).
@@ -125,7 +125,7 @@ Template:
 - Branch: [branch-name]
 - Commit type: [feat/fix/chore/docs/refactor] (conventional commit prefix)
 - Current step: [1-9] (use `6-code` / `6-test` within step 6; `8-ci-fix` within step 8)
-- Test iteration: [1-3] (current test-fix cycle — starts at 1, incremented after each test failure)
+- Test iteration: [1-5] (current test-fix cycle — starts at 1, incremented after each test failure)
 - Plan revised: [yes/no]
 - Escalation rejected: [none/iteration-N — brief reason]
 - HEAD commit: [hash] (from `git rev-parse HEAD` — update after each commit or tree reset)
@@ -141,7 +141,7 @@ This allows the orchestrator to recover if the context window is compacted mid-r
 
 Two iteration counters, both starting at 1:
 
-- **`Test iteration`** (Step 6): Incremented after each test failure. Passed to code and test subagents. Artifacts: `changes-[N].md`, `test-issues-[N].md`. Maximum 3.
+- **`Test iteration`** (Step 6): Incremented after each test failure. Passed to code and test subagents. Artifacts: `changes-[N].md`, `test-issues-[N].md`. Maximum 5.
 - **`CI iteration`** (Step 8): Incremented after each CI failure + fix. Passed to merge subagent. CI fix code artifacts use `Test iteration + CI iteration` to avoid collisions. CI issues: `ci-issues-[N].md`. Maximum 3 (fail the run when `CI iteration ≥ 3`).
 
 ## Escalation Check

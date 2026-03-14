@@ -6,6 +6,9 @@ import { initialize, mswLoader } from "msw-storybook-addon";
 initialize({ onUnhandledRequest: "bypass" });
 
 const preview: Preview = {
+    initialGlobals: {
+        theme: process.env.STORYBOOK_THEME || "light",
+    },
     decorators: [
         withThemeByClassName({
             themes: {

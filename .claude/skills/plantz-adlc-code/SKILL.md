@@ -74,11 +74,13 @@ This skill runs in one of two modes, determined by the inputs:
 
 **Subagent A** implements the full change set and writes `changes-[iteration].md`. If A encounters plan-level concerns in fix mode, it flags them in the **Notes** section for B to evaluate.
 
-**Subagent B** has three responsibilities, in order:
+**Subagent B** has four responsibilities, in order:
 
 1. **Code review.** Read every changed file listed in `changes-[iteration].md`. Fix mechanical issues (semicolons, import paths, missing exports) and substantive issues (component structure, accessibility gaps, missing dark mode variants, incorrect patterns). Update `changes-[iteration].md` to reflect modifications. Do not defer fixable concerns — resolve them.
 
-2. **Run workspace tests.** Run all workspace tests from the workspace root:
+2. **Loading performance review.** For every changed file that adds or modifies data fetching, route definitions, or component imports: verify compliance with the `workleap-react-best-practices` skill's **async-rules** and **bundle-rules**, and flag unnecessary loading states. Fix violations directly and note fixes in `changes-[iteration].md` under **Notes**.
+
+3. **Run workspace tests.** Run all workspace tests from the workspace root:
 
     ```bash
     pnpm test
@@ -112,7 +114,7 @@ This skill runs in one of two modes, determined by the inputs:
 
     If the Storybook Vitest a11y project is not configured for the affected domain, skip this step and note it in `changes-[iteration].md` under **Notes**.
 
-3. **Escalation check.** Read the **Notes** section of `changes-[iteration].md` for any plan-level concerns A flagged, then investigate the code for brute-force signals: type suppressions (`as any`, `@ts-ignore`), lint-disable comments, wrapper components that exist only to bridge a bad abstraction, or growing complexity relative to the problem being solved. These are indicators to investigate for underlying plan problems, not automatic escalation triggers — a pragmatic `as any` bridging an external library's type gap is not a plan problem.
+4. **Escalation check.** Read the **Notes** section of `changes-[iteration].md` for any plan-level concerns A flagged, then investigate the code for brute-force signals: type suppressions (`as any`, `@ts-ignore`), lint-disable comments, wrapper components that exist only to bridge a bad abstraction, or growing complexity relative to the problem being solved. These are indicators to investigate for underlying plan problems, not automatic escalation triggers — a pragmatic `as any` bridging an external library's type gap is not a plan problem.
 
     **Escalation threshold:** Escalate only when the plan's approach is fundamentally wrong and no amount of code editing can fix it. Examples: the plan decomposed components in a way that makes the required data flow impossible; the plan chose a library that conflicts with the framework; the plan assumed module boundaries that force a cross-module import. Do NOT escalate for: difficulty, missing details the code agent can infer, suboptimal but workable approaches, or issues that the test phase will catch.
 

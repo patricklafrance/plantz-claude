@@ -13,6 +13,16 @@ class UsersDb {
     getById(id: string): User | undefined {
         return this.#users.find((u) => u.id === id);
     }
+
+    updateName(id: string, name: string): User | undefined {
+        const user = this.getById(id);
+
+        if (user) {
+            user.name = name;
+        }
+
+        return user;
+    }
 }
 
 export const usersDb = new UsersDb();

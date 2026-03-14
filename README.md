@@ -78,7 +78,33 @@ Key design decisions:
 - **Subagent protocol**: Every multi-agent step uses a drafter/reviewer pair (A drafts, B reviews and improves). The orchestrator spawns both — subagents never spawn further subagents.
 - **File-based coordination**: All inter-step communication goes through files in `./tmp/runs/[uuid]/`. This makes handoffs explicit and debuggable (see "Run folder artifacts" below).
 - **Test as the single gate**: The test skill owns all verification — both static (lint, modules, accessibility) and visual/interactive (browser screenshots via Chrome DevTools MCP). The code skill writes code; the test skill validates it.
-- **Acceptance criteria flow**: Plan tags each criterion. Test verifies them and writes results to `changes-*.md`. Merge reads results and populates the PR with pass/fail status.
+- **Acceptance criteria flow**: Plan tags each criterion. Test verifies them and writes results to `changes-*.md`. Merge reads results and populates the PR with pass/fail status. See [Acceptance criteria flow](#acceptance-criteria-flow) below.
+
+#### Acceptance criteria flow
+
+Every PR carries a machine-verified checklist proving the change works — visible directly in the PR body so reviewers don't have to manually verify behavior.
+
+**1. Plan** — The plan skill writes acceptance criteria in `plan.md`. Each criterion is tagged by how it will be verified:
+
+| Tag             | Verified by                                    |
+| --------------- | ---------------------------------------------- |
+| `[static]`      | Lint, typecheck, module validation             |
+| `[visual]`      | Launching the app and inspecting a screenshot  |
+| `[interactive]` | Clicking, typing, or navigating in the browser |
+
+Criteria must be specific enough for an agent with Chrome DevTools to verify (e.g., "dialog has readable text on dark background", not "dark mode looks good").
+
+**2. Test** — The test skill runs static checks first, then opens a browser to verify `[visual]` and `[interactive]` criteria via screenshots and interaction. If anything fails, the orchestrator loops back to the code skill (up to 5 iterations) until all criteria pass.
+
+**3. Merge** — The merge skill publishes the final pass/fail results into the PR body:
+
+```markdown
+## Verified acceptance criteria
+
+- ✅ `[static]` Types compile with no errors
+- ✅ `[visual]` Delete button has white text on red background
+- ✅ `[interactive]` Pressing Escape closes the modal
+```
 
 #### Run folder artifacts
 

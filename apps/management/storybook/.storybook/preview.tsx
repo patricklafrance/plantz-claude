@@ -7,7 +7,7 @@ initialize({ onUnhandledRequest: "bypass", quiet: true });
 
 const preview: Preview = {
     initialGlobals: {
-        theme: process.env.STORYBOOK_THEME || "light",
+        theme: import.meta.env.STORYBOOK_THEME || "light",
     },
     decorators: [
         withThemeByClassName({

@@ -36,7 +36,7 @@ This skill runs in one of two modes, determined by the inputs:
 4. **Fix mode only — assess before coding.** Read every issue in the issues file and attempt all fixes. For any fix where the plan's approach seems fundamentally mismatched — the plan assumed a component decomposition or data flow that doesn't work, a library choice is fighting the framework, or the fix requires cross-module access the plan didn't anticipate — explain the specific concern in `changes-[iteration].md` under **Notes** (what about the plan is wrong, not just "this is hard"). Fix the issue anyway to the best of your ability. **Only Subagent B writes escalation files** — A never escalates directly.
 5. **Plan mode only:** If the plan requires scaffolding a new module, load and use the `plantz-scaffold-domain-module` skill. If it requires a new Storybook, use `plantz-scaffold-domain-storybook`.
 6. **Start the dev server or Storybook before implementing.** Run the appropriate root script for the affected package — `pnpm dev-host` for app routes, or the matching `pnpm dev-{domain}-storybook` for stories (e.g., `pnpm dev-today-storybook`). Use Chrome DevTools MCP tools to see what you're building as you go. Implement the changes with the browser open — navigate to relevant pages, take screenshots to check your work, and course-correct as you code. Follow all technology rules from this skill's `references/` files.
-7. Write a summary of all changes to `./tmp/runs/[run-uuid]/changes-[iteration].md`.
+7. Write a summary of all changes to `./tmp/runs/[run-uuid]/changes-[iteration].md`. **Plan mode only:** before writing, review your implementation for any choice where a reasonable reviewer might pick differently — state placement, component boundaries, data flow, patterns that look wrong but are intentional, alternatives you tried and rejected. Document these in the **Decisions & Trade-offs** section. Zero entries is fine if the implementation was straightforward; aim for 2-5 when there are genuine trade-offs. Fix iterations skip this section.
 
 ## Changes File Format
 
@@ -59,6 +59,10 @@ This skill runs in one of two modes, determined by the inputs:
 
 - `package-name` in `workspace-package` — [why needed]
 
+## Decisions & Trade-offs
+
+[Choices where a reasonable reviewer might pick a different approach. For each: what you chose, the alternative considered, and why. Omit in fix iterations.]
+
 ## Notes
 
 [Anything the test or document phases should know about]
@@ -74,11 +78,21 @@ This skill runs in one of two modes, determined by the inputs:
 
 **Subagent A** implements the full change set and writes `changes-[iteration].md`. If A encounters plan-level concerns in fix mode, it flags them in the **Notes** section for B to evaluate.
 
-**Subagent B** has three responsibilities, in order:
+**Subagent B** reviews and improves A's work.
 
-1. **Code review.** Read every changed file listed in `changes-[iteration].md`. Fix mechanical issues (semicolons, import paths, missing exports) and substantive issues (component structure, accessibility gaps, missing dark mode variants, incorrect patterns). Update `changes-[iteration].md` to reflect modifications. Do not defer fixable concerns — resolve them.
+Start by reading the **plan file** to form independent expectations of what the code should look like — A's decisions are context, not justification.
 
-2. **Run workspace tests.** Run all workspace tests from the workspace root:
+**Fix threshold.** Fix code that violates the plan, an ADR/ODR, or a loaded skill's rules. Do not rewrite working code that follows a valid alternative pattern — note disagreements in Notes if they matter for future iterations.
+
+**Decisions preservation.** When editing `changes-[iteration].md`, amend A's Decisions entries rather than deleting them. Annotate with `**B:**` — confirm, qualify, or override with an explanation.
+
+B has four responsibilities, in order:
+
+1. **Code review.** In plan mode, cross-check the plan's File Changes section against A's changes file — flag missing files, unexpected files, or decomposition that diverges from the plan. Then read every changed file. Fix mechanical issues and substantive issues (plan deviations, component structure, accessibility gaps, missing dark mode variants, incorrect patterns). Update `changes-[iteration].md` to reflect modifications. Do not defer fixable concerns — resolve them.
+
+2. **Loading performance review.** For every changed file that adds or modifies data fetching, route definitions, or component imports: verify compliance with the `workleap-react-best-practices` skill's **async-rules** and **bundle-rules**, and flag unnecessary loading states. Fix violations directly and note fixes in `changes-[iteration].md` under **Notes**.
+
+3. **Run workspace tests.** Run all workspace tests from the workspace root:
 
     ```bash
     pnpm test
@@ -112,7 +126,7 @@ This skill runs in one of two modes, determined by the inputs:
 
     If the Storybook Vitest a11y project is not configured for the affected domain, skip this step and note it in `changes-[iteration].md` under **Notes**.
 
-3. **Escalation check.** Read the **Notes** section of `changes-[iteration].md` for any plan-level concerns A flagged, then investigate the code for brute-force signals: type suppressions (`as any`, `@ts-ignore`), lint-disable comments, wrapper components that exist only to bridge a bad abstraction, or growing complexity relative to the problem being solved. These are indicators to investigate for underlying plan problems, not automatic escalation triggers — a pragmatic `as any` bridging an external library's type gap is not a plan problem.
+4. **Escalation check.** Read the **Notes** section of `changes-[iteration].md` for any plan-level concerns A flagged, then investigate the code for brute-force signals: type suppressions (`as any`, `@ts-ignore`), lint-disable comments, wrapper components that exist only to bridge a bad abstraction, or growing complexity relative to the problem being solved. These are indicators to investigate for underlying plan problems, not automatic escalation triggers — a pragmatic `as any` bridging an external library's type gap is not a plan problem.
 
     **Escalation threshold:** Escalate only when the plan's approach is fundamentally wrong and no amount of code editing can fix it. Examples: the plan decomposed components in a way that makes the required data flow impossible; the plan chose a library that conflicts with the framework; the plan assumed module boundaries that force a cross-module import. Do NOT escalate for: difficulty, missing details the code agent can infer, suboptimal but workable approaches, or issues that the test phase will catch.
 

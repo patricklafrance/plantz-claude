@@ -21,6 +21,10 @@ The real validation gate is the `plantz-adlc-test` phase — B improves quality 
 
 **Subagent lifecycle:** Claude Code subagents are stateless. Each spawned subagent starts fresh. Context is passed between iterations via files in `./tmp/runs/[run-uuid]/`. Always spawn new subagents with the relevant file paths — never refer to "existing subagents."
 
+## Hard Constraints
+
+- **Never edit repository files directly** — only `./tmp/runs/` and git/shell commands. All source code, config, docs, and tests go through subagents. The orchestrator's context window is too scarce to spend on code. If a change seems "too small to delegate," delegate it anyway.
+
 ## Port Cleanup Between Subagents
 
 **After every code or test subagent returns**, kill any processes listening on ports 8080 and 6006 before spawning the next subagent.
@@ -73,6 +77,8 @@ Spawn **one** subagent with the `simplify` skill to review the uncommitted chang
 
 If the subagent crashes or returns no output, log a warning and continue.
 
+After the simplify subagent returns, if it made changes, append a `## Simplify` section to `changes-[iteration].md` listing the files it modified and what it removed. This keeps the changes file accurate for downstream phases (test, document, merge).
+
 ### Step 6 — Test and iterate
 
 Spawn two subagents using the `plantz-adlc-test` skill.
@@ -106,7 +112,7 @@ After the merge subagent creates the PR (or confirms one exists), query the PR n
 The merge subagent returns in one of two ways:
 
 - **Success:** All CI checks passed and the `run chromatic` label was added to trigger visual regression testing. Chromatic runs asynchronously — the agent does not wait for it. Proceed to Step 9.
-- **CI failure:** The merge subagent writes `ci-issues-[CI iteration].md` and stops. Check `CI iteration` in `orchestrator-state.md` — if ≥ 3, follow the failure handling procedure (maximum 3 CI iterations). Otherwise, set `Current step: 8-ci-fix`. Spawn `plantz-adlc-code` subagents (2 subagents, following the subagent protocol) with: `run-uuid`, `iteration` = `Test iteration` + `CI iteration` (to avoid overwriting test-phase artifacts), plan path, the CI issues file, the latest changes file, and escalation context (`null` unless a prior escalation was rejected). After the code subagent returns, run the escalation check (see "Escalation Check"). If no escalation, increment `CI iteration` in state and spawn a new merge subagent (passing the new `CI iteration`) to commit, push, and resume monitoring.
+- **CI failure:** The merge subagent writes `ci-issues-[CI iteration].md` and stops. Check `CI iteration` in `orchestrator-state.md` — if ≥ 3, follow the failure handling procedure (maximum 3 CI iterations). Otherwise, set `Current step: 8-ci-fix`. Spawn `plantz-adlc-code` subagents (2 subagents, following the subagent protocol) with: `run-uuid`, `iteration` = `Test iteration` + `CI iteration` (to avoid overwriting test-phase artifacts), plan path, the CI issues file, the latest changes file, and escalation context (`null` unless a prior escalation was rejected). After the code subagent returns, run the escalation check (see "Escalation Check"). If no escalation, increment `CI iteration` in state and spawn a new merge subagent (passing `Iteration` = `Test iteration` + new `CI iteration`, and the new `CI iteration`) to commit, push, and resume monitoring.
 
 ### Step 9 — Clean up
 

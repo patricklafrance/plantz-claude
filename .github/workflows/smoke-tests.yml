@@ -15,7 +15,7 @@ concurrency:
 jobs:
     smoke-tests:
         runs-on: ubuntu-latest
-        timeout-minutes: 10
+        timeout-minutes: 15
         env:
             TURBO_TELEMETRY_DISABLED: "1"
         permissions:

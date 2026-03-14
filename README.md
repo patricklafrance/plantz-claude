@@ -106,6 +106,14 @@ Criteria must be specific enough for an agent with Chrome DevTools to verify (e.
 - ✅ `[interactive]` Pressing Escape closes the modal
 ```
 
+#### Escalation process
+
+Sometimes a plan's approach is structurally wrong — no amount of code iteration can fix it. The escalation process handles this.
+
+Only the reviewing subagent (B) can escalate — never the drafter. This separation prevents the agent that wrote the code from vetoing its own plan. B writes an escalation file describing the problem, evidence, and a proposed alternative. The orchestrator then judges whether the issue is genuinely structural or whether the reviewer is being overly cautious. If justified, the plan is revised and implementation restarts from scratch. If rejected, the run continues normally and the rejected escalation is carried forward as context to prevent the same concern from resurfacing.
+
+A maximum of one plan revision is allowed per run — the system fails fast rather than entering an endless redesign loop.
+
 #### Run folder artifacts
 
 Every ADLC run produces files in `./tmp/runs/[uuid]/` that flow between subagents:

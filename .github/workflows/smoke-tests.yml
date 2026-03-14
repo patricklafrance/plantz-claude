@@ -15,7 +15,7 @@ concurrency:
 jobs:
     smoke-tests:
         runs-on: ubuntu-latest
-        timeout-minutes: 30
+        timeout-minutes: 10
         env:
             TURBO_TELEMETRY_DISABLED: "1"
         permissions:
@@ -84,7 +84,7 @@ jobs:
                       If the app fails to start or has console errors, report the failure as a PR comment.
                       If the app passes, post a summary comment with the results table.
                   claude_args: >-
-                      --allowedTools Read,Glob,Grep,Bash(pnpm:*,node:*,mkdir:*,rm:*,lsof:*,kill:*,agent-browser:*),Skill,Task*
+                      --allowedTools Read,Glob,Grep,Bash(pnpm:*,node:*,mkdir:*,rm:*,lsof:*,kill:*,pkill:*,agent-browser:*),Skill,Task*
               env:
                   GH_TOKEN: ${{ github.token }}
 

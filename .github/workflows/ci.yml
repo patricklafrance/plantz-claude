@@ -64,7 +64,11 @@ jobs:
                   fi
 
             - name: Size limit
-              run: pnpm sizecheck
+              # Only run if the build produced bundle output; the filtered build may skip @apps/host.
+              run: |
+                  if [ -d "apps/host/dist/static/js" ]; then
+                      pnpm sizecheck
+                  fi
 
             - name: Oxlint
               run: |

@@ -121,8 +121,8 @@ The merge subagent returns in one of two ways:
     - Update `orchestrator-state.md` `Current step: 8-ci-test`.
     - Spawn new `plantz-adlc-test` subagents. Pass: `run-uuid`, `iteration` = `Test iteration` + `CI iteration`, plan path, previous issues path = `null`.
     - **Completion check:** Verify `changes-[iteration].md` contains `<!-- test-complete -->`. If absent, the test subagent crashed — follow failure handling.
-    - If `test-issues-[iteration].md` exists (test failed): treat as a CI failure — return to the CI iteration check above. The test failure consumes one attempt from the shared budget.
-    - If no issues file exists and the marker is present (test passed): spawn a new merge subagent with `Iteration` = `Test iteration` + `CI iteration`, and the current `CI iteration`. On success, proceed to Step 9. On CI failure, return to the CI iteration check above.
+    - If `test-issues-[iteration].md` exists (test failed): treat as a CI failure — return to the top of the CI failure flow above. The test failure consumes one attempt from the shared budget.
+    - If no issues file exists and the marker is present (test passed): spawn a new merge subagent with `Iteration` = `Test iteration` + `CI iteration`, and the current `CI iteration`. On success, proceed to Step 9. On CI failure, return to the top of the CI failure flow above.
 
 ### Step 9 — Clean up
 

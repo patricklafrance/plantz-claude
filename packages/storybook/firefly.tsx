@@ -1,12 +1,18 @@
 /**
- * Minimal Squide Firefly helpers for the packages storybook.
+ * Squide Firefly helpers for Storybook.
  *
- * Stripped-down version of the domain storybook firefly.tsx — no LaunchDarkly,
- * no environment variables, no MSW plugin. Only what shell component stories need.
+ * Builder-agnostic replacement for @squide/firefly-rsbuild-storybook.
+ * Provides the same API but typed for @storybook/react-vite.
  */
 
-import { AppRouter, FireflyProvider, FireflyRuntime, type FireflyRuntimeOptions, FireflyRuntimeScope, type ModuleRegisterFunction, toLocalModuleDefinitions } from "@squide/firefly";
+import { EnvironmentVariablesPlugin, type EnvironmentVariables } from "@squide/env-vars";
+import { AppRouter, FireflyProvider, FireflyRuntime, type FireflyRuntimeOptions, FireflyRuntimeScope, InMemoryLaunchDarklyClient, type ModuleRegisterFunction, toLocalModuleDefinitions } from "@squide/firefly";
+import { LaunchDarklyPlugin, type FeatureFlags, isEditableLaunchDarklyClient, useLaunchDarklyClient } from "@squide/launch-darkly";
+import { MswPlugin } from "@squide/msw";
 import type { Decorator } from "@storybook/react-vite";
+import type { RootLogger } from "@workleap/logging";
+import type { LDClient } from "launchdarkly-js-client-sdk";
+import { type PropsWithChildren, useEffect, useRef } from "react";
 import { createMemoryRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 
@@ -33,13 +39,26 @@ class StorybookRuntimeScope extends FireflyRuntimeScope {}
 
 export interface InitializeFireflyForStorybookOptions {
     localModules?: ModuleRegisterFunction<FireflyRuntime>[];
+    environmentVariables?: EnvironmentVariables;
+    featureFlags?: Partial<FeatureFlags>;
+    launchDarklyClient?: LDClient;
+    loggers?: RootLogger[];
+    useMsw?: boolean;
 }
 
 export async function initializeFireflyForStorybook(options: InitializeFireflyForStorybookOptions = {}): Promise<StorybookRuntime> {
-    const { localModules = [] } = options;
+    const { localModules = [], environmentVariables, featureFlags = {}, launchDarklyClient, loggers, useMsw = true } = options;
+
+    const plugins: FireflyRuntimeOptions["plugins"] = [(x) => new EnvironmentVariablesPlugin(x, { variables: environmentVariables }), (x) => new LaunchDarklyPlugin(x, launchDarklyClient ?? new InMemoryLaunchDarklyClient(featureFlags))];
+
+    if (useMsw) {
+        plugins.push((x) => new MswPlugin(x));
+    }
 
     const runtime = new StorybookRuntime({
         mode: "development",
+        plugins,
+        loggers,
     });
 
     if (localModules.length > 0) {
@@ -53,12 +72,48 @@ export async function initializeFireflyForStorybook(options: InitializeFireflyFo
 
 // --- withFireflyDecorator ---
 
-export function withFireflyDecorator(runtime: FireflyRuntime): Decorator {
-    return (story) => (
+export interface FireflyDecoratorProps extends PropsWithChildren {
+    runtime: FireflyRuntime;
+}
+
+export function FireflyDecorator({ runtime, children: story }: FireflyDecoratorProps) {
+    return (
         <FireflyProvider runtime={runtime}>
             <AppRouter strictMode={false}>
-                {({ rootRoute, routerProps, routerProviderProps }) => <RouterProvider router={createMemoryRouter([{ element: rootRoute, children: [{ path: "/story", element: story() }] }], { ...routerProps, initialEntries: ["/story"] })} {...routerProviderProps} />}
+                {({ rootRoute, routerProps, routerProviderProps }) => <RouterProvider router={createMemoryRouter([{ element: rootRoute, children: [{ path: "/story", element: story }] }], { ...routerProps, initialEntries: ["/story"] })} {...routerProviderProps} />}
             </AppRouter>
         </FireflyProvider>
     );
+}
+
+export function withFireflyDecorator(runtime: FireflyRuntime): Decorator {
+    return (story) => <FireflyDecorator runtime={runtime}>{story()}</FireflyDecorator>;
+}
+
+// --- withFeatureFlagsOverrideDecorator ---
+
+function OverrideFeatureFlags({ overrides, children }: PropsWithChildren<{ overrides: Partial<FeatureFlags> }>) {
+    const transactionRef = useRef<{ undo: () => void } | undefined>(undefined);
+    const client = useLaunchDarklyClient();
+
+    if (!transactionRef.current) {
+        if (!isEditableLaunchDarklyClient(client)) {
+            throw new Error("[squide] The withFeatureFlagsOverrideDecorator hook can only be used with an EditableLaunchDarklyClient instance.");
+        }
+        transactionRef.current = client.startTransaction();
+        client.setFeatureFlags(overrides);
+    }
+
+    useEffect(() => {
+        return () => {
+            transactionRef.current?.undo();
+            transactionRef.current = undefined;
+        };
+    }, [transactionRef]);
+
+    return children;
+}
+
+export function withFeatureFlagsOverrideDecorator(overrides: Partial<FeatureFlags>): Decorator {
+    return (story) => <OverrideFeatureFlags overrides={overrides}>{story()}</OverrideFeatureFlags>;
 }

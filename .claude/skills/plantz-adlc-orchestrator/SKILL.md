@@ -113,8 +113,9 @@ The merge subagent returns in one of two ways:
 
 - **Success:** All CI checks passed and the `run chromatic` label was added to trigger visual regression testing. Chromatic runs asynchronously — the agent does not wait for it. Proceed to Step 9.
 - **CI failure:** The merge subagent writes `ci-issues-[CI iteration].md` and stops.
-    - Check `CI iteration` in `orchestrator-state.md` — if > 3, follow the failure handling procedure (maximum 3 fix attempts).
-    - Increment `CI iteration`. Update `orchestrator-state.md` with the new value and set `Current step: 8-ci-fix`.
+    - Increment `CI iteration`. Update `orchestrator-state.md` with the new value.
+    - Check `CI iteration` — if > 3, follow the failure handling procedure (maximum 3 fix attempts).
+    - Set `Current step: 8-ci-fix`.
     - Spawn new `plantz-adlc-code` subagents. Pass: `run-uuid`, `iteration` = `Test iteration` + `CI iteration`, plan path, the issues file from the triggering failure (`ci-issues-*.md` or `test-issues-*.md`), the latest changes file, and escalation context (`null` unless a prior escalation was rejected). They produce `changes-[iteration].md`.
     - **Escalation check:** After the code subagent returns, follow the escalation check procedure (see "Escalation Check").
     - Update `orchestrator-state.md` `Current step: 8-ci-test`.
@@ -157,7 +158,7 @@ This allows the orchestrator to recover if the context window is compacted mid-r
 Two iteration counters, both starting at 1:
 
 - **`Test iteration`** (Step 6): Incremented after each test failure. Passed to code and test subagents. Artifacts: `changes-[N].md`, `test-issues-[N].md`. Maximum 5.
-- **`CI iteration`** (Step 8): Starts at 0. Incremented before each fix attempt in the CI fix loop. Code and test subagents receive `iteration` = `Test iteration` + `CI iteration` (avoids collisions with Step 6 artifacts). CI issues: `ci-issues-[N].md`. Maximum 3 fix attempts (fail the run when `CI iteration > 3`).
+- **`CI iteration`** (Step 8): Starts at 0. Incremented on each failure, then checked before the fix runs. Code and test subagents receive `iteration` = `Test iteration` + `CI iteration` (avoids collisions with Step 6 artifacts). CI issues: `ci-issues-[N].md`. Maximum 3 fix attempts (fail the run when `CI iteration > 3`).
 
 ## Escalation Check
 

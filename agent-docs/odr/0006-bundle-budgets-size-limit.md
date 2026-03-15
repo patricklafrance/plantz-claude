@@ -22,4 +22,3 @@ Use size-limit with per-app budgets enforced in CI (Option 1). Each deployable a
 ## Consequences
 
 Configuration lives in each app's `.size-limit.json` (e.g., `apps/host/.size-limit.json`). Dependencies (`size-limit`, `@size-limit/file`) are installed in the app's own `package.json`, not the root. The root `package.json` provides `pnpm sizecheck` as the entry point.
-

@@ -67,7 +67,7 @@ that tooling cannot make.
 - **Bad:** "Search for the comment via `gh pr view {number} --json comments --jq '.comments[] | select(.body | startswith("## CI Validation")) | .id'`, then update it with `gh api -X PATCH repos/{owner}/{repo}/issues/comments/{id} -f body="..."`."
 - **Good:** "Search for an existing comment starting with `## CI Validation` on the PR. If found, update it in place. If not found, create a new one."
 
-Describe *what* the agent should achieve, not *which commands* to run. Agents know their tools — hardcoding commands makes instructions brittle (flags change, better approaches exist) and wastes context on information the agent already has. Reserve specific commands for cases where the exact invocation is non-obvious or repo-specific.
+Describe _what_ the agent should achieve, not _which commands_ to run. Agents know their tools — hardcoding commands makes instructions brittle (flags change, better approaches exist) and wastes context on information the agent already has. Reserve specific commands for cases where the exact invocation is non-obvious or repo-specific.
 
 ## Guardrails
 

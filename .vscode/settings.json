@@ -37,6 +37,10 @@
         {
             "fileMatch": ["chromatic.config.json"],
             "url": "https://www.chromatic.com/config-file.schema.json"
+        },
+        {
+            "fileMatch": ["knip.json"],
+            "url": "https://unpkg.com/knip@5/schema-jsonc.json"
         }
     ]
 }

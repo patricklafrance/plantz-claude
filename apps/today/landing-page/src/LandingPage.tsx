@@ -7,6 +7,7 @@ import type { Plant } from "@packages/core-plants";
 
 import { PlantDetailDialog } from "./PlantDetailDialog.tsx";
 import { useTodayPlantsCollection } from "./TodayPlantsContext.tsx";
+import { VacationPlanBanner } from "./VacationPlanBanner.tsx";
 
 export function LandingPage() {
     const { filters, updateFilter, clearFilters, hasActiveFilters } = usePlantFilters();
@@ -66,6 +67,8 @@ export function LandingPage() {
             <div className="flex items-center justify-between">
                 <h1 className="text-xl font-semibold">Today</h1>
             </div>
+
+            <VacationPlanBanner />
 
             <FilterBar filters={filters} onFilterChange={updateFilter} onClear={clearFilters} hasActiveFilters={hasActiveFilters} showDueForWatering={false} />
 

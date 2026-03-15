@@ -3,6 +3,7 @@ import type { QueryClient } from "@tanstack/react-query";
 
 import { createTodayVacationPlantsCollection } from "./plantsCollection.ts";
 import { TodayVacationPlantsCollectionProvider } from "./TodayVacationPlantsContext.tsx";
+import { VacationPlannerNavLabel } from "./VacationPlannerNavLabel.tsx";
 
 function registerRoutes(runtime: FireflyRuntime, collection: ReturnType<typeof createTodayVacationPlantsCollection>) {
     runtime.registerRoute({
@@ -22,7 +23,7 @@ function registerRoutes(runtime: FireflyRuntime, collection: ReturnType<typeof c
 
     runtime.registerNavigationItem({
         $id: "today-vacation-planner",
-        $label: "Vacation Planner",
+        $label: <VacationPlannerNavLabel />,
         $priority: 95,
         to: "/today/vacation-planner",
     });

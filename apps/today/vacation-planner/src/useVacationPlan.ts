@@ -91,6 +91,7 @@ export function useVacationPlan() {
         if (response.ok) {
             const savedPlan = { ...state.plan, status: "active" as const, updatedAt: new Date() };
             dispatch({ type: "SAVE_COMPLETE", plan: savedPlan });
+            window.dispatchEvent(new CustomEvent("vacation-plan-changed", { detail: { active: true } }));
         }
     }, [state.plan, state.recommendations]);
 
@@ -104,6 +105,7 @@ export function useVacationPlan() {
         });
 
         dispatch({ type: "CANCEL_COMPLETE" });
+        window.dispatchEvent(new CustomEvent("vacation-plan-changed", { detail: { active: false } }));
     }, [state.plan]);
 
     const overrideRecommendation = useCallback((plantId: string, newType: RecommendationType) => {

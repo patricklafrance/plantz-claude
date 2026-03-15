@@ -32,7 +32,7 @@ function makePlant(overrides: Partial<Plant> = {}): Plant {
 }
 
 const meta = {
-    title: "Packages/PlantsCore/Components/PlantListItem",
+    title: "Packages/CorePlants/Components/PlantListItem",
     component: PlantListItem,
     parameters: {
         chromatic: {

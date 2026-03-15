@@ -11,6 +11,7 @@ const storybookConfig: StorybookConfig = {
     stories: [
         // Packages
         "../../../packages/components/src/**/*.stories.tsx",
+        "../../../packages/core-module/src/**/*.stories.tsx",
         "../../../packages/core-plants/src/**/*.stories.tsx",
         // Management
         "../../management/plants/src/**/*.stories.tsx",

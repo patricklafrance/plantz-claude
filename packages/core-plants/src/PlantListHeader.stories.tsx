@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { PlantListHeader } from "./PlantListHeader.tsx";
 
 const meta = {
-    title: "Packages/PlantsCore/Components/PlantListHeader",
+    title: "Packages/CorePlants/Components/PlantListHeader",
     component: PlantListHeader,
     parameters: {
         chromatic: {

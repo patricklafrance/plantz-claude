@@ -12,14 +12,14 @@ Handle committing, pushing, opening a PR, and monitoring CI. Uses a **single sub
 
 ## Inputs (provided by orchestrator)
 
-| Input        | Description                                                                                                                               |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `run-uuid`   | Run folder identifier                                                                                                                     |
-| Branch name  | The branch created in the orchestrator step 2                                                                                             |
-| Commit type  | Conventional commit prefix: `feat`, `fix`, `chore`, `docs`, or `refactor`                                                                 |
-| Plan path    | `./tmp/runs/[run-uuid]/plan.md` — needed for acceptance criteria                                                                          |
-| Iteration    | The final iteration number — used to find `changes-[iteration].md` for `## Verification results`                                          |
-| CI iteration | Current CI fix iteration number (1-3), provided by orchestrator. Used to name `ci-issues-[iteration].md`. Defaults to `1` on first merge. |
+| Input        | Description                                                                                                                                                                                                                                                                                          |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `run-uuid`   | Run folder identifier                                                                                                                                                                                                                                                                                |
+| Branch name  | The branch created in the orchestrator step 2                                                                                                                                                                                                                                                        |
+| Commit type  | Conventional commit prefix: `feat`, `fix`, `chore`, `docs`, or `refactor`                                                                                                                                                                                                                            |
+| Plan path    | `./tmp/runs/[run-uuid]/plan.md` — needed for acceptance criteria                                                                                                                                                                                                                                     |
+| Iteration    | The final iteration number. To find `## Verification results`, scan backwards from `changes-[iteration].md` through earlier `changes-*.md` files until one contains the section. During CI fix cycles the latest changes file may lack verification results because only the test skill writes them. |
+| CI iteration | Current CI fix iteration number (0-3), provided by orchestrator. Used to name `ci-issues-[iteration].md`. Defaults to `0` on first merge.                                                                                                                                                            |
 
 ## Step 1 — Commit
 
@@ -103,14 +103,14 @@ If `gh pr create` fails, retry once. If it fails again, **stop and write `ci-iss
 
 Not all CI workflows report results the same way. Some report via check run status (the workflow itself fails), while others always exit successfully and post results as **PR comments**.
 
-| Workflow                        | Reports via            | Notes                                                         |
-| ------------------------------- | ---------------------- | ------------------------------------------------------------- |
-| `CI` (ci.yml)                   | Check run status       | Monitored                                                     |
-| `Code Review` (code-review.yml) | Check run status       | Monitored                                                     |
-| `Smoke Tests` (smoke-tests.yml) | PR comment             | Monitored — scan bot comments for failure indicators           |
-| `Lighthouse CI` (lighthouse.yml)| Check run status       | Monitored                                                     |
-| `Chromatic` (chromatic.yml)     | Check run status       | Excluded — label-gated, runs after merge skill exits          |
-| `Claude` (claude.yml)           | —                      | Excluded — triggered by `@claude` mentions, not CI            |
+| Workflow                         | Reports via      | Notes                                                |
+| -------------------------------- | ---------------- | ---------------------------------------------------- |
+| `CI` (ci.yml)                    | Check run status | Monitored                                            |
+| `Code Review` (code-review.yml)  | Check run status | Monitored                                            |
+| `Smoke Tests` (smoke-tests.yml)  | PR comment       | Monitored — scan bot comments for failure indicators |
+| `Lighthouse CI` (lighthouse.yml) | Check run status | Monitored                                            |
+| `Chromatic` (chromatic.yml)      | Check run status | Excluded — label-gated, runs after merge skill exits |
+| `Claude` (claude.yml)            | —                | Excluded — triggered by `@claude` mentions, not CI   |
 
 **Monitored workflows:** `CI`, `Code Review`, `Smoke Tests`, `Lighthouse CI`. These are tracked in the CI Validation comment.
 

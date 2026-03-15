@@ -20,8 +20,23 @@ function applyMode(mode: ColorMode) {
     document.documentElement.classList.toggle("dark", isDark);
 }
 
-let currentMode = getStoredMode();
+let currentMode: ColorMode | undefined;
+let initialized = false;
 const listeners = new Set<() => void>();
+
+function ensureInitialized() {
+    if (initialized) return;
+    initialized = true;
+
+    currentMode = getStoredMode();
+    applyMode(currentMode);
+
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+        if (currentMode === "system") {
+            applyMode("system");
+        }
+    });
+}
 
 function subscribe(listener: () => void) {
     listeners.add(listener);
@@ -30,10 +45,13 @@ function subscribe(listener: () => void) {
 }
 
 function getSnapshot(): ColorMode {
-    return currentMode;
+    ensureInitialized();
+
+    return currentMode!;
 }
 
 function setMode(mode: ColorMode) {
+    ensureInitialized();
     currentMode = mode;
     localStorage.setItem(STORAGE_KEY, mode);
     applyMode(mode);
@@ -42,16 +60,6 @@ function setMode(mode: ColorMode) {
         listener();
     }
 }
-
-// Apply on load.
-applyMode(currentMode);
-
-// Listen for OS preference changes (matters when mode is "system").
-window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-    if (currentMode === "system") {
-        applyMode("system");
-    }
-});
 
 export function useColorMode() {
     const mode = useSyncExternalStore(subscribe, getSnapshot);

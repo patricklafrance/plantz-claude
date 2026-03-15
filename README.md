@@ -148,16 +148,16 @@ Hard constraints that skills cannot bypass — enforced at the tool level (hooks
 
 Shell scripts that run automatically before or after agent tool calls, enforcing architectural rules in real time.
 
-| Hook                                           | Trigger           | What it does                                                        |
-| ---------------------------------------------- | ----------------- | ------------------------------------------------------------------- |
-| `pre-bash--enforce-pnpm.sh`                    | Before Bash       | Blocks npm/npx — only pnpm allowed                                  |
-| `pre-bash--lint-on-commit.sh`                  | Before Bash       | Runs oxlint on staged files before git commit                       |
-| `pre-bash--no-file-level-disable-on-commit.sh` | Before Bash       | Rejects file-level `/* oxlint-disable */` comments on commit        |
-| `pre-bash--secret-scan.sh`                     | Before Bash       | Runs gitleaks on staged files before git commit — catches secrets   |
-| `pre-edit--protect-files.sh`                   | Before Edit/Write | Prevents modification of sensitive files                            |
-| `pre-edit--module-import-guard.sh`             | Before Edit/Write | Prevents cross-module imports (`@modules/*` packages stay isolated) |
-| `post-edit--format.sh`                         | After Edit/Write  | Formats with oxfmt                                                  |
-| `post-edit--lint.sh`                           | After Edit/Write  | Lints with oxlint — reports issues immediately                      |
+| Hook                                           | Trigger           | What it does                                                              |
+| ---------------------------------------------- | ----------------- | ------------------------------------------------------------------------- |
+| `pre-bash--enforce-pnpm.sh`                    | Before Bash       | Blocks npm/npx — only pnpm allowed                                        |
+| `pre-bash--lint-on-commit.sh`                  | Before Bash       | Runs oxlint on staged files before git commit                             |
+| `pre-bash--no-file-level-disable-on-commit.sh` | Before Bash       | Rejects file-level `/* oxlint-disable */` comments on commit              |
+| `pre-bash--secret-scan.sh`                     | Before Bash       | Runs gitleaks on staged files before git commit — catches secrets         |
+| `pre-edit--protect-files.sh`                   | Before Edit/Write | Prevents modification of sensitive files                                  |
+| `pre-edit--module-import-guard.sh`             | Before Edit/Write | Enforces architectural layering — blocks forbidden imports between layers |
+| `post-edit--format.sh`                         | After Edit/Write  | Formats with oxfmt                                                        |
+| `post-edit--lint.sh`                           | After Edit/Write  | Lints with oxlint — reports issues immediately                            |
 
 Hook names follow the `{event}--{what}.sh` convention so it's clear at a glance when a hook fires and what it does.
 

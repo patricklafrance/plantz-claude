@@ -34,7 +34,7 @@ Each domain is fully isolated — modules never import from each other. Each has
 
 ### Tech stack
 
-Node 24+, pnpm 10, TypeScript 7 (tsgo), Rsbuild, Vite (Storybooks), Tailwind CSS 4, TanStack DB, Storybook 10, Chromatic, Vitest, Playwright, oxlint, oxfmt, syncpack, knip.
+Node 24+, pnpm 10, TypeScript 7 (tsgo), Rsbuild, Vite (Storybooks), Tailwind CSS 4, TanStack DB, Storybook 10, Chromatic, Vitest, Playwright, oxlint, oxfmt, syncpack, knip, gitleaks.
 
 ---
 
@@ -153,6 +153,7 @@ Shell scripts that run automatically before or after agent tool calls, enforcing
 | `pre-bash--enforce-pnpm.sh`                    | Before Bash       | Blocks npm/npx — only pnpm allowed                                  |
 | `pre-bash--lint-on-commit.sh`                  | Before Bash       | Runs oxlint on staged files before git commit                       |
 | `pre-bash--no-file-level-disable-on-commit.sh` | Before Bash       | Rejects file-level `/* oxlint-disable */` comments on commit        |
+| `pre-bash--secret-scan.sh`                     | Before Bash       | Runs gitleaks on staged files before git commit — catches secrets   |
 | `pre-edit--protect-files.sh`                   | Before Edit/Write | Prevents modification of sensitive files                            |
 | `pre-edit--module-import-guard.sh`             | Before Edit/Write | Prevents cross-module imports (`@modules/*` packages stay isolated) |
 | `post-edit--format.sh`                         | After Edit/Write  | Formats with oxfmt                                                  |
@@ -164,7 +165,7 @@ Hook names follow the `{event}--{what}.sh` convention so it's clear at a glance 
 
 #### Static analysis
 
-Four tools run on every `pnpm lint` and in CI, catching issues before code is merged:
+Five tools run on every `pnpm lint` and in CI, catching issues before code is merged:
 
 | Tool     | What it enforces                                                                                        |
 | -------- | ------------------------------------------------------------------------------------------------------- |
@@ -172,6 +173,7 @@ Four tools run on every `pnpm lint` and in CI, catching issues before code is me
 | tsgo     | Native TypeScript type checker (`@typescript/native-preview`) — ensures type safety across all packages |
 | syncpack | Dependency version consistency — apps pin exact versions, packages use `^` ranges                       |
 | knip     | Dead code detection — unused files, unused/unlisted dependencies, unused exports                        |
+| gitleaks | Secret scanning — detects API keys, tokens, and credentials before they enter git history               |
 
 #### Bundle budgets
 
@@ -193,14 +195,14 @@ pnpm test           # Runs all workspace tests (including Storybook a11y) via Tu
 
 Seven GitHub Actions workflows, four of which involve Claude Code:
 
-| Workflow          | Trigger                         | Purpose                                                                   |
-| ----------------- | ------------------------------- | ------------------------------------------------------------------------- |
-| `ci.yml`          | Push to main, PRs               | Build, size-limit, lint (oxlint, oxfmt, typecheck, syncpack, knip), test  |
-| `lighthouse.yml`  | Push to main, PRs               | Lighthouse CI — performance gate (error below 0.5, 3 runs, median)        |
-| `chromatic.yml`   | Push to main, labeled PRs       | Visual regression testing — only affected Storybooks                      |
-| `claude.yml`      | `@claude` mention in issues/PRs | Claude Code agent responds to issues and PR comments                      |
-| `code-review.yml` | PRs opened/updated              | Automated code review by Claude (read-only tools)                         |
-| `smoke-tests.yml` | PRs to main                     | Smoke-tests all apps via Claude (scoped Bash, artifact upload on failure) |
+| Workflow          | Trigger                         | Purpose                                                                               |
+| ----------------- | ------------------------------- | ------------------------------------------------------------------------------------- |
+| `ci.yml`          | Push to main, PRs               | Secret scan, build, size-limit, lint (oxlint, oxfmt, typecheck, syncpack, knip), test |
+| `lighthouse.yml`  | Push to main, PRs               | Lighthouse CI — performance gate (error below 0.5, 3 runs, median)                    |
+| `chromatic.yml`   | Push to main, labeled PRs       | Visual regression testing — only affected Storybooks                                  |
+| `claude.yml`      | `@claude` mention in issues/PRs | Claude Code agent responds to issues and PR comments                                  |
+| `code-review.yml` | PRs opened/updated              | Automated code review by Claude (read-only tools)                                     |
+| `smoke-tests.yml` | PRs to main                     | Smoke-tests all apps via Claude (scoped Bash, artifact upload on failure)             |
 
 **Files:** [`.github/workflows/`](.github/workflows/), [`.github/prompts/`](.github/prompts/)
 

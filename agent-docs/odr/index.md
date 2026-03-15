@@ -8,3 +8,5 @@
 | Apps pin all deps; packages use `^` for prod/peer; enforced by syncpack                      | [ODR-0002](0002-dependency-versioning-syncpack.md) |
 | Chromatic runs are label-gated and skip unaffected Storybooks via `getAffectedStorybooks.ts` | [ODR-0003](0003-selective-chromatic-runs.md)       |
 | Packages expose source via `exports` (JIT); no pre-build needed for dev                      | [ODR-0004](0004-jit-packages.md)                   |
+| Knip detects unused files, dependencies, and exports; runs as `//#knip` in the lint pipeline | [ODR-0005](0005-knip-dead-code-detection.md)       |
+| Bundle budgets via size-limit; CI gate with agent policy for budget management                | [ODR-0006](0006-bundle-budgets-size-limit.md)      |

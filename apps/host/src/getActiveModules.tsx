@@ -2,6 +2,7 @@ import type { ModuleRegisterFunction, FireflyRuntime } from "@squide/firefly";
 import type { QueryClient } from "@tanstack/react-query";
 
 import { registerManagementPlants } from "@modules/management-plants";
+import { registerManagementUser } from "@modules/management-user";
 import { registerTodayLandingPage } from "@modules/today-landing-page";
 
 interface ModuleEntry {
@@ -10,6 +11,7 @@ interface ModuleEntry {
 
 const ModuleRegistry: Record<string, ModuleEntry> = {
     "management/plants": { register: registerManagementPlants },
+    "management/user": { register: registerManagementUser },
     "today/landing-page": { register: registerTodayLandingPage },
 };
 

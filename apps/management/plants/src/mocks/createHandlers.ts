@@ -1,6 +1,6 @@
 import { delay, http, HttpResponse } from "msw";
 
-import type { Plant } from "@packages/plants-core";
+import type { Plant } from "@packages/core-plants";
 
 export type PlantsData = Plant[] | "loading" | "error";
 

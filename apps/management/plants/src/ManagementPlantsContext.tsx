@@ -1,6 +1,6 @@
 import { createContext, useContext, type ReactNode } from "react";
 
-import type { PlantsCollection } from "@packages/plants-core/collection";
+import type { PlantsCollection } from "@packages/core-plants/collection";
 
 const ManagementPlantsCollectionContext = createContext<PlantsCollection | null>(null);
 

@@ -22,14 +22,15 @@ The single validation gate for all code quality. Runs static checks (lint, modul
 ## Procedure
 
 1. Read all `./tmp/runs/[run-uuid]/changes-*.md` files (1 through current iteration) to build the cumulative set of affected files. This ensures accessibility checks cover the full feature scope, not just the latest fix.
-2. Read all files in this skill's `references/` directory for technology rules and quality standards.
+2. Read these reference files for technology rules and quality standards: `agent-docs/references/msw-tanstack-query.md`, `agent-docs/references/storybook.md`, `agent-docs/references/tailwind-postcss.md`, `agent-docs/references/shadcn.md`, `agent-docs/references/color-mode.md`, `agent-docs/references/bundle-size-budget.md`.
 3. Run `pnpm lint` from the workspace root. This includes typecheck and syncpack. Record any errors.
-4. Load the `plantz-validate-modules` skill and validate all modules. Record any failures.
-5. **Accessibility review** (static): Load the `accessibility` skill. Review every changed file for WCAG AA violations — focus on semantic HTML, interactive element labelling, form error associations, color-only indicators, and live regions. For each failure, include the file path and element reference so the code skill can act on it.
-6. **Browser verification**: Read `plan.md` and extract all `[visual]` and `[interactive]` acceptance criteria. If any exist, follow the browser verification procedure (below) to verify them. Record pass/fail for each criterion.
-7. **Workspace tests**: Run `pnpm test` from the workspace root. This runs all workspace test tasks (including Storybook a11y). See the workspace tests procedure (below). This step runs **unconditionally** — it is not gated by `[visual]`/`[interactive]` criteria.
-8. **Regression check** (iteration > 1 only): If a previous issues path was provided and that file exists, compare the current iteration's issues with the previous iteration's issues. Any issue in the current run that was NOT present in the previous iteration is a regression introduced by the fix cycle. Prefix these with `⚠️ REGRESSION:` in the issues file so the code skill knows to revert the offending change rather than pile on more fixes. If the previous issues file doesn't exist (previous iteration passed), treat all current issues as regressions.
-9. **Always** write the final `## Verification results` section into the latest `changes-[iteration].md` file (add it after `## Notes`), regardless of whether checks passed or failed. The merge skill needs this section to populate the PR. End the section with the completion marker `<!-- test-complete -->` as the very last line — this is how the orchestrator distinguishes "all checks passed" from "subagent crashed." Use this format:
+4. Run `pnpm sizecheck` to check bundle budgets. If it fails, record the full size-limit output in the issues file under `## Bundle size`. Do not attempt to fix or increase budgets — that is the code skill's responsibility.
+5. Load the `plantz-validate-modules` skill and validate all modules. Record any failures.
+6. **Accessibility review** (static): Load the `accessibility` skill. Review every changed file for WCAG AA violations — focus on semantic HTML, interactive element labelling, form error associations, color-only indicators, and live regions. For each failure, include the file path and element reference so the code skill can act on it.
+7. **Browser verification**: Read `plan.md` and extract all `[visual]` and `[interactive]` acceptance criteria. If any exist, follow the browser verification procedure (below) to verify them. Record pass/fail for each criterion.
+8. **Workspace tests**: Run `pnpm test` from the workspace root. This runs all workspace test tasks (including Storybook a11y). See the workspace tests procedure (below). This step runs **unconditionally** — it is not gated by `[visual]`/`[interactive]` criteria.
+9. **Regression check** (iteration > 1 only): If a previous issues path was provided and that file exists, compare the current iteration's issues with the previous iteration's issues. Any issue in the current run that was NOT present in the previous iteration is a regression introduced by the fix cycle. Prefix these with `⚠️ REGRESSION:` in the issues file so the code skill knows to revert the offending change rather than pile on more fixes. If the previous issues file doesn't exist (previous iteration passed), treat all current issues as regressions.
+10. **Always** write the final `## Verification results` section into the latest `changes-[iteration].md` file (add it after `## Notes`), regardless of whether checks passed or failed. The merge skill needs this section to populate the PR. End the section with the completion marker `<!-- test-complete -->` as the very last line — this is how the orchestrator distinguishes "all checks passed" from "subagent crashed." Use this format:
 
     ```markdown
     ## Verification results
@@ -97,6 +98,10 @@ Run all workspace tests as a gate check. This includes Storybook a11y tests (axe
 ## Lint (includes typecheck + syncpack)
 
 - [error details, or "Pass"]
+
+## Bundle size
+
+- [size-limit output if budget exceeded, or "Pass"]
 
 ## Module validation
 

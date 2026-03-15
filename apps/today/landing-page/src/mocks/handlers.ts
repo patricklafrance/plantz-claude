@@ -1,6 +1,7 @@
 import { http, HttpResponse } from "msw";
 
-import { getUserId, plantsDb } from "@packages/plants-core/db";
+import { getUserId } from "@packages/core-module/db";
+import { plantsDb } from "@packages/core-plants/db";
 
 export const todayPlantHandlers = [
     http.get("/api/today/plants", ({ request }) => {

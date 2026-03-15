@@ -2,7 +2,7 @@
 
 ## What I want
 
-The plant list items (`PlantListItem` in `@packages/plants-core`) display all information inline on a single row, but on desktop the content is squeezed to the left while the row stretches across the full width. The layout needs to breathe — spread the columns across the available space and add a header row with labels so users know what each column represents.
+The plant list items (`PlantListItem` in `@packages/core-plants`) display all information inline on a single row, but on desktop the content is squeezed to the left while the row stretches across the full width. The layout needs to breathe — spread the columns across the available space and add a header row with labels so users know what each column represents.
 
 ### 1. Add a header row above the plant list
 

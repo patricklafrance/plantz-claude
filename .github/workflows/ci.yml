@@ -63,6 +63,9 @@ jobs:
                       pnpm build-host
                   fi
 
+            - name: Size limit
+              run: pnpm sizecheck
+
             - name: Oxlint
               run: |
                   if [ "${{ github.event_name }}" == "pull_request" ]; then

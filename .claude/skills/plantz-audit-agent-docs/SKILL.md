@@ -22,7 +22,7 @@ This skill audits:
 
 This skill does NOT audit:
 
-- `.claude/skills/*/references/` files — these are owned by individual skills, not the agent-docs system
+- `.claude/skills/*/references/` files — some skills have their own references (e.g., `vite`); these are skill-specific, not part of the agent-docs system
 - Third-party skill documentation (e.g., `accessibility`, `frontend-design`, `shadcn`)
 
 ## Cross-Reference Map

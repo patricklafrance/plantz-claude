@@ -107,7 +107,7 @@ When done, run `git diff --stat` to verify the subagent made documentation chang
 Spawn **one** subagent using the `plantz-adlc-merge` skill. This step uses a single subagent only — concurrent git operations would conflict.
 Pass: `run-uuid`, the branch name from step 2, the commit type from step 2, the plan path (`./tmp/runs/[run-uuid]/plan.md`), the final `Test iteration` number, and `CI iteration` (starts at `1`). Set `CI iteration: 1` in `orchestrator-state.md`.
 
-After the merge subagent creates the PR (or confirms one exists), query the PR number (`gh pr list --head {branch-name} --json number --jq '.[0].number'`) and record it in `orchestrator-state.md`. This survives context compaction.
+After the merge subagent creates the PR (or confirms one exists), query the PR number for the branch and record it in `orchestrator-state.md`. This survives context compaction.
 
 The merge subagent returns in one of two ways:
 
@@ -134,7 +134,7 @@ Template:
 - Test iteration: [1-5] (current test-fix cycle — starts at 1, incremented after each test failure)
 - Plan revised: [yes/no]
 - Escalation rejected: [none/iteration-N — brief reason]
-- HEAD commit: [hash] (from `git rev-parse HEAD` — update after each commit or tree reset)
+- HEAD commit: [hash] (update after each commit or tree reset)
 - PR number: [number/none]
 - CI iteration: [1-3/none] (within step 8 only — starts at 1, incremented after each CI failure + fix)
 ```
@@ -158,8 +158,8 @@ Referenced from Step 4, Step 6, and Step 8. After any code subagent returns, che
 2. Read the escalation file and judge whether the issue is genuinely structural (the plan's approach is fundamentally wrong) or whether the code agent is being too cautious about a fixable problem.
 3. **If justified:** Spawn `plantz-adlc-plan` subagents with `mode=revision`, feature description, `plan.md` path, and escalation file path. After revision, clean up:
     - Delete all `escalation-*.md`, `changes-*.md`, `test-issues-*.md`, and `ci-issues-*.md` from the run folder.
-    - If escalation happened during Step 8: reset the branch to its merge-base with main (`git reset $(git merge-base HEAD main)`) then `git push --force-with-lease origin {branch-name}`.
-    - Reset working tree: `git checkout -- .` and `git clean -fd --exclude=tmp/`.
+    - If escalation happened during Step 8: reset the branch to its merge-base with main and force-push.
+    - Reset the working tree to a clean state, preserving the `tmp/` directory.
     - Set `Test iteration` to 1, `Plan revised: yes` in state. Restart from Step 4.
 4. **If not justified:** Update `orchestrator-state.md` with `Escalation rejected: iteration-[N] — [one-line reason]`. Proceed to the next phase (simplify, test, or merge depending on context). The escalation file remains on disk. Pass it to the next code subagent via the `Escalation context` input if another fix cycle occurs — the code subagent reads it to understand what was tried and why the orchestrator disagreed. If no further fix cycle occurs (tests pass), ignore it.
 5. **Maximum 1 plan revision per run.** Enforced by checking `Plan revised` in step 1 above.

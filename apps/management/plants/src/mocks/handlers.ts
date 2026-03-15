@@ -1,7 +1,8 @@
 import { http, HttpResponse } from "msw";
 
-import type { Plant } from "@packages/plants-core";
-import { getUserId, plantsDb } from "@packages/plants-core/db";
+import { getUserId } from "@packages/core-module/db";
+import type { Plant } from "@packages/core-plants";
+import { plantsDb } from "@packages/core-plants/db";
 
 export const managementPlantHandlers = [
     http.get("/api/management/plants", ({ request }) => {

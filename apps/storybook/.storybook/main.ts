@@ -11,9 +11,10 @@ const storybookConfig: StorybookConfig = {
     stories: [
         // Packages
         "../../../packages/components/src/**/*.stories.tsx",
-        "../../../packages/plants-core/src/**/*.stories.tsx",
+        "../../../packages/core-plants/src/**/*.stories.tsx",
         // Management
         "../../management/plants/src/**/*.stories.tsx",
+        "../../management/user/src/**/*.stories.tsx",
         // Today
         "../../today/landing-page/src/**/*.stories.tsx",
     ],

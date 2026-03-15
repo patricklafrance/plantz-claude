@@ -1,8 +1,8 @@
 import { format } from "date-fns";
 
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@packages/components";
-import { getOptionLabel, locations, luminosities, wateringFrequencies, wateringTypes } from "@packages/plants-core";
-import type { Plant } from "@packages/plants-core";
+import { getOptionLabel, locations, luminosities, wateringFrequencies, wateringTypes } from "@packages/core-plants";
+import type { Plant } from "@packages/core-plants";
 
 interface PlantDetailDialogProps {
     plant: Plant | null;

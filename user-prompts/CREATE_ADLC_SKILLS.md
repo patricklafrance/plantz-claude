@@ -1,3 +1,5 @@
+> **OUTDATED:** The "self-contained references" approach described below was replaced. Tech-stack references now live in `agent-docs/references/` as a single source of truth. ADLC skills read them via explicit paths, not local copies. See the current SKILL.md files for the actual pattern.
+
 # Create ADLC Agent Skills
 
 Create a collection of agent skills that map the Agent Development Life Cycle (ADLC). These skills will be used by an orchestrator agent and specialized subagents to develop a feature end-to-end.

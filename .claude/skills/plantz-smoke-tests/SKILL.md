@@ -1,14 +1,14 @@
 ---
 name: plantz-smoke-tests
 description: |
-    Smoke-test the host application by starting the dev server and verifying the page loads without errors.
+    Smoke-test the host application by starting the dev server, logging in with demo credentials, and verifying authenticated content loads without errors.
     Use when asked to "verify apps", "test all apps", "smoke test", "check dev servers".
 license: MIT
 ---
 
 # Smoke Tests
 
-Smoke-test the host application by starting its dev server and verifying the page loads without errors.
+Smoke-test the host application by starting its dev server, logging in, and verifying authenticated content loads without errors.
 
 ## Prerequisites
 
@@ -16,18 +16,11 @@ This skill requires `agent-browser` CLI for browser verification (navigating to 
 
 ## Run Folder
 
-Generate a UUID at the start of the run:
-
-```bash
-RUN_UUID=$(node -e "console.log(require('crypto').randomUUID())")
-mkdir -p ./tmp/smoke-tests/$RUN_UUID
-```
-
-All screenshots and artifacts go in `./tmp/smoke-tests/$RUN_UUID/`.
+Generate a UUID and create `./tmp/smoke-tests/[run-uuid]/`. All screenshots and artifacts go in this folder.
 
 ## Target
 
-The only app to test is the host. Run it with `pnpm dev-host` (port `8080`).
+The only app to test is the host. Run it with `pnpm dev-host` (port `8080`, URL `http://localhost:8080`).
 
 ## Procedure
 
@@ -37,24 +30,33 @@ Run `pnpm dev-host` in the background. Capture the task ID so you can stop it la
 
 ### Step 2 — Wait for ready
 
-Watch stdout for the local URL. Wait for the server to emit it — this confirms the build succeeded and the server is listening.
-
-**Known port:** `8080`.
+Watch stdout for the local URL (`http://localhost:8080`). Wait for the server to emit it — this confirms the build succeeded and the server is listening.
 
 **Timeout:** 60 seconds.
 
-### Step 3 — Verify in browser
+### Step 3 — Log in
 
-1. Navigate to the local URL.
-2. Take a page snapshot and confirm meaningful content loaded (not a blank page or error screen).
-3. Check the browser console for errors. Warnings are acceptable — errors are not.
-4. Take a screenshot and save it to `./tmp/smoke-tests/$RUN_UUID/{app-name}.png`.
+The app redirects unauthenticated users to `/login`. You must log in before verifying content.
 
-### Step 4 — Stop the dev server
+**Demo credentials:** `alice@example.com` / `password`
+
+1. Navigate to `http://localhost:8080`.
+2. The app shows a loading spinner while MSW initializes. Wait for the login page to render.
+3. Fill in the email and password fields with the demo credentials and submit the form.
+4. Wait for the redirect to the home page. **Timeout: 10 seconds.** You should see an authenticated layout (header with logo, navigation, content area) — not the login form.
+5. If the redirect does not happen within 10 seconds, take a screenshot (`{app-name}-login-failed.png`), check the browser console for errors, and **fail** the test.
+
+### Step 4 — Verify in browser
+
+1. Take a page snapshot and confirm the authenticated layout loaded (header, navigation, content area — not the login form).
+2. Check the browser console for errors. Warnings are acceptable — errors are not.
+3. Take a screenshot and save it to `./tmp/smoke-tests/[run-uuid]/{app-name}.png`.
+
+### Step 5 — Stop the dev server
 
 Stop the background task started in Step 1. Then **immediately** run the port-cleanup procedure below.
 
-### Step 5 — Record result
+### Step 6 — Record result
 
 Record the app name, URL, status (pass/fail), and any errors.
 
@@ -76,11 +78,11 @@ taskkill //PID <PID> //T //F
 **Rules:**
 
 - Always check the port after TaskStop, even if TaskStop reported success.
-- If the server used a port other than 8080 (discovered from server output), use that port instead.
+- Use port `8080` (or the port from server output if it differs).
 
 ## Cleanup
 
-- **On success:** delete the run folder: `rm -rf ./tmp/smoke-tests/$RUN_UUID`.
+- **On success:** delete the run folder: `rm -rf ./tmp/smoke-tests/[run-uuid]`.
 - **On failure:** never delete the run folder. Leave artifacts for diagnosis.
 
 ## Summary

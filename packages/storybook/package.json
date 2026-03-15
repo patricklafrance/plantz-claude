@@ -17,7 +17,7 @@
     },
     "dependencies": {
         "@packages/components": "workspace:*",
-        "@packages/plants-core": "workspace:*",
+        "@packages/core-plants": "workspace:*",
         "@storybook/addon-a11y": "10.2.15",
         "@storybook/addon-themes": "10.2.15",
         "@storybook/addon-vitest": "10.2.15",

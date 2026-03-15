@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import type { Plant } from "@packages/plants-core";
+import type { Plant } from "@packages/core-plants";
 
 import { PlantDetailDialog } from "./PlantDetailDialog.tsx";
 

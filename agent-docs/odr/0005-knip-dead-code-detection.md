@@ -20,8 +20,8 @@ Use Knip (Option 1). It is installed at the workspace root as a global tool and 
 
 ## Consequences
 
-- `knip.json` at the repo root defines workspace mappings and `ignoreDependencies` for known false positives (tooling deps referenced by CLI configs, phantom deps required by Storybook story globs).
+- `knip.json` at the repo root defines workspace mappings and `ignoreDependencies` for known false positives.
 - The `//#knip` task is wired into the `lint` pipeline via `dependsOn`, so `pnpm lint` runs knip alongside all other quality checks.
-- Knip uses default rules (all issue types are errors). No categories are downgraded to warnings.
-- When adding a new workspace, CLI config file (e.g., `rsbuild.*.ts`, `rslib.*.ts`), or tool dependency consumed only via config strings, update `knip.json` to add the appropriate `entry` or `ignoreDependencies` entry.
-- Storybook packages list module/shared-package dependencies that are not directly imported by `.storybook/` config files but are needed at runtime by story files loaded via globs. These are suppressed via `ignoreDependencies` in `knip.json`.
+- All issue types are errors — no categories are downgraded to warnings.
+
+See [references/static-analysis.md](../references/static-analysis.md) for the suppression policy and per-tool configuration guidance.

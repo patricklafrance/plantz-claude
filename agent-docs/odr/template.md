@@ -19,4 +19,4 @@ What was decided and why. Reference the chosen option above.
 
 ## Consequences
 
-What changed as a result. Include both positive outcomes and trade-offs accepted.
+What changed as a result — capabilities gained, constraints introduced, trade-offs accepted. Do not include procedural instructions ("when X happens, do Y") — those belong in reference docs under `agent-docs/references/`.

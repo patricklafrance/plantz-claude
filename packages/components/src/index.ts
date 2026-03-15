@@ -13,3 +13,4 @@ export { Label } from "./components/ui/label.tsx";
 export { Separator } from "./components/ui/separator.tsx";
 export { Checkbox } from "./components/ui/checkbox.tsx";
 export { Badge, badgeVariants } from "./components/ui/badge.tsx";
+export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./components/ui/tooltip.tsx";

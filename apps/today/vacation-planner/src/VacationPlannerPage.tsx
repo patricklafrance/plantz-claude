@@ -1,7 +1,7 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { useState, useMemo, useCallback, useEffect } from "react";
 
-import { Button } from "@packages/components";
+import { Badge, Button } from "@packages/components";
 import { getAuthHeaders } from "@packages/core-module";
 import type { PlanningStrategy, RecommendationType, DelegationInfo } from "@packages/core-plants/vacation";
 
@@ -103,7 +103,11 @@ export function VacationPlannerPage() {
     return (
         <div className="flex flex-col gap-6 p-6">
             <div className="flex items-center justify-between">
-                <h1 className="text-xl font-semibold">Vacation Planner</h1>
+                <div className="flex items-center gap-2">
+                    <h1 className="text-xl font-semibold">Vacation Planner</h1>
+                    {plan && plan.status === "draft" && <Badge variant="secondary">Draft</Badge>}
+                    {plan && plan.status === "active" && <Badge variant="default">Saved</Badge>}
+                </div>
                 {plan && plan.status === "active" && (
                     <Button variant="destructive" size="sm" onClick={cancelPlan}>
                         Cancel Plan

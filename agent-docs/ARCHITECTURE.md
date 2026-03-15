@@ -21,7 +21,7 @@ plantz-claude/
     components/                    # Shared UI components — shadcn/ui + Tailwind v4 (@packages/components)
     plants-core/                   # Shared plant domain types, utilities, and components (@packages/plants-core)
     storybook/                     # Packages-layer Storybook runner for shared package stories (@apps/packages-storybook)
-  tooling/                         # Build scripts (getAffectedStorybooks.ts)
+  scripts/                         # Build scripts (getAffectedStorybooks.ts)
   agent-docs/                      # Agent documentation (this folder)
   .agents/skills/                  # Shared agent skills (git-commit, etc.)
   .claude/skills/                  # Claude Code discovery layer — symlinks to .agents/skills/ plus project-specific skills

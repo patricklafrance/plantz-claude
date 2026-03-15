@@ -42,11 +42,11 @@ PRs require the `run chromatic` label to trigger `chromatic.yml`. Without it, th
 
 ## Smoke tests
 
-`smoke-tests.yml` runs on PRs to `main`. It uses `claude-code-action` to load the `plantz-smoke-tests` skill, which starts the host app's dev server, verifies it in a headless browser via `agent-browser`, then stops with port cleanup. Results are posted as a PR comment. 30-minute timeout with concurrency group (`cancel-in-progress`).
+`smoke-tests.yml` runs on PRs to `main`. It uses `claude-code-action` to load the `plantz-smoke-tests` skill, which starts the host app's dev server, verifies it in a headless browser via `agent-browser`, then stops with port cleanup. Results are posted as a PR comment. 15-minute timeout with concurrency group (`cancel-in-progress`).
 
 **Workflow validation caveat:** `claude-code-action` requires the workflow file on the PR branch to match the version on `main`. If the workflow is new or modified in the PR, the action silently no-ops and the job reports success without running the skill. The skill only executes once the workflow file is merged to `main`.
 
-**Tool scoping:** The agent's Bash access is restricted to specific CLIs (`pnpm`, `node`, `mkdir`, `rm`, `lsof`, `kill`, `agent-browser`). On failure, screenshots are uploaded as GitHub Actions artifacts for diagnosis.
+**Tool scoping:** The agent's Bash access is restricted to specific CLIs (`pnpm`, `node`, `mkdir`, `rm`, `lsof`, `kill`, `pkill`, `agent-browser`). On failure, screenshots are uploaded as GitHub Actions artifacts for diagnosis.
 
 ## Netlify preview deploys
 

@@ -1,4 +1,3 @@
-import { createOptimisticAction } from "@tanstack/db";
 import type { QueryClient } from "@tanstack/react-query";
 
 import { getAuthHeaders } from "@packages/core-module";
@@ -27,29 +26,4 @@ export function createTodayPlantsCollection(queryClient: QueryClient): PlantsCol
         queryFn: fetchPlants,
         queryClient,
     });
-}
-
-export function createTodayPlantActions(plantsCollection: PlantsCollection) {
-    const deletePlants = createOptimisticAction<string[]>({
-        onMutate: (ids) => {
-            for (const id of ids) {
-                plantsCollection.delete(id);
-            }
-        },
-        mutationFn: async (ids) => {
-            const response = await fetch(API_BASE, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json", ...getAuthHeaders() },
-                body: JSON.stringify({ ids }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`Failed to delete plants: ${response.status}`);
-            }
-
-            await plantsCollection.utils.refetch();
-        },
-    });
-
-    return { deletePlants };
 }

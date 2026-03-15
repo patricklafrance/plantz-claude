@@ -44,7 +44,6 @@ Each module has a `plantsCollection.ts` with a factory function that creates a f
 ### Today (`apps/today/landing-page/src/plantsCollection.ts`)
 
 - `createTodayPlantsCollection(queryClient)` — creates a collection instance (provided via `TodayPlantsCollectionProvider` React Context)
-- `createTodayPlantActions(collection)` — returns `{ deletePlants }` (read + delete only)
 
 ## Optimistic Mutations
 

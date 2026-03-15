@@ -20,7 +20,6 @@
         "@tanstack/db": "^0.5.32",
         "@tanstack/query-db-collection": "^1.0.29",
         "lucide-react": "^0.577.0",
-        "msw": "^2.12.10",
         "zod": "^4.3.6"
     },
     "devDependencies": {

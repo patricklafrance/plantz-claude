@@ -2,7 +2,7 @@ import { delay, http, HttpResponse } from "msw";
 
 import type { Plant } from "@packages/core-plants";
 
-export type PlantsData = Plant[] | "loading" | "error";
+type PlantsData = Plant[] | "loading" | "error";
 
 export function createTodayPlantHandlers(data: PlantsData) {
     return [

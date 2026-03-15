@@ -18,8 +18,7 @@
         "@tanstack/react-db": "^0.1.76",
         "@tanstack/react-virtual": "^3.13.21",
         "date-fns": "^4.1.0",
-        "lucide-react": "^0.577.0",
-        "zod": "^4.3.6"
+        "lucide-react": "^0.577.0"
     },
     "devDependencies": {
         "@apps/packages-storybook": "workspace:*",

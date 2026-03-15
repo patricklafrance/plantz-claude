@@ -13,10 +13,10 @@
             "ignoreDependencies": ["@packages/components", "@packages/core-plants", "@squide/env-vars", "@squide/firefly", "@squide/launch-darkly", "@squide/msw", "@tanstack/react-query", "@workleap/logging", "react-router", "playwright"]
         },
         "apps/management/storybook": {
-            "ignoreDependencies": ["@packages/components", "@packages/core-plants"]
+            "ignoreDependencies": ["@packages/components", "@packages/core-plants", "launchdarkly-js-client-sdk"]
         },
         "apps/today/storybook": {
-            "ignoreDependencies": ["@packages/components", "@packages/core-plants"]
+            "ignoreDependencies": ["@packages/components", "@packages/core-plants", "launchdarkly-js-client-sdk"]
         },
         "apps/management/*": {
             "ignoreDependencies": ["@apps/packages-storybook"]
@@ -29,7 +29,7 @@
             "ignoreDependencies": ["@tailwindcss/postcss"]
         },
         "packages/storybook": {
-            "ignoreDependencies": ["@packages/components", "@packages/core-plants", "msw", "react-router"]
+            "ignoreDependencies": ["@packages/components", "@packages/core-module", "@packages/core-plants", "launchdarkly-js-client-sdk"]
         },
         "packages/*": {}
     }

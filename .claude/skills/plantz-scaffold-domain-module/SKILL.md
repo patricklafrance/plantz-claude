@@ -69,10 +69,16 @@ Create only the files listed below — do not copy domain-specific source files 
     - Add entry to `ModuleRegistry`: `"{registryKey}": {registerFunction}`
 2. In `apps/host/package.json`:
     - Add `"{packageName}": "workspace:*"` to `dependencies`
+3. In `apps/host/src/styles/globals.css`:
+    - Add `@source "../../../{domain}/{module}/src/**/*.{ts,tsx}";`
 
-### Step 4 — Update domain storybook CSS
+Without the `@source` directive, Tailwind classes used by the new module will not be scanned in the host app.
 
-In `apps/{domain}/storybook/.storybook/storybook.css`, add a `@source` directive for the new module:
+### Step 4 — Update domain storybook
+
+Two files in `apps/{domain}/storybook/.storybook/` need updating:
+
+1. In `storybook.css`, add a `@source` directive for the new module:
 
 ```css
 @source "../../{module}/src/**/*.{ts,tsx}";
@@ -80,17 +86,35 @@ In `apps/{domain}/storybook/.storybook/storybook.css`, add a `@source` directive
 
 Without this, Tailwind classes used in the new module will not be scanned and will be missing from the domain storybook.
 
+2. In `main.ts`, add a story glob for the new module to the `stories` array:
+
+```ts
+"../../{module}/src/**/*.stories.tsx";
+```
+
+Without this, stories from the new module will not appear in the domain storybook.
+
 If the domain storybook does not exist yet, skip this step and warn the user.
 
 ### Step 5 — Update unified storybook
 
-In `apps/storybook/.storybook/main.ts`, add a story glob for the new module under the appropriate `// {DomainTitle}` comment section in the `stories` array:
+Two files in `apps/storybook/.storybook/` need updating:
+
+1. In `main.ts`, add a story glob for the new module under the appropriate `// {DomainTitle}` comment section in the `stories` array:
 
 ```ts
-"../{domain}/{module}/src/**/*.stories.tsx";
+"../../{domain}/{module}/src/**/*.stories.tsx";
 ```
 
 Follow the existing comment-section pattern visible in the file. The `stories` array has a `// Packages` comment section for non-module packages — never add module globs under that section.
+
+2. In `storybook.css`, add a `@source` directive for the new module:
+
+```css
+@source "../../{domain}/{module}/src/**/*.{ts,tsx}";
+```
+
+Without this, Tailwind classes used by the new module will be missing from the unified storybook.
 
 ### Step 6 — Update storybook affected map
 
@@ -116,9 +140,9 @@ Run `pnpm install` to link the new workspace package.
 
 1. Confirm all 5 files from the Step 2 table exist in the new module.
 2. Confirm `getActiveModules.tsx` imports the register function and has the registry entry.
-3. Confirm `apps/host/package.json` lists the new package in `dependencies`.
-4. Confirm domain storybook's `storybook.css` includes a `@source` directive for the new module.
-5. Confirm `apps/storybook/.storybook/main.ts` includes a story glob for the new module.
+3. Confirm `apps/host/package.json` lists the new package in `dependencies` and `apps/host/src/styles/globals.css` includes a `@source` directive for the new module.
+4. Confirm domain storybook's `storybook.css` includes a `@source` directive and `main.ts` includes a story glob for the new module.
+5. Confirm unified storybook's `main.ts` includes a story glob and `storybook.css` includes a `@source` directive for the new module.
 6. Confirm `getAffectedStorybooks.ts` includes the new package.
 7. Confirm root `package.json` has the dev script.
 8. Run `pnpm syncpack` — fix any version mismatches.

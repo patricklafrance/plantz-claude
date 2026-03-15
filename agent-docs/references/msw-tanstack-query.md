@@ -41,9 +41,13 @@ Each module has a `plantsCollection.ts` with a factory function that creates a f
 - `createManagementPlantsCollection(queryClient)` — creates a collection instance (called once during registration, provided to components via `ManagementPlantsCollectionProvider` React Context)
 - `createManagementPlantActions(collection)` — returns `{ insertPlant, updatePlant, deletePlant, deletePlants }`
 
-### Today (`apps/today/landing-page/src/plantsCollection.ts`)
+### Today Landing (`apps/today/landing-page/src/plantsCollection.ts`)
 
 - `createTodayPlantsCollection(queryClient)` — creates a collection instance (provided via `TodayPlantsCollectionProvider` React Context)
+
+### Today Vacation Planner (`apps/today/vacation-planner/src/plantsCollection.ts`)
+
+- `createTodayVacationPlantsCollection(queryClient)` — creates a read-only collection instance (provided via `TodayVacationPlantsCollectionProvider` React Context). No optimistic actions — vacation plan mutations use React state, not the plants collection.
 
 ## Optimistic Mutations
 
@@ -117,7 +121,8 @@ The shared in-memory database is exposed via `@packages/core-plants/db`:
 Each module defines its own MSW handlers in a local `mocks/` folder:
 
 - **Management:** `managementPlantHandlers` in `apps/management/plants/src/mocks/handlers.ts` — 6 routes at `/api/management/plants`
-- **Today:** `todayPlantHandlers` in `apps/today/landing-page/src/mocks/handlers.ts` — 3 routes at `/api/today/plants`
+- **Today Landing:** `todayPlantHandlers` in `apps/today/landing-page/src/mocks/handlers.ts` — 3 routes at `/api/today/plants`
+- **Today Vacation:** `todayVacationPlannerHandlers` in `apps/today/vacation-planner/src/mocks/handlers.ts` — 5 routes at `/api/today/vacation-planner/`
 
 ## Storybook Setup
 
@@ -206,13 +211,23 @@ Use `delay("infinite")` for loading state stories.
 | DELETE | `/api/management/plants/:id` | Delete single plant                             |
 | DELETE | `/api/management/plants`     | Bulk delete (body: `{ ids: string[] }`)         |
 
-### Today (`/api/today/plants`)
+### Today Landing (`/api/today/plants`)
 
 | Method | Path                    | Description                             |
 | ------ | ----------------------- | --------------------------------------- |
 | GET    | `/api/today/plants`     | List all plants                         |
 | DELETE | `/api/today/plants/:id` | Delete single plant                     |
 | DELETE | `/api/today/plants`     | Bulk delete (body: `{ ids: string[] }`) |
+
+### Today Vacation Planner (`/api/today/vacation-planner/`)
+
+| Method | Path                                       | Description                                         |
+| ------ | ------------------------------------------ | --------------------------------------------------- |
+| GET    | `/api/today/vacation-planner/plants`       | List all user plants (reads from shared `plantsDb`) |
+| POST   | `/api/today/vacation-planner/plans`        | Create a new vacation plan                          |
+| GET    | `/api/today/vacation-planner/plans/active` | Get the active plan (if any)                        |
+| PUT    | `/api/today/vacation-planner/plans/:id`    | Update plan (save, cancel, update recommendations)  |
+| DELETE | `/api/today/vacation-planner/plans/:id`    | Delete a plan                                       |
 
 ## Seed Data
 

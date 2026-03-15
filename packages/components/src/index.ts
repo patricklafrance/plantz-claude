@@ -12,3 +12,4 @@ export { Textarea } from "./components/ui/textarea.tsx";
 export { Label } from "./components/ui/label.tsx";
 export { Separator } from "./components/ui/separator.tsx";
 export { Checkbox } from "./components/ui/checkbox.tsx";
+export { Badge, badgeVariants } from "./components/ui/badge.tsx";

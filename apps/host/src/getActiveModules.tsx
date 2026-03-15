@@ -4,6 +4,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { registerManagementPlants } from "@modules/management-plants";
 import { registerManagementUser } from "@modules/management-user";
 import { registerTodayLandingPage } from "@modules/today-landing-page";
+import { registerTodayVacationPlanner } from "@modules/today-vacation-planner";
 
 interface ModuleEntry {
     register: (runtime: FireflyRuntime, queryClient: QueryClient) => Promise<void>;
@@ -13,6 +14,7 @@ const ModuleRegistry: Record<string, ModuleEntry> = {
     "management/plants": { register: registerManagementPlants },
     "management/user": { register: registerManagementUser },
     "today/landing-page": { register: registerTodayLandingPage },
+    "today/vacation-planner": { register: registerTodayVacationPlanner },
 };
 
 export function getActiveModules(filter: string | undefined, queryClient: QueryClient): ModuleRegisterFunction<FireflyRuntime>[] {

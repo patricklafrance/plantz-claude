@@ -16,6 +16,7 @@ plantz-claude/
       storybook/                   # Management domain Storybook (@apps/management-storybook)
     today/
       landing-page/                # Today domain — landing page module (@modules/today-landing-page)
+      vacation-planner/            # Today domain — vacation planner module (@modules/today-vacation-planner)
       storybook/                   # Today domain Storybook (@apps/today-storybook)
     storybook/                     # Unified Storybook — all stories in the repo (@apps/storybook)
   packages/

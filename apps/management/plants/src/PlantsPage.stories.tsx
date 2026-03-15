@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { makePlant, FAR_PAST, FAR_FUTURE } from "@packages/plants-core/test-utils";
+import { makePlant, FAR_PAST, FAR_FUTURE } from "@packages/core-plants/test-utils";
 
 import { createManagementPlantHandlers } from "./mocks/index.ts";
 import { PlantsPage } from "./PlantsPage.tsx";

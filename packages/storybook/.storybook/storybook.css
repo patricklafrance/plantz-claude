@@ -1,4 +1,5 @@
 @import "../../components/src/styles/globals.css";
 
 @source "../../components/src/**/*.{ts,tsx}";
-@source "../../plants-core/src/**/*.{ts,tsx}";
+@source "../../core-module/src/**/*.{ts,tsx}";
+@source "../../core-plants/src/**/*.{ts,tsx}";

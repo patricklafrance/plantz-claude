@@ -30,8 +30,8 @@ This skill runs in one of three modes, determined by the `mode` input:
 
 ## Procedure
 
-1. Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, `agent-docs/odr/index.md`, and all files in this skill's `references/` directory.
-2. Load the `accessibility`, `shadcn`, `frontend-design`, `workleap-react-best-practices`, and `workleap-squide` skills for design guidance.
+1. Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, `agent-docs/odr/index.md`, and these reference files: `agent-docs/references/domains.md`, `agent-docs/references/msw-tanstack-query.md`, `agent-docs/references/storybook.md`, `agent-docs/references/tailwind-postcss.md`, `agent-docs/references/shadcn.md`, `agent-docs/references/color-mode.md`, `agent-docs/references/bundle-size-budget.md`.
+2. Load the `accessibility`, `shadcn`, `frontend-design`, `workleap-react-best-practices`, `workleap-squide`, and `workleap-web-configs` skills for design guidance.
 3. **Draft mode:** Analyze the feature requirements and determine which packages/modules are affected.
    **Review mode:** Read the existing plan at the plan path. This plan was written by the user — treat it as the starting point. Proceed directly to step 5 (validate and improve).
    **Revision mode:** Read the existing plan (at the existing plan path input) and the escalation file (at the escalation path input). Understand what was attempted, what failed structurally, and the proposed alternative. Focus the revision on the structural issue — don't rewrite sections that aren't affected.

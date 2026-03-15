@@ -12,7 +12,8 @@
     },
     "dependencies": {
         "@packages/components": "workspace:*",
-        "@packages/plants-core": "workspace:*",
+        "@packages/core-module": "workspace:*",
+        "@packages/core-plants": "workspace:*",
         "@tanstack/db": "^0.5.32",
         "@tanstack/react-db": "^0.1.76",
         "@tanstack/react-virtual": "^3.13.21",

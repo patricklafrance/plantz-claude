@@ -1,8 +1,9 @@
 import { createOptimisticAction } from "@tanstack/db";
 import type { QueryClient } from "@tanstack/react-query";
 
-import { getCurrentUserId, getAuthHeaders, plantSchema, type Plant } from "@packages/plants-core";
-import { createPlantsCollection, type PlantsCollection } from "@packages/plants-core/collection";
+import { getCurrentUserId, getAuthHeaders } from "@packages/core-module";
+import { plantSchema, type Plant } from "@packages/core-plants";
+import { createPlantsCollection, type PlantsCollection } from "@packages/core-plants/collection";
 
 const API_BASE = "/api/management/plants";
 

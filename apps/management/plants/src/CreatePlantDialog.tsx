@@ -1,7 +1,7 @@
 import { useState, useMemo, type FormEvent } from "react";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button, Input, Textarea, Label, Switch, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, DatePicker } from "@packages/components";
-import { locations, luminosities, wateringFrequencies, wateringTypes } from "@packages/plants-core";
+import { locations, luminosities, wateringFrequencies, wateringTypes } from "@packages/core-plants";
 
 import { useManagementPlantsCollection } from "./ManagementPlantsContext.tsx";
 import { createManagementPlantActions } from "./plantsCollection.ts";

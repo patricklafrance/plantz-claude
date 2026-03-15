@@ -105,14 +105,24 @@ When done, run `git diff --stat` to verify the subagent made documentation chang
 ### Step 8 — Merge
 
 Spawn **one** subagent using the `plantz-adlc-merge` skill. This step uses a single subagent only — concurrent git operations would conflict.
-Pass: `run-uuid`, the branch name from step 2, the commit type from step 2, the plan path (`./tmp/runs/[run-uuid]/plan.md`), the final `Test iteration` number, and `CI iteration` (starts at `1`). Set `CI iteration: 1` in `orchestrator-state.md`.
+Pass: `run-uuid`, the branch name from step 2, the commit type from step 2, the plan path (`./tmp/runs/[run-uuid]/plan.md`), the final `Test iteration` number, and `CI iteration` (starts at `0`). Set `CI iteration: 0` in `orchestrator-state.md`.
 
-After the merge subagent creates the PR (or confirms one exists), query the PR number (`gh pr list --head {branch-name} --json number --jq '.[0].number'`) and record it in `orchestrator-state.md`. This survives context compaction.
+After the merge subagent creates the PR (or confirms one exists), query the PR number for the branch and record it in `orchestrator-state.md`. This survives context compaction.
 
 The merge subagent returns in one of two ways:
 
 - **Success:** All CI checks passed and the `run chromatic` label was added to trigger visual regression testing. Chromatic runs asynchronously — the agent does not wait for it. Proceed to Step 9.
-- **CI failure:** The merge subagent writes `ci-issues-[CI iteration].md` and stops. Check `CI iteration` in `orchestrator-state.md` — if ≥ 3, follow the failure handling procedure (maximum 3 CI iterations). Otherwise, set `Current step: 8-ci-fix`. Spawn `plantz-adlc-code` subagents (2 subagents, following the subagent protocol) with: `run-uuid`, `iteration` = `Test iteration` + `CI iteration` (to avoid overwriting test-phase artifacts), plan path, the CI issues file, the latest changes file, and escalation context (`null` unless a prior escalation was rejected). After the code subagent returns, run the escalation check (see "Escalation Check"). If no escalation, increment `CI iteration` in state and spawn a new merge subagent (passing `Iteration` = `Test iteration` + new `CI iteration`, and the new `CI iteration`) to commit, push, and resume monitoring.
+- **CI failure:** The merge subagent writes `ci-issues-[CI iteration].md` and stops.
+    - Increment `CI iteration`. Update `orchestrator-state.md` with the new value.
+    - Check `CI iteration` — if > 3, follow the failure handling procedure (maximum 3 fix attempts).
+    - Set `Current step: 8-ci-fix`.
+    - Spawn new `plantz-adlc-code` subagents. Pass: `run-uuid`, `iteration` = `Test iteration` + `CI iteration`, plan path, the issues file from the triggering failure (`ci-issues-*.md` or `test-issues-*.md`), the latest changes file, and escalation context (`null` unless a prior escalation was rejected). They produce `changes-[iteration].md`.
+    - **Escalation check:** After the code subagent returns, follow the escalation check procedure (see "Escalation Check").
+    - Update `orchestrator-state.md` `Current step: 8-ci-test`.
+    - Spawn new `plantz-adlc-test` subagents. Pass: `run-uuid`, `iteration` = `Test iteration` + `CI iteration`, plan path, previous issues path = `null`.
+    - **Completion check:** Verify `changes-[iteration].md` contains `<!-- test-complete -->`. If absent, the test subagent crashed — follow failure handling.
+    - If `test-issues-[iteration].md` exists (test failed): treat as a CI failure — return to the top of the CI failure flow above. The test failure consumes one attempt from the shared budget.
+    - If no issues file exists and the marker is present (test passed): spawn a new merge subagent with `Iteration` = `Test iteration` + `CI iteration`, and the current `CI iteration`. On success, proceed to Step 9. On CI failure, return to the top of the CI failure flow above.
 
 ### Step 9 — Clean up
 
@@ -130,13 +140,13 @@ Template:
 - Run UUID: [uuid]
 - Branch: [branch-name]
 - Commit type: [feat/fix/chore/docs/refactor] (conventional commit prefix)
-- Current step: [1-9] (use `6-code` / `6-test` within step 6; `8-ci-fix` within step 8)
+- Current step: [1-9] (use `6-code` / `6-test` within step 6; `8-ci-fix` / `8-ci-test` within step 8)
 - Test iteration: [1-5] (current test-fix cycle — starts at 1, incremented after each test failure)
 - Plan revised: [yes/no]
 - Escalation rejected: [none/iteration-N — brief reason]
-- HEAD commit: [hash] (from `git rev-parse HEAD` — update after each commit or tree reset)
+- HEAD commit: [hash] (update after each commit or tree reset)
 - PR number: [number/none]
-- CI iteration: [1-3/none] (within step 8 only — starts at 1, incremented after each CI failure + fix)
+- CI iteration: [0-3/none] (within step 8 only — starts at 0, incremented before each fix attempt)
 ```
 
 **Before writing state**, confirm the step's expected artifact exists — do not write state claiming a step completed if its output is missing.
@@ -148,18 +158,18 @@ This allows the orchestrator to recover if the context window is compacted mid-r
 Two iteration counters, both starting at 1:
 
 - **`Test iteration`** (Step 6): Incremented after each test failure. Passed to code and test subagents. Artifacts: `changes-[N].md`, `test-issues-[N].md`. Maximum 5.
-- **`CI iteration`** (Step 8): Incremented after each CI failure + fix. Passed to merge subagent. CI fix code artifacts use `Test iteration + CI iteration` to avoid collisions. CI issues: `ci-issues-[N].md`. Maximum 3 (fail the run when `CI iteration ≥ 3`).
+- **`CI iteration`** (Step 8): Starts at 0. Incremented on each failure, then checked before the fix runs. Code and test subagents receive `iteration` = `Test iteration` + `CI iteration` (avoids collisions with Step 6 artifacts). CI issues: `ci-issues-[N].md`. Maximum 3 fix attempts (fail the run when `CI iteration > 3`).
 
 ## Escalation Check
 
-Referenced from Step 4, Step 6, and Step 8. After any code subagent returns, check for `./tmp/runs/[run-uuid]/escalation-[iteration].md`. If absent, continue normally (proceed to the next phase — test, simplify, or merge depending on context). If present:
+Referenced from Step 4, Step 6, and Step 8. After any code subagent returns, check for `./tmp/runs/[run-uuid]/escalation-[iteration].md`. If absent, continue normally (proceed to the next phase — simplify, test, or CI-test depending on context). If present:
 
 1. Read `orchestrator-state.md` to check whether `Plan revised` is already `yes`. If so, a plan revision already occurred. Follow the failure handling procedure — but include the second escalation file's diagnosis in `failure-summary.md` so the user understands the additional structural issue that surfaced.
 2. Read the escalation file and judge whether the issue is genuinely structural (the plan's approach is fundamentally wrong) or whether the code agent is being too cautious about a fixable problem.
 3. **If justified:** Spawn `plantz-adlc-plan` subagents with `mode=revision`, feature description, `plan.md` path, and escalation file path. After revision, clean up:
     - Delete all `escalation-*.md`, `changes-*.md`, `test-issues-*.md`, and `ci-issues-*.md` from the run folder.
-    - If escalation happened during Step 8: reset the branch to its merge-base with main (`git reset $(git merge-base HEAD main)`) then `git push --force-with-lease origin {branch-name}`.
-    - Reset working tree: `git checkout -- .` and `git clean -fd --exclude=tmp/`.
+    - If escalation happened during Step 8: reset the branch to its merge-base with main and force-push.
+    - Reset the working tree to a clean state, preserving the `tmp/` directory.
     - Set `Test iteration` to 1, `Plan revised: yes` in state. Restart from Step 4.
-4. **If not justified:** Update `orchestrator-state.md` with `Escalation rejected: iteration-[N] — [one-line reason]`. Proceed to the next phase (simplify, test, or merge depending on context). The escalation file remains on disk. Pass it to the next code subagent via the `Escalation context` input if another fix cycle occurs — the code subagent reads it to understand what was tried and why the orchestrator disagreed. If no further fix cycle occurs (tests pass), ignore it.
+4. **If not justified:** Update `orchestrator-state.md` with `Escalation rejected: iteration-[N] — [one-line reason]`. Proceed to the next phase (simplify, test, or CI-test depending on context). The escalation file remains on disk. Pass it to the next code subagent via the `Escalation context` input if another fix cycle occurs — the code subagent reads it to understand what was tried and why the orchestrator disagreed. If no further fix cycle occurs (tests pass), ignore it.
 5. **Maximum 1 plan revision per run.** Enforced by checking `Plan revised` in step 1 above.

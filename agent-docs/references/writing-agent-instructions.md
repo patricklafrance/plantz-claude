@@ -62,6 +62,13 @@ Do not write agent instructions for constraints already enforced by tooling
 (TypeScript compiler, syncpack, CI checks). Agent instructions are for judgments
 that tooling cannot make.
 
+### 9. Intent over implementation
+
+- **Bad:** "Search for the comment via `gh pr view {number} --json comments --jq '.comments[] | select(.body | startswith("## CI Validation")) | .id'`, then update it with `gh api -X PATCH repos/{owner}/{repo}/issues/comments/{id} -f body="..."`."
+- **Good:** "Search for an existing comment starting with `## CI Validation` on the PR. If found, update it in place. If not found, create a new one."
+
+Describe _what_ the agent should achieve, not _which commands_ to run. Agents know their tools — hardcoding commands makes instructions brittle (flags change, better approaches exist) and wastes context on information the agent already has. Reserve specific commands for cases where the exact invocation is non-obvious or repo-specific.
+
 ## Guardrails
 
 **Prohibition inflation** — Reserve NEVER/MUST NOT for architectural invariants
@@ -82,6 +89,7 @@ When writing or editing any file in `agent-docs/` or `CLAUDE.md`:
 2. Include a consequence or rationale in the same sentence.
 3. If the rule has an edge case, add a negative example immediately after.
 4. If tooling already enforces the rule, do not duplicate it as prose.
+5. Describe the goal, not the shell commands — agents know their tools.
 
 ---
 

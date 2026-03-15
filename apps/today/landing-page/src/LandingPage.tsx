@@ -2,8 +2,8 @@ import { useLiveQuery } from "@tanstack/react-db";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { useState, useRef, useMemo, useCallback } from "react";
 
-import { applyPlantFilters, FilterBar, isDueForWatering, PlantListHeader, PlantListItem, usePlantFilters } from "@packages/plants-core";
-import type { Plant } from "@packages/plants-core";
+import { applyPlantFilters, FilterBar, isDueForWatering, PlantListHeader, PlantListItem, usePlantFilters } from "@packages/core-plants";
+import type { Plant } from "@packages/core-plants";
 
 import { PlantDetailDialog } from "./PlantDetailDialog.tsx";
 import { useTodayPlantsCollection } from "./TodayPlantsContext.tsx";

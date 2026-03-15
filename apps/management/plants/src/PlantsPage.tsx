@@ -4,8 +4,8 @@ import { Plus } from "lucide-react";
 import { useState, useRef, useMemo, useCallback } from "react";
 
 import { Button } from "@packages/components";
-import { applyPlantFilters, DeleteConfirmDialog, FilterBar, PlantListHeader, PlantListItem, usePlantFilters } from "@packages/plants-core";
-import type { Plant } from "@packages/plants-core";
+import { applyPlantFilters, DeleteConfirmDialog, FilterBar, PlantListHeader, PlantListItem, usePlantFilters } from "@packages/core-plants";
+import type { Plant } from "@packages/core-plants";
 
 import { CreatePlantDialog } from "./CreatePlantDialog.tsx";
 import { EditPlantDialog } from "./EditPlantDialog.tsx";

@@ -17,6 +17,7 @@ apps/
   host/                        # Thin shell — bootstraps Squide, no domain logic
   management/
     plants/                    # Management domain module
+    user/                      # User profile module
     storybook/                 # Management domain Storybook + Chromatic
   today/
     landing-page/              # Today domain module
@@ -24,7 +25,8 @@ apps/
   storybook/                   # Packages-layer Storybook
 packages/
   components/                  # Shared UI — shadcn/ui (Base UI) + Tailwind v4
-  plants-core/                 # Shared plants data layer (MSW handlers, TanStack DB, seed data)
+  core-module/                 # Cross-module infrastructure — session, auth, app shell
+  core-plants/                 # Shared plants data layer (MSW handlers, TanStack DB, seed data)
   storybook/                   # Shared Storybook config
 ```
 
@@ -32,7 +34,7 @@ Each domain is fully isolated — modules never import from each other. Each has
 
 ### Tech stack
 
-Node 24+, pnpm 10, TypeScript 7 (tsgo), Rsbuild, Vite (Storybooks), Tailwind CSS 4, TanStack DB, Storybook 10, Chromatic, Vitest, Playwright, oxlint, oxfmt, syncpack.
+Node 24+, pnpm 10, TypeScript 7 (tsgo), Rsbuild, Vite (Storybooks), Tailwind CSS 4, TanStack DB, Storybook 10, Chromatic, Vitest, Playwright, oxlint, oxfmt, syncpack, knip.
 
 ---
 
@@ -78,7 +80,7 @@ flowchart TD
 
 Key design decisions:
 
-- **Self-contained**: Plan, code, and test skills each embed their own `references/` files (tech-stack rules, styling conventions, accessibility requirements).
+- **Shared references**: Tech-stack rules (Tailwind, Storybook, shadcn, MSW, color mode) live in `agent-docs/references/` as a single source of truth. Each ADLC skill explicitly lists which references it reads — no duplication, no drift.
 - **Subagent protocol**: Every multi-agent step uses a drafter/reviewer pair (A drafts, B reviews and improves). The orchestrator spawns both — subagents never spawn further subagents.
 - **File-based coordination**: All inter-step communication goes through files in `./tmp/runs/[uuid]/`. This makes handoffs explicit and debuggable (see "Run folder artifacts" below).
 - **Test as the single gate**: The test skill owns all verification — both static (lint, modules, accessibility) and visual/interactive (browser screenshots via Chrome DevTools MCP). The code skill writes code; the test skill validates it.
@@ -162,13 +164,22 @@ Hook names follow the `{event}--{what}.sh` convention so it's clear at a glance 
 
 #### Static analysis
 
-Three tools run on every `pnpm lint` and in CI, catching issues before code is merged:
+Four tools run on every `pnpm lint` and in CI, catching issues before code is merged:
 
 | Tool     | What it enforces                                                                                        |
 | -------- | ------------------------------------------------------------------------------------------------------- |
 | oxlint   | Fast JS/TS linter — catches bugs, accessibility issues, and perf anti-patterns                          |
 | tsgo     | Native TypeScript type checker (`@typescript/native-preview`) — ensures type safety across all packages |
 | syncpack | Dependency version consistency — apps pin exact versions, packages use `^` ranges                       |
+| knip     | Dead code detection — unused files, unused/unlisted dependencies, unused exports                        |
+
+#### Bundle budgets
+
+[size-limit](https://github.com/ai/size-limit) enforces gzipped bundle size budgets per app. Budgets are defined in each app's `.size-limit.json` and checked in CI after every build. Agents that exceed a budget must optimize before increasing it — see [ODR-0006](agent-docs/odr/0006-bundle-budgets-size-limit.md) for the full policy.
+
+```bash
+pnpm sizecheck      # Check bundle size budgets
+```
 
 #### Storybook a11y testing
 
@@ -180,11 +191,12 @@ pnpm test           # Runs all workspace tests (including Storybook a11y) via Tu
 
 #### CI/CD
 
-Six GitHub Actions workflows, four of which involve Claude Code:
+Seven GitHub Actions workflows, four of which involve Claude Code:
 
 | Workflow          | Trigger                         | Purpose                                                                   |
 | ----------------- | ------------------------------- | ------------------------------------------------------------------------- |
-| `ci.yml`          | Push to main, PRs               | Build, lint (oxlint, oxfmt, typecheck, syncpack), test                    |
+| `ci.yml`          | Push to main, PRs               | Build, size-limit, lint (oxlint, oxfmt, typecheck, syncpack, knip), test  |
+| `lighthouse.yml`  | Push to main, PRs               | Lighthouse CI — performance gate (error below 0.5, 3 runs, median)        |
 | `chromatic.yml`   | Push to main, labeled PRs       | Visual regression testing — only affected Storybooks                      |
 | `claude.yml`      | `@claude` mention in issues/PRs | Claude Code agent responds to issues and PR comments                      |
 | `code-review.yml` | PRs opened/updated              | Automated code review by Claude (read-only tools)                         |
@@ -217,10 +229,10 @@ Utility skills use a **reference module pattern** — instead of hardcoding depe
 | `shadcn`                        | plan, code | shadcn/ui component management           |
 | `frontend-design`               | plan, code | Production-grade UI design               |
 | `workleap-squide`               | plan, code | Squide modular shell conventions         |
-| `pnpm`                          | code, test | Workspace dependency management          |
+| `pnpm`                          | code       | Workspace dependency management          |
 | `turborepo`                     | code, test | Monorepo task orchestration              |
 | `vitest`                        | test       | Unit testing                             |
-| `workleap-web-configs`          | code       | Shared ESLint/TypeScript/Rsbuild configs |
+| `workleap-web-configs`          | plan, code | Shared ESLint/TypeScript/Rsbuild configs |
 | `workleap-logging`              | code       | Structured logging                       |
 
 **Files:** [`.claude/skills/`](.claude/skills/), [`.agents/skills/`](.agents/skills/)
@@ -237,6 +249,7 @@ Formal logs of _why_ decisions were made — not just what was decided. Agents c
 | ODR-0002 | Dependency versioning via syncpack (apps pin, packages use `^`) |
 | ODR-0003 | Selective Chromatic runs — only test affected Storybooks        |
 | ODR-0004 | JIT packages — no pre-build needed for dev                      |
+| ODR-0005 | Knip for dead code detection in the lint pipeline               |
 
 **Files:** [`agent-docs/adr/`](agent-docs/adr/), [`agent-docs/odr/`](agent-docs/odr/)
 
@@ -298,4 +311,6 @@ pnpm oxlint        # oxlint (custom config in oxlintrc.json)
 pnpm oxfmt         # Formatter check (oxfmt with Tailwind class sorting)
 pnpm typecheck     # TypeScript (tsgo)
 pnpm syncpack      # Dependency version consistency
+pnpm knip          # Dead code detection (unused files, deps, exports)
+pnpm sizecheck     # Bundle size budgets
 ```

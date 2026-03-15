@@ -12,14 +12,14 @@ Handle committing, pushing, opening a PR, and monitoring CI. Uses a **single sub
 
 ## Inputs (provided by orchestrator)
 
-| Input        | Description                                                                                                                               |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `run-uuid`   | Run folder identifier                                                                                                                     |
-| Branch name  | The branch created in the orchestrator step 2                                                                                             |
-| Commit type  | Conventional commit prefix: `feat`, `fix`, `chore`, `docs`, or `refactor`                                                                 |
-| Plan path    | `./tmp/runs/[run-uuid]/plan.md` — needed for acceptance criteria                                                                          |
-| Iteration    | The final iteration number — used to find `changes-[iteration].md` for `## Verification results`                                          |
-| CI iteration | Current CI fix iteration number (1-3), provided by orchestrator. Used to name `ci-issues-[iteration].md`. Defaults to `1` on first merge. |
+| Input        | Description                                                                                                                                                                                                                                                                                          |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `run-uuid`   | Run folder identifier                                                                                                                                                                                                                                                                                |
+| Branch name  | The branch created in the orchestrator step 2                                                                                                                                                                                                                                                        |
+| Commit type  | Conventional commit prefix: `feat`, `fix`, `chore`, `docs`, or `refactor`                                                                                                                                                                                                                            |
+| Plan path    | `./tmp/runs/[run-uuid]/plan.md` — needed for acceptance criteria                                                                                                                                                                                                                                     |
+| Iteration    | The final iteration number. To find `## Verification results`, scan backwards from `changes-[iteration].md` through earlier `changes-*.md` files until one contains the section. During CI fix cycles the latest changes file may lack verification results because only the test skill writes them. |
+| CI iteration | Current CI fix iteration number (0-3), provided by orchestrator. Used to name `ci-issues-[iteration].md`. Defaults to `0` on first merge.                                                                                                                                                            |
 
 ## Step 1 — Commit
 
@@ -64,6 +64,8 @@ Format each criterion as:
 - ❌ `[tag]` criterion text — what was observed
 ```
 
+**Section 4 (conditional) — `## Budget increase`:** Only include this section if any `changes-*.md` file mentions a size-limit budget increase in its Notes section. List: which app, how much (KB gzipped), and why. See `agent-docs/references/bundle-size-budget.md` for the full policy.
+
 End with: `🤖 Generated with [Claude Code](https://claude.com/claude-code)`
 
 ### Create the PR
@@ -101,13 +103,18 @@ If `gh pr create` fails, retry once. If it fails again, **stop and write `ci-iss
 
 Not all CI workflows report results the same way. Some report via check run status (the workflow itself fails), while others always exit successfully and post results as **PR comments**.
 
-| Workflow                        | Reports via            | How to check                                                  |
-| ------------------------------- | ---------------------- | ------------------------------------------------------------- |
-| `CI` (ci.yml)                   | Check run status       | `gh run list` — look for completion + success                 |
-| `Code Review` (code-review.yml) | Inline review comments | Handled by orchestrator — **ignore** in CI monitoring         |
-| `Smoke Tests` (smoke-tests.yml) | PR comment             | `gh pr view --json comments` — scan for failure indicators    |
-| `Chromatic` (chromatic.yml)     | Check run status       | Label-gated — only runs after `run chromatic` label added     |
-| `Claude` (claude.yml)           | —                      | Triggered by `@claude` mentions — **ignore** in CI monitoring |
+| Workflow                         | Reports via      | Notes                                                |
+| -------------------------------- | ---------------- | ---------------------------------------------------- |
+| `CI` (ci.yml)                    | Check run status | Monitored                                            |
+| `Code Review` (code-review.yml)  | Check run status | Monitored                                            |
+| `Smoke Tests` (smoke-tests.yml)  | PR comment       | Monitored — scan bot comments for failure indicators |
+| `Lighthouse CI` (lighthouse.yml) | Check run status | Monitored                                            |
+| `Chromatic` (chromatic.yml)      | Check run status | Excluded — label-gated, runs after merge skill exits |
+| `Claude` (claude.yml)            | —                | Excluded — triggered by `@claude` mentions, not CI   |
+
+**Monitored workflows:** `CI`, `Code Review`, `Smoke Tests`, `Lighthouse CI`. These are tracked in the CI Validation comment.
+
+**Excluded workflows:** `Chromatic` (label-gated, runs after merge skill exits), `Claude` (triggered by mentions, not CI).
 
 ### Polling loop
 
@@ -115,7 +122,7 @@ Poll every 60 seconds, with a maximum wait of 30 minutes per CI cycle. Each poll
 
 **Channel 1 — Workflow run status:**
 
-Query workflow runs for the branch. Filter out `Chromatic`, `Claude`, and `Code review` runs by name. Wait until all remaining workflows (currently: `CI`, `Smoke Tests`) reach `status: "completed"`. If any has `conclusion: "failure"`, that workflow has failed.
+Query workflow runs for the branch. Filter out `Chromatic` and `Claude` runs by name. Wait until all monitored workflows (`CI`, `Code Review`, `Smoke Tests`, `Lighthouse CI`) reach `status: "completed"`. If any has `conclusion: "failure"`, that workflow has failed. Track each workflow's status (completed+success, completed+failure, or still running) for the CI Validation comment.
 
 **Channel 2 — Bot PR comments:**
 
@@ -141,9 +148,58 @@ Scan PR comments **only from known bot authors** (`claude[bot]`, `github-actions
 
 2. **All green — add Chromatic label and report success:** When all monitored workflows have completed successfully **and** no bot PR comments report failures **and** the stabilization check has passed, add the `run chromatic` label and **stop**. Do **not** wait for Chromatic to complete — visual regressions require human review. Report success after adding the label.
 
+3. **Not completed:** If the polling loop reaches 30 minutes and some monitored workflows have not completed, post the CI Validation comment showing which workflows are still running, then **stop**. Do not write `ci-issues-[iteration].md`. Do not add the `run chromatic` label. The remaining workflows will resolve on their own via GitHub's checks.
+
+### CI Validation comment
+
+**Always** post a sticky PR comment before exiting, regardless of outcome. This is a snapshot of what the agent observed at the time it stopped monitoring.
+
+**Sticky behavior:** Before posting, search for an existing comment starting with `## CI Validation` on the PR. If found, update it in place. If not found, create a new one. This avoids clutter across CI iterations.
+
+**Comment format — all workflows completed successfully:**
+
+```markdown
+## CI Validation
+
+All monitored workflows completed successfully.
+
+- [x] CI
+- [x] Code Review
+- [x] Smoke Tests
+- [x] Lighthouse CI
+```
+
+**Comment format — one or more workflows failed:**
+
+```markdown
+## CI Validation
+
+- [x] CI
+- [ ] Smoke Tests — failed
+- [x] Code Review
+- [x] Lighthouse CI
+```
+
+**Comment format — agent timed out before all workflows finished:**
+
+```markdown
+## CI Validation
+
+⚠️ Not completed — some workflows did not finish within the monitoring window.
+
+- [x] CI
+- [ ] Smoke Tests — still running
+- [x] Code Review
+- [ ] Lighthouse CI — still running
+```
+
+**Checklist entries:** One line per monitored workflow (`CI`, `Code Review`, `Smoke Tests`, `Lighthouse CI`). Use `- [x]` for completed+success, `- [ ] Name — failed` for completed+failure, `- [ ] Name — still running` for workflows that did not complete.
+
+**Post the comment before executing the terminal action** (adding the `run chromatic` label on success, or writing `ci-issues-[iteration].md` on failure/timeout).
+
 ## Hard Constraints
 
-- **The PR body MUST have exactly three sections: `## Summary`, `## Quality checks`, `## Verified acceptance criteria`.** No other sections.
+- **The PR body MUST have exactly three sections: `## Summary`, `## Quality checks`, `## Verified acceptance criteria`.** The only allowed additional section is `## Budget increase` (conditional — only when a budget was increased).
 
 ## Subagent Pattern
 

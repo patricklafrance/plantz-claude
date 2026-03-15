@@ -1,15 +1,16 @@
 # CI/CD Reference
 
-Six GitHub Actions workflows in `.github/workflows/`:
+Seven GitHub Actions workflows in `.github/workflows/`:
 
-| File                   | Purpose                                             |
-| ---------------------- | --------------------------------------------------- |
-| `ci.yml`               | Lint, typecheck, build, test on PRs and main pushes |
-| `chromatic.yml`        | Visual regression via Chromatic                     |
-| `claude.yml`           | Claude Code agent for issue/PR comments             |
-| `code-review.yml`      | Automated PR code review via Claude                 |
-| `audit-agent-docs.yml` | Weekly agent-docs freshness audit                   |
-| `smoke-tests.yml`      | Smoke-test the host app on PRs via Claude           |
+| File                   | Purpose                                                                     |
+| ---------------------- | --------------------------------------------------------------------------- |
+| `ci.yml`               | Build, size-limit, oxlint, typecheck, syncpack, test on PRs and main pushes |
+| `lighthouse.yml`       | Lighthouse CI — performance gate (error below 0.5, 3 runs, median)          |
+| `chromatic.yml`        | Visual regression via Chromatic                                             |
+| `claude.yml`           | Claude Code agent for issue/PR comments                                     |
+| `code-review.yml`      | Automated PR code review via Claude                                         |
+| `audit-agent-docs.yml` | Weekly agent-docs freshness audit                                           |
+| `smoke-tests.yml`      | Smoke-test the host app on PRs via Claude                                   |
 
 Read the YAML files directly for triggers, steps, and concurrency rules.
 
@@ -63,7 +64,7 @@ These deploys are independent of the GitHub Actions workflows listed above — N
 
 ## Turbo cache strategy
 
-Four workflows (ci, chromatic, claude, smoke-tests) share a Turbo cache pattern with restore-key prefixes (`${{ runner.os }}-turbo-`) that allow cross-workflow cache hits. `code-review.yml` and `audit-agent-docs.yml` do not use Turbo cache.
+Five workflows (ci, lighthouse, chromatic, claude, smoke-tests) share a Turbo cache pattern with restore-key prefixes (`${{ runner.os }}-turbo-`) that allow cross-workflow cache hits. `code-review.yml` and `audit-agent-docs.yml` do not use Turbo cache.
 
 When adding a new workflow that runs Turbo tasks, follow the existing pattern: restore before tasks, save on cache miss (`cache-hit != 'true'`), use prefix fallback keys.
 

@@ -14,7 +14,7 @@ Reset the MSW in-memory plant database with fresh seed data via Chrome DevTools 
 
 ## Background
 
-Plant data lives in an MSW in-memory database (`plantsDb` from `@packages/plants-core/db`). On page load, the host app calls `plantsDb.reset(defaultSeedPlants)` which populates ~250 plants. The `scripts/seed-plants.ts` script can also generate a static JSON file, but the primary seeding mechanism is the in-memory DB.
+Plant data lives in an MSW in-memory database (`plantsDb` from `@packages/core-plants/db`). On page load, the host app calls `plantsDb.reset(defaultSeedPlants)` which populates ~250 plants. The `scripts/seed-plants.ts` script can also generate a static JSON file, but the primary seeding mechanism is the in-memory DB.
 
 ## Procedure
 

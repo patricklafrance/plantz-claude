@@ -12,7 +12,7 @@ const runtime = await initializeFireflyForStorybook({
         async (rt: FireflyRuntime) => {
             rt.registerNavigationItem({
                 $id: "plants",
-                $label: "Plants",
+                $label: "My Plants",
                 $priority: 90,
                 to: "/management/plants",
             });

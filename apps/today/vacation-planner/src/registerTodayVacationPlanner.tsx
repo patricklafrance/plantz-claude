@@ -23,7 +23,7 @@ function registerRoutes(runtime: FireflyRuntime, collection: ReturnType<typeof c
     runtime.registerNavigationItem({
         $id: "today-vacation-planner",
         $label: "Vacation Planner",
-        $priority: 80,
+        $priority: 95,
         to: "/today/vacation-planner",
     });
 }

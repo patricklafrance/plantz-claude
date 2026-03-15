@@ -60,7 +60,7 @@ export function RecommendationCard({ recommendation, onDelegate, onOverride }: R
                     )}
                     {recommendation.override && <span className="text-muted-foreground text-xs italic">Overridden</span>}
                     {onOverride && !recommendation.override && (
-                        <Button variant="ghost" size="xs" onClick={() => onOverride?.(recommendation.plantId)}>
+                        <Button variant="ghost" size="xs" onClick={() => onOverride?.(recommendation.plantId)} title="Toggle this plant's recommendation between 'Water Before Trip' and 'Safe Until Return'">
                             Override
                         </Button>
                     )}

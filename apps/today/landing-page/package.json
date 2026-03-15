@@ -14,15 +14,11 @@
         "@packages/components": "workspace:*",
         "@packages/core-module": "workspace:*",
         "@packages/core-plants": "workspace:*",
-        "@tanstack/db": "^0.5.32",
         "@tanstack/react-db": "^0.1.76",
         "@tanstack/react-virtual": "^3.13.21",
-        "date-fns": "^4.1.0",
-        "lucide-react": "^0.577.0",
-        "zod": "^4.3.6"
+        "date-fns": "^4.1.0"
     },
     "devDependencies": {
-        "@apps/packages-storybook": "workspace:*",
         "@storybook/react-vite": "10.2.15",
         "@types/react": "19.2.9",
         "@types/react-dom": "19.2.3",

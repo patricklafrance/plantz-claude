@@ -20,8 +20,9 @@ Combine custom affected-detection with label gating and Chromatic's `onlyChanged
 
 ## Consequences
 
-- PRs require the `run chromatic` label to trigger visual regression testing. The label is auto-removed after the workflow completes.
-- `scripts/getAffectedStorybooks.ts` must be maintained when Storybook packages are added or renamed.
-- Each Chromatic step uses `skip` to bypass unaffected Storybooks based on the script's outputs.
-- On push to `main`, `autoAcceptChanges` is enabled — changes are auto-accepted as the new baseline.
-- If the affected-detection script fails, all Storybooks should run as a fallback.
+- PRs require the `run chromatic` label to trigger visual regression testing.
+- `scripts/getAffectedStorybooks.ts` determines which Storybooks are affected using Turborepo's dependency graph. Unaffected Storybooks are skipped entirely.
+- On push to `main`, changes are auto-accepted as the new Chromatic baseline.
+- If the affected-detection script fails, all Storybooks run as a fallback — safety over speed.
+
+See [references/ci-cd.md](../references/ci-cd.md) for maintenance procedures and workflow details.

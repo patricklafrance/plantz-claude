@@ -24,7 +24,8 @@ For build tooling, CI, or agent workflow decisions, write an [ODR](../odr/) inst
 1. Find the next number: check this folder for the highest `NNNN` and increment.
 2. Copy [template.md](./template.md) to `NNNN-short-title.md`.
 3. Fill in all sections — especially **Options Considered** and **Decision** with clear rationale.
-4. Set status to `proposed`. A developer will accept it during PR review.
+4. Keep **Consequences** focused on impacts: capabilities gained, constraints introduced, trade-offs accepted. Do not include procedural guidance ("when X happens, do Y") or configuration how-tos — those belong in `agent-docs/references/`. ADRs record _why_ a decision was made; reference docs show _how_ to work with it.
+5. Set status to `proposed`. A developer will accept it during PR review.
 
 ## Status lifecycle
 

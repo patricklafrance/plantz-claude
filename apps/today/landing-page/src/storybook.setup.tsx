@@ -30,7 +30,7 @@ function CollectionDecorator({ children }: { children: ReactNode }) {
     );
 }
 
-export function withCollectionDecorator(): Decorator {
+function withCollectionDecorator(): Decorator {
     return (story) => <CollectionDecorator>{story()}</CollectionDecorator>;
 }
 

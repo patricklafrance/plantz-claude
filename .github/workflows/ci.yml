@@ -41,6 +41,12 @@ jobs:
                   cache: pnpm
                   cache-dependency-path: pnpm-lock.yaml
 
+            - name: Secret scan
+              uses: gitleaks/gitleaks-action@v2
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  GITLEAKS_CONFIG: .gitleaks.toml
+
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
 

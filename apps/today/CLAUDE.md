@@ -31,7 +31,7 @@ Modules in this domain own their API surface under `/api/today/`. Each module ha
 - `src/plantsCollection.ts` — TanStack DB collection factory (`createTodayPlantsCollection`) called during registration + optimistic actions via `createOptimisticAction`. The collection is provided to components via `TodayPlantsCollectionProvider` React Context.
 - `src/mocks/` — MSW handlers scoped to `/api/today/<entity>`
 
-Components read with `useLiveQuery` and write with actions from `createTodayPlantActions`. No `api/` folder — the collection handles data fetching internally via `queryCollectionOptions`.
+Components read with `useLiveQuery`. Mutations go through MSW handlers (`DELETE /api/today/plants/:id` and `DELETE /api/today/plants`). No `api/` folder — the collection handles data fetching internally via `queryCollectionOptions`.
 
 See `msw-tanstack-query.md` in `.claude/skills/plantz-adlc-*/references/` for implementation patterns.
 

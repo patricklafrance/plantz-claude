@@ -37,7 +37,7 @@ class StorybookRuntimeScope extends FireflyRuntimeScope {}
 
 // --- initializeFireflyForStorybook ---
 
-export interface InitializeFireflyForStorybookOptions {
+interface InitializeFireflyForStorybookOptions {
     localModules?: ModuleRegisterFunction<FireflyRuntime>[];
     environmentVariables?: EnvironmentVariables;
     featureFlags?: Partial<FeatureFlags>;
@@ -72,11 +72,11 @@ export async function initializeFireflyForStorybook(options: InitializeFireflyFo
 
 // --- withFireflyDecorator ---
 
-export interface FireflyDecoratorProps extends PropsWithChildren {
+interface FireflyDecoratorProps extends PropsWithChildren {
     runtime: FireflyRuntime;
 }
 
-export function FireflyDecorator({ runtime, children: story }: FireflyDecoratorProps) {
+function FireflyDecorator({ runtime, children: story }: FireflyDecoratorProps) {
     return (
         <FireflyProvider runtime={runtime}>
             <AppRouter strictMode={false}>
@@ -114,6 +114,6 @@ function OverrideFeatureFlags({ overrides, children }: PropsWithChildren<{ overr
     return children;
 }
 
-export function withFeatureFlagsOverrideDecorator(overrides: Partial<FeatureFlags>): Decorator {
+function withFeatureFlagsOverrideDecorator(overrides: Partial<FeatureFlags>): Decorator {
     return (story) => <OverrideFeatureFlags overrides={overrides}>{story()}</OverrideFeatureFlags>;
 }

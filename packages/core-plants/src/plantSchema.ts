@@ -19,4 +19,3 @@ export const plantSchema = z.object({
 });
 
 export type Plant = z.infer<typeof plantSchema>;
-export type PlantInput = z.input<typeof plantSchema>;

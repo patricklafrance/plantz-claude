@@ -2,6 +2,8 @@
 
 A plants watering app used as a proof-of-concept for a **Claude Code agent harness** — a structured setup that lets AI agents scaffold sfeatures.
 
+Hosted on Netlify: https://plantz-claude-storybook.netlify.app/
+
 ## What's in this repo
 
 ### The application

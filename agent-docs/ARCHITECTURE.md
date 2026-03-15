@@ -23,7 +23,7 @@ plantz-claude/
     core-module/                   # Cross-module infrastructure — session, auth, app shell (@packages/core-module)
     core-plants/                   # Shared plant domain types, utilities, and components (@packages/core-plants)
     storybook/                     # Packages-layer Storybook runner for shared package stories (@apps/packages-storybook)
-  tooling/                         # Build scripts (getAffectedStorybooks.ts)
+  scripts/                         # Build scripts (getAffectedStorybooks.ts)
   agent-docs/                      # Agent documentation (this folder)
   .agents/skills/                  # Shared agent skills (git-commit, etc.)
   .claude/skills/                  # Claude Code discovery layer — symlinks to .agents/skills/ plus project-specific skills

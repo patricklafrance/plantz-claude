@@ -48,7 +48,13 @@ Consuming apps also use `@source` directives to tell Tailwind where to find util
 @import "@packages/components/globals.css";
 
 @source "../../../../packages/components/src/**/*.{ts,tsx}";
+@source "../../../../packages/core-module/src/shell/**/*.{ts,tsx}";
 @source "../../../../packages/core-plants/src/**/*.{ts,tsx}";
+@source "../../../management/plants/src/**/*.{ts,tsx}";
+@source "../../../management/user/src/**/*.{ts,tsx}";
+@source "../../../today/landing-page/src/**/*.{ts,tsx}";
 ```
 
-If you add a new workspace package whose components are rendered in the host app, add a corresponding `@source` directive in `apps/host/src/styles/globals.css`. Domain-module source paths (e.g., `management/plants`, `today/landing-page`) also need their own `@source` entries there.
+This is the host app example. Domain storybooks and the unified storybook have their own `globals.css`/`storybook.css` with similar `@source` directives scoped to their relevant packages and modules.
+
+If you add a new workspace package or domain module whose components are rendered in the host app, add a corresponding `@source` directive in `apps/host/src/styles/globals.css` and in the relevant storybook CSS files.

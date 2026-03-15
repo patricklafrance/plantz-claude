@@ -4,4 +4,5 @@
 @source "../../../../packages/core-module/src/shell/**/*.{ts,tsx}";
 @source "../../../../packages/core-plants/src/**/*.{ts,tsx}";
 @source "../../../management/plants/src/**/*.{ts,tsx}";
+@source "../../../management/user/src/**/*.{ts,tsx}";
 @source "../../../today/landing-page/src/**/*.{ts,tsx}";

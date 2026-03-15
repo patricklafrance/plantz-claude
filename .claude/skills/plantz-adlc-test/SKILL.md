@@ -89,7 +89,7 @@ Run all workspace tests as a gate check. This includes Storybook a11y tests (axe
 
 ## Output
 
-- If **all checks pass** (static, browser, and workspace tests): do NOT create an issues file. The orchestrator uses the `<!-- test-complete -->` marker in `changes-[iteration].md` (written in step 9) to confirm the test ran to completion.
+- If **all checks pass** (static, browser, and workspace tests): do NOT create an issues file. The orchestrator uses the `<!-- test-complete -->` marker in `changes-[iteration].md` (written in step 10) to confirm the test ran to completion.
 - If **any check fails**: write the issues to `./tmp/runs/[run-uuid]/test-issues-[iteration].md` with this format:
 
 ```markdown

@@ -16,7 +16,7 @@ This skill requires `agent-browser` CLI for browser verification (navigating to 
 
 ## Run Folder
 
-Generate a UUID and create `./tmp/smoke-tests/[run-uuid]/`. All screenshots and artifacts go in this folder.
+Generate a UUID and create `.smoke-tests/[run-uuid]/`. All screenshots and artifacts go in this folder.
 
 ## Target
 
@@ -50,7 +50,7 @@ The app redirects unauthenticated users to `/login`. You must log in before veri
 
 1. Take a page snapshot and confirm the authenticated layout loaded (header, navigation, content area — not the login form).
 2. Check the browser console for errors. Warnings are acceptable — errors are not.
-3. Take a screenshot and save it to `./tmp/smoke-tests/[run-uuid]/{app-name}.png`.
+3. Take a screenshot and save it to `.smoke-tests/[run-uuid]/{app-name}.png`.
 
 ### Step 5 — Stop the dev server
 
@@ -82,7 +82,7 @@ taskkill //PID <PID> //T //F
 
 ## Cleanup
 
-- **On success:** delete the run folder: `rm -rf ./tmp/smoke-tests/[run-uuid]`.
+- **On success:** delete the run folder: `rm -rf .smoke-tests/[run-uuid]`.
 - **On failure:** never delete the run folder. Leave artifacts for diagnosis.
 
 ## Summary

@@ -15,15 +15,22 @@ Coordinates the full Agent Development Life Cycle for a feature by spawning spec
 1. **Subagent A** (drafter): produces the initial output (plan, code, test report, doc update).
 2. **Subagent B** (challenger): reviews Subagent A's output and improves it. B fixes everything it can by editing the output files and the code directly. The one exception: B can write an escalation file for structural issues that require a plan revision (see "Escalation Check").
 
-The **orchestrator** spawns both subagents directly — subagents never spawn further subagents. Only one subagent writes to the repo or output file at a time (A finishes before B starts).
+The **orchestrator** spawns both subagents directly — subagents never spawn further subagents.
 
 The real validation gate is the `plantz-adlc-test` phase — B improves quality before that gate but is not the final check.
 
-**Subagent lifecycle:** Claude Code subagents are stateless. Each spawned subagent starts fresh. Context is passed between iterations via files in `./tmp/runs/[run-uuid]/`. Always spawn new subagents with the relevant file paths — never refer to "existing subagents."
+Context is passed between subagents via files in `.adlc/[run-uuid]/`. Always spawn new subagents with the relevant file paths.
 
 ## Hard Constraints
 
-- **Never edit repository files directly** — only `./tmp/runs/` and git/shell commands. All source code, config, docs, and tests go through subagents. The orchestrator's context window is too scarce to spend on code. If a change seems "too small to delegate," delegate it anyway.
+- **Never edit repository files directly** — only `.adlc/` and git/shell commands. All source code, config, docs, and tests go through subagents. The orchestrator's context window is too scarce to spend on code. If a change seems "too small to delegate," delegate it anyway.
+
+## Inputs (optional — for revise mode)
+
+| Input                | Description                                                                                                         |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `--revise`           | The user's change request (feedback text). Presence of this input indicates revise mode — skip `.adlc/` cleanup, use current branch |
+| `--previous-run-uuid`| UUID of the previous run. Required when `--revise` is set. Used to locate `.adlc/[uuid]/plan.md`                    |
 
 ## Port Cleanup Between Subagents
 
@@ -34,57 +41,50 @@ The real validation gate is the `plantz-adlc-test` phase — B improves quality 
 If a subagent fails to produce its expected output file, or if a command fails unexpectedly:
 
 1. **Stop the run** — do not retry blindly.
-2. **Preserve artifacts** — do not clean up `./tmp/runs/[run-uuid]/`. All intermediate files (`changes-*.md`, `test-issues-*.md`, `orchestrator-state.md`) remain on disk for post-mortem.
-3. **Write a failure summary** to `./tmp/runs/[run-uuid]/failure-summary.md` containing: the step that failed, the error or unresolved issues, and what was attempted.
-
-Only clean up the run folder on successful completion (step 9).
+2. **Write a failure summary** to `.adlc/[run-uuid]/failure-summary.md` containing: the step that failed, the error or unresolved issues, and what was attempted.
 
 ## Steps
 
 ### Step 1 — Generate run UUID and create run folder
 
-Generate a UUID and create `./tmp/runs/[run-uuid]/`. Pass the UUID to every subagent. Each run gets its own folder to avoid file collisions. (`tmp/` is already in `.gitignore`.)
+**New feature (default):** Delete any existing `.adlc/` directory (handle both tracked and untracked files). Generate a UUID and create `.adlc/[run-uuid]/`. Pass the UUID to every subagent.
 
-### Step 2 — Create a branch from `main`
+**Revise mode (when `--revise` is provided):** Do NOT delete `.adlc/`. Generate a new UUID and create `.adlc/[run-uuid]/`.
 
-First, run `git status --short` to verify the working tree is clean. If there are uncommitted changes, stop and ask the user to resolve them.
+### Step 2 — Create a branch from `main` (or checkout existing)
 
-Branch format: `{type}/{short-description}` (kebab-case).
-Use the commit type matching the feature intent: `feat`, `fix`, `chore`, `docs`, `refactor`.
-Example: `feat/add-watering-schedules`.
+**New feature (default):** Verify the working tree is clean. If there are uncommitted changes, stop and ask the user to resolve them. Pull latest `main` and create a branch. Branch format: `{type}/{short-description}` (kebab-case). Use the commit type matching the feature intent: `feat`, `fix`, `chore`, `docs`, `refactor`. Example: `feat/add-watering-schedules`.
 
-Pull latest `main` and create the branch.
+**Revise mode (when `--revise` is provided):** Skip branch creation. Use the current branch. Pull latest. Discover the PR number from the branch.
 
 ### Step 3 — Plan
 
-**If an inline plan was provided in the prompt:** Write it to `./tmp/runs/[run-uuid]/plan.md`. Spawn only **Subagent B** with `mode=review`, `run-uuid`, feature description, and the plan path.
+**Revise mode (when `--revise` is provided):** Spawn two subagents using the `plantz-adlc-plan` skill with `mode=revision`, `run-uuid`, feature description (the `--revise` text), the previous plan path (`.adlc/[--previous-run-uuid value]/plan.md`), and escalation path `null`.
 
-**Otherwise:** Spawn two subagents with `mode=draft`, `run-uuid`, feature description. Existing plan path and escalation path are `null`.
+**New feature (default):** Spawn two subagents using the `plantz-adlc-plan` skill with `mode=draft`, `run-uuid`, feature description. Existing plan path and escalation path are `null`.
 
-When done, verify `./tmp/runs/[run-uuid]/plan.md` exists. If not, fail the run.
+When done, verify `.adlc/[run-uuid]/plan.md` exists. If not, fail the run.
 
 ### Step 4 — Code
 
 Spawn two subagents using the `plantz-adlc-code` skill.
 Pass: `run-uuid`, `iteration=1`, plan path. Issues path, changes path, and escalation context are `null` for iteration 1.
-When done, verify `./tmp/runs/[run-uuid]/changes-1.md` exists. If not, fail the run.
+When done, verify `.adlc/[run-uuid]/changes-1.md` exists. If not, fail the run.
 
-**Escalation check:** After the code subagent returns, check for `./tmp/runs/[run-uuid]/escalation-1.md`. If present, follow the escalation check procedure (see "Escalation check" below).
+**Escalation check:** After the code subagent returns, check for `.adlc/[run-uuid]/escalation-1.md`. If present, follow the escalation check procedure (see "Escalation check" below).
 
 ### Step 5 — Simplify
 
-Spawn **one** subagent with the `simplify` skill to review the uncommitted changes for dead code, redundant abstractions, and over-engineering. This runs once on the initial implementation — fix iterations produce small surgical patches that don't need simplification.
+Spawn **one** subagent with the `simplify` skill. If it crashes or returns no output, log a warning and continue.
 
-If the subagent crashes or returns no output, log a warning and continue.
-
-After the simplify subagent returns, if it made changes, append a `## Simplify` section to `changes-[iteration].md` listing the files it modified and what it removed. This keeps the changes file accurate for downstream phases (test, document, merge).
+If it made changes, append a `## Simplify` section to `changes-[iteration].md` listing the files it modified. This keeps the changes file accurate for downstream phases.
 
 ### Step 6 — Test and iterate
 
 Spawn two subagents using the `plantz-adlc-test` skill.
-Pass: `run-uuid`, `iteration=1`, plan path (`./tmp/runs/[run-uuid]/plan.md`), previous issues path (`null` for iteration 1).
+Pass: `run-uuid`, `iteration=1`, plan path (`.adlc/[run-uuid]/plan.md`), previous issues path (`null` for iteration 1).
 
-- If `./tmp/runs/[run-uuid]/test-issues-[test iteration].md` is produced with issues:
+- If `.adlc/[run-uuid]/test-issues-[test iteration].md` is produced with issues:
     - Check `Test iteration` in `orchestrator-state.md` — if ≥ 5, follow the failure handling procedure (maximum 5 test iterations).
     - Increment `Test iteration`. Update `orchestrator-state.md` with the new value and set `Current step: 6-code`.
     - Spawn new `plantz-adlc-code` subagents. Pass: `run-uuid`, `iteration` = `Test iteration`, plan path, the previous iteration's issues file path (`test-issues-[test iteration - 1].md`), the previous iteration's changes file path (`changes-[test iteration - 1].md`), and escalation context (the rejected escalation file path if one was rejected earlier, otherwise `null`). They produce `changes-[test iteration].md`.
@@ -98,21 +98,23 @@ Pass: `run-uuid`, `iteration=1`, plan path (`./tmp/runs/[run-uuid]/plan.md`), pr
 ### Step 7 — Document
 
 Spawn two subagents using the `plantz-adlc-document` skill (following the subagent protocol).
-Pass: `run-uuid`, the final `Test iteration` number, plan path (`./tmp/runs/[run-uuid]/plan.md`).
+Pass: `run-uuid`, the final `Test iteration` number, plan path (`.adlc/[run-uuid]/plan.md`).
 
-When done, run `git diff --stat` to verify the subagent made documentation changes. A documentation phase that changes nothing is unusual — review the subagent's output to confirm it completed normally. If it appears to have crashed, follow the failure handling procedure.
+When done, verify the subagent made documentation changes. A documentation phase that changes nothing is unusual — if it appears to have crashed, follow the failure handling procedure.
 
-### Step 8 — Merge
+### Step 8 — PR
 
-Spawn **one** subagent using the `plantz-adlc-merge` skill. This step uses a single subagent only — concurrent git operations would conflict.
-Pass: `run-uuid`, the branch name from step 2, the commit type from step 2, the plan path (`./tmp/runs/[run-uuid]/plan.md`), the final `Test iteration` number, and `CI iteration` (starts at `0`). Set `CI iteration: 0` in `orchestrator-state.md`.
+Spawn **one** subagent using the `plantz-adlc-pr` skill.
+Pass: `run-uuid`, the branch name from step 2, the commit type from step 2, the plan path (`.adlc/[run-uuid]/plan.md`), the final `Test iteration` number, and `CI iteration` (starts at `0`). Set `CI iteration: 0` in `orchestrator-state.md`.
 
-After the merge subagent creates the PR (or confirms one exists), query the PR number for the branch and record it in `orchestrator-state.md`. This survives context compaction.
+After the PR subagent creates the PR (or confirms one exists), record the PR number in `orchestrator-state.md`.
 
-The merge subagent returns in one of two ways:
+The PR subagent returns in one of two ways:
 
-- **Success:** All CI checks passed and the `run chromatic` label was added to trigger visual regression testing. Chromatic runs asynchronously — the agent does not wait for it. Proceed to Step 9.
-- **CI failure:** The merge subagent writes `ci-issues-[CI iteration].md` and stops.
+- **Success:** All CI checks passed. The run is complete.
+
+**Revise mode:** Pass `--revision` to the PR subagent. The PR subagent appends a `## Revision [N]` section and updates the footer's revise command with the new run UUID.
+- **CI failure:** The PR subagent writes `ci-issues-[CI iteration].md` and stops.
     - Increment `CI iteration`. Update `orchestrator-state.md` with the new value.
     - Check `CI iteration` — if > 3, follow the failure handling procedure (maximum 3 fix attempts).
     - Set `Current step: 8-ci-fix`.
@@ -122,15 +124,11 @@ The merge subagent returns in one of two ways:
     - Spawn new `plantz-adlc-test` subagents. Pass: `run-uuid`, `iteration` = `Test iteration` + `CI iteration`, plan path, previous issues path = `null`.
     - **Completion check:** Verify `changes-[iteration].md` contains `<!-- test-complete -->`. If absent, the test subagent crashed — follow failure handling.
     - If `test-issues-[iteration].md` exists (test failed): treat as a CI failure — return to the top of the CI failure flow above. The test failure consumes one attempt from the shared budget.
-    - If no issues file exists and the marker is present (test passed): spawn a new merge subagent with `Iteration` = `Test iteration` + `CI iteration`, and the current `CI iteration`. On success, proceed to Step 9. On CI failure, return to the top of the CI failure flow above.
-
-### Step 9 — Clean up
-
-Delete the `./tmp/runs/[run-uuid]/` folder.
+    - If no issues file exists and the marker is present (test passed): spawn a new PR subagent with `Iteration` = `Test iteration` + `CI iteration`, and the current `CI iteration`. On success, proceed to Step 9. On CI failure, return to the top of the CI failure flow above.
 
 ## State Persistence
 
-After completing each step, write the current state to `./tmp/runs/[run-uuid]/orchestrator-state.md` atomically (write to a temp file, then rename).
+After completing each step, write the current state to `.adlc/[run-uuid]/orchestrator-state.md`.
 
 Template:
 
@@ -140,7 +138,7 @@ Template:
 - Run UUID: [uuid]
 - Branch: [branch-name]
 - Commit type: [feat/fix/chore/docs/refactor] (conventional commit prefix)
-- Current step: [1-9] (use `6-code` / `6-test` within step 6; `8-ci-fix` / `8-ci-test` within step 8)
+- Current step: [1-8] (use `6-code` / `6-test` within step 6; `8-ci-fix` / `8-ci-test` within step 8)
 - Test iteration: [1-5] (current test-fix cycle — starts at 1, incremented after each test failure)
 - Plan revised: [yes/no]
 - Escalation rejected: [none/iteration-N — brief reason]
@@ -151,25 +149,16 @@ Template:
 
 **Before writing state**, confirm the step's expected artifact exists — do not write state claiming a step completed if its output is missing.
 
-This allows the orchestrator to recover if the context window is compacted mid-run. At the start of each step, read this file to restore state if needed.
-
-## Iteration Tracking
-
-Two iteration counters, both starting at 1:
-
-- **`Test iteration`** (Step 6): Incremented after each test failure. Passed to code and test subagents. Artifacts: `changes-[N].md`, `test-issues-[N].md`. Maximum 5.
-- **`CI iteration`** (Step 8): Starts at 0. Incremented on each failure, then checked before the fix runs. Code and test subagents receive `iteration` = `Test iteration` + `CI iteration` (avoids collisions with Step 6 artifacts). CI issues: `ci-issues-[N].md`. Maximum 3 fix attempts (fail the run when `CI iteration > 3`).
-
 ## Escalation Check
 
-Referenced from Step 4, Step 6, and Step 8. After any code subagent returns, check for `./tmp/runs/[run-uuid]/escalation-[iteration].md`. If absent, continue normally (proceed to the next phase — simplify, test, or CI-test depending on context). If present:
+Referenced from Step 4, Step 6, and Step 8. After any code subagent returns, check for `.adlc/[run-uuid]/escalation-[iteration].md`. If absent, continue normally (proceed to the next phase — simplify, test, or CI-test depending on context). If present:
 
 1. Read `orchestrator-state.md` to check whether `Plan revised` is already `yes`. If so, a plan revision already occurred. Follow the failure handling procedure — but include the second escalation file's diagnosis in `failure-summary.md` so the user understands the additional structural issue that surfaced.
 2. Read the escalation file and judge whether the issue is genuinely structural (the plan's approach is fundamentally wrong) or whether the code agent is being too cautious about a fixable problem.
 3. **If justified:** Spawn `plantz-adlc-plan` subagents with `mode=revision`, feature description, `plan.md` path, and escalation file path. After revision, clean up:
     - Delete all `escalation-*.md`, `changes-*.md`, `test-issues-*.md`, and `ci-issues-*.md` from the run folder.
     - If escalation happened during Step 8: reset the branch to its merge-base with main and force-push.
-    - Reset the working tree to a clean state, preserving the `tmp/` directory.
+    - Reset the working tree to a clean state.
     - Set `Test iteration` to 1, `Plan revised: yes` in state. Restart from Step 4.
-4. **If not justified:** Update `orchestrator-state.md` with `Escalation rejected: iteration-[N] — [one-line reason]`. Proceed to the next phase (simplify, test, or CI-test depending on context). The escalation file remains on disk. Pass it to the next code subagent via the `Escalation context` input if another fix cycle occurs — the code subagent reads it to understand what was tried and why the orchestrator disagreed. If no further fix cycle occurs (tests pass), ignore it.
+4. **If not justified:** Update `orchestrator-state.md` with `Escalation rejected: iteration-[N] — [one-line reason]`. Proceed to the next phase (simplify, test, or CI-test depending on context). Pass the escalation file to the next code subagent via the `Escalation context` input if another fix cycle occurs.
 5. **Maximum 1 plan revision per run.** Enforced by checking `Plan revised` in step 1 above.

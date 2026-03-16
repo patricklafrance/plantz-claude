@@ -44,7 +44,23 @@ Four pillars make this repo fully agent-driven. Each section links to the implem
 
 ### 1. ADLC skills — end-to-end feature development
 
-Six skills that form a complete Agent Development Life Cycle (ADLC). The orchestrator (`/plantz-adlc-orchestrator`) is the sole entry point for feature development — it spawns subagents for each phase and coordinates them through file-based handoffs in `./tmp/runs/[uuid]/`.
+Seven skills that form a complete Agent Development Life Cycle (ADLC). Two flows:
+
+**New feature** — run the orchestrator locally with a feature request. It creates a branch, spawns subagents for each phase (plan, code, test, document), opens a PR, and monitors CI.
+
+```
+/plantz-adlc-orchestrator Add a vacation planner page with date picker and delegation support
+```
+
+**Revise a feature** — on the PR branch, run the orchestrator with `--revise` to apply feedback through the full ADLC pipeline (plan revision, code, test, document, push).
+
+```
+/plantz-adlc-orchestrator --revise "restructure the data layer to use TanStack DB" --previous-run-uuid abc123
+```
+
+The `--previous-run-uuid` is shown in the PR description footer. For lightweight fixes, comment `/patch <feedback>` directly on the PR instead — a CI workflow applies the patch, runs tests, and pushes.
+
+All inter-step coordination goes through files in `.adlc/[uuid]/`.
 
 ```mermaid
 flowchart TD
@@ -59,10 +75,10 @@ flowchart TD
         Test -- "issues found" --> Code
         Test -- "all passed" -->
         Document["<b>Document</b><br/>A audits · B reviews"] -->
-        Merge["<b>Merge</b><br/>commit, PR, CI"]
+        PR["<b>PR</b><br/>commit, push, CI"]
     end
 
-    Merge --> Done([PR ready])
+    PR --> Done([PR ready])
 
     style Start fill:#4ade80,stroke:#16a34a,color:#000
     style Done fill:#4ade80,stroke:#16a34a,color:#000
@@ -71,18 +87,19 @@ flowchart TD
 
 | Skill                      | What it does                                                                                                   |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `plantz-adlc-orchestrator` | Entry point. Generates a run UUID, creates a branch, and runs steps 1-9 sequentially                           |
+| `plantz-adlc-orchestrator` | Entry point. Generates a run UUID, creates a branch, and runs steps 1-8 sequentially                           |
 | `plantz-adlc-plan`         | Drafts a structured technical plan with tagged acceptance criteria (`[static]`, `[visual]`, `[interactive]`)   |
 | `plantz-adlc-code`         | Implements the plan or fixes issues. Uses Chrome DevTools MCP for visual feedback while coding                 |
 | `plantz-adlc-test`         | Single validation gate — static checks (lint, modules, accessibility) and browser verification of all criteria |
 | `plantz-adlc-document`     | Audits agent-docs and CLAUDE.md for drift, creates ADRs/ODRs if new decisions were made                        |
-| `plantz-adlc-merge`        | Commits, pushes, opens a PR with strict template, monitors CI. Returns control on failures                     |
+| `plantz-adlc-pr`           | Commits, pushes, opens a PR, monitors CI. Returns control on failures                                          |
+| `plantz-adlc-patch`        | Lightweight PR iteration — applies scoped fixes from `/patch` comments in CI                                   |
 
 Key design decisions:
 
 - **Shared references**: Tech-stack rules (Tailwind, Storybook, shadcn, MSW, color mode) live in `agent-docs/references/` as a single source of truth. Each ADLC skill explicitly lists which references it reads — no duplication, no drift.
 - **Subagent protocol**: Every multi-agent step uses a drafter/reviewer pair (A drafts, B reviews and improves). The orchestrator spawns both — subagents never spawn further subagents.
-- **File-based coordination**: All inter-step communication goes through files in `./tmp/runs/[uuid]/`. This makes handoffs explicit and debuggable (see "Run folder artifacts" below).
+- **File-based coordination**: All inter-step communication goes through files in `.adlc/[uuid]/`. This makes handoffs explicit and debuggable (see "Run folder artifacts" below).
 - **Test as the single gate**: The test skill owns all verification — both static (lint, modules, accessibility) and visual/interactive (browser screenshots via Chrome DevTools MCP). The code skill writes code; the test skill validates it.
 - **Acceptance criteria flow**: Plan tags each criterion. Test verifies them and writes results to `changes-*.md`. Merge reads results and populates the PR with pass/fail status. See [Acceptance criteria flow](#acceptance-criteria-flow) below.
 
@@ -122,10 +139,10 @@ A maximum of one plan revision is allowed per run — the system fails fast rath
 
 #### Run folder artifacts
 
-Every ADLC run produces files in `./tmp/runs/[uuid]/` that flow between subagents:
+Every ADLC run produces files in `.adlc/[uuid]/` that flow between subagents:
 
 ```
-./tmp/runs/[uuid]/
+.adlc/[uuid]/
   ├─ orchestrator-state.md    # Orchestrator writes after each step (recovery on context compaction)
   ├─ plan.md                  # Plan skill writes → Code, Test, Merge read
   ├─ changes-1.md             # Code writes → Test appends verification results → Merge reads for PR
@@ -135,8 +152,6 @@ Every ADLC run produces files in `./tmp/runs/[uuid]/` that flow between subagent
   ├─ ci-issues-1.md           # Merge writes (only if CI fails) → Code reads for fix
   └─ failure-summary.md       # Orchestrator writes on unrecoverable failure
 ```
-
-The folder is deleted on successful completion and preserved on failure for post-mortem.
 
 **Files:** [`.claude/skills/plantz-adlc-*/`](.claude/skills/)
 
@@ -193,7 +208,7 @@ pnpm test           # Runs all workspace tests (including Storybook a11y) via Tu
 
 #### CI/CD
 
-Seven GitHub Actions workflows, four of which involve Claude Code:
+Eight GitHub Actions workflows, five of which involve Claude Code:
 
 | Workflow          | Trigger                         | Purpose                                                                               |
 | ----------------- | ------------------------------- | ------------------------------------------------------------------------------------- |
@@ -203,6 +218,7 @@ Seven GitHub Actions workflows, four of which involve Claude Code:
 | `claude.yml`      | `@claude` mention in issues/PRs | Claude Code agent responds to issues and PR comments                                  |
 | `code-review.yml` | PRs opened/updated              | Automated code review by Claude (read-only tools)                                     |
 | `smoke-tests.yml` | PRs to main                     | Smoke-tests all apps via Claude (scoped Bash, artifact upload on failure)             |
+| `adlc-patch.yml`  | `/patch` in PR comments         | Patch iteration — lightweight fixes on existing PRs via Claude                        |
 
 **Files:** [`.github/workflows/`](.github/workflows/), [`.github/prompts/`](.github/prompts/)
 

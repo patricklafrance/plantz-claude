@@ -16,7 +16,7 @@ Implement the plan or fix issues reported by the test phase or CI.
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `run-uuid`         | Run folder identifier                                                                                                                                   |
 | `iteration`        | Current iteration number (starts at 1). This is the iteration the agent will **write** to (`changes-[iteration].md`).                                   |
-| Plan path          | Always provided — `./tmp/runs/[run-uuid]/plan.md`                                                                                                       |
+| Plan path          | Always provided — `.adlc/[run-uuid]/plan.md`                                                                                                       |
 | Issues path        | `null` on iteration 1. On fix cycles: the path to the issues file — either `test-issues-*.md` (from test phase) or `ci-issues-*.md` (from CI failures). |
 | Changes path       | `null` on iteration 1. On fix cycles: the explicit path to the **previous** iteration's changes file (e.g., `changes-1.md` when `iteration=2`).         |
 | Escalation context | `null` unless the orchestrator rejected a previous escalation. If provided: path to the rejected escalation file from a prior iteration.                |
@@ -30,13 +30,13 @@ This skill runs in one of two modes, determined by the inputs:
 
 ## Procedure
 
-1. Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, `agent-docs/odr/index.md`, and these reference files: `agent-docs/references/domains.md`, `agent-docs/references/msw-tanstack-query.md`, `agent-docs/references/storybook.md`, `agent-docs/references/tailwind-postcss.md`, `agent-docs/references/shadcn.md`, `agent-docs/references/color-mode.md`, `agent-docs/references/bundle-size-budget.md`.
+1. Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, `agent-docs/odr/index.md`, and these reference files: `agent-docs/references/domains.md`, `agent-docs/references/msw-tanstack-query.md`, `agent-docs/references/storybook.md`, `agent-docs/references/tailwind-postcss.md`, `agent-docs/references/shadcn.md`, `agent-docs/references/color-mode.md`, `agent-docs/references/bundle-size-budget.md`, `agent-docs/references/static-analysis.md`, `agent-docs/references/turborepo.md`, `agent-docs/references/typescript.md`.
 2. Load the `accessibility`, `shadcn`, `frontend-design`, `workleap-react-best-practices`, `workleap-squide`, `workleap-web-configs`, and `pnpm` skills for implementation guidance.
 3. Read the plan file for architectural context. In **fix mode**, also read the issues file and previous changes file to understand what was done and what failed. If an escalation context path is provided, read it to understand what was tried and why the orchestrator disagreed.
 4. **Fix mode only — assess before coding.** Read every issue in the issues file and attempt all fixes. For any fix where the plan's approach seems fundamentally mismatched — the plan assumed a component decomposition or data flow that doesn't work, a library choice is fighting the framework, or the fix requires cross-module access the plan didn't anticipate — explain the specific concern in `changes-[iteration].md` under **Notes** (what about the plan is wrong, not just "this is hard"). Fix the issue anyway to the best of your ability. **Only Subagent B writes escalation files** — A never escalates directly.
 5. **Plan mode only:** If the plan requires scaffolding a new module, load and use the `plantz-scaffold-domain-module` skill. If it requires a new Storybook, use `plantz-scaffold-domain-storybook`.
 6. **Start the dev server or Storybook before implementing.** Run the appropriate root script for the affected package — `pnpm dev-host` for app routes, or the matching `pnpm dev-{domain}-storybook` for stories (e.g., `pnpm dev-today-storybook`). Use Chrome DevTools MCP tools to see what you're building as you go. Implement the changes with the browser open — navigate to relevant pages, take screenshots to check your work, and course-correct as you code. Follow all technology rules from the `agent-docs/references/` files read in step 1.
-7. Write a summary of all changes to `./tmp/runs/[run-uuid]/changes-[iteration].md`. **Plan mode only:** before writing, review your implementation for any choice where a reasonable reviewer might pick differently — state placement, component boundaries, data flow, patterns that look wrong but are intentional, alternatives you tried and rejected. Document these in the **Decisions & Trade-offs** section. Zero entries is fine if the implementation was straightforward; aim for 2-5 when there are genuine trade-offs. Fix iterations skip this section.
+7. Write a summary of all changes to `.adlc/[run-uuid]/changes-[iteration].md`. **Plan mode only:** before writing, review your implementation for any choice where a reasonable reviewer might pick differently — state placement, component boundaries, data flow, patterns that look wrong but are intentional, alternatives you tried and rejected. Document these in the **Decisions & Trade-offs** section. Zero entries is fine if the implementation was straightforward; aim for 2-5 when there are genuine trade-offs. Fix iterations skip this section.
 
 ## Changes File Format
 
@@ -132,7 +132,7 @@ B has five responsibilities, in order:
 
     **Escalation threshold:** Escalate only when the plan's approach is fundamentally wrong and no amount of code editing can fix it. Examples: the plan decomposed components in a way that makes the required data flow impossible; the plan chose a library that conflicts with the framework; the plan assumed module boundaries that force a cross-module import. Do NOT escalate for: difficulty, missing details the code agent can infer, suboptimal but workable approaches, or issues that the test phase will catch.
 
-    If B identifies a structural issue meeting this threshold, B writes `./tmp/runs/[run-uuid]/escalation-[iteration].md` using this format:
+    If B identifies a structural issue meeting this threshold, B writes `.adlc/[run-uuid]/escalation-[iteration].md` using this format:
 
     ```markdown
     # Escalation — Iteration [N]

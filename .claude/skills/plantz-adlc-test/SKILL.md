@@ -16,12 +16,12 @@ The single validation gate for all code quality. Runs static checks (lint, modul
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | `run-uuid`           | Run folder identifier                                                                                                                       |
 | `iteration`          | Current iteration number                                                                                                                    |
-| Plan path            | `./tmp/runs/[run-uuid]/plan.md` — needed for acceptance criteria                                                                            |
+| Plan path            | `.adlc/[run-uuid]/plan.md` — needed for acceptance criteria                                                                            |
 | Previous issues path | `null` on iteration 1. On iteration > 1: path to `test-issues-[iteration-1].md`. May not exist if the previous iteration passed all checks. |
 
 ## Procedure
 
-1. Read all `./tmp/runs/[run-uuid]/changes-*.md` files (1 through current iteration) to build the cumulative set of affected files. This ensures accessibility checks cover the full feature scope, not just the latest fix.
+1. Read all `.adlc/[run-uuid]/changes-*.md` files (1 through current iteration) to build the cumulative set of affected files. This ensures accessibility checks cover the full feature scope, not just the latest fix.
 2. Read these reference files for technology rules and quality standards: `agent-docs/references/msw-tanstack-query.md`, `agent-docs/references/storybook.md`, `agent-docs/references/tailwind-postcss.md`, `agent-docs/references/shadcn.md`, `agent-docs/references/color-mode.md`, `agent-docs/references/bundle-size-budget.md`.
 3. Run `pnpm lint` from the workspace root. This includes typecheck and syncpack. Record any errors.
 4. Run `pnpm sizecheck` to check bundle budgets. If it fails, record the full size-limit output in the issues file under `## Bundle size`. Do not attempt to fix or increase budgets — that is the code skill's responsibility.
@@ -30,7 +30,7 @@ The single validation gate for all code quality. Runs static checks (lint, modul
 7. **Browser verification**: Read `plan.md` and extract all `[visual]` and `[interactive]` acceptance criteria. If any exist, follow the browser verification procedure (below) to verify them. Record pass/fail for each criterion.
 8. **Workspace tests**: Run `pnpm test` from the workspace root. This runs all workspace test tasks (including Storybook a11y). See the workspace tests procedure (below). This step runs **unconditionally** — it is not gated by `[visual]`/`[interactive]` criteria.
 9. **Regression check** (iteration > 1 only): If a previous issues path was provided and that file exists, compare the current iteration's issues with the previous iteration's issues. Any issue in the current run that was NOT present in the previous iteration is a regression introduced by the fix cycle. Prefix these with `⚠️ REGRESSION:` in the issues file so the code skill knows to revert the offending change rather than pile on more fixes. If the previous issues file doesn't exist (previous iteration passed), treat all current issues as regressions.
-10. **Always** write the final `## Verification results` section into the latest `changes-[iteration].md` file (add it after `## Notes`), regardless of whether checks passed or failed. The merge skill needs this section to populate the PR. End the section with the completion marker `<!-- test-complete -->` as the very last line — this is how the orchestrator distinguishes "all checks passed" from "subagent crashed." Use this format:
+10. **Always** write the final `## Verification results` section into the latest `changes-[iteration].md` file (add it after `## Notes`), regardless of whether checks passed or failed. The PR skill needs this section to populate the PR. End the section with the completion marker `<!-- test-complete -->` as the very last line — this is how the orchestrator distinguishes "all checks passed" from "subagent crashed." Use this format:
 
     ```markdown
     ## Verification results
@@ -90,7 +90,7 @@ Run all workspace tests as a gate check. This includes Storybook a11y tests (axe
 ## Output
 
 - If **all checks pass** (static, browser, and workspace tests): do NOT create an issues file. The orchestrator uses the `<!-- test-complete -->` marker in `changes-[iteration].md` (written in step 10) to confirm the test ran to completion.
-- If **any check fails**: write the issues to `./tmp/runs/[run-uuid]/test-issues-[iteration].md` with this format:
+- If **any check fails**: write the issues to `.adlc/[run-uuid]/test-issues-[iteration].md` with this format:
 
 ```markdown
 # Test Issues — Iteration [N]

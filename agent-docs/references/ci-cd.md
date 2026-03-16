@@ -1,6 +1,6 @@
 # CI/CD Reference
 
-Seven GitHub Actions workflows in `.github/workflows/`:
+Eight GitHub Actions workflows in `.github/workflows/`:
 
 | File                   | Purpose                                                                                  |
 | ---------------------- | ---------------------------------------------------------------------------------------- |
@@ -11,6 +11,7 @@ Seven GitHub Actions workflows in `.github/workflows/`:
 | `code-review.yml`      | Automated PR code review via Claude                                                      |
 | `audit-agent-docs.yml` | Weekly agent-docs freshness audit                                                        |
 | `smoke-tests.yml`      | Smoke-test the host app on PRs via Claude                                                |
+| `adlc-patch.yml`       | Patch iteration on PRs via `/patch` comments                                             |
 
 Read the YAML files directly for triggers, steps, and concurrency rules.
 
@@ -64,9 +65,19 @@ These deploys are independent of the GitHub Actions workflows listed above — N
 
 ## Turbo cache strategy
 
-Five workflows (ci, lighthouse, chromatic, claude, smoke-tests) share a Turbo cache pattern with restore-key prefixes (`${{ runner.os }}-turbo-`) that allow cross-workflow cache hits. `code-review.yml` and `audit-agent-docs.yml` do not use Turbo cache.
+Six workflows (ci, lighthouse, chromatic, claude, smoke-tests, adlc-patch) share a Turbo cache pattern with restore-key prefixes (`${{ runner.os }}-turbo-`) that allow cross-workflow cache hits. `code-review.yml` and `audit-agent-docs.yml` do not use Turbo cache.
 
 When adding a new workflow that runs Turbo tasks, follow the existing pattern: restore before tasks, save on cache miss (`cache-hit != 'true'`), use prefix fallback keys.
+
+## Iterate (Patch mode)
+
+`adlc-patch.yml` runs when a user comments `/patch <feedback>` on a PR. It applies lightweight, scoped fixes without running the full ADLC pipeline.
+
+**Trigger:** `issue_comment` (created) containing `/patch`, filtered to PR comments from OWNER/MEMBER/COLLABORATOR.
+
+**Concurrency:** `pr-iterate-${{ github.event.issue.number }}` with `cancel-in-progress: true`. Multiple simultaneous comments — only the latest executes.
+
+**Revise mode:** For changes exceeding patch scope, the agent posts a ready-to-paste local command: `/plantz-adlc-orchestrator --revise "<feedback>" --previous-run-uuid <uuid>`. This runs the full ADLC on the existing PR branch with all quality gates.
 
 ---
 

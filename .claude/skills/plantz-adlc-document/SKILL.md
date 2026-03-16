@@ -16,11 +16,11 @@ Audit agent documentation for drift after implementation and fix any issues foun
 | ----------- | ------------------------------------------------------------------------------ |
 | `run-uuid`  | Run folder identifier                                                          |
 | `iteration` | The latest iteration number (used to know how many `changes-*.md` files exist) |
-| Plan path   | `./tmp/runs/[run-uuid]/plan.md` — needed for the `## Decisions` section        |
+| Plan path   | `.adlc/[run-uuid]/plan.md` — needed for the `## Decisions` section        |
 
 ## Procedure
 
-1. Read all `./tmp/runs/[run-uuid]/changes-*.md` files to understand the full scope of changes.
+1. Read all `.adlc/[run-uuid]/changes-*.md` files to understand the full scope of changes.
 2. Read the plan file's `## Decisions` section. Each entry describes a choice where alternatives existed — use these to determine whether new ADRs or ODRs are needed.
 3. Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, `agent-docs/odr/index.md`, and any `agent-docs/references/` files whose topics overlap with the changes (e.g., `msw-tanstack-query.md` if data layer changed, `storybook.md` if story conventions changed, `tailwind-postcss.md` if styling changed, `bundle-size-budget.md` if budgets changed, `ci-cd.md` if workflows changed, `color-mode.md` if theming changed, `shadcn.md` if components changed, `domains.md` if module boundaries changed).
 4. Load the `plantz-audit-agent-docs` skill and run the audit. This detects drift between agent-docs and the actual codebase.

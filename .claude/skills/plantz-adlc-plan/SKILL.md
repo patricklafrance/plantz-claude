@@ -15,29 +15,27 @@ Draft the technical approach for a feature and output it to a plan file.
 | Input               | Description                                                                                                        |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | `run-uuid`          | Run folder identifier                                                                                              |
-| `mode`              | `draft`, `review`, or `revision`                                                                                   |
+| `mode`              | `draft` or `revision`                                                                                              |
 | Feature description | What the user wants built                                                                                          |
 | Escalation path     | `null` except in `revision` mode: path to `escalation-[iteration].md` — explains what the previous plan got wrong. |
-| Existing plan path  | `null` in `draft` mode. In `review` and `revision` modes: path to the current `plan.md`.                           |
+| Existing plan path  | `null` in `draft` mode. In `revision` mode: path to the previous `plan.md`.                                        |
 
 ## Mode
 
 This skill runs in one of three modes, determined by the `mode` input:
 
 - **Draft**: Create a plan from scratch based on the feature description.
-- **Review**: The orchestrator already wrote the user's plan to `plan.md`. Only Subagent B runs — validate format, challenge gaps, and improve. See Subagent Pattern below.
-- **Revision**: Revise the existing plan to address the structural issue described in the escalation file.
+- **Revision**: Revise the existing plan. The revision is driven by either the escalation file or the feature description — whichever is provided.
 
 ## Procedure
 
 1. Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, `agent-docs/odr/index.md`, and these reference files: `agent-docs/references/domains.md`, `agent-docs/references/msw-tanstack-query.md`, `agent-docs/references/storybook.md`, `agent-docs/references/tailwind-postcss.md`, `agent-docs/references/shadcn.md`, `agent-docs/references/color-mode.md`, `agent-docs/references/bundle-size-budget.md`.
 2. Load the `accessibility`, `shadcn`, `frontend-design`, `workleap-react-best-practices`, `workleap-squide`, and `workleap-web-configs` skills for design guidance.
 3. **Draft mode:** Analyze the feature requirements and determine which packages/modules are affected.
-   **Review mode:** Read the existing plan at the plan path. This plan was written by the user — treat it as the starting point. Proceed directly to step 5 (validate and improve).
-   **Revision mode:** Read the existing plan (at the existing plan path input) and the escalation file (at the escalation path input). Understand what was attempted, what failed structurally, and the proposed alternative. Focus the revision on the structural issue — don't rewrite sections that aren't affected.
+   **Revision mode:** Read the existing plan (at the existing plan path input) and the escalation file (at the escalation path input) if provided. Understand what was attempted, what failed structurally, and the proposed alternative. Focus the revision on the structural issue — don't rewrite sections that aren't affected.
 4. If a new module or storybook needs to be scaffolded, note it in the plan. Do NOT scaffold during planning — that happens during the coding phase.
 5. Draft, revise, or validate and improve the plan following the **plan output format** below.
-6. Write the plan to `./tmp/runs/[run-uuid]/plan.md`.
+6. Write the plan to `.adlc/[run-uuid]/plan.md`.
 
 ## Plan Output Format
 
@@ -110,10 +108,10 @@ Criteria:
 
 ## Subagent Pattern
 
-In **draft mode**, Subagent A drafts the plan from scratch and writes `plan.md`. In **revision mode**, A reads the existing plan and the escalation file, then revises `plan.md` to address the structural issue — keeping sections that aren't affected. In **review mode**, Subagent A is skipped entirely — only B runs.
+In **draft mode**, Subagent A drafts the plan from scratch and writes `plan.md`. In **revision mode**, A reads the existing plan and the escalation file (if provided), then revises `plan.md` to address the structural issue — keeping sections that aren't affected.
 
 In **revision mode**, Subagent B reviews A's revisions — challenges the revised approach, validates that the structural issue from the escalation file is genuinely addressed (not just papered over), and validates acceptance criteria. B should verify that the revised plan doesn't introduce new cross-module dependencies or contradict existing ADRs.
 
-Subagent B reads the plan, challenges it — checking for missing affected packages, unrealistic scope, incorrect patterns, missing stories, or accessibility gaps — and edits `plan.md` directly to improve it. B does not append concerns; it rewrites sections that need improvement. In **review mode**, B also ensures the plan follows the expected output format. If sections are missing, B adds them.
+Subagent B reads the plan, challenges it — checking for missing affected packages, unrealistic scope, incorrect patterns, missing stories, or accessibility gaps — and edits `plan.md` directly to improve it. B does not append concerns; it rewrites sections that need improvement.
 
 **B MUST validate acceptance criteria against the RULES in the plan output format.** If any rule is violated, B fixes the criteria directly.

@@ -16,7 +16,7 @@ Implement the plan or fix issues reported by the test phase or CI.
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `run-uuid`         | Run folder identifier                                                                                                                                   |
 | `iteration`        | Current iteration number (starts at 1). This is the iteration the agent will **write** to (`changes-[iteration].md`).                                   |
-| Plan path          | Always provided — `.adlc/[run-uuid]/plan.md`                                                                                                       |
+| Plan path          | Always provided — `.adlc/[run-uuid]/plan.md`                                                                                                            |
 | Issues path        | `null` on iteration 1. On fix cycles: the path to the issues file — either `test-issues-*.md` (from test phase) or `ci-issues-*.md` (from CI failures). |
 | Changes path       | `null` on iteration 1. On fix cycles: the explicit path to the **previous** iteration's changes file (e.g., `changes-1.md` when `iteration=2`).         |
 | Escalation context | `null` unless the orchestrator rejected a previous escalation. If provided: path to the rejected escalation file from a prior iteration.                |
@@ -35,25 +35,30 @@ This skill runs in one of two modes, determined by the inputs:
 3. Read the plan file for architectural context. In **fix mode**, also read the issues file and previous changes file to understand what was done and what failed. If an escalation context path is provided, read it to understand what was tried and why the orchestrator disagreed.
 4. **Fix mode only — assess before coding.** Read every issue in the issues file and attempt all fixes. For any fix where the plan's approach seems fundamentally mismatched — the plan assumed a component decomposition or data flow that doesn't work, a library choice is fighting the framework, or the fix requires cross-module access the plan didn't anticipate — explain the specific concern in `changes-[iteration].md` under **Notes** (what about the plan is wrong, not just "this is hard"). Fix the issue anyway to the best of your ability. **Only Subagent B writes escalation files** — A never escalates directly.
 5. **Plan mode only:** If the plan requires scaffolding a new module, load and use the `plantz-scaffold-domain-module` skill. If it requires a new Storybook, use `plantz-scaffold-domain-storybook`.
-6. **Start the dev server or Storybook before implementing.** Run the appropriate root script for the affected package — `pnpm dev-host` for app routes, or the matching `pnpm dev-{domain}-storybook` for stories (e.g., `pnpm dev-today-storybook`). Use Chrome DevTools MCP tools to see what you're building as you go. Implement the changes with the browser open — navigate to relevant pages, take screenshots to check your work, and course-correct as you code. Follow all technology rules from the `agent-docs/references/` files read in step 1.
+6. **Start the dev server or Storybook before implementing.** Run the appropriate root script for the affected package — `pnpm dev-host` for app routes, or the matching `pnpm dev-{domain}-storybook` for stories (e.g., `pnpm dev-today-storybook`). Use Chrome DevTools MCP tools to see what you're building as you go. Implement in dependency order: shared packages (`@packages/*`) first since modules consume them, then complete each affected module end-to-end (data layer → components → integration) before moving to the next module. Verify each module works in the browser before starting the next. Follow all technology rules from the `agent-docs/references/` files read in step 1.
 7. Write a summary of all changes to `.adlc/[run-uuid]/changes-[iteration].md`. **Plan mode only:** before writing, review your implementation for any choice where a reasonable reviewer might pick differently — state placement, component boundaries, data flow, patterns that look wrong but are intentional, alternatives you tried and rejected. Document these in the **Decisions & Trade-offs** section. Zero entries is fine if the implementation was straightforward; aim for 2-5 when there are genuine trade-offs. Fix iterations skip this section.
 
 ## Changes File Format
 
+Organize changes by package, matching the plan's File Changes structure. List shared packages (`@packages/*`) before modules (`@modules/*`) before apps. Within each package, list files in dependency order. Prefix each entry with Created, Modified, or Deleted.
+
 ```markdown
 # Changes — Iteration [N]
 
-## Files created
+## `@packages/core-plants`
 
-- `path/to/file.tsx` — [brief description]
+- Created `src/careEventTypes.ts` — type definitions for care events
+- Created `src/careEventSchema.ts` — zod schema with date coercion
+- Created `src/CareEventBadge.tsx` — badge component for care event type
+- Created `src/CareEventBadge.stories.tsx` — stories with all event types
 
-## Files modified
+## `@modules/today-landing-page`
 
-- `path/to/file.tsx` — [what changed and why]
-
-## Files deleted
-
-- `path/to/file.tsx` — [why deleted]
+- Created `src/mocks/careEventHandlers.ts` — MSW handlers for care history endpoint
+- Modified `src/plantsCollection.ts` — added care events to plant detail query
+- Created `src/PlantCareSection.tsx` — care history section for plant detail dialog
+- Created `src/PlantCareSection.stories.tsx` — stories with empty/populated states
+- Modified `src/PlantDetailDialog.tsx` — integrated PlantCareSection
 
 ## Dependencies added
 
@@ -66,6 +71,14 @@ This skill runs in one of two modes, determined by the inputs:
 ## Notes
 
 [Anything the test or document phases should know about]
+
+## Exceptions
+
+[List every policy suppression or override introduced in this iteration. For each: the suppression type, file and location, and justification. If none, write "None."]
+
+- `oxlint-disable-next-line {rule}` in `path/file.tsx:{line}` — {justification}
+- `a11y-suppress {rule}` in `path/file.stories.tsx:{story}` — {justification}
+- `as any` in `path/file.ts:{line}` — {justification}
 ```
 
 ## Hard Constraints
@@ -88,7 +101,7 @@ Start by reading the **plan file** to form independent expectations of what the 
 
 B has five responsibilities, in order:
 
-1. **Code review.** In plan mode, cross-check the plan's File Changes section against A's changes file — flag missing files, unexpected files, or decomposition that diverges from the plan. Then read every changed file. Fix mechanical issues and substantive issues (plan deviations, component structure, accessibility gaps, missing dark mode variants, incorrect patterns). Update `changes-[iteration].md` to reflect modifications. Do not defer fixable concerns — resolve them.
+1. **Code review.** In plan mode, cross-check the plan's File Changes section against A's changes file — flag missing files, unexpected files, or decomposition that diverges from the plan. Then read every changed file. Fix mechanical issues and substantive issues (plan deviations, component structure, accessibility gaps, missing dark mode variants, incorrect patterns). Update `changes-[iteration].md` to reflect modifications. Do not defer fixable concerns — resolve them. While reviewing, collect every policy suppression or override (`oxlint-disable`, `a11y-suppress` / a11y rule disabled in story parameters, `as any`, `@ts-ignore`) into the `## Exceptions` section of `changes-[iteration].md`. Include the suppression type, file path with line or story name, and justification from the inline comment. If no exceptions exist, write "None."
 
 2. **Loading performance review.** For every changed file that adds or modifies data fetching, route definitions, or component imports: verify compliance with the `workleap-react-best-practices` skill's **async-rules** and **bundle-rules**, and flag unnecessary loading states. Fix violations directly and note fixes in `changes-[iteration].md` under **Notes**.
 

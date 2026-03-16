@@ -44,7 +44,7 @@ Four pillars make this repo fully agent-driven. Each section links to the implem
 
 ### 1. ADLC skills — end-to-end feature development
 
-Seven skills that form a complete Agent Development Life Cycle (ADLC). Two flows:
+Six skills that form a complete Agent Development Life Cycle (ADLC). Two flows:
 
 **New feature** — run the orchestrator locally with a feature request. It creates a branch, spawns subagents for each phase (plan, code, test, document), opens a PR, and monitors CI.
 
@@ -58,7 +58,7 @@ Seven skills that form a complete Agent Development Life Cycle (ADLC). Two flows
 /plantz-adlc-orchestrator --revise "restructure the data layer to use TanStack DB" --previous-run-uuid abc123
 ```
 
-The `--previous-run-uuid` is shown in the PR description footer. For lightweight fixes, comment `/patch <feedback>` directly on the PR instead — a CI workflow applies the patch, runs tests, and pushes.
+The `--previous-run-uuid` is shown in the PR description footer. For lightweight fixes, comment `@claude /fix <feedback>` directly on the PR instead — the Claude workflow applies the fix, runs tests, and pushes.
 
 All inter-step coordination goes through files in `.adlc/[uuid]/`.
 
@@ -93,7 +93,6 @@ flowchart TD
 | `plantz-adlc-test`         | Single validation gate — static checks (lint, modules, accessibility) and browser verification of all criteria |
 | `plantz-adlc-document`     | Audits agent-docs and CLAUDE.md for drift, creates ADRs/ODRs if new decisions were made                        |
 | `plantz-adlc-pr`           | Commits, pushes, opens a PR, monitors CI. Returns control on failures                                          |
-| `plantz-adlc-patch`        | Lightweight PR iteration — applies scoped fixes from `/patch` comments in CI                                   |
 
 Key design decisions:
 
@@ -143,8 +142,8 @@ Every ADLC run produces files in `.adlc/[uuid]/` that flow between subagents:
 
 ```
 .adlc/[uuid]/
-  ├─ orchestrator-state.md    # Orchestrator writes after each step (recovery on context compaction)
-  ├─ plan.md                  # Plan skill writes → Code, Test, Merge read
+  ├─ orchestrator-state.md    # Orchestrator writes after each step
+  ├─ plan.md                  # Plan skill writes → Code, Test, Merge read (committed for revise/fix)
   ├─ changes-1.md             # Code writes → Test appends verification results → Merge reads for PR
   ├─ changes-2.md             # (iteration 2, if test found issues)
   ├─ test-issues-1.md         # Test writes (only if failures) → Code reads on next fix iteration
@@ -208,17 +207,16 @@ pnpm test           # Runs all workspace tests (including Storybook a11y) via Tu
 
 #### CI/CD
 
-Eight GitHub Actions workflows, five of which involve Claude Code:
+Seven GitHub Actions workflows, four of which involve Claude Code:
 
-| Workflow          | Trigger                         | Purpose                                                                               |
-| ----------------- | ------------------------------- | ------------------------------------------------------------------------------------- |
-| `ci.yml`          | Push to main, PRs               | Secret scan, build, size-limit, lint (oxlint, oxfmt, typecheck, syncpack, knip), test |
-| `lighthouse.yml`  | Push to main, PRs               | Lighthouse CI — performance gate (error below 0.5, 3 runs, median)                    |
-| `chromatic.yml`   | Push to main, labeled PRs       | Visual regression testing — only affected Storybooks                                  |
-| `claude.yml`      | `@claude` mention in issues/PRs | Claude Code agent responds to issues and PR comments                                  |
-| `code-review.yml` | PRs opened/updated              | Automated code review by Claude (read-only tools)                                     |
-| `smoke-tests.yml` | PRs to main                     | Smoke-tests all apps via Claude (scoped Bash, artifact upload on failure)             |
-| `adlc-patch.yml`  | `/patch` in PR comments         | Patch iteration — lightweight fixes on existing PRs via Claude                        |
+| Workflow          | Trigger                   | Purpose                                                                               |
+| ----------------- | ------------------------- | ------------------------------------------------------------------------------------- |
+| `ci.yml`          | Push to main, PRs         | Secret scan, build, size-limit, lint (oxlint, oxfmt, typecheck, syncpack, knip), test |
+| `lighthouse.yml`  | Push to main, PRs         | Lighthouse CI — performance gate (error below 0.5, 3 runs, median)                    |
+| `chromatic.yml`   | Push to main, labeled PRs | Visual regression testing — only affected Storybooks                                  |
+| `claude.yml`      | `@claude` in issues/PRs   | Claude Code agent — general assistance and `/fix` iteration                           |
+| `code-review.yml` | PRs opened/updated        | Automated code review by Claude (read-only tools)                                     |
+| `smoke-tests.yml` | PRs to main               | Smoke-tests all apps via Claude (scoped Bash, artifact upload on failure)             |
 
 **Files:** [`.github/workflows/`](.github/workflows/), [`.github/prompts/`](.github/prompts/)
 

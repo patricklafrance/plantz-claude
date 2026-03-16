@@ -5,8 +5,8 @@ import { getFrequencyDays } from "@packages/core-plants";
 import type { CareEventType } from "@packages/core-plants/care-event";
 import { careEventsDb, plantsDb } from "@packages/core-plants/db";
 
-export const todayCareEventHandlers = [
-    http.get("/api/today/care-events", ({ request }) => {
+export const managementCareEventHandlers = [
+    http.get("/api/management/care-events", ({ request }) => {
         const userId = getUserId(request);
 
         if (!userId) {
@@ -25,7 +25,7 @@ export const todayCareEventHandlers = [
         return HttpResponse.json(events);
     }),
 
-    http.post("/api/today/care-events", async ({ request }) => {
+    http.post("/api/management/care-events", async ({ request }) => {
         const userId = getUserId(request);
 
         if (!userId) {
@@ -44,7 +44,6 @@ export const todayCareEventHandlers = [
 
         careEventsDb.insert(event);
 
-        // When watered, advance the plant's nextWateringDate
         if (body.eventType === "watered") {
             const plant = plantsDb.get(body.plantId);
             if (plant) {
@@ -58,7 +57,7 @@ export const todayCareEventHandlers = [
         return HttpResponse.json(event, { status: 201 });
     }),
 
-    http.post("/api/today/care-events/bulk", async ({ request }) => {
+    http.post("/api/management/care-events/bulk", async ({ request }) => {
         const userId = getUserId(request);
 
         if (!userId) {

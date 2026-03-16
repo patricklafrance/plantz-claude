@@ -2,22 +2,8 @@ import { getAuthHeaders } from "@packages/core-module";
 import { careEventSchema } from "@packages/core-plants/care-event";
 import type { CareEvent, CareEventType } from "@packages/core-plants/care-event";
 
-export async function fetchCareEvents(plantId: string): Promise<CareEvent[]> {
-    const response = await fetch(`/api/today/care-events?plantId=${encodeURIComponent(plantId)}`, {
-        headers: getAuthHeaders(),
-    });
-
-    if (!response.ok) {
-        throw new Error(`Failed to fetch care events: ${response.status}`);
-    }
-
-    const data = (await response.json()) as unknown[];
-
-    return data.map((item) => careEventSchema.parse(item));
-}
-
 export async function createCareEvent(plantId: string, eventType: CareEventType, notes?: string): Promise<CareEvent> {
-    const response = await fetch("/api/today/care-events", {
+    const response = await fetch("/api/management/care-events", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -36,7 +22,7 @@ export async function createCareEvent(plantId: string, eventType: CareEventType,
 }
 
 export async function createBulkCareEvents(plantIds: string[], eventType: CareEventType, notes?: string): Promise<CareEvent[]> {
-    const response = await fetch("/api/today/care-events/bulk", {
+    const response = await fetch("/api/management/care-events/bulk", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

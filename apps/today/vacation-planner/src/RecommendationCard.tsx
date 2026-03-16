@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 
-import { Badge, Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@packages/components";
+import { Badge, Button } from "@packages/components";
 import type { PlantRecommendation, RecommendationType } from "@packages/core-plants/vacation";
 
 import { recommendationLabels } from "./recommendationLabels.ts";
@@ -58,14 +58,10 @@ export function RecommendationCard({ recommendation, onDelegate, onOverride }: R
                             {recommendation.delegation ? recommendation.delegation.helperName : "Delegate"}
                         </Button>
                     )}
-                    {recommendation.override && <span className="text-muted-foreground text-xs italic">Overridden</span>}
                     {onOverride && !recommendation.override && (
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger render={<Button variant="ghost" size="xs" onClick={() => onOverride?.(recommendation.plantId)} />}>Override</TooltipTrigger>
-                                <TooltipContent>Toggle this plant's recommendation between 'Water Before Trip' and 'Safe Until Return'</TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
+                        <Button variant="ghost" size="xs" onClick={() => onOverride?.(recommendation.plantId)}>
+                            {displayType === "water-before-trip" ? "Mark as Safe Until Return" : "Mark as Water Before Trip"}
+                        </Button>
                     )}
                 </div>
             </div>

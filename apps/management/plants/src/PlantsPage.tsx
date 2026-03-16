@@ -7,6 +7,7 @@ import { Button } from "@packages/components";
 import { applyPlantFilters, DeleteConfirmDialog, FilterBar, PlantListHeader, PlantListItem, usePlantFilters } from "@packages/core-plants";
 import type { Plant } from "@packages/core-plants";
 
+import { createBulkCareEvents, createCareEvent } from "./careEventsApi.ts";
 import { CreatePlantDialog } from "./CreatePlantDialog.tsx";
 import { EditPlantDialog } from "./EditPlantDialog.tsx";
 import { useManagementPlantsCollection } from "./ManagementPlantsContext.tsx";
@@ -110,6 +111,31 @@ export function PlantsPage() {
         if (!open) setDeleteTarget(null);
     }, []);
 
+    const handleMarkWatered = useCallback(
+        async (plant: Plant) => {
+            try {
+                await createCareEvent(plant.id, "watered");
+                await collection.utils.refetch();
+            } catch {
+                // Silently handle — the user can retry.
+            }
+        },
+        [collection],
+    );
+
+    const handleBulkMarkWatered = useCallback(async () => {
+        const ids = plants.filter((p) => selectedIds.has(p.id)).map((p) => p.id);
+        if (ids.length === 0) return;
+
+        try {
+            await createBulkCareEvents(ids, "watered");
+            setSelectedIds(new Set());
+            await collection.utils.refetch();
+        } catch {
+            // Silently handle — the user can retry.
+        }
+    }, [plants, selectedIds, collection]);
+
     const selectedCount = plants.filter((p) => selectedIds.has(p.id)).length;
 
     const deleteTargetNames = deleteTarget?.map((p) => p.name) ?? [];
@@ -149,6 +175,9 @@ export function PlantsPage() {
             {selectedCount > 0 && (
                 <div role="status" className="border-primary/20 bg-primary/5 flex items-center gap-3 rounded-lg border px-4 py-2">
                     <span className="text-sm font-medium">{selectedCount} selected</span>
+                    <Button variant="default" size="xs" onClick={handleBulkMarkWatered}>
+                        Mark selected as Watered
+                    </Button>
                     <Button variant="destructive" size="xs" onClick={handleBulkDelete}>
                         Delete selected
                     </Button>
@@ -175,7 +204,7 @@ export function PlantsPage() {
                         };
                         return (
                             <div key={plant.id} role="listitem" style={rowStyle}>
-                                <PlantListItem plant={plant} selected={selectedIds.has(plant.id)} onToggleSelect={toggleSelect} onEdit={handleEditPlant} onDelete={handleDeleteSingle} />
+                                <PlantListItem plant={plant} selected={selectedIds.has(plant.id)} onToggleSelect={toggleSelect} onEdit={handleEditPlant} onDelete={handleDeleteSingle} onMarkWatered={handleMarkWatered} />
                             </div>
                         );
                     })}
@@ -183,7 +212,7 @@ export function PlantsPage() {
             </div>
 
             <CreatePlantDialog open={createOpen} onOpenChange={setCreateOpen} />
-            <EditPlantDialog plant={editPlant} open={editOpen} onOpenChange={setEditOpen} onDelete={handleEditFromDialog} />
+            <EditPlantDialog plant={editPlant} open={editOpen} onOpenChange={setEditOpen} onDelete={handleEditFromDialog} onMarkWatered={handleMarkWatered} />
             <DeleteConfirmDialog open={deleteTarget !== null} onOpenChange={handleDeleteDialogOpenChange} plantNames={deleteTargetNames} onConfirm={confirmDelete} />
         </div>
     );

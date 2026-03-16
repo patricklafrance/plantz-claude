@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { Droplets } from "lucide-react";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, Button, Input, Textarea, Label, Switch, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue, DatePicker } from "@packages/components";
@@ -13,9 +14,10 @@ interface EditPlantDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onDelete: (plant: Plant) => void;
+    onMarkWatered?: (plant: Plant) => void;
 }
 
-export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPlantDialogProps) {
+export function EditPlantDialog({ plant, open, onOpenChange, onDelete, onMarkWatered }: EditPlantDialogProps) {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [family, setFamily] = useState("");
@@ -236,6 +238,12 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete }: EditPla
                     </div>
                 </div>
                 <DialogFooter>
+                    {onMarkWatered && (
+                        <Button variant="default" size="sm" onClick={() => onMarkWatered(plant)}>
+                            <Droplets data-icon="inline-start" aria-hidden="true" />
+                            Mark as Watered
+                        </Button>
+                    )}
                     <Button
                         variant="destructive"
                         size="sm"

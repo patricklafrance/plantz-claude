@@ -115,6 +115,18 @@ export const LongFieldValues: Story = {
     },
 };
 
+export const WithMarkWatered: Story = {
+    args: {
+        plant: makePlant({
+            id: "test-edit-1",
+            name: "Monstera Deliciosa",
+            description: "A tropical plant with large fenestrated leaves",
+            nextWateringDate: FAR_PAST,
+        }),
+        onMarkWatered: () => {},
+    },
+};
+
 export const NullPlant: Story = {
     args: {
         plant: null,

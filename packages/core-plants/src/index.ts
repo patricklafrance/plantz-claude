@@ -1,5 +1,5 @@
 export { plantSchema, type Plant } from "./plantSchema.ts";
-export { getOptionLabel, isDueForWatering, applyPlantFilters } from "./plantUtils.ts";
+export { getFrequencyDays, getOptionLabel, isDueForWatering, applyPlantFilters } from "./plantUtils.ts";
 export { locations, luminosities, wateringFrequencies, wateringTypes } from "./constants.ts";
 export type { LocationId, LuminosityId, WateringFrequencyId, WateringTypeId } from "./constants.ts";
 export { PlantListHeader } from "./PlantListHeader.tsx";

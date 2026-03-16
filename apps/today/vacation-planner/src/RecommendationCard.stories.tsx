@@ -129,6 +129,17 @@ export const WithUserOverride: Story = {
     },
 };
 
+export const SafeUntilReturnWithOverrideButton: Story = {
+    args: {
+        recommendation: makeRecommendation({
+            type: "safe-until-return",
+            reasoning: "This plant won't need watering until after your return.",
+            suggestedActionDate: FAR_FUTURE,
+            riskLevel: "low",
+        }),
+    },
+};
+
 export const LongPlantName: Story = {
     args: {
         recommendation: makeRecommendation({

@@ -78,3 +78,35 @@ export const LongValues: Story = {
         }),
     },
 };
+
+export const WithCareSection: Story = {
+    args: {
+        plant: makePlant(),
+        careSection: (
+            <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-1">
+                    <span className="text-sm font-semibold">Care Insights</span>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                            <span className="text-muted-foreground">Last watered:</span> 3 days ago
+                        </div>
+                        <div>
+                            <span className="text-muted-foreground">Streak:</span> 5 waterings
+                        </div>
+                    </div>
+                </div>
+                <div className="flex flex-col gap-1">
+                    <span className="text-sm font-semibold">Care History</span>
+                    <p className="text-muted-foreground text-xs">Sample care history entries would appear here.</p>
+                </div>
+            </div>
+        ),
+    },
+};
+
+export const WithMarkWatered: Story = {
+    args: {
+        plant: makePlant(),
+        onMarkWatered: () => {},
+    },
+};

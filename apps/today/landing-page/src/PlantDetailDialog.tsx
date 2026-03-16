@@ -1,6 +1,8 @@
 import { format } from "date-fns";
+import { Droplets } from "lucide-react";
+import type { ReactNode } from "react";
 
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@packages/components";
+import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, Separator } from "@packages/components";
 import { getOptionLabel, locations, luminosities, wateringFrequencies, wateringTypes } from "@packages/core-plants";
 import type { Plant } from "@packages/core-plants";
 
@@ -8,9 +10,11 @@ interface PlantDetailDialogProps {
     plant: Plant | null;
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    careSection?: ReactNode;
+    onMarkWatered?: () => void;
 }
 
-export function PlantDetailDialog({ plant, open, onOpenChange }: PlantDetailDialogProps) {
+export function PlantDetailDialog({ plant, open, onOpenChange, careSection, onMarkWatered }: PlantDetailDialogProps) {
     if (!plant) return null;
 
     return (
@@ -73,8 +77,21 @@ export function PlantDetailDialog({ plant, open, onOpenChange }: PlantDetailDial
                     <div className="text-muted-foreground text-xs">
                         Created: {format(plant.creationDate, "PPP")} · Last updated: {format(plant.lastUpdateDate, "PPP")}
                     </div>
+                    {careSection && (
+                        <>
+                            <Separator />
+                            {careSection}
+                        </>
+                    )}
                 </div>
-                <DialogFooter showCloseButton />
+                <DialogFooter showCloseButton>
+                    {onMarkWatered && (
+                        <Button variant="default" onClick={onMarkWatered}>
+                            <Droplets data-icon="inline-start" aria-hidden="true" />
+                            Mark as Watered
+                        </Button>
+                    )}
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );

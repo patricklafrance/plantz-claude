@@ -8,3 +8,5 @@ export { DeleteConfirmDialog } from "./DeleteConfirmDialog.tsx";
 export { FilterBar } from "./FilterBar.tsx";
 export { usePlantFilters } from "./usePlantFilters.ts";
 export type { PlantFilters } from "./usePlantFilters.ts";
+export { CareEventBadge } from "./CareEventBadge.tsx";
+export { CareInsightsSummary } from "./CareInsightsSummary.tsx";

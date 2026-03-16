@@ -1,10 +1,13 @@
 import { useLiveQuery } from "@tanstack/react-db";
+import { useQueryClient } from "@tanstack/react-query";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { useState, useRef, useMemo, useCallback } from "react";
 
 import { applyPlantFilters, FilterBar, isDueForWatering, PlantListHeader, PlantListItem, usePlantFilters } from "@packages/core-plants";
 import type { Plant } from "@packages/core-plants";
 
+import { createCareEvent } from "./careEventsApi.ts";
+import { PlantCareSection } from "./PlantCareSection.tsx";
 import { PlantDetailDialog } from "./PlantDetailDialog.tsx";
 import { useTodayPlantsCollection } from "./TodayPlantsContext.tsx";
 import { VacationPlanBanner } from "./VacationPlanBanner.tsx";
@@ -13,6 +16,7 @@ export function LandingPage() {
     const { filters, updateFilter, clearFilters, hasActiveFilters } = usePlantFilters();
     const [detailPlant, setDetailPlant] = useState<Plant | null>(null);
     const listRef = useRef<HTMLDivElement>(null);
+    const queryClient = useQueryClient();
 
     const collection = useTodayPlantsCollection();
     const { data: allPlants, isReady } = useLiveQuery((q) => q.from({ plant: collection }));
@@ -43,6 +47,18 @@ export function LandingPage() {
             setDetailPlant(null);
         }
     }, []);
+
+    const handleMarkWatered = useCallback(async () => {
+        if (!detailPlant) return;
+
+        try {
+            await createCareEvent(detailPlant.id, "watered");
+            await queryClient.invalidateQueries({ queryKey: ["today", "care-events", detailPlant.id] });
+        } catch {
+            // Silently handle — the user can retry. A toast/notification system
+            // can be wired in later for better UX.
+        }
+    }, [detailPlant, queryClient]);
 
     const totalSize = virtualizer.getTotalSize();
     const virtualizerContainerStyle = useMemo(
@@ -99,7 +115,7 @@ export function LandingPage() {
                 </div>
             </div>
 
-            <PlantDetailDialog plant={detailPlant} open={detailPlant !== null} onOpenChange={handleDetailOpenChange} />
+            <PlantDetailDialog plant={detailPlant} open={detailPlant !== null} onOpenChange={handleDetailOpenChange} careSection={detailPlant ? <PlantCareSection plantId={detailPlant.id} /> : undefined} onMarkWatered={handleMarkWatered} />
         </div>
     );
 }

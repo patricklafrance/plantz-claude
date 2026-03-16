@@ -116,12 +116,14 @@ The shared in-memory database is exposed via `@packages/core-plants/db`:
 - `defaultSeedPlants` — Pre-generated stable seed data (~250 plants)
 - `generatePlants(count?)` — Generate random plant data
 
+Care event types, schema, and insight utilities are exposed via `@packages/core-plants/care-event`. Module-local DBs (e.g., `careEventsDb` in today-landing-page) stay in the module's `src/mocks/` folder — they are not shared across modules.
+
 ### Module-Specific Handlers
 
 Each module defines its own MSW handlers in a local `mocks/` folder:
 
 - **Management:** `managementPlantHandlers` in `apps/management/plants/src/mocks/handlers.ts` — 6 routes at `/api/management/plants`
-- **Today Landing:** `todayPlantHandlers` in `apps/today/landing-page/src/mocks/handlers.ts` — 3 routes at `/api/today/plants`
+- **Today Landing:** `todayPlantHandlers` in `apps/today/landing-page/src/mocks/handlers.ts` — 3 routes at `/api/today/plants`; `todayCareEventHandlers` in `apps/today/landing-page/src/mocks/careEventHandlers.ts` — 2 routes at `/api/today/care-events`
 - **Today Vacation:** `todayVacationPlannerHandlers` in `apps/today/vacation-planner/src/mocks/handlers.ts` — 5 routes at `/api/today/vacation-planner/`
 
 ## Storybook Setup
@@ -211,13 +213,15 @@ Use `delay("infinite")` for loading state stories.
 | DELETE | `/api/management/plants/:id` | Delete single plant                             |
 | DELETE | `/api/management/plants`     | Bulk delete (body: `{ ids: string[] }`)         |
 
-### Today Landing (`/api/today/plants`)
+### Today Landing (`/api/today/plants`, `/api/today/care-events`)
 
-| Method | Path                    | Description                             |
-| ------ | ----------------------- | --------------------------------------- |
-| GET    | `/api/today/plants`     | List all plants                         |
-| DELETE | `/api/today/plants/:id` | Delete single plant                     |
-| DELETE | `/api/today/plants`     | Bulk delete (body: `{ ids: string[] }`) |
+| Method | Path                     | Description                                            |
+| ------ | ------------------------ | ------------------------------------------------------ |
+| GET    | `/api/today/plants`      | List all plants                                        |
+| DELETE | `/api/today/plants/:id`  | Delete single plant                                    |
+| DELETE | `/api/today/plants`      | Bulk delete (body: `{ ids: string[] }`)                |
+| GET    | `/api/today/care-events` | List care events for a plant (`?plantId=` query param) |
+| POST   | `/api/today/care-events` | Create a new care event (server generates id)          |
 
 ### Today Vacation Planner (`/api/today/vacation-planner/`)
 
@@ -231,4 +235,4 @@ Use `delay("infinite")` for loading state stories.
 
 ## Seed Data
 
-The in-memory DB resets on page reload. For dev, `defaultSeedPlants` provides ~250 plants with realistic data. Stories use per-story MSW handler overrides with inline `makePlant()` helpers for focused data sets.
+The in-memory DB resets on page reload. For dev, `defaultSeedPlants` provides ~250 plants with realistic data. The today-landing-page module also seeds `careEventsDb` with `defaultSeedCareEvents` (deterministic care events for ~20 plants using fixed absolute dates). Stories use per-story MSW handler overrides with inline `makePlant()` / `makeCareEvent()` helpers for focused data sets.

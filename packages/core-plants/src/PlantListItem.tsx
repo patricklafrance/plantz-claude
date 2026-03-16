@@ -15,9 +15,10 @@ interface PlantListItemProps {
     onToggleSelect?: ((id: string) => void) | undefined;
     onEdit?: ((plant: Plant) => void) | undefined;
     onDelete?: ((plant: Plant) => void) | undefined;
+    onMarkWatered?: ((plant: Plant) => void) | undefined;
 }
 
-export const PlantListItem = memo(function PlantListItem({ plant, selected = false, onClick, onToggleSelect, onEdit, onDelete }: PlantListItemProps) {
+export const PlantListItem = memo(function PlantListItem({ plant, selected = false, onClick, onToggleSelect, onEdit, onDelete, onMarkWatered }: PlantListItemProps) {
     const due = isDueForWatering(plant);
 
     const isClickable = !!(onClick || onEdit);
@@ -26,6 +27,7 @@ export const PlantListItem = memo(function PlantListItem({ plant, selected = fal
     const handleClick = useCallback(() => (onClick ?? onEdit)?.(plant), [onClick, onEdit, plant]);
     const handleEdit = useCallback(() => onEdit?.(plant), [onEdit, plant]);
     const handleDelete = useCallback(() => onDelete?.(plant), [onDelete, plant]);
+    const handleMarkWatered = useCallback(() => onMarkWatered?.(plant), [onMarkWatered, plant]);
 
     return (
         <div className={`border-border relative flex h-full items-center gap-3 border-b px-4 py-2.5 transition-colors ${due ? "bg-destructive/5" : "hover:bg-muted/50"}`}>
@@ -54,8 +56,13 @@ export const PlantListItem = memo(function PlantListItem({ plant, selected = fal
                 <span className="text-muted-foreground hidden truncate text-xs md:block">{getOptionLabel(locations, plant.location)}</span>
                 <span className="hidden md:block">{plant.mistLeaves && <Check className="text-muted-foreground size-3.5" aria-label="Mist leaves" />}</span>
             </div>
-            {(onEdit || onDelete) && (
+            {(onEdit || onDelete || (onMarkWatered && due)) && (
                 <div className="relative z-10 flex shrink-0 items-center gap-1">
+                    {onMarkWatered && due && (
+                        <Button variant="ghost" size="icon-xs" onClick={handleMarkWatered} aria-label={`Mark ${plant.name} as watered`}>
+                            <Droplets />
+                        </Button>
+                    )}
                     {onEdit && (
                         <Button variant="ghost" size="icon-xs" onClick={handleEdit} aria-label={`Edit ${plant.name}`}>
                             <Pencil />

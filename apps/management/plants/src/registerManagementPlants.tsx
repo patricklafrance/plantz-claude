@@ -33,7 +33,8 @@ export async function registerManagementPlants(runtime: FireflyRuntime, queryCli
     registerRoutes(runtime, collection);
 
     if (runtime.isMswEnabled) {
-        const { managementPlantHandlers } = await import("./mocks/index.ts");
+        const { managementPlantHandlers, managementCareEventHandlers } = await import("./mocks/index.ts");
         runtime.registerRequestHandlers(managementPlantHandlers);
+        runtime.registerRequestHandlers(managementCareEventHandlers);
     }
 }

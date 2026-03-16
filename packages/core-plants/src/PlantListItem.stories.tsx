@@ -153,6 +153,20 @@ export const ClickOnly: Story = {
     },
 };
 
+export const DueWithMarkWatered: Story = {
+    args: {
+        plant: makePlant({ nextWateringDate: FAR_PAST }),
+        onMarkWatered: () => {},
+    },
+};
+
+export const NotDueWithMarkWatered: Story = {
+    args: {
+        plant: makePlant({ nextWateringDate: FAR_FUTURE }),
+        onMarkWatered: () => {},
+    },
+};
+
 export const MistLeavesFalse: Story = {
     args: {
         plant: makePlant({ mistLeaves: false }),

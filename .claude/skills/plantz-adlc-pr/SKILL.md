@@ -17,9 +17,9 @@ Commit, push, open a PR, and monitor CI.
 | `run-uuid`   | Run folder identifier                                                                                                                                                                                                                                                                                |
 | Branch name  | The branch created in the orchestrator step 2                                                                                                                                                                                                                                                        |
 | Commit type  | Conventional commit prefix: `feat`, `fix`, `chore`, `docs`, or `refactor`                                                                                                                                                                                                                            |
-| Plan path    | `.adlc/[run-uuid]/plan.md` — needed for acceptance criteria                                                                                                                                                                                                                                     |
+| Plan path    | `.adlc/[run-uuid]/plan.md` — needed for acceptance criteria                                                                                                                                                                                                                                          |
 | Iteration    | The final iteration number. To find `## Verification results`, scan backwards from `changes-[iteration].md` through earlier `changes-*.md` files until one contains the section. During CI fix cycles the latest changes file may lack verification results because only the test skill writes them. |
-| CI iteration    | Current CI fix iteration number (0-3), provided by orchestrator. Used to name `ci-issues-[iteration].md`. Defaults to `0` on first PR creation.                                                                                                                                                            |
+| CI iteration | Current CI fix iteration number (0-3), provided by orchestrator. Used to name `ci-issues-[iteration].md`. Defaults to `0` on first PR creation.                                                                                                                                                      |
 | `--revision` | Optional. When set, the PR already exists — edit the body instead of creating a new PR. Append a `## Revision [N]` section and update the footer with the new run UUID.                                                                                                                              |
 
 ## Step 1 — Commit
@@ -42,12 +42,15 @@ If a PR already exists for this branch and `--revision` is NOT set, skip creatio
 ## Revision [N]
 
 ### Summary
+
 - [bullets derived from changes-*.md files for this run]
 
 ### Quality checks
+
 [same checkbox format as the original]
 
 ### Verified acceptance criteria
+
 [same format, updated for this revision's results]
 ```
 
@@ -94,7 +97,7 @@ End with: `🤖 Generated with [Claude Code](https://claude.com/claude-code)`
 
 Create the PR with title `{prefix}: {description}`. The body must match this example — no other sections:
 
-```markdown
+````markdown
 ## Summary
 
 - Added watering schedule editor with weekly/biweekly/monthly options
@@ -115,13 +118,27 @@ Create the PR with title `{prefix}: {description}`. The body must match this exa
 - ❌ `[visual]` Calendar icon aligns with date text — icon is 2px too high
 
 ---
-> **Need changes?** Comment `/patch <feedback>` for a quick patch, or revise locally:
+
+> **Need changes?** Two options depending on scope:
+>
+> **Quick patch** — for small, targeted fixes (typo, style, minor bug). Comment on this PR:
+>
+> ```
+> /patch <your feedback>
+> ```
+>
+> Runs in CI with static checks only (lint, tests, size). No browser verification. One fix attempt — stops on failure.
+>
+> **Full revise** — for broader changes (architecture, multi-file restructuring, new requirements). Run locally:
+>
 > ```
 > /plantz-adlc-orchestrator --revise "your feedback" --previous-run-uuid [run-uuid]
 > ```
+>
+> Re-runs the full pipeline including browser verification. Multiple fix iterations. Appends a "Revision [N]" section to this PR.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
-```
+````
 
 If PR creation fails, retry once. If it fails again, **stop and write `ci-issues-[iteration].md`** with the error. Do not proceed to CI monitoring without a PR.
 
@@ -131,18 +148,20 @@ If PR creation fails, retry once. If it fails again, **stop and write `ci-issues
 
 Not all CI workflows report results the same way. Some report via check run status (the workflow itself fails), while others always exit successfully and post results as **PR comments**.
 
-| Workflow                         | Reports via      | Notes                                                |
-| -------------------------------- | ---------------- | ---------------------------------------------------- |
-| `CI` (ci.yml)                    | Check run status | Monitored                                            |
-| `Code Review` (code-review.yml)  | Check run status | Monitored                                            |
-| `Smoke Tests` (smoke-tests.yml)  | PR comment       | Monitored — scan bot comments for failure indicators |
-| `Lighthouse CI` (lighthouse.yml) | Check run status | Monitored                                            |
-| `Chromatic` (chromatic.yml)      | Check run status | Excluded — label-gated, runs after PR skill exits |
-| `Claude` (claude.yml)            | —                | Excluded — triggered by `@claude` mentions, not CI   |
+| Workflow                         | Reports via      | Notes                                                 |
+| -------------------------------- | ---------------- | ----------------------------------------------------- |
+| `CI` (ci.yml)                    | Check run status | Monitored                                             |
+| `Code Review` (code-review.yml)  | Check run status | Monitored                                             |
+| `Smoke Tests` (smoke-tests.yml)  | PR comment       | Monitored — scan bot comments for failure indicators  |
+| `Lighthouse CI` (lighthouse.yml) | Check run status | Monitored                                             |
+| `Chromatic` (chromatic.yml)      | Check run status | Phase 2 — label-gated, monitored after label is added |
+| `Claude` (claude.yml)            | —                | Excluded — triggered by `@claude` mentions, not CI    |
 
-**Monitored workflows:** `CI`, `Code Review`, `Smoke Tests`, `Lighthouse CI`. These are tracked in the CI Validation comment.
+**Phase 1 workflows:** `CI`, `Code Review`, `Smoke Tests`, `Lighthouse CI`. Monitored immediately.
 
-**Excluded workflows:** `Chromatic` (label-gated, runs after PR skill exits), `Claude` (triggered by mentions, not CI).
+**Phase 2 workflows:** `Chromatic`. Monitored only after the `run chromatic` label is added (see Decision flow).
+
+**Excluded workflows:** `Claude` (triggered by mentions, not CI).
 
 ### Polling loop
 
@@ -150,17 +169,19 @@ Poll every 60 seconds, with a maximum wait of 30 minutes per CI cycle. Each poll
 
 **Channel 1 — Workflow run status:**
 
-Query workflow runs for the branch. Filter out `Chromatic` and `Claude` runs by name. Wait until all monitored workflows (`CI`, `Code Review`, `Smoke Tests`, `Lighthouse CI`) reach `status: "completed"`. If any has `conclusion: "failure"`, that workflow has failed. Track each workflow's status (completed+success, completed+failure, or still running) for the CI Validation comment.
+Query workflow runs for the branch. In Phase 1, filter out `Chromatic` and `Claude` runs by name. Wait until all Phase 1 workflows (`CI`, `Code Review`, `Smoke Tests`, `Lighthouse CI`) reach `status: "completed"`. If any has `conclusion: "failure"`, that workflow has failed. Track each workflow's status (completed+success, completed+failure, or still running) for the CI Validation comment.
 
 **Channel 2 — Bot PR comments:**
 
 Scan PR comments **only from known bot authors** (`claude[bot]`, `github-actions[bot]`) for failure indicators: lines containing "❌", or lines where "failed", "FAIL", or "error:" appear in a context indicating an actual failure (not a zero-count like "0 failed"). When in doubt, read the full comment body. **Ignore user comments** — those are code review feedback, not CI results.
 
-**Stabilization check:** After all monitored workflows complete, run **one additional poll cycle** (60 seconds) before declaring "all green."
+**Stabilization check:** After all workflows in the current phase complete, run **one additional poll cycle** (60 seconds) before declaring that phase "all green."
 
 ### Decision flow
 
-1. **CI failure (workflow or bot comment):** If any monitored workflow has `conclusion: "failure"` **or** any bot PR comment reports failures, read the failure logs. Write the errors to `.adlc/[run-uuid]/ci-issues-[iteration].md` using this format, then **stop**.
+#### Phase 1 — Core workflows
+
+1. **CI failure (workflow or bot comment):** If any Phase 1 workflow has `conclusion: "failure"` **or** any bot PR comment reports failures, read the failure logs. Write the errors to `.adlc/[run-uuid]/ci-issues-[iteration].md` using this format. Then post a **CI Fix Progress comment** (see below) and **stop**.
 
     ```markdown
     # CI Issues — Iteration [N]
@@ -174,23 +195,48 @@ Scan PR comments **only from known bot authors** (`claude[bot]`, `github-actions
     - [error output]
     ```
 
-2. **All green — add Chromatic label and report success:** When all monitored workflows have completed successfully **and** no bot PR comments report failures **and** the stabilization check has passed, add the `run chromatic` label and **stop**.
+2. **All green — proceed to Phase 2:** When all Phase 1 workflows have completed successfully **and** no bot PR comments report failures **and** the stabilization check has passed, add the `run chromatic` label and continue to Phase 2. If a CI Fix Progress comment from a previous iteration exists, **edit it** to append: `✅ CI fixes pushed.`
 
-3. **Not completed:** If the polling loop reaches 30 minutes and some monitored workflows have not completed, post the CI Validation comment showing which workflows are still running, then **stop**. Do not write `ci-issues-[iteration].md`. Do not add the `run chromatic` label.
+3. **Not completed:** If the polling loop reaches 30 minutes and some Phase 1 workflows have not completed, post the CI Validation comment showing which workflows are still running, then **stop**. Do not write `ci-issues-[iteration].md`. Do not add the `run chromatic` label.
+
+#### Phase 2 — Chromatic
+
+After adding the `run chromatic` label, resume the polling loop (same 60-second interval, fresh 30-minute timeout) to monitor the `Chromatic` workflow.
+
+1. **Chromatic failure:** If the `Chromatic` workflow completes with `conclusion: "failure"`, read the failure logs. Write the errors to `.adlc/[run-uuid]/ci-issues-[iteration].md`. Then post a **CI Fix Progress comment** (see below) and **stop**.
+
+2. **Chromatic success:** When the `Chromatic` workflow completes successfully and the stabilization check passes, if a CI Fix Progress comment from a previous iteration exists, **edit it** to append: `✅ CI fixes pushed.` Then **stop** — all CI is green.
+
+3. **Not completed:** If 30 minutes elapse and `Chromatic` has not completed, post the CI Validation comment showing Chromatic as still running, then **stop**. Do not write `ci-issues-[iteration].md`.
+
+### CI Fix Progress comment
+
+When a CI failure is detected (Phase 1 or Phase 2), post a **new** PR comment to notify the reviewer that automated fixes are underway:
+
+```markdown
+## CI Fix — Iteration [CI iteration + 1]
+
+Workflow failures detected. Applying automated fixes...
+```
+
+On the **next** PR skill invocation (after the orchestrator fixes and pushes), look for the most recent `## CI Fix` comment. If one exists, **edit it** to append: `✅ CI fixes pushed.`
+
+This gives reviewers a clear signal that the fix cycle completed and new code is being validated.
 
 ### CI Validation comment
 
-Post or update a sticky `## CI Validation` PR comment before exiting. Formats:
+Post or update a sticky `## CI Validation` PR comment before exiting. Update it at each phase transition and on exit. Formats:
 
 ```markdown
 ## CI Validation
 
-All monitored workflows completed successfully.
+All workflows completed successfully.
 
 - [x] CI
 - [x] Code Review
 - [x] Smoke Tests
 - [x] Lighthouse CI
+- [x] Chromatic
 ```
 
 ```markdown
@@ -200,6 +246,17 @@ All monitored workflows completed successfully.
 - [ ] Smoke Tests — failed
 - [x] Code Review
 - [x] Lighthouse CI
+- [ ] Chromatic — not started (blocked by Phase 1 failure)
+```
+
+```markdown
+## CI Validation
+
+- [x] CI
+- [x] Code Review
+- [x] Smoke Tests
+- [x] Lighthouse CI
+- [ ] Chromatic — still running
 ```
 
 ```markdown
@@ -211,6 +268,7 @@ All monitored workflows completed successfully.
 - [ ] Smoke Tests — still running
 - [x] Code Review
 - [ ] Lighthouse CI — still running
+- [ ] Chromatic — not started
 ```
 
 ## Hard Constraints

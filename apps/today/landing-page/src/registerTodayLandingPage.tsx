@@ -40,7 +40,9 @@ export async function registerTodayLandingPage(runtime: FireflyRuntime, queryCli
     registerRoutes(runtime, collection);
 
     if (runtime.isMswEnabled) {
-        const { todayPlantHandlers } = await import("./mocks/index.ts");
+        const { todayPlantHandlers, todayCareEventHandlers, defaultSeedCareEvents, careEventsDb } = await import("./mocks/index.ts");
+        careEventsDb.reset(defaultSeedCareEvents);
         runtime.registerRequestHandlers(todayPlantHandlers);
+        runtime.registerRequestHandlers(todayCareEventHandlers);
     }
 }

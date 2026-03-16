@@ -18,6 +18,5 @@ chromatic-diagnostics.json
 # so git still traverses into them and negation patterns work.
 .adlc/*/*
 !.adlc/*/plan.md
-!.adlc/*/orchestrator-state.md
 
 

@@ -26,7 +26,7 @@ Commit, push, open a PR, and monitor CI.
 
 If the working tree is clean, skip to Step 2.
 
-Stage and commit all changes. The `.gitignore` selectively tracks `.adlc/` — `plan.md` and `orchestrator-state.md` are committed; all other `.adlc/` artifacts are excluded. Use the commit type provided by the orchestrator. The commit message should be a concise summary derived from aggregating all `.adlc/[run-uuid]/changes-*.md` files. Include the `Co-Authored-By: Claude <noreply@anthropic.com>` trailer.
+Stage and commit all changes. The `.gitignore` selectively tracks `.adlc/` — only `plan.md` is committed; all other `.adlc/` artifacts are excluded. Use the commit type provided by the orchestrator. The commit message should be a concise summary derived from aggregating all `.adlc/[run-uuid]/changes-*.md` files. Include the `Co-Authored-By: Claude <noreply@anthropic.com>` trailer.
 
 Investigate unexpected files before staging.
 
@@ -89,6 +89,16 @@ Format each criterion as:
 
 **Section 4 (conditional) — `## Budget increase`:** Only include this section if any `changes-*.md` file mentions a size-limit budget increase in its Notes section. List: which app, how much (KB gzipped), and why. See `agent-docs/references/bundle-size-budget.md` for the full policy.
 
+**Section 5 (conditional) — `## Exceptions`:** Only include this section if the latest `changes-[iteration].md` has an `## Exceptions` section that is not "None." Copy the entries directly:
+
+```
+- **oxlint-disable** `{rule}` in `path/file.tsx:{line}` — {justification}
+- **a11y-suppress** `{rule}` in `path/file.stories.tsx:{story}` — {justification}
+- **as any** in `path/file.ts:{line}` — {justification}
+```
+
+If there are no exceptions, omit this section entirely.
+
 After all sections, add the footer with a visible revise command containing the run UUID.
 
 End with: `🤖 Generated with [Claude Code](https://claude.com/claude-code)`
@@ -121,13 +131,13 @@ Create the PR with title `{prefix}: {description}`. The body must match this exa
 
 > **Need changes?** Two options depending on scope:
 >
-> **Quick patch** — for small, targeted fixes (typo, style, minor bug). Comment on this PR:
+> **Quick fix** — for small, targeted fixes (typo, style, minor bug). Comment on this PR:
 >
 > ```
-> /patch <your feedback>
+> @claude /fix <your feedback>
 > ```
 >
-> Runs in CI with static checks only (lint, tests, size). No browser verification. One fix attempt — stops on failure.
+> Runs in CI with static checks only (lint, tests, size). No browser verification.
 >
 > **Full revise** — for broader changes (architecture, multi-file restructuring, new requirements). Run locally:
 >
@@ -273,7 +283,7 @@ All workflows completed successfully.
 
 ## Hard Constraints
 
-- **The PR body MUST have three mandatory sections: `## Summary`, `## Quality checks`, `## Verified acceptance criteria`.** The only allowed additional sections are `## Budget increase` (conditional — only when a budget was increased) and `## Revision [N]` (added by revise runs via `--revision`).
+- **The PR body MUST have three mandatory sections: `## Summary`, `## Quality checks`, `## Verified acceptance criteria`.** The only allowed additional sections are `## Budget increase` (conditional — only when a budget was increased), `## Exceptions` (conditional — only when policy suppressions or escalation rejections exist), and `## Revision [N]` (added by revise runs via `--revision`).
 
 ## Subagent Pattern
 

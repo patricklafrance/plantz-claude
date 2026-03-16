@@ -1,19 +1,35 @@
 # CI/CD Reference
 
-Eight GitHub Actions workflows in `.github/workflows/`:
+Seven GitHub Actions workflows in `.github/workflows/`:
 
 | File                   | Purpose                                                                                  |
 | ---------------------- | ---------------------------------------------------------------------------------------- |
 | `ci.yml`               | Secret scan, build, size-limit, oxlint, typecheck, syncpack, test on PRs and main pushes |
 | `lighthouse.yml`       | Lighthouse CI — performance gate (error below 0.5, 3 runs, median)                       |
 | `chromatic.yml`        | Visual regression via Chromatic                                                          |
-| `claude.yml`           | Claude Code agent for issue/PR comments                                                  |
+| `claude.yml`           | Claude Code agent for issue/PR comments and `/fix` iteration                             |
 | `code-review.yml`      | Automated PR code review via Claude                                                      |
 | `audit-agent-docs.yml` | Weekly agent-docs freshness audit                                                        |
 | `smoke-tests.yml`      | Smoke-test the host app on PRs via Claude                                                |
-| `adlc-patch.yml`       | Patch iteration on PRs via `/patch` comments                                             |
 
 Read the YAML files directly for triggers, steps, and concurrency rules.
+
+## Claude workflow
+
+`claude.yml` is the unified entry point for all `@claude` interactions. It handles two modes, routed by `.github/prompts/claude.md`:
+
+- **General mode** — triggered by `@claude` mentions on issues, PR comments, and reviews. Responds to questions, suggestions, and code changes.
+- **Fix mode** — triggered by `@claude /fix <feedback>` on PR comments. Applies targeted fixes, runs tests, commits, and posts a structured report.
+
+**Trigger:** `issue_comment`, `pull_request_review_comment`, `pull_request_review`, `issues` (opened/assigned) — all require `@claude` in the comment body.
+
+**Auth gating:** All triggers require OWNER/MEMBER/COLLABORATOR association. Bot comments are excluded to prevent re-trigger loops.
+
+**Concurrency:** `claude-${{ issue.number }}` with `cancel-in-progress: true`.
+
+**Acknowledgment:** The workflow adds a 👀 reaction to the triggering comment immediately, before Claude boots.
+
+**Revise mode:** For changes exceeding fix scope, the agent posts a ready-to-paste local command: `/plantz-adlc-orchestrator --revise "<feedback>" --previous-run-uuid <uuid>`. This runs the full ADLC on the existing PR branch with all quality gates.
 
 ## Chromatic label gate
 
@@ -48,7 +64,7 @@ PRs require the `run chromatic` label to trigger `chromatic.yml`. Without it, th
 
 **Workflow validation caveat:** `claude-code-action` requires the workflow file on the PR branch to match the version on `main`. If the workflow is new or modified in the PR, the action silently no-ops and the job reports success without running the skill. The skill only executes once the workflow file is merged to `main`.
 
-**Tool scoping:** The agent's Bash access is restricted to specific CLIs (`pnpm`, `node`, `mkdir`, `rm`, `lsof`, `kill`, `agent-browser`). On failure, screenshots are uploaded as GitHub Actions artifacts for diagnosis.
+**Tool scoping:** The agent's Bash access is restricted to specific CLIs (`pnpm`, `node`, `mkdir`, `rm`, `lsof`, `kill`, `pkill`, `agent-browser`). On failure, screenshots are uploaded as GitHub Actions artifacts for diagnosis.
 
 ## Netlify preview deploys
 
@@ -65,19 +81,9 @@ These deploys are independent of the GitHub Actions workflows listed above — N
 
 ## Turbo cache strategy
 
-Six workflows (ci, lighthouse, chromatic, claude, smoke-tests, adlc-patch) share a Turbo cache pattern with restore-key prefixes (`${{ runner.os }}-turbo-`) that allow cross-workflow cache hits. `code-review.yml` and `audit-agent-docs.yml` do not use Turbo cache.
+Five workflows (ci, lighthouse, chromatic, claude, smoke-tests) share a Turbo cache pattern with restore-key prefixes (`${{ runner.os }}-turbo-`) that allow cross-workflow cache hits. `code-review.yml` and `audit-agent-docs.yml` do not use Turbo cache.
 
 When adding a new workflow that runs Turbo tasks, follow the existing pattern: restore before tasks, save on cache miss (`cache-hit != 'true'`), use prefix fallback keys.
-
-## Iterate (Patch mode)
-
-`adlc-patch.yml` runs when a user comments `/patch <feedback>` on a PR. It applies lightweight, scoped fixes without running the full ADLC pipeline.
-
-**Trigger:** `issue_comment` (created) containing `/patch`, filtered to PR comments from OWNER/MEMBER/COLLABORATOR.
-
-**Concurrency:** `pr-iterate-${{ github.event.issue.number }}` with `cancel-in-progress: true`. Multiple simultaneous comments — only the latest executes.
-
-**Revise mode:** For changes exceeding patch scope, the agent posts a ready-to-paste local command: `/plantz-adlc-orchestrator --revise "<feedback>" --previous-run-uuid <uuid>`. This runs the full ADLC on the existing PR branch with all quality gates.
 
 ---
 

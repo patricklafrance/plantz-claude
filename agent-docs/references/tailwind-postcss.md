@@ -53,6 +53,7 @@ Consuming apps also use `@source` directives to tell Tailwind where to find util
 @source "../../../management/plants/src/**/*.{ts,tsx}";
 @source "../../../management/user/src/**/*.{ts,tsx}";
 @source "../../../today/landing-page/src/**/*.{ts,tsx}";
+@source "../../../today/vacation-planner/src/**/*.{ts,tsx}";
 ```
 
 This is the host app example. Domain storybooks and the unified storybook have their own `globals.css`/`storybook.css` with similar `@source` directives scoped to their relevant packages and modules.

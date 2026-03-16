@@ -18,6 +18,7 @@ const storybookConfig: StorybookConfig = {
         "../../management/user/src/**/*.stories.tsx",
         // Today
         "../../today/landing-page/src/**/*.stories.tsx",
+        "../../today/vacation-planner/src/**/*.stories.tsx",
     ],
     staticDirs: ["./public"],
 };

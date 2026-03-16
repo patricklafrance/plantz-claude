@@ -27,14 +27,14 @@ fi
 
 # Lint the file. Use the binary directly to avoid pnpm exec startup overhead.
 # Report only — do not auto-fix. The agent decides how to address issues.
-# Exit non-zero on warnings or errors so the agent is forced to fix them immediately.
+# Exit non-zero on errors only — warnings flow through to the ADLC test phase or pre-commit.
 OUTPUT=$(./node_modules/.bin/oxlint --react-plugin --import-plugin --jsx-a11y-plugin --react-perf-plugin --promise-plugin --vitest-plugin "$FILE_PATH" 2>/dev/null)
 EXIT_CODE=$?
 
 if echo "$OUTPUT" | grep -qP 'Found \d+ warnings? and \d+ errors?'; then
     WARNINGS=$(echo "$OUTPUT" | grep -oP 'Found \K\d+(?= warning)')
     ERRORS=$(echo "$OUTPUT" | grep -oP 'and \K\d+(?= error)')
-    if [[ "${WARNINGS:-0}" -gt 0 || "${ERRORS:-0}" -gt 0 ]]; then
+    if [[ "${ERRORS:-0}" -gt 0 ]]; then
         echo "$OUTPUT"
         exit 1
     fi

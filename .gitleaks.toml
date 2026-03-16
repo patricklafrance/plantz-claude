@@ -2,7 +2,4 @@
 # Extends the default ruleset; only add allowlist entries for confirmed false positives.
 
 [allowlist]
-  paths = [
-    '''public/mockServiceWorker\.js''',
-    '''pnpm-lock\.yaml''',
-  ]
+paths = ['''public/mockServiceWorker\.js''', '''pnpm-lock\.yaml''']

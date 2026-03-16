@@ -12,6 +12,7 @@
         "dev-management-user": "cross-env MODULES=management/user pnpm dev-host",
         "dev-management-storybook": "turbo run dev --filter=@apps/management-storybook",
         "dev-today-landing-page": "cross-env MODULES=today/landing-page pnpm dev-host",
+        "dev-today-vacation-planner": "cross-env MODULES=today/vacation-planner pnpm dev-host",
         "dev-today-storybook": "turbo run dev --filter=@apps/today-storybook",
         "dev-packages-storybook": "turbo run dev --filter=@apps/packages-storybook",
         "dev-storybook": "turbo run dev --filter=@apps/storybook",

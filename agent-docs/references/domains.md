@@ -16,10 +16,10 @@ If the feature doesn't fit an existing domain, that's a signal to discuss a new 
 
 ## Domains
 
-| Domain         | Mental model                                          | Existing modules                                                      |
-| -------------- | ----------------------------------------------------- | --------------------------------------------------------------------- |
-| **management** | Admin and configuration — set things up               | `management/plants` (plant CRUD), `management/user` (profile editing) |
-| **today**      | Daily care dashboard — what needs attention right now | `today/landing-page` (daily watering overview)                        |
+| Domain         | Mental model                                          | Existing modules                                                                                  |
+| -------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| **management** | Admin and configuration — set things up               | `management/plants` (plant CRUD), `management/user` (profile editing)                             |
+| **today**      | Daily care dashboard — what needs attention right now | `today/landing-page` (daily watering overview), `today/vacation-planner` (vacation care planning) |
 
 The **host** (`apps/host/`) is not a domain. It is a thin bootstrap layer that wires `registerShell` (from `@packages/core-module/shell`) with domain modules. Shell components and auth handlers live in core-module, not the host.
 

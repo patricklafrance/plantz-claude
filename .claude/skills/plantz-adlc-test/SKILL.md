@@ -16,7 +16,7 @@ The single validation gate for all code quality. Runs static checks (lint, modul
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | `run-uuid`           | Run folder identifier                                                                                                                       |
 | `iteration`          | Current iteration number                                                                                                                    |
-| Plan path            | `.adlc/[run-uuid]/plan.md` — needed for acceptance criteria                                                                            |
+| Plan path            | `.adlc/[run-uuid]/plan.md` — needed for acceptance criteria                                                                                 |
 | Previous issues path | `null` on iteration 1. On iteration > 1: path to `test-issues-[iteration-1].md`. May not exist if the previous iteration passed all checks. |
 
 ## Procedure
@@ -127,7 +127,7 @@ Run all workspace tests as a gate check. This includes Storybook a11y tests (axe
 
 ## Subagent Pattern
 
-**Subagent A** runs static checks (steps 1-5) and writes the test issues file with static results. A does NOT run browser verification or workspace tests.
+**Subagent A** runs static checks (steps 1-6) and writes the test issues file with static results. A does NOT run browser verification or workspace tests.
 
 **Subagent B** has four responsibilities, in order:
 

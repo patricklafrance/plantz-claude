@@ -44,9 +44,9 @@ Four pillars make this repo fully agent-driven. Each section links to the implem
 
 ### 1. ADLC skills — end-to-end feature development
 
-Six skills that form a complete Agent Development Life Cycle (ADLC). Two flows:
+Seven skills that form a complete Agent Development Life Cycle (ADLC). Two flows:
 
-**New feature** — run the orchestrator locally with a feature request. It creates a branch, spawns subagents for each phase (plan, code, test, document), opens a PR, and monitors CI.
+**New feature** — run the orchestrator locally with a feature request. It creates a branch, spawns subagents for each phase (plan, architect, code, test, document), opens a PR, and monitors CI.
 
 ```
 /plantz-adlc-orchestrator Add a vacation planner page with date picker and delegation support
@@ -69,6 +69,7 @@ flowchart TD
     subgraph Orch["Orchestrator"]
         direction TB
         Plan["<b>Plan</b><br/>A drafts · B reviews"] -- "plan.md" -->
+        Architect["<b>Architect</b><br/>A explores · B reviews"] -- "architecture-review.md" -->
         Code["<b>Code</b><br/>A implements · B reviews"] -- "changes.md" -->
         Simplify["<b>Simplify</b>"] -->
         Test["<b>Test</b><br/>A validates · B reviews"]
@@ -87,8 +88,9 @@ flowchart TD
 
 | Skill                      | What it does                                                                                                   |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `plantz-adlc-orchestrator` | Entry point. Generates a run UUID, creates a branch, and runs steps 1-8 sequentially                           |
+| `plantz-adlc-orchestrator` | Entry point. Generates a run UUID, creates a branch, and runs steps 1-9 sequentially                           |
 | `plantz-adlc-plan`         | Drafts a structured technical plan with tagged acceptance criteria (`[static]`, `[visual]`, `[interactive]`)   |
+| `plantz-adlc-architect`    | Explores codebase for friction, designs interface contracts, classifies dependency boundaries, assesses depth  |
 | `plantz-adlc-code`         | Implements the plan or fixes issues. Uses Chrome DevTools MCP for visual feedback while coding                 |
 | `plantz-adlc-test`         | Single validation gate — static checks (lint, modules, accessibility) and browser verification of all criteria |
 | `plantz-adlc-document`     | Audits agent-docs and CLAUDE.md for drift, creates ADRs/ODRs if new decisions were made                        |
@@ -143,7 +145,8 @@ Every ADLC run produces files in `.adlc/[uuid]/` that flow between subagents:
 ```
 .adlc/[uuid]/
   ├─ orchestrator-state.md    # Orchestrator writes after each step
-  ├─ plan.md                  # Plan skill writes → Code, Test, Merge read (committed for revise/fix)
+  ├─ plan.md                  # Plan skill writes → Architect, Code, Test, Merge read
+  ├─ architecture-review.md   # Architect writes → Code reads for interface contracts
   ├─ changes-1.md             # Code writes → Test appends verification results → Merge reads for PR
   ├─ changes-2.md             # (iteration 2, if test found issues)
   ├─ test-issues-1.md         # Test writes (only if failures) → Code reads on next fix iteration
@@ -238,18 +241,18 @@ Utility skills use a **reference module pattern** — instead of hardcoding depe
 
 **External skills** (symlinked from `.agents/skills/`):
 
-| Skill                           | Loaded by  | Purpose                                  |
-| ------------------------------- | ---------- | ---------------------------------------- |
-| `workleap-react-best-practices` | plan, code | React SPA performance patterns           |
-| `accessibility`                 | plan, code | WCAG 2.1 audit and remediation           |
-| `shadcn`                        | plan, code | shadcn/ui component management           |
-| `frontend-design`               | plan, code | Production-grade UI design               |
-| `workleap-squide`               | plan, code | Squide modular shell conventions         |
-| `pnpm`                          | code       | Workspace dependency management          |
-| `turborepo`                     | code, test | Monorepo task orchestration              |
-| `vitest`                        | test       | Unit testing                             |
-| `workleap-web-configs`          | plan, code | Shared ESLint/TypeScript/Rsbuild configs |
-| `workleap-logging`              | code       | Structured logging                       |
+| Skill                           | Loaded by             | Purpose                                  |
+| ------------------------------- | --------------------- | ---------------------------------------- |
+| `workleap-react-best-practices` | plan, code            | React SPA performance patterns           |
+| `accessibility`                 | plan, code            | WCAG 2.1 audit and remediation           |
+| `shadcn`                        | plan, code            | shadcn/ui component management           |
+| `frontend-design`               | plan, code            | Production-grade UI design               |
+| `workleap-squide`               | plan, code, architect | Squide modular shell conventions         |
+| `pnpm`                          | code                  | Workspace dependency management          |
+| `turborepo`                     | code, test            | Monorepo task orchestration              |
+| `vitest`                        | test                  | Unit testing                             |
+| `workleap-web-configs`          | plan, code            | Shared ESLint/TypeScript/Rsbuild configs |
+| `workleap-logging`              | plan, code            | Structured logging                       |
 
 **Files:** [`.claude/skills/`](.claude/skills/), [`.agents/skills/`](.agents/skills/)
 

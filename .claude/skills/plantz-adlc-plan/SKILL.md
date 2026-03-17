@@ -22,7 +22,7 @@ Draft the technical approach for a feature and output it to a plan file.
 
 ## Mode
 
-This skill runs in one of three modes, determined by the `mode` input:
+This skill runs in one of two modes, determined by the `mode` input:
 
 - **Draft**: Create a plan from scratch based on the feature description.
 - **Revision**: Revise the existing plan. The revision is driven by either the escalation file or the feature description — whichever is provided.
@@ -30,7 +30,7 @@ This skill runs in one of three modes, determined by the `mode` input:
 ## Procedure
 
 1. Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, `agent-docs/odr/index.md`, and these reference files: `agent-docs/references/domains.md`, `agent-docs/references/msw-tanstack-query.md`, `agent-docs/references/storybook.md`, `agent-docs/references/tailwind-postcss.md`, `agent-docs/references/shadcn.md`, `agent-docs/references/color-mode.md`, `agent-docs/references/bundle-size-budget.md`.
-2. Load the `accessibility`, `shadcn`, `frontend-design`, `workleap-react-best-practices`, `workleap-squide`, and `workleap-web-configs` skills for design guidance.
+2. Always load the `accessibility`, `frontend-design`, `workleap-react-best-practices`, and `workleap-squide` skills. Load each of the following whose description matches the feature's affected packages — do not skip a skill you are unsure about: `shadcn`, `workleap-web-configs`, `workleap-logging`, `pnpm`.
 3. **Draft mode:** Analyze the feature requirements and determine which packages/modules are affected.
    **Revision mode:** Read the existing plan (at the existing plan path input) and the escalation file (at the escalation path input) if provided. Understand what was attempted, what failed structurally, and the proposed alternative. Focus the revision on the structural issue — don't rewrite sections that aren't affected.
 4. If a new module or storybook needs to be scaffolded, note it in the plan. Do NOT scaffold during planning — that happens during the coding phase.
@@ -112,6 +112,6 @@ In **draft mode**, Subagent A drafts the plan from scratch and writes `plan.md`.
 
 In **revision mode**, Subagent B reviews A's revisions — challenges the revised approach, validates that the structural issue from the escalation file is genuinely addressed (not just papered over), and validates acceptance criteria. B should verify that the revised plan doesn't introduce new cross-module dependencies or contradict existing ADRs.
 
-Subagent B reads the plan, challenges it — checking for missing affected packages, unrealistic scope, incorrect patterns, missing stories, or accessibility gaps — and edits `plan.md` directly to improve it. B does not append concerns; it rewrites sections that need improvement.
+Subagent B reads the plan, challenges it — checking for missing affected packages, unrealistic scope, incorrect patterns, missing stories, accessibility gaps, shallow decompositions (where a component's props would mirror its internal state instead of hiding complexity), and testability gaps (components or hooks that cannot be rendered in a Storybook story without an elaborate multi-provider setup) — and edits `plan.md` directly to improve it. B does not append concerns; it rewrites sections that need improvement.
 
-**B MUST validate acceptance criteria against the RULES in the plan output format.** If any rule is violated, B fixes the criteria directly.
+**B MUST validate acceptance criteria against the RULES in the plan output format.** If any rule is violated, B fixes the criteria directly. After editing, B must also verify that every acceptance criterion references a capability present in the plan's File Changes section — remove or revise orphaned criteria that reference files or features dropped during edits.

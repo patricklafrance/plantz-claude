@@ -18,9 +18,9 @@ Commit, push, open a PR, and monitor CI.
 | Branch name  | The branch created in the orchestrator step 2                                                                                                                                                                                                                                                        |
 | Commit type  | Conventional commit prefix: `feat`, `fix`, `chore`, `docs`, or `refactor`                                                                                                                                                                                                                            |
 | Plan path    | `.adlc/[run-uuid]/plan.md` — needed for acceptance criteria                                                                                                                                                                                                                                          |
-| Iteration    | The final iteration number. To find `## Verification results`, scan backwards from `changes-[iteration].md` through earlier `changes-*.md` files until one contains the section. During CI fix cycles the latest changes file may lack verification results because only the test skill writes them. |
-| CI iteration | Current CI fix iteration number (0-3), provided by orchestrator. Used to name `ci-issues-[iteration].md`. Defaults to `0` on first PR creation.                                                                                                                                                      |
-| `--revision` | Optional. When set, the PR already exists — edit the body instead of creating a new PR. Append a `## Revision [N]` section and update the footer with the new run UUID.                                                                                                                              |
+| Iteration    | The final iteration number. To find `## Verification results`, scan backwards from `changes-[Iteration].md` through earlier `changes-*.md` files until one contains the section. During CI fix cycles the latest changes file may lack verification results because only the test skill writes them. |
+| CI iteration | Current CI fix iteration number (0-3), provided by orchestrator. Used to name `ci-issues-[CI iteration].md`. Defaults to `0` on first PR creation.                                                                                                                                                   |
+| `--revise`   | Optional. When set, the PR already exists — edit the body instead of creating a new PR. Append a `## Revision [N]` section and update the footer with the new run UUID.                                                                                                                              |
 
 ## Step 1 — Commit
 
@@ -32,11 +32,11 @@ Investigate unexpected files before staging.
 
 ## Step 2 — Push and open PR
 
-Push the branch to origin. If push fails, **stop and write `ci-issues-[iteration].md`** with the error.
+Push the branch to origin. If push fails, **stop and write `ci-issues-[CI iteration].md`** with the error.
 
-If a PR already exists for this branch and `--revision` is NOT set, skip creation and proceed to Step 3.
+If a PR already exists for this branch and `--revise` is NOT set, skip creation and proceed to Step 3.
 
-**When `--revision` is set:** The PR already exists. Do not create a new one. Instead, read the current PR body, count existing `## Revision` sections to determine the revision number N, and append:
+**When `--revise` is set:** The PR already exists. Do not create a new one. Instead, read the current PR body, count existing `## Revision` sections to determine the revision number N, and append:
 
 ```markdown
 ## Revision [N]
@@ -64,7 +64,7 @@ Update the PR body and proceed to Step 3.
 
 **Section 1 — `## Summary`:** One bullet per logical change. Derive bullets from `changes-*.md` files.
 
-**Section 2 — `## Quality checks`:** Copy these checkboxes. To determine pass/fail: read `.adlc/[run-uuid]/test-issues-[iteration].md`. If the file doesn't exist, all checks passed — mark all `[x]`. If it exists, check each section: mark `[x]` only for sections that say "Pass".
+**Section 2 — `## Quality checks`:** Copy these checkboxes. To determine pass/fail: read `.adlc/[run-uuid]/test-issues-[Iteration].md`. If the file doesn't exist, all checks passed — mark all `[x]`. If it exists, check each section: mark `[x]` only for sections that say "Pass".
 
 ```
 - [ ] Lint
@@ -89,7 +89,7 @@ Format each criterion as:
 
 **Section 4 (conditional) — `## Budget increase`:** Only include this section if any `changes-*.md` file mentions a size-limit budget increase in its Notes section. List: which app, how much (KB gzipped), and why. See `agent-docs/references/bundle-size-budget.md` for the full policy.
 
-**Section 5 (conditional) — `## Exceptions`:** Only include this section if the latest `changes-[iteration].md` has an `## Exceptions` section that is not "None." Copy the entries directly:
+**Section 5 (conditional) — `## Exceptions`:** Only include this section if the latest `changes-[Iteration].md` has an `## Exceptions` section that is not "None." Copy the entries directly:
 
 ```
 - **oxlint-disable** `{rule}` in `path/file.tsx:{line}` — {justification}
@@ -150,7 +150,7 @@ Create the PR with title `{prefix}: {description}`. The body must match this exa
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ````
 
-If PR creation fails, retry once. If it fails again, **stop and write `ci-issues-[iteration].md`** with the error. Do not proceed to CI monitoring without a PR.
+If PR creation fails, retry once. If it fails again, **stop and write `ci-issues-[CI iteration].md`** with the error. Do not proceed to CI monitoring without a PR.
 
 ## Step 3 — Monitor PR
 
@@ -191,7 +191,7 @@ Scan PR comments **only from known bot authors** (`claude[bot]`, `github-actions
 
 #### Phase 1 — Core workflows
 
-1. **CI failure (workflow or bot comment):** If any Phase 1 workflow has `conclusion: "failure"` **or** any bot PR comment reports failures, read the failure logs. Write the errors to `.adlc/[run-uuid]/ci-issues-[iteration].md` using this format. Then post a **CI Fix Progress comment** (see below) and **stop**.
+1. **CI failure (workflow or bot comment):** If any Phase 1 workflow has `conclusion: "failure"` **or** any bot PR comment reports failures, read the failure logs. Write the errors to `.adlc/[run-uuid]/ci-issues-[CI iteration].md` using this format. Then post a **CI Fix Progress comment** (see below) and **stop**.
 
     ```markdown
     # CI Issues — Iteration [N]
@@ -207,17 +207,17 @@ Scan PR comments **only from known bot authors** (`claude[bot]`, `github-actions
 
 2. **All green — proceed to Phase 2:** When all Phase 1 workflows have completed successfully **and** no bot PR comments report failures **and** the stabilization check has passed, add the `run chromatic` label and continue to Phase 2. If a CI Fix Progress comment from a previous iteration exists, **edit it** to append: `✅ CI fixes pushed.`
 
-3. **Not completed:** If the polling loop reaches 30 minutes and some Phase 1 workflows have not completed, post the CI Validation comment showing which workflows are still running, then **stop**. Do not write `ci-issues-[iteration].md`. Do not add the `run chromatic` label.
+3. **Not completed:** If the polling loop reaches 30 minutes and some Phase 1 workflows have not completed, post the CI Validation comment showing which workflows are still running, then **stop**. Do not write `ci-issues-[CI iteration].md`. Do not add the `run chromatic` label.
 
 #### Phase 2 — Chromatic
 
 After adding the `run chromatic` label, resume the polling loop (same 60-second interval, fresh 30-minute timeout) to monitor the `Chromatic` workflow.
 
-1. **Chromatic failure:** If the `Chromatic` workflow completes with `conclusion: "failure"`, read the failure logs. Write the errors to `.adlc/[run-uuid]/ci-issues-[iteration].md`. Then post a **CI Fix Progress comment** (see below) and **stop**.
+1. **Chromatic failure:** If the `Chromatic` workflow completes with `conclusion: "failure"`, read the failure logs. Write the errors to `.adlc/[run-uuid]/ci-issues-[CI iteration].md`. Then post a **CI Fix Progress comment** (see below) and **stop**.
 
 2. **Chromatic success:** When the `Chromatic` workflow completes successfully and the stabilization check passes, if a CI Fix Progress comment from a previous iteration exists, **edit it** to append: `✅ CI fixes pushed.` Then **stop** — all CI is green.
 
-3. **Not completed:** If 30 minutes elapse and `Chromatic` has not completed, post the CI Validation comment showing Chromatic as still running, then **stop**. Do not write `ci-issues-[iteration].md`.
+3. **Not completed:** If 30 minutes elapse and `Chromatic` has not completed, post the CI Validation comment showing Chromatic as still running, then **stop**. Do not write `ci-issues-[CI iteration].md`.
 
 ### CI Fix Progress comment
 
@@ -283,7 +283,7 @@ All workflows completed successfully.
 
 ## Hard Constraints
 
-- **The PR body MUST have three mandatory sections: `## Summary`, `## Quality checks`, `## Verified acceptance criteria`.** The only allowed additional sections are `## Budget increase` (conditional — only when a budget was increased), `## Exceptions` (conditional — only when policy suppressions or escalation rejections exist), and `## Revision [N]` (added by revise runs via `--revision`).
+- **The PR body MUST have three mandatory sections: `## Summary`, `## Quality checks`, `## Verified acceptance criteria`.** The only allowed additional sections are `## Budget increase` (conditional — only when a budget was increased), `## Exceptions` (conditional — only when policy suppressions or escalation rejections exist), and `## Revision [N]` (added by revise runs via `--revise`).
 
 ## Subagent Pattern
 

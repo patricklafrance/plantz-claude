@@ -72,6 +72,10 @@ export function LandingPage() {
         }
     }, []);
 
+    const handleAdjustmentAccepted = useCallback(async () => {
+        await collection.utils.refetch();
+    }, [collection]);
+
     const handleMarkWatered = useCallback(async () => {
         if (!detailPlant) return;
 
@@ -163,7 +167,13 @@ export function LandingPage() {
                 </div>
             </div>
 
-            <PlantDetailDialog plant={detailPlant} open={detailPlant !== null} onOpenChange={handleDetailOpenChange} careSection={detailPlant ? <PlantCareSection plantId={detailPlant.id} /> : undefined} onMarkWatered={handleMarkWatered} />
+            <PlantDetailDialog
+                plant={detailPlant}
+                open={detailPlant !== null}
+                onOpenChange={handleDetailOpenChange}
+                careSection={detailPlant ? <PlantCareSection plantId={detailPlant.id} wateringFrequency={detailPlant.wateringFrequency} onAdjustmentAccepted={handleAdjustmentAccepted} /> : undefined}
+                onMarkWatered={handleMarkWatered}
+            />
         </div>
     );
 }

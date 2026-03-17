@@ -3,9 +3,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMemo, type ReactNode } from "react";
 
 import type { CareEvent } from "@packages/core-plants/care-event";
-import { makeCareEvent } from "@packages/core-plants/test-utils";
+import { makeAdjustmentRecommendation, makeCareEvent } from "@packages/core-plants/test-utils";
 
-import { createCareEventHandlers } from "./mocks/index.ts";
+import { createAdjustmentHandlers, createCareEventHandlers } from "./mocks/index.ts";
 import { PlantCareSection } from "./PlantCareSection.tsx";
 import { fireflyDecorator } from "./storybook.setup.tsx";
 
@@ -20,6 +20,8 @@ function QueryDecorator({ children }: { children: ReactNode }) {
 
     return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }
+
+const noAdjustmentHandlers = createAdjustmentHandlers({ recommendation: null, history: [] });
 
 const meta = {
     title: "Today/LandingPage/Components/PlantCareSection",
@@ -38,6 +40,8 @@ const meta = {
     },
     args: {
         plantId: "plant-1",
+        wateringFrequency: "1-week",
+        onAdjustmentAccepted: () => {},
     },
     decorators: [
         (story) => <QueryDecorator>{story()}</QueryDecorator>,
@@ -66,7 +70,7 @@ const sampleEvents: CareEvent[] = [
 export const WithHistory: Story = {
     parameters: {
         msw: {
-            handlers: createCareEventHandlers(sampleEvents),
+            handlers: [...createCareEventHandlers(sampleEvents), ...noAdjustmentHandlers],
         },
     },
 };
@@ -74,7 +78,7 @@ export const WithHistory: Story = {
 export const NoHistory: Story = {
     parameters: {
         msw: {
-            handlers: createCareEventHandlers([]),
+            handlers: [...createCareEventHandlers([]), ...noAdjustmentHandlers],
         },
     },
 };
@@ -82,7 +86,7 @@ export const NoHistory: Story = {
 export const SingleWatering: Story = {
     parameters: {
         msw: {
-            handlers: createCareEventHandlers([makeCareEvent({ id: "e1", eventDate: new Date(2024, 6, 15), eventType: "watered" })]),
+            handlers: [...createCareEventHandlers([makeCareEvent({ id: "e1", eventDate: new Date(2024, 6, 15), eventType: "watered" })]), ...noAdjustmentHandlers],
         },
     },
 };
@@ -91,6 +95,43 @@ export const Loading: Story = {
     parameters: {
         msw: {
             handlers: createCareEventHandlers("loading"),
+        },
+    },
+};
+
+export const WithAdjustmentSuggestion: Story = {
+    parameters: {
+        msw: {
+            handlers: [
+                ...createCareEventHandlers(sampleEvents),
+                ...createAdjustmentHandlers({
+                    recommendation: makeAdjustmentRecommendation(),
+                    history: [],
+                }),
+            ],
+        },
+    },
+};
+
+export const WithAdjustmentHistory: Story = {
+    parameters: {
+        msw: {
+            handlers: [
+                ...createCareEventHandlers(sampleEvents),
+                ...createAdjustmentHandlers({
+                    recommendation: null,
+                    history: [
+                        {
+                            id: "adj-1",
+                            plantId: "plant-1",
+                            previousInterval: 14,
+                            newInterval: 7,
+                            adjustmentDate: new Date(2024, 6, 10),
+                            note: "Adjusted based on summer watering patterns",
+                        },
+                    ],
+                }),
+            ],
         },
     },
 };

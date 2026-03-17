@@ -239,7 +239,7 @@ export function EditPlantDialog({ plant, open, onOpenChange, onDelete, onMarkWat
                 </div>
                 <DialogFooter>
                     {onMarkWatered && (
-                        <Button variant="default" size="sm" onClick={() => onMarkWatered(plant)}>
+                        <Button variant="default" size="sm" className="sm:mr-auto" onClick={() => onMarkWatered(plant)}>
                             <Droplets data-icon="inline-start" aria-hidden="true" />
                             Mark as Watered
                         </Button>

@@ -12,13 +12,13 @@ Draft the technical approach for a feature and output it to a plan file.
 
 ## Inputs (provided by orchestrator)
 
-| Input               | Description                                                                                                        |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `run-uuid`          | Run folder identifier                                                                                              |
-| `mode`              | `draft` or `revision`                                                                                              |
-| Feature description | What the user wants built                                                                                          |
-| Escalation path     | `null` except in `revision` mode: path to `escalation-[iteration].md` — explains what the previous plan got wrong. |
-| Existing plan path  | `null` in `draft` mode. In `revision` mode: path to the previous `plan.md`.                                        |
+| Input               | Description                                                                                                                                                                                                                        |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `run-uuid`          | Run folder identifier                                                                                                                                                                                                              |
+| `mode`              | `draft` or `revision`                                                                                                                                                                                                              |
+| Feature description | What the user wants built                                                                                                                                                                                                          |
+| Escalation path     | `null` in most cases. In `revision` mode triggered by a code escalation: path to `escalation-[iteration].md` — explains what the previous plan got wrong. Still `null` in `revision` mode triggered by user feedback (`--revise`). |
+| Existing plan path  | `null` in `draft` mode. In `revision` mode: path to the previous `plan.md`.                                                                                                                                                        |
 
 ## Mode
 

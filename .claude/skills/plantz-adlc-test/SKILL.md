@@ -12,12 +12,11 @@ The single validation gate for all code quality. Runs static checks (lint, modul
 
 ## Inputs (provided by orchestrator)
 
-| Input                | Description                                                                                                                                 |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `run-uuid`           | Run folder identifier                                                                                                                       |
-| `iteration`          | Current iteration number                                                                                                                    |
-| Plan path            | `.adlc/[run-uuid]/plan.md` — needed for acceptance criteria                                                                                 |
-| Previous issues path | `null` on iteration 1. On iteration > 1: path to `test-issues-[iteration-1].md`. May not exist if the previous iteration passed all checks. |
+| Input       | Description                                                 |
+| ----------- | ----------------------------------------------------------- |
+| `run-uuid`  | Run folder identifier                                       |
+| `iteration` | Current iteration number                                    |
+| Plan path   | `.adlc/[run-uuid]/plan.md` — needed for acceptance criteria |
 
 ## Procedure
 
@@ -29,8 +28,7 @@ The single validation gate for all code quality. Runs static checks (lint, modul
 6. **Accessibility review** (static): Load the `accessibility` skill. Review every changed file for WCAG AA violations — focus on semantic HTML, interactive element labelling, form error associations, color-only indicators, and live regions. For each failure, include the file path and element reference so the code skill can act on it.
 7. **Browser verification**: Read `plan.md` and extract all `[visual]` and `[interactive]` acceptance criteria. If any exist, follow the browser verification procedure (below) to verify them. Record pass/fail for each criterion.
 8. **Workspace tests**: Run `pnpm test` from the workspace root. This runs all workspace test tasks (including Storybook a11y). See the workspace tests procedure (below). This step runs **unconditionally** — it is not gated by `[visual]`/`[interactive]` criteria.
-9. **Regression check** (iteration > 1 only): If a previous issues path was provided and that file exists, compare the current iteration's issues with the previous iteration's issues. Any issue in the current run that was NOT present in the previous iteration is a regression introduced by the fix cycle. Prefix these with `⚠️ REGRESSION:` in the issues file so the code skill knows to revert the offending change rather than pile on more fixes. If the previous issues file doesn't exist (previous iteration passed), treat all current issues as regressions.
-10. **Always** write the final `## Verification results` section into the latest `changes-[iteration].md` file (add it after `## Notes`), regardless of whether checks passed or failed. The PR skill needs this section to populate the PR. The presence of this section is how the orchestrator distinguishes "all checks passed" from "subagent crashed" — never skip it. Use this format:
+9. **Always** write the final `## Verification results` section into the latest `changes-[iteration].md` file (add it after `## Notes`), regardless of whether checks passed or failed. The PR skill needs this section to populate the PR body. Use this format:
 
     ```markdown
     ## Verification results
@@ -44,15 +42,11 @@ The single validation gate for all code quality. Runs static checks (lint, modul
 
 ### Browser verification procedure
 
-**Scope:**
-
-- **Iteration 1:** Verify ALL `[visual]` and `[interactive]` criteria from the plan.
-- **Iteration > 1:** Verify only criteria related to files changed in this iteration. Carry forward passing results from the previous iteration's `changes-*.md` for criteria you did not re-verify — copy them with a note "(carried from iteration N)".
-- **Indirect regressions:** If this iteration changed shared styles/layouts/utilities, re-verify all criteria that render those elements.
+**Scope:** Verify ALL `[visual]` and `[interactive]` criteria from the plan on every iteration.
 
 **Phase 0 — Server startup and viewport:**
 
-Start the appropriate dev server (Storybook for story criteria, host app for route criteria). Wait for it to be ready (up to 60 seconds). If it fails to start, skip browser verification and note the failure in `## Verification results`. Set a consistent desktop viewport size before verifying — screenshots vary between runs without one.
+Start the appropriate dev server (Storybook for story criteria, host app for route criteria). Wait for it to be ready (up to 60 seconds). If it fails to start, stop — the orchestrator will detect the missing output and follow failure handling. Set a consistent desktop viewport size before verifying — screenshots vary between runs without one.
 
 **Dark mode verification:**
 For dark mode criteria, toggle the `dark` class on the document element via Chrome DevTools MCP, verify the criterion, then toggle back.
@@ -92,12 +86,11 @@ Run all workspace tests as a gate check. This includes Storybook a11y tests (axe
     This runs `turbo run test`, which executes every package's test task. Turborepo caching ensures unchanged packages are skipped. Each domain Storybook has its own `vitest.config.ts` with the `storybookTest` plugin that runs axe-core a11y checks.
 
 2. If violations are reported, add them to the test issues file under `## Storybook a11y`. For each violation include: story name, rule ID, element selector, and the violation description.
-3. If a violation was already reported in the previous iteration's test issues and the code skill attempted a fix: prefix with `⚠️ PERSISTENT:` to signal the code skill to suppress rather than retry.
-4. If no violations, record "Pass" in the `## Storybook a11y` section.
+3. If no violations, record "Pass" in the `## Storybook a11y` section.
 
 ## Output
 
-- If **all checks pass** (static, browser, and workspace tests): do NOT create an issues file. The orchestrator uses the `## Verification results` section in `changes-[iteration].md` (written in step 10) to confirm the test ran to completion.
+- If **all checks pass** (static, browser, and workspace tests): do NOT create an issues file.
 - If **any check fails**: write the issues to `.adlc/[run-uuid]/test-issues-[iteration].md` with this format:
 
 ```markdown
@@ -145,4 +138,4 @@ Run all workspace tests as a gate check. This includes Storybook a11y tests (axe
 
 3. **Workspace tests.** Follow the workspace tests procedure (above) to run `pnpm test`. This runs unconditionally — not gated by `[visual]`/`[interactive]` criteria. Record results in the test issues file under `## Storybook a11y` (for a11y violations) or the appropriate section for other test failures. B owns this step.
 
-4. **Write the verification results.** B **always** writes the final `## Verification results` section into `changes-[iteration].md` — even if there were no `[visual]`/`[interactive]` criteria to verify. This section is how the orchestrator confirms B completed normally — never skip it.
+4. **Write the verification results.** B **always** writes the final `## Verification results` section into `changes-[iteration].md` — even if there were no `[visual]`/`[interactive]` criteria to verify.

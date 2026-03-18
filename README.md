@@ -146,7 +146,6 @@ Every ADLC run produces files in `.adlc/[uuid]/` that flow between subagents:
 
 ```
 .adlc/[uuid]/
-  ├─ orchestrator-state.md    # Orchestrator writes after each step
   ├─ plan.md                  # Plan skill writes → Architect, Code, Test, PR read
   ├─ architecture-review.md   # Architect writes → Code reads for interface contracts
   ├─ changes-1.md             # Code writes → Test appends verification results → PR skill reads

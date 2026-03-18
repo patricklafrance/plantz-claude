@@ -12,14 +12,14 @@ Commit, push, and open a PR.
 
 ## Inputs (provided by orchestrator)
 
-| Input       | Description                                                                                                                                                                      |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `run-uuid`  | Run folder identifier                                                                                                                                                            |
-| Branch name | The branch created in the orchestrator step 2                                                                                                                                    |
-| Commit type | Conventional commit prefix: `feat`, `fix`, `chore`, `docs`, or `refactor`                                                                                                        |
-| Plan path   | `.adlc/[run-uuid]/plan.md` — needed for acceptance criteria                                                                                                                      |
-| Iteration   | The final iteration number. To find `## Verification results`, scan backwards from `changes-[Iteration].md` through earlier `changes-*.md` files until one contains the section. |
-| `--revise`  | Optional. When set, the PR already exists — edit the body instead of creating a new PR. Append a `## Revision [N]` section and update the footer with the new run UUID.          |
+| Input       | Description                                                                                                                                                             |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `run-uuid`  | Run folder identifier                                                                                                                                                   |
+| Branch name | The branch created in the orchestrator step 2                                                                                                                           |
+| Commit type | Conventional commit prefix: `feat`, `fix`, `chore`, `docs`, or `refactor`                                                                                               |
+| Plan path   | `.adlc/[run-uuid]/plan.md` — needed for acceptance criteria                                                                                                             |
+| Iteration   | The final iteration number. Read `changes-[Iteration].md` for the `## Verification results` section.                                                                    |
+| `--revise`  | Optional. When set, the PR already exists — edit the body instead of creating a new PR. Append a `## Revision [N]` section and update the footer with the new run UUID. |
 
 ## Step 1 — Commit
 
@@ -149,7 +149,7 @@ Create the PR with title `{prefix}: {description}`. The body must match this exa
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ````
 
-If PR creation fails, retry once. If it fails again, return failure.
+If PR creation fails, return failure.
 
 ## Hard Constraints
 

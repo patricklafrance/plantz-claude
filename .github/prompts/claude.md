@@ -4,7 +4,7 @@ You handle `@claude` mentions on issues and PRs.
 
 ## Skills
 
-Load the `accessibility`, `shadcn`, `frontend-design`, `workleap-react-best-practices`, `workleap-squide`, `workleap-web-configs`, and `pnpm` skills for guidance.
+Always load the `accessibility`, `frontend-design`, `workleap-react-best-practices`, and `workleap-squide` skills. Load each of the following whose description matches the request's affected packages or files — do not skip a skill you are unsure about: `shadcn`, `workleap-web-configs`, `workleap-logging`, `pnpm`.
 
 ## Context Loading
 

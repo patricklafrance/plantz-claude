@@ -12,15 +12,15 @@ Implement the plan or fix issues reported by the test phase.
 
 ## Inputs (provided by orchestrator)
 
-| Input                    | Description                                                                                                                                         |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `run-uuid`               | Run folder identifier                                                                                                                               |
-| `iteration`              | Current iteration number (starts at 1). This is the iteration the agent will **write** to (`changes-[iteration].md`).                               |
-| Plan path                | Always provided — `.adlc/[run-uuid]/plan.md`                                                                                                        |
-| Issues path              | `null` on iteration 1. On fix cycles: the path to the issues file (`test-issues-*.md` from test phase).                                             |
-| Changes path             | `null` on iteration 1. On fix cycles: the explicit path to the **previous** iteration's changes file (e.g., `changes-1.md` when `iteration=2`).     |
-| Architecture review path | `null` if the architect step crashed. Otherwise `.adlc/[run-uuid]/architecture-review.md`. Provided on every code invocation, not just iteration 1. |
-| Escalation context       | `null` unless the orchestrator rejected a previous escalation. If provided: path to the rejected escalation file from a prior iteration.            |
+| Input                    | Description                                                                                                                                     |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `run-uuid`               | Run folder identifier                                                                                                                           |
+| `iteration`              | Current iteration number (starts at 1). This is the iteration the agent will **write** to (`changes-[iteration].md`).                           |
+| Plan path                | Always provided — `.adlc/[run-uuid]/plan.md`                                                                                                    |
+| Issues path              | `null` on iteration 1. On fix cycles: the path to the issues file (`test-issues-*.md` from test phase).                                         |
+| Changes path             | `null` on iteration 1. On fix cycles: the explicit path to the **previous** iteration's changes file (e.g., `changes-1.md` when `iteration=2`). |
+| Architecture review path | `.adlc/[run-uuid]/architecture-review.md`. Always provided on every code invocation, not just iteration 1.                                      |
+| Escalation context       | `null` unless the orchestrator rejected a previous escalation. If provided: path to the rejected escalation file from a prior iteration.        |
 
 ## Mode
 
@@ -33,7 +33,7 @@ This skill runs in one of two modes, determined by the inputs:
 
 1. Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, `agent-docs/odr/index.md`, and these reference files: `agent-docs/references/domains.md`, `agent-docs/references/msw-tanstack-query.md`, `agent-docs/references/storybook.md`, `agent-docs/references/tailwind-postcss.md`, `agent-docs/references/shadcn.md`, `agent-docs/references/color-mode.md`, `agent-docs/references/bundle-size-budget.md`, `agent-docs/references/static-analysis.md`, `agent-docs/references/turborepo.md`, `agent-docs/references/typescript.md`.
 2. Always load the `accessibility`, `frontend-design`, `workleap-react-best-practices`, and `workleap-squide` skills. Load each of the following whose description matches the plan's affected packages or the issues file's affected files — do not skip a skill you are unsure about: `shadcn`, `workleap-web-configs`, `workleap-logging`, `pnpm`.
-3. Read the plan file for architectural context. If an architecture review path is provided and the file exists, read it. Precedence between the two:
+3. Read the plan file for architectural context. Read the architecture review file. Precedence between the two:
     - **Architect wins on explicit structure.** When the review names a specific interface, signature, component boundary, data flow location, coupling constraint, or file, that specification is authoritative — implement it as written regardless of what the plan says about the same topic.
     - **Plan wins on everything else.** If the review does not address something, the plan governs. Silence in the review is not permission to deviate from the plan.
     - **Recommendations are advisory.** Anything under `## Recommendations` is informational. If a recommendation conflicts with the plan's File Changes, follow the plan and flag the conflict in Notes for Subagent B's escalation check.

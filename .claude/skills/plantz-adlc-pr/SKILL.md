@@ -1,26 +1,25 @@
 ---
 name: plantz-adlc-pr
 description: |
-    Commit, push, open a PR, and monitor CI. Handles CI failures by returning control to the orchestrator.
+    Commit, push, and open a PR. Returns the PR number for the monitor skill.
     Use when asked to "commit and push", "open a PR", or as part of the ADLC orchestrator's PR phase.
 license: MIT
 ---
 
 # ADLC PR
 
-Commit, push, open a PR, and monitor CI.
+Commit, push, and open a PR.
 
 ## Inputs (provided by orchestrator)
 
-| Input        | Description                                                                                                                                                                                                                                                                                          |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `run-uuid`   | Run folder identifier                                                                                                                                                                                                                                                                                |
-| Branch name  | The branch created in the orchestrator step 2                                                                                                                                                                                                                                                        |
-| Commit type  | Conventional commit prefix: `feat`, `fix`, `chore`, `docs`, or `refactor`                                                                                                                                                                                                                            |
-| Plan path    | `.adlc/[run-uuid]/plan.md` — needed for acceptance criteria                                                                                                                                                                                                                                          |
-| Iteration    | The final iteration number. To find `## Verification results`, scan backwards from `changes-[Iteration].md` through earlier `changes-*.md` files until one contains the section. During CI fix cycles the latest changes file may lack verification results because only the test skill writes them. |
-| CI iteration | Current CI fix iteration number (0-3), provided by orchestrator. Used to name `ci-issues-[CI iteration].md`. Defaults to `0` on first PR creation.                                                                                                                                                   |
-| `--revise`   | Optional. When set, the PR already exists — edit the body instead of creating a new PR. Append a `## Revision [N]` section and update the footer with the new run UUID.                                                                                                                              |
+| Input       | Description                                                                                                                                                                      |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `run-uuid`  | Run folder identifier                                                                                                                                                            |
+| Branch name | The branch created in the orchestrator step 2                                                                                                                                    |
+| Commit type | Conventional commit prefix: `feat`, `fix`, `chore`, `docs`, or `refactor`                                                                                                        |
+| Plan path   | `.adlc/[run-uuid]/plan.md` — needed for acceptance criteria                                                                                                                      |
+| Iteration   | The final iteration number. To find `## Verification results`, scan backwards from `changes-[Iteration].md` through earlier `changes-*.md` files until one contains the section. |
+| `--revise`  | Optional. When set, the PR already exists — edit the body instead of creating a new PR. Append a `## Revision [N]` section and update the footer with the new run UUID.          |
 
 ## Step 1 — Commit
 
@@ -32,9 +31,9 @@ Investigate unexpected files before staging.
 
 ## Step 2 — Push and open PR
 
-Push the branch to origin. If push fails, **stop and write `ci-issues-[CI iteration].md`** with the error.
+Push the branch to origin. If push fails, return failure.
 
-If a PR already exists for this branch and `--revise` is NOT set, skip creation and proceed to Step 3.
+If a PR already exists for this branch and `--revise` is NOT set, skip creation.
 
 **When `--revise` is set:** The PR already exists. Do not create a new one. Instead, read the current PR body, count existing `## Revision` sections to determine the revision number N, and append:
 
@@ -56,7 +55,7 @@ If a PR already exists for this branch and `--revise` is NOT set, skip creation 
 
 Also update the footer's revise command to use the new run UUID.
 
-Update the PR body and proceed to Step 3.
+Update the PR body.
 
 ### PR body template
 
@@ -150,136 +149,7 @@ Create the PR with title `{prefix}: {description}`. The body must match this exa
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ````
 
-If PR creation fails, retry once. If it fails again, **stop and write `ci-issues-[CI iteration].md`** with the error. Do not proceed to CI monitoring without a PR.
-
-## Step 3 — Monitor PR
-
-### Workflow reference
-
-Not all CI workflows report results the same way. Some report via check run status (the workflow itself fails), while others always exit successfully and post results as **PR comments**.
-
-| Workflow                         | Reports via      | Notes                                                 |
-| -------------------------------- | ---------------- | ----------------------------------------------------- |
-| `CI` (ci.yml)                    | Check run status | Monitored                                             |
-| `Code Review` (code-review.yml)  | Check run status | Monitored                                             |
-| `Smoke Tests` (smoke-tests.yml)  | PR comment       | Monitored — scan bot comments for failure indicators  |
-| `Lighthouse CI` (lighthouse.yml) | Check run status | Monitored                                             |
-| `Chromatic` (chromatic.yml)      | Check run status | Phase 2 — label-gated, monitored after label is added |
-| `Claude` (claude.yml)            | —                | Excluded — triggered by `@claude` mentions, not CI    |
-
-**Phase 1 workflows:** `CI`, `Code Review`, `Smoke Tests`, `Lighthouse CI`. Monitored immediately.
-
-**Phase 2 workflows:** `Chromatic`. Monitored only after the `run chromatic` label is added (see Decision flow).
-
-**Excluded workflows:** `Claude` (triggered by mentions, not CI).
-
-### Polling loop
-
-Poll every 60 seconds, with a maximum wait of 30 minutes per CI cycle. Each poll iteration checks two independent channels:
-
-**Channel 1 — Workflow run status:**
-
-Query workflow runs for the branch. In Phase 1, filter out `Chromatic` and `Claude` runs by name. Wait until all Phase 1 workflows (`CI`, `Code Review`, `Smoke Tests`, `Lighthouse CI`) reach `status: "completed"`. If any has `conclusion: "failure"`, that workflow has failed. Track each workflow's status (completed+success, completed+failure, or still running) for the CI Validation comment.
-
-**Channel 2 — Bot PR comments:**
-
-Scan PR comments **only from known bot authors** (`claude[bot]`, `github-actions[bot]`) for failure indicators: lines containing "❌", or lines where "failed", "FAIL", or "error:" appear in a context indicating an actual failure (not a zero-count like "0 failed"). When in doubt, read the full comment body. **Ignore user comments** — those are code review feedback, not CI results.
-
-**Stabilization check:** After all workflows in the current phase complete, run **one additional poll cycle** (60 seconds) before declaring that phase "all green."
-
-### Decision flow
-
-#### Phase 1 — Core workflows
-
-1. **CI failure (workflow or bot comment):** If any Phase 1 workflow has `conclusion: "failure"` **or** any bot PR comment reports failures, read the failure logs. Write the errors to `.adlc/[run-uuid]/ci-issues-[CI iteration].md` using this format. Then post a **CI Fix Progress comment** (see below) and **stop**.
-
-    ```markdown
-    # CI Issues — Iteration [N]
-
-    ## {workflow-name} / {step-name}
-
-    - [error output]
-
-    ## {workflow-name} / {step-name}
-
-    - [error output]
-    ```
-
-2. **All green — proceed to Phase 2:** When all Phase 1 workflows have completed successfully **and** no bot PR comments report failures **and** the stabilization check has passed, add the `run chromatic` label and continue to Phase 2. If a CI Fix Progress comment from a previous iteration exists, **edit it** to append: `✅ CI fixes pushed.`
-
-3. **Not completed:** If the polling loop reaches 30 minutes and some Phase 1 workflows have not completed, post the CI Validation comment showing which workflows are still running, then **stop**. Do not write `ci-issues-[CI iteration].md`. Do not add the `run chromatic` label.
-
-#### Phase 2 — Chromatic
-
-After adding the `run chromatic` label, resume the polling loop (same 60-second interval, fresh 30-minute timeout) to monitor the `Chromatic` workflow.
-
-1. **Chromatic failure:** If the `Chromatic` workflow completes with `conclusion: "failure"`, read the failure logs. Write the errors to `.adlc/[run-uuid]/ci-issues-[CI iteration].md`. Then post a **CI Fix Progress comment** (see below) and **stop**.
-
-2. **Chromatic success:** When the `Chromatic` workflow completes successfully and the stabilization check passes, if a CI Fix Progress comment from a previous iteration exists, **edit it** to append: `✅ CI fixes pushed.` Then **stop** — all CI is green.
-
-3. **Not completed:** If 30 minutes elapse and `Chromatic` has not completed, post the CI Validation comment showing Chromatic as still running, then **stop**. Do not write `ci-issues-[CI iteration].md`.
-
-### CI Fix Progress comment
-
-When a CI failure is detected (Phase 1 or Phase 2), post a **new** PR comment to notify the reviewer that automated fixes are underway:
-
-```markdown
-## CI Fix — Iteration [CI iteration + 1]
-
-Workflow failures detected. Applying automated fixes...
-```
-
-On the **next** PR skill invocation (after the orchestrator fixes and pushes), look for the most recent `## CI Fix` comment. If one exists, **edit it** to append: `✅ CI fixes pushed.`
-
-This gives reviewers a clear signal that the fix cycle completed and new code is being validated.
-
-### CI Validation comment
-
-Post or update a sticky `## CI Validation` PR comment before exiting. Update it at each phase transition and on exit. Formats:
-
-```markdown
-## CI Validation
-
-All workflows completed successfully.
-
-- [x] CI
-- [x] Code Review
-- [x] Smoke Tests
-- [x] Lighthouse CI
-- [x] Chromatic
-```
-
-```markdown
-## CI Validation
-
-- [x] CI
-- [ ] Smoke Tests — failed
-- [x] Code Review
-- [x] Lighthouse CI
-- [ ] Chromatic — not started (blocked by Phase 1 failure)
-```
-
-```markdown
-## CI Validation
-
-- [x] CI
-- [x] Code Review
-- [x] Smoke Tests
-- [x] Lighthouse CI
-- [ ] Chromatic — still running
-```
-
-```markdown
-## CI Validation
-
-⚠️ Not completed — some workflows did not finish within the monitoring window.
-
-- [x] CI
-- [ ] Smoke Tests — still running
-- [x] Code Review
-- [ ] Lighthouse CI — still running
-- [ ] Chromatic — not started
-```
+If PR creation fails, retry once. If it fails again, return failure.
 
 ## Hard Constraints
 
@@ -287,4 +157,4 @@ All workflows completed successfully.
 
 ## Subagent Pattern
 
-This skill runs as a **single subagent**. When CI failures require code changes, write the issues to a file and stop.
+This skill runs as a **single subagent**.

@@ -8,26 +8,26 @@ license: MIT
 
 # ADLC Code
 
-Implement the plan or fix issues reported by the test phase or CI.
+Implement the plan or fix issues reported by the test phase.
 
 ## Inputs (provided by orchestrator)
 
-| Input                    | Description                                                                                                                                             |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `run-uuid`               | Run folder identifier                                                                                                                                   |
-| `iteration`              | Current iteration number (starts at 1). This is the iteration the agent will **write** to (`changes-[iteration].md`).                                   |
-| Plan path                | Always provided — `.adlc/[run-uuid]/plan.md`                                                                                                            |
-| Issues path              | `null` on iteration 1. On fix cycles: the path to the issues file — either `test-issues-*.md` (from test phase) or `ci-issues-*.md` (from CI failures). |
-| Changes path             | `null` on iteration 1. On fix cycles: the explicit path to the **previous** iteration's changes file (e.g., `changes-1.md` when `iteration=2`).         |
-| Architecture review path | `null` if the architect step crashed. Otherwise `.adlc/[run-uuid]/architecture-review.md`. Provided on every code invocation, not just iteration 1.     |
-| Escalation context       | `null` unless the orchestrator rejected a previous escalation. If provided: path to the rejected escalation file from a prior iteration.                |
+| Input                    | Description                                                                                                                                         |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `run-uuid`               | Run folder identifier                                                                                                                               |
+| `iteration`              | Current iteration number (starts at 1). This is the iteration the agent will **write** to (`changes-[iteration].md`).                               |
+| Plan path                | Always provided — `.adlc/[run-uuid]/plan.md`                                                                                                        |
+| Issues path              | `null` on iteration 1. On fix cycles: the path to the issues file (`test-issues-*.md` from test phase).                                             |
+| Changes path             | `null` on iteration 1. On fix cycles: the explicit path to the **previous** iteration's changes file (e.g., `changes-1.md` when `iteration=2`).     |
+| Architecture review path | `null` if the architect step crashed. Otherwise `.adlc/[run-uuid]/architecture-review.md`. Provided on every code invocation, not just iteration 1. |
+| Escalation context       | `null` unless the orchestrator rejected a previous escalation. If provided: path to the rejected escalation file from a prior iteration.            |
 
 ## Mode
 
 This skill runs in one of two modes, determined by the inputs:
 
 - **Plan mode** (`iteration=1`, issues path is `null`): Implement the feature from scratch based on the plan.
-- **Fix mode** (`iteration>1`, issues path provided): Fix specific issues from the test phase or CI. The plan is still read for context, but the issues file drives the work.
+- **Fix mode** (`iteration>1`, issues path provided): Fix specific issues from the test phase. The plan is still read for context, but the issues file drives the work.
 
 ## Procedure
 

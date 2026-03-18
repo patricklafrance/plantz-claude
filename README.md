@@ -44,9 +44,9 @@ Four pillars make this repo fully agent-driven. Each section links to the implem
 
 ### 1. ADLC skills — end-to-end feature development
 
-Seven skills that form a complete Agent Development Life Cycle (ADLC). Two flows:
+Eight skills that form a complete Agent Development Life Cycle (ADLC). Two flows:
 
-**New feature** — run the orchestrator locally with a feature request. It creates a branch, spawns subagents for each phase (plan, architect, code, test, document), opens a PR, and monitors CI.
+**New feature** — run the orchestrator locally with a feature request. It creates a branch, spawns subagents for each phase (plan, architect, code, simplify, test, document, PR, monitor), opens a PR, and monitors CI.
 
 ```
 /plantz-adlc-orchestrator Add a vacation planner page with date picker and delegation support
@@ -76,10 +76,11 @@ flowchart TD
         Test -- "issues found" --> Code
         Test -- "all passed" -->
         Document["<b>Document</b><br/>A audits · B reviews"] -->
-        PR["<b>PR</b><br/>commit, push, CI"]
+        PR["<b>PR</b><br/>commit, push"] -->
+        Monitor["<b>Monitor</b><br/>CI watch, auto-fix"]
     end
 
-    PR --> Done([PR ready])
+    Monitor --> Done([PR ready])
 
     style Start fill:#4ade80,stroke:#16a34a,color:#000
     style Done fill:#4ade80,stroke:#16a34a,color:#000
@@ -88,13 +89,14 @@ flowchart TD
 
 | Skill                      | What it does                                                                                                   |
 | -------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `plantz-adlc-orchestrator` | Entry point. Generates a run UUID, creates a branch, and runs steps 1-9 sequentially                           |
+| `plantz-adlc-orchestrator` | Entry point. Generates a run UUID, creates a branch, and runs steps 1-10 sequentially                          |
 | `plantz-adlc-plan`         | Drafts a structured technical plan with tagged acceptance criteria (`[static]`, `[visual]`, `[interactive]`)   |
 | `plantz-adlc-architect`    | Explores codebase for friction, designs interface contracts, classifies dependency boundaries, assesses depth  |
 | `plantz-adlc-code`         | Implements the plan or fixes issues. Uses Chrome DevTools MCP for visual feedback while coding                 |
 | `plantz-adlc-test`         | Single validation gate — static checks (lint, modules, accessibility) and browser verification of all criteria |
 | `plantz-adlc-document`     | Audits agent-docs and CLAUDE.md for drift, creates ADRs/ODRs if new decisions were made                        |
-| `plantz-adlc-pr`           | Commits, pushes, opens a PR, monitors CI. Returns control on failures                                          |
+| `plantz-adlc-pr`           | Commits, pushes, and opens a PR. Returns the PR number for the monitor skill                                   |
+| `plantz-adlc-monitor`      | Monitors CI workflows (Phase 1 core + Phase 2 Chromatic), auto-fixes failures, adds `run chromatic` label      |
 
 Key design decisions:
 
@@ -102,7 +104,7 @@ Key design decisions:
 - **Subagent protocol**: Every multi-agent step uses a drafter/reviewer pair (A drafts, B reviews and improves). The orchestrator spawns both — subagents never spawn further subagents.
 - **File-based coordination**: All inter-step communication goes through files in `.adlc/[uuid]/`. This makes handoffs explicit and debuggable (see "Run folder artifacts" below).
 - **Test as the single gate**: The test skill owns all verification — both static (lint, modules, accessibility) and visual/interactive (browser screenshots via Chrome DevTools MCP). The code skill writes code; the test skill validates it.
-- **Acceptance criteria flow**: Plan tags each criterion. Test verifies them and writes results to `changes-*.md`. Merge reads results and populates the PR with pass/fail status. See [Acceptance criteria flow](#acceptance-criteria-flow) below.
+- **Acceptance criteria flow**: Plan tags each criterion. Test verifies them and writes results to `changes-*.md`. The PR skill reads results and populates the PR with pass/fail status. See [Acceptance criteria flow](#acceptance-criteria-flow) below.
 
 #### Acceptance criteria flow
 
@@ -120,7 +122,7 @@ Criteria must be specific enough for an agent with Chrome DevTools to verify (e.
 
 **2. Test** — The test skill runs static checks first, then opens a browser to verify `[visual]` and `[interactive]` criteria via screenshots and interaction. If anything fails, the orchestrator loops back to the code skill (up to 5 iterations) until all criteria pass.
 
-**3. Merge** — The merge skill publishes the final pass/fail results into the PR body:
+**3. PR** — The PR skill publishes the final pass/fail results into the PR body:
 
 ```markdown
 ## Verified acceptance criteria
@@ -145,13 +147,12 @@ Every ADLC run produces files in `.adlc/[uuid]/` that flow between subagents:
 ```
 .adlc/[uuid]/
   ├─ orchestrator-state.md    # Orchestrator writes after each step
-  ├─ plan.md                  # Plan skill writes → Architect, Code, Test, Merge read
+  ├─ plan.md                  # Plan skill writes → Architect, Code, Test, PR read
   ├─ architecture-review.md   # Architect writes → Code reads for interface contracts
-  ├─ changes-1.md             # Code writes → Test appends verification results → Merge reads for PR
+  ├─ changes-1.md             # Code writes → Test appends verification results → PR skill reads
   ├─ changes-2.md             # (iteration 2, if test found issues)
   ├─ test-issues-1.md         # Test writes (only if failures) → Code reads on next fix iteration
   ├─ escalation-1.md          # Code B writes (only if structural) → Orchestrator judges
-  ├─ ci-issues-1.md           # Merge writes (only if CI fails) → Code reads for fix
   └─ failure-summary.md       # Orchestrator writes on unrecoverable failure
 ```
 

@@ -25,9 +25,7 @@ Read the YAML files directly for triggers, steps, and concurrency rules.
 
 **Auth gating:** All triggers require OWNER/MEMBER/COLLABORATOR association. Bot comments are excluded to prevent re-trigger loops.
 
-**Concurrency:** `claude-${{ issue.number }}` with `cancel-in-progress: true`.
-
-**Acknowledgment:** The workflow adds a 👀 reaction to the triggering comment immediately, before Claude boots.
+**Concurrency:** `claude-${{ comment.id || review.id || issue.number || run_id }}` with `cancel-in-progress: true`. Keyed by comment ID (not issue number) so that unrelated comments on the same PR don't cancel in-progress Claude runs.
 
 **Revise mode:** For changes exceeding fix scope, the agent posts a ready-to-paste local command: `/plantz-adlc-orchestrator --revise "<feedback>" --previous-run-uuid <uuid>`. This runs the full ADLC on the existing PR branch with all quality gates.
 

@@ -13,7 +13,7 @@ Coordinates the full Agent Development Life Cycle for a feature by spawning spec
 ## Subagent Protocol
 
 1. **Subagent A** (drafter): produces the initial output (plan, code, test report, doc update).
-2. **Subagent B** (challenger): reviews Subagent A's output and improves it. B fixes everything it can by editing the output files and the code directly. The one exception: B can write an escalation file for structural issues that require a plan revision (see "Escalation Check").
+2. **Subagent B** (challenger): reviews Subagent A's output and improves it. B fixes everything it can by editing the output files and the code directly. The one exception: B can write a bail file when the plan is fundamentally unimplementable (see "Bail Check").
 
 The **orchestrator** spawns both subagents directly — subagents never spawn further subagents. Subagent A must complete and produce its expected output file before Subagent B is spawned. They run sequentially, never in parallel.
 
@@ -36,14 +36,14 @@ Context is passed between subagents via files in `.adlc/[run-uuid]/`. Always spa
 
 ## Port Cleanup Between Subagents
 
-**After every code, test, or simplify subagent returns**, kill any processes listening on ports 8080 and 6006 before spawning the next subagent.
+**After every code or test subagent returns**, kill any processes listening on ports 8080 and 6006 before spawning the next subagent.
 
 ## Failure Handling
 
 If a subagent fails to produce its expected output file, or if a command fails unexpectedly:
 
 1. **Stop the run** — do not retry blindly.
-2. **Write a failure summary** to `.adlc/[run-uuid]/failure-summary.md` containing: the step that failed, the error or unresolved issues, and what was attempted.
+2. **Write a failure summary** to `.adlc/[run-uuid]/failure-summary.md` containing: the step that failed, the error or unresolved issues, and what was attempted. **Output the failure summary to the console** so the user sees the issue immediately.
 
 ## Steps
 
@@ -51,94 +51,104 @@ If a subagent fails to produce its expected output file, or if a command fails u
 
 **New feature (default):** Delete any existing `.adlc/` directory (handle both tracked and untracked files). Generate a UUID and create `.adlc/[run-uuid]/`. Pass the UUID to every subagent.
 
-**Revise mode (when `--revise` is provided):** Do NOT delete `.adlc/`. Generate a new UUID and create `.adlc/[run-uuid]/`.
+**Revise mode (when `--revise` is provided):** Validate that `--previous-run-uuid` is provided and that `.adlc/[--previous-run-uuid value]/plan.md` exists. If either check fails, stop with a clear error message. Do NOT delete `.adlc/`. Generate a new UUID and create `.adlc/[run-uuid]/`.
 
 ### Step 2 — Create a branch from `main` (or checkout existing)
 
 **New feature (default):** Verify the working tree is clean. If there are uncommitted changes, stop and ask the user to resolve them. Pull latest `main` and create a branch. Branch format: `{type}/{short-description}` (kebab-case). Use the commit type matching the feature intent: `feat`, `fix`, `chore`, `docs`, `refactor`. Example: `feat/add-watering-schedules`.
 
-**Revise mode (when `--revise` is provided):** Skip branch creation. Use the current branch. Pull latest. Discover the PR number from the branch.
+**Revise mode (when `--revise` is provided):** Skip branch creation. Use the current branch. Pull latest — if merge conflicts occur, attempt to resolve them automatically; if resolution fails, stop and ask the user to resolve conflicts before running `--revise` again.
 
-### Step 3 — Plan
+### Step 3 — Plan-Architect Loop (max 3 plan-iterations)
 
-**Revise mode (when `--revise` is provided):** Spawn two subagents using the `plantz-adlc-plan` skill with `mode=revision`, `run-uuid`, feature description (the `--revise` text), the previous plan path (`.adlc/[--previous-run-uuid value]/plan.md`), and escalation path `null`.
+**New feature (default):**
 
-**New feature (default):** Spawn two subagents using the `plantz-adlc-plan` skill with `mode=draft`, `run-uuid`, feature description. Existing plan path and escalation path are `null`.
+plan-iteration = 1
 
-When done, verify `.adlc/[run-uuid]/plan.md` exists. If not, fail the run.
+Spawn two subagents using the `plantz-adlc-plan` skill with `mode=draft`, `run-uuid`, feature description. Existing plan path is `null`.
+Verify `.adlc/[run-uuid]/plan.md` exists. If not, fail the run.
 
-### Step 4 — Architect Review
+**Revise mode (when `--revise` is provided):**
+
+plan-iteration = 1
+
+Spawn two subagents using the `plantz-adlc-plan` skill with `mode=revision`, `run-uuid`, feature description (the `--revise` text), the previous plan path (`.adlc/[--previous-run-uuid value]/plan.md`).
+Verify `.adlc/[run-uuid]/plan.md` exists. If not, fail the run.
+
+**Loop (both modes):**
 
 Spawn two subagents using the `plantz-adlc-architect` skill.
-Pass: `run-uuid`, plan path (`.adlc/[run-uuid]/plan.md`).
+Pass: `run-uuid`, plan path (`.adlc/[run-uuid]/plan.md`), `plan-iteration`.
 
-When done, verify `.adlc/[run-uuid]/architecture-review.md` exists. If not, fail the run.
+Check for `.adlc/[run-uuid]/architect-revision-[plan-iteration].md`:
 
-### Step 5 — Code
+- **If absent** → architect approved and enriched plan. Break loop, proceed to Step 4 (Code).
+- **If present:**
+    - If plan-iteration ≥ 3 → failure handling. Include ALL revision request files (`architect-revision-1.md` through `architect-revision-[plan-iteration].md`) and ALL plan backups (`plan-iteration-1.md` through `plan-iteration-[plan-iteration].md`) in `failure-summary.md` so the user sees the full progression.
+    - Copy `plan.md` to `plan-iteration-[plan-iteration].md` (audit trail).
+    - Increment plan-iteration.
+    - Spawn two subagents using the `plantz-adlc-plan` skill with `mode=revision`, `run-uuid`, feature description = content of `architect-revision-[plan-iteration - 1].md`, existing plan path = `.adlc/[run-uuid]/plan.md`.
+    - Verify `.adlc/[run-uuid]/plan.md` exists. If not, fail the run.
+    - Loop back to architect.
+
+### Step 4 — Code
 
 Spawn two subagents using the `plantz-adlc-code` skill.
-Pass: `run-uuid`, `iteration=1`, plan path, architecture review path (`.adlc/[run-uuid]/architecture-review.md`). Issues path, changes path, and escalation context are `null` for iteration 1.
+Pass: `run-uuid`, `iteration=1`, plan path (`.adlc/[run-uuid]/plan.md`). Issues path and changes path are `null` for iteration 1.
 When done, verify `.adlc/[run-uuid]/changes-1.md` exists. If not, fail the run.
 
-**Escalation check:** After the code subagent returns, check for `.adlc/[run-uuid]/escalation-1.md`. If present, follow the escalation check procedure (see "Escalation check" below).
+**Bail check:** After the code subagent returns, check for `.adlc/[run-uuid]/bail.md`. If present: copy `.adlc/[run-uuid]/plan.md` to `.adlc/[run-uuid]/plan-backup.md`, then reset the working tree to the merge-base with `main`. Follow the failure handling procedure — include the bail file's content verbatim in `failure-summary.md`, prefixed with which step and iteration the bail occurred at.
 
-### Step 6 — Simplify
+### Step 5 — Simplify
 
 Spawn **one** subagent with the `simplify` skill. If it crashes or returns no output, log a warning and continue.
 
-If it made changes, append a `## Simplify` section to `changes-[iteration].md` listing the files it modified. This keeps the changes file accurate for downstream phases.
+### Step 6 — Test and iterate
 
-### Step 7 — Test and iterate
-
-The orchestrator tracks the current test iteration locally (starts at 1, maximum 5).
+The orchestrator tracks the current code-iteration locally (starts at 1, maximum 5).
 
 Spawn two subagents using the `plantz-adlc-test` skill.
 Pass: `run-uuid`, `iteration=1`, plan path (`.adlc/[run-uuid]/plan.md`).
 
-- If `.adlc/[run-uuid]/test-issues-[iteration].md` is produced with issues:
-    - If iteration ≥ 5, follow the failure handling procedure (maximum 5 test iterations).
-    - Increment iteration.
-    - Spawn new `plantz-adlc-code` subagents. Pass: `run-uuid`, `iteration`, plan path, architecture review path (`.adlc/[run-uuid]/architecture-review.md`), the previous iteration's issues file path (`test-issues-[iteration - 1].md`), the previous iteration's changes file path (`changes-[iteration - 1].md`), and escalation context (`null` unless the orchestrator rejected an escalation earlier in this run — if so, pass the rejected escalation file path so the code agent avoids re-escalating the same concern). They produce `changes-[iteration].md`.
-    - Verify `.adlc/[run-uuid]/changes-[iteration].md` exists. If not, fail the run.
-    - **Escalation check:** After the code subagent returns, follow the escalation check procedure (see "Escalation check" below).
-    - Spawn new `plantz-adlc-test` subagents. Pass: `run-uuid`, `iteration`, plan path.
+- If `.adlc/[run-uuid]/test-issues-[code-iteration].md` is produced with issues:
+    - If code-iteration ≥ 5, follow the failure handling procedure (maximum 5 code-test iterations).
+    - Increment code-iteration.
+    - Spawn new `plantz-adlc-code` subagents. Pass: `run-uuid`, `iteration=code-iteration`, plan path (`.adlc/[run-uuid]/plan.md`), the previous iteration's issues file path (`test-issues-[code-iteration - 1].md`), the previous iteration's changes file path (`changes-[code-iteration - 1].md`). They produce `changes-[code-iteration].md`.
+    - Verify `.adlc/[run-uuid]/changes-[code-iteration].md` exists. If not, fail the run.
+    - **Bail check:** After the code subagent returns, check for `.adlc/[run-uuid]/bail.md`. If present, follow the same bail procedure as Step 4.
+    - Spawn new `plantz-adlc-test` subagents. Pass: `run-uuid`, `iteration=code-iteration`, plan path.
     - Repeat until no issues or max reached.
-- **Completion check:** Verify `changes-[iteration].md` contains a `## Verification results` section. If absent, follow failure handling.
-- If no issues file exists and the verification results section is present, proceed.
+- **Completion check (after each test subagent run):** Verify `.adlc/[run-uuid]/verification-results-[code-iteration].md` exists. If absent, follow failure handling.
+- If no issues file exists and the verification results file is present, proceed.
 
-### Step 8 — Document
+### Step 7 — Document
 
 Spawn two subagents using the `plantz-adlc-document` skill (following the subagent protocol).
-Pass: `run-uuid`, the final iteration number, plan path (`.adlc/[run-uuid]/plan.md`), architecture review path (`.adlc/[run-uuid]/architecture-review.md`).
+Pass: `run-uuid`, the final code-iteration number, plan path (`.adlc/[run-uuid]/plan.md`).
 
 The A/B protocol provides the quality check. No additional output verification is needed — if the subagent returns, the step is complete.
 
-### Step 9 — PR
+### Step 8 — PR
 
 Spawn **one** subagent using the `plantz-adlc-pr` skill.
-Pass: `run-uuid`, the branch name from step 2, the commit type from step 2, the plan path (`.adlc/[run-uuid]/plan.md`), and the final iteration number.
+Pass: `run-uuid`, the branch name from step 2, the commit type from step 2, the plan path (`.adlc/[run-uuid]/plan.md`), and the final code-iteration number (as `Code iteration`).
 
-**Revise mode or post-escalation:** Pass `--revise` to the PR subagent when either (a) the orchestrator was invoked with `--revise`, or (b) a plan revision occurred during this run and a PR already exists. The PR subagent appends a `## Revision [N]` section and updates the footer's revise command with the new run UUID.
+**Revise mode:** Pass `--revise` to the PR subagent when the orchestrator was invoked with `--revise`. The PR subagent appends a `## Revision [N]` section and updates the footer's revise command with the new run UUID.
 
-### Step 10 — Monitor
+### Step 9 — Monitor
 
 Spawn **one** subagent using the `plantz-adlc-monitor` skill.
-Pass: `run-uuid`, the PR number from step 9, the branch name from step 2, and the plan path (`.adlc/[run-uuid]/plan.md`).
+Pass: `run-uuid`, the branch name from step 2, and the plan path (`.adlc/[run-uuid]/plan.md`). The monitor discovers the PR number from the branch itself.
 
 The monitor skill handles CI monitoring and fixes internally. It returns success or failure.
 
 - **Success:** All CI checks passed. The run is complete.
 - **Failure:** The monitor exhausted its fix budget or a timeout occurred. Follow the failure handling procedure.
 
-## Escalation Check
+## Bail Check
 
-Referenced from Step 5 and Step 7. After any code subagent returns, check for `.adlc/[run-uuid]/escalation-[iteration].md`. If absent, continue normally (proceed to the next phase — simplify or test depending on context). If present:
+Referenced from Step 4 and Step 6. After any code subagent returns, check for `.adlc/[run-uuid]/bail.md`. If absent, continue normally (proceed to the next phase — simplify or test depending on context). If present:
 
-1. If a plan revision already occurred during this run, follow the failure handling procedure — include the second escalation file's diagnosis in `failure-summary.md` so the user understands the additional structural issue that surfaced.
-2. Read the escalation file and judge whether the issue is genuinely structural (the plan's approach is fundamentally wrong) or whether the code agent is being too cautious about a fixable problem.
-3. **If justified:** Spawn `plantz-adlc-plan` subagents with `mode=revision`, feature description, `plan.md` path, and escalation file path. After revision, clean up:
-    - Delete all `escalation-*.md`, `changes-*.md`, `test-issues-*.md`, and `architecture-review.md` from the run folder.
-    - Reset the working tree to a clean state.
-    - Reset the test iteration to 1. Restart from Step 4 (Architect Review).
-4. **If not justified:** Proceed to the next phase (simplify or test depending on context). Pass the escalation file to the next code subagent via the `Escalation context` input if another fix cycle occurs.
-5. **Maximum 1 plan revision per run.**
+1. Copy `.adlc/[run-uuid]/plan.md` to `.adlc/[run-uuid]/plan-backup.md`.
+2. Reset the working tree to the merge-base with `main`.
+3. Follow the failure handling procedure — include the bail file's content verbatim in `failure-summary.md`, prefixed with which step and iteration the bail occurred at.

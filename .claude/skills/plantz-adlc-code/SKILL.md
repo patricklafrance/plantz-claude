@@ -12,15 +12,13 @@ Implement the plan or fix issues reported by the test phase.
 
 ## Inputs (provided by orchestrator)
 
-| Input                    | Description                                                                                                                                     |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `run-uuid`               | Run folder identifier                                                                                                                           |
-| `iteration`              | Current iteration number (starts at 1). This is the iteration the agent will **write** to (`changes-[iteration].md`).                           |
-| Plan path                | Always provided — `.adlc/[run-uuid]/plan.md`                                                                                                    |
-| Issues path              | `null` on iteration 1. On fix cycles: the path to the issues file (`test-issues-*.md` from test phase).                                         |
-| Changes path             | `null` on iteration 1. On fix cycles: the explicit path to the **previous** iteration's changes file (e.g., `changes-1.md` when `iteration=2`). |
-| Architecture review path | `.adlc/[run-uuid]/architecture-review.md`. Always provided on every code invocation, not just iteration 1.                                      |
-| Escalation context       | `null` unless the orchestrator rejected a previous escalation. If provided: path to the rejected escalation file from a prior iteration.        |
+| Input          | Description                                                                                                                                     |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `run-uuid`     | Run folder identifier                                                                                                                           |
+| Code iteration | Current code-test iteration number (starts at 1). This is the iteration the agent will **write** to (`changes-[iteration].md`).                 |
+| Plan path      | Always provided — `.adlc/[run-uuid]/plan.md`                                                                                                    |
+| Issues path    | `null` on iteration 1. On fix cycles: the path to the issues file (`test-issues-*.md` from test phase).                                         |
+| Changes path   | `null` on iteration 1. On fix cycles: the explicit path to the **previous** iteration's changes file (e.g., `changes-1.md` when `iteration=2`). |
 
 ## Mode
 
@@ -33,14 +31,10 @@ This skill runs in one of two modes, determined by the inputs:
 
 1. Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, `agent-docs/odr/index.md`, and these reference files: `agent-docs/references/domains.md`, `agent-docs/references/msw-tanstack-query.md`, `agent-docs/references/storybook.md`, `agent-docs/references/tailwind-postcss.md`, `agent-docs/references/shadcn.md`, `agent-docs/references/color-mode.md`, `agent-docs/references/bundle-size-budget.md`, `agent-docs/references/static-analysis.md`, `agent-docs/references/turborepo.md`, `agent-docs/references/typescript.md`.
 2. Always load the `accessibility`, `frontend-design`, `workleap-react-best-practices`, and `workleap-squide` skills. Load each of the following whose description matches the plan's affected packages or the issues file's affected files — do not skip a skill you are unsure about: `shadcn`, `workleap-web-configs`, `workleap-logging`, `pnpm`.
-3. Read the plan file for architectural context. Read the architecture review file. Precedence between the two:
-    - **Architect wins on explicit structure.** When the review names a specific interface, signature, component boundary, data flow location, coupling constraint, or file, that specification is authoritative — implement it as written regardless of what the plan says about the same topic.
-    - **Plan wins on everything else.** If the review does not address something, the plan governs. Silence in the review is not permission to deviate from the plan.
-    - **Recommendations are advisory.** Anything under `## Recommendations` is informational. If a recommendation conflicts with the plan's File Changes, follow the plan and flag the conflict in Notes for Subagent B's escalation check.
-      In **fix mode**, re-read the review to ensure fixes don't regress architectural contracts. If a test failure requires changing a signature that the architect review designates as authoritative, do not change the signature — note the conflict in `changes-[iteration].md` under Notes for B to evaluate.
-4. **Fix mode only — assess before coding.** Read the issues file and previous changes file. If an escalation context path is provided, read it — the orchestrator rejected this escalation, meaning the plan's approach is considered viable. Do not re-escalate for the same structural concern; if the same problem surfaces again, work around it within the plan's constraints and document the workaround in Notes. Read every issue and attempt all fixes. For any fix where the plan's approach seems fundamentally mismatched — the plan assumed a component decomposition or data flow that doesn't work, a library choice is fighting the framework, or the fix requires cross-module access the plan didn't anticipate — explain the specific concern in `changes-[iteration].md` under **Notes** (what about the plan is wrong, not just "this is hard"). Fix the issue anyway to the best of your ability. This does not override the architect contract constraint in step 3 — if a fix requires changing an architect-authoritative signature, note the conflict rather than changing the signature. **Only Subagent B writes escalation files** — A never escalates directly.
-5. **Plan mode only:** If the plan requires scaffolding a new module, load and use the `plantz-scaffold-domain-module` skill. If it requires a new Storybook, use `plantz-scaffold-domain-storybook`.
-6. **Start the dev server or Storybook before implementing.** Run the appropriate root script for the affected package — `pnpm dev-host` for app routes, or the matching `pnpm dev-{domain}-storybook` for stories (e.g., `pnpm dev-today-storybook`). Use Chrome DevTools MCP tools to see what you're building as you go. If the dev server or Storybook fails to start within 60 seconds, stop implementation — do not produce `changes-[iteration].md`. The orchestrator will detect the missing file and follow failure handling. Implement in dependency order: shared packages (`@packages/*`) first since modules consume them, then complete each affected module end-to-end (data layer → components → integration) before moving to the next module. Verify each module works in the browser before starting the next. Follow all technology rules from the `agent-docs/references/` files read in step 1.
+3. Read the plan file. The plan is the single authoritative source for implementation — it contains the scope (objectives, file changes, acceptance criteria) and the shape (inline interface contracts, `ARCHITECT CONSTRAINT:` blocks, constraints added by the architect). Implement the plan as written. In **fix mode**, re-read the plan to ensure fixes don't regress inline interface contracts (`**Contract**:` lines). Document any necessary deviations in `changes-[iteration].md` under Notes.
+4. **Fix mode only — assess before coding.** Read the issues file and previous changes file. Issues are tagged `[regressed]`, `[persistent]`, or `[new]` by the test skill. Prioritize `[regressed]` issues first (something the previous fix broke), then `[persistent]` (previous fix didn't work — try a different approach), then `[new]`. If the same issue is `[persistent]` across two consecutive iterations, the current approach is failing — try a fundamentally different fix strategy or flag it in Notes for B to evaluate. Read every issue and attempt all fixes. For any fix where the plan's approach seems fundamentally mismatched — the plan assumed a component decomposition or data flow that doesn't work, a library choice is fighting the framework, or the fix requires cross-module access the plan didn't anticipate — explain the specific concern in `changes-[iteration].md` under **Notes** (what about the plan is wrong, not just "this is hard"). Fix the issue anyway to the best of your ability.
+5. **Plan mode only:** If the plan requires scaffolding a new module, load and use the `plantz-scaffold-domain-module` skill. If it requires a new Storybook, use `plantz-scaffold-domain-storybook`. If scaffolding fails, stop implementation — do not produce `changes-[iteration].md`.
+6. **Start the dev server or Storybook before implementing.** Run the appropriate root script for the affected package — `pnpm dev-host` for app routes, or the matching `pnpm dev-{domain}-storybook` for stories (e.g., `pnpm dev-today-storybook`). If the plan affects both routes and stories, start `pnpm dev-host` (it serves the full app including module routes). Switch to the domain Storybook only when implementing story files that don't need the full app context. Use Chrome DevTools MCP tools to see what you're building as you go. If the dev server or Storybook fails to start within 60 seconds, stop implementation — do not produce `changes-[iteration].md`. The orchestrator will detect the missing file and follow failure handling. Implement in dependency order: shared packages (`@packages/*`) first since modules consume them, then complete each affected module end-to-end (data layer → components → integration) before moving to the next module. Verify each module works in the browser before starting the next. Follow all technology rules from the `agent-docs/references/` files read in step 1.
 7. Write a summary of all changes to `.adlc/[run-uuid]/changes-[iteration].md`. **Plan mode only:** before writing, review your implementation for any choice where a reasonable reviewer might pick differently — state placement, component boundaries, data flow, patterns that look wrong but are intentional, alternatives you tried and rejected. Document these in the **Decisions & Trade-offs** section. Zero entries is fine if the implementation was straightforward; aim for 2-5 when there are genuine trade-offs. Fix iterations skip this section.
 
 ## Changes File Format
@@ -50,20 +44,20 @@ Organize changes by package, matching the plan's File Changes structure. List sh
 ```markdown
 # Changes — Iteration [N]
 
-## `@packages/core-plants`
+## `@packages/core-{domain}`
 
-- Created `src/careEventTypes.ts` — type definitions for care events
-- Created `src/careEventSchema.ts` — zod schema with date coercion
-- Created `src/CareEventBadge.tsx` — badge component for care event type
-- Created `src/CareEventBadge.stories.tsx` — stories with all event types
+- Created `src/itemTypes.ts` — type definitions for domain entities
+- Created `src/itemSchema.ts` — zod schema with validation
+- Created `src/ItemBadge.tsx` — badge component for entity status
+- Created `src/ItemBadge.stories.tsx` — stories with all variants
 
-## `@modules/today-landing-page`
+## `@modules/{domain}-{feature}`
 
-- Created `src/mocks/careEventHandlers.ts` — MSW handlers for care history endpoint
-- Modified `src/plantsCollection.ts` — added care events to plant detail query
-- Created `src/PlantCareSection.tsx` — care history section for plant detail dialog
-- Created `src/PlantCareSection.stories.tsx` — stories with empty/populated states
-- Modified `src/PlantDetailDialog.tsx` — integrated PlantCareSection
+- Created `src/mocks/itemHandlers.ts` — MSW handlers for domain endpoint
+- Modified `src/itemsCollection.ts` — added new field to detail query
+- Created `src/DetailSection.tsx` — new section for detail dialog
+- Created `src/DetailSection.stories.tsx` — stories with empty/populated states
+- Modified `src/DetailDialog.tsx` — integrated DetailSection
 
 ## Dependencies added
 
@@ -106,7 +100,7 @@ Start by reading the **plan file** to form independent expectations of what the 
 
 B has five responsibilities, in order:
 
-1.  **Code review.** In plan mode, cross-check the plan's File Changes section against A's changes file — flag missing files, unexpected files, or decomposition that diverges from the plan. Then read every changed file. Fix mechanical issues and substantive issues (plan deviations, component structure, accessibility gaps, missing dark mode variants, incorrect patterns). If an architecture review exists, verify that each component, hook, or utility listed in its Interface Contracts section matches the implemented signature and that any Coupling constraints are satisfied by the consuming code (e.g., required provider wrappers are present, state synchronization obligations are fulfilled, call-order dependencies are respected). Fix mismatches directly and note fixes in `changes-[iteration].md`. Update `changes-[iteration].md` to reflect modifications. Do not defer fixable concerns — resolve them. While reviewing, collect every policy suppression or override (`oxlint-disable`, `a11y-suppress` / a11y rule disabled in story parameters, `as any`, `@ts-ignore`) into the `## Exceptions` section of `changes-[iteration].md`. Include the suppression type, file path with line or story name, and justification from the inline comment. If no exceptions exist, write "None."
+1.  **Code review.** In plan mode, cross-check the plan's File Changes section against A's changes file — flag missing files, unexpected files, or decomposition that diverges from the plan. Then read every changed file. Fix mechanical issues and substantive issues (plan deviations, component structure, accessibility gaps, missing dark mode variants, incorrect patterns). Verify that each `**Contract**:` line and `**ARCHITECT CONSTRAINT**:` block in the plan's File Changes section was implemented as specified. Fix mismatches directly and note fixes in `changes-[iteration].md`. Update `changes-[iteration].md` to reflect modifications. Do not defer fixable concerns — resolve them. While reviewing, collect every policy suppression or override (`oxlint-disable`, `a11y-suppress` / a11y rule disabled in story parameters, `as any`, `@ts-ignore`) into the `## Exceptions` section of `changes-[iteration].md`. Include the suppression type, file path with line or story name, and justification from the inline comment. If no exceptions exist, write "None."
 
     1a. **Interactive criteria trace.** After the file-level review, cross-check every acceptance criterion in the plan that describes a user-visible state change against the implemented code path:
 
@@ -156,19 +150,18 @@ B has five responsibilities, in order:
 
     If the Storybook Vitest a11y project is not configured for the affected domain, skip this step and note it in `changes-[iteration].md` under **Notes**.
 
-5.  **Escalation check.** Read the **Notes** section of `changes-[iteration].md` for any plan-level concerns A flagged, then investigate the code for brute-force signals: type suppressions (`as any`, `@ts-ignore`), lint-disable comments, wrapper components that exist only to bridge a bad abstraction, or growing complexity relative to the problem being solved. These are indicators to investigate for underlying plan problems, not automatic escalation triggers — a pragmatic `as any` bridging an external library's type gap is not a plan problem.
+5.  **Bail check.** Read the **Notes** section of `changes-[iteration].md` for plan-level concerns A flagged, then investigate the code for brute-force signals: type suppressions (`as any`, `@ts-ignore`), lint-disable comments, wrapper components that exist only to bridge a bad abstraction, or growing complexity disproportionate to the problem being solved. These are indicators to investigate, not automatic bail triggers — a pragmatic `as any` bridging an external library's type gap is not a plan problem.
 
-    **Escalation threshold:** Escalate only when the plan's approach is fundamentally wrong and no amount of code editing can fix it. Examples: the plan decomposed components in a way that makes the required data flow impossible; the plan chose a library that conflicts with the framework; the plan assumed module boundaries that force a cross-module import. Do NOT escalate for: difficulty, missing details the code agent can infer, suboptimal but workable approaches, or issues that the test phase will catch.
+    **Bail threshold:** Bail only when the plan's approach is fundamentally wrong and no amount of code editing can fix it. Examples: the plan decomposed components in a way that makes the required data flow impossible; the plan chose a library that conflicts with the framework; the plan assumed module boundaries that force a cross-module import. Do NOT bail for: difficulty, missing details the code agent can infer, suboptimal but workable approaches, or issues that the test phase will catch.
 
     Gray-zone verdicts:
-    - The plan works but requires creating multiple wrapper components that exist only to bridge an abstraction mismatch → **escalate** (the abstraction is wrong, not just verbose).
-    - The plan works but the resulting code is significantly longer than an alternative approach → do **NOT** escalate (suboptimal but functional).
-    - A test fix requires changing an interface the architect review designated as authoritative → do **NOT** escalate (note the conflict for B, per step 3).
+    - The plan works but requires multiple wrapper components only to bridge an abstraction mismatch → **bail** (the abstraction is wrong, not just verbose).
+    - The plan works but the code is significantly longer than an alternative → do **NOT** bail (suboptimal but functional).
 
-    If B identifies a structural issue meeting this threshold, B writes `.adlc/[run-uuid]/escalation-[iteration].md` using this format:
+    If B determines the plan meets the bail threshold, write `.adlc/[run-uuid]/bail.md`:
 
     ```markdown
-    # Escalation — Iteration [N]
+    # Bail — Iteration [N]
 
     ## Problem
 
@@ -176,11 +169,11 @@ B has five responsibilities, in order:
 
     ## Evidence
 
-    [Code locations, failed patterns, or data flow conflicts that demonstrate the problem]
+    [Code locations, failed patterns, or data flow conflicts that prove it]
 
-    ## Proposed alternative
+    ## Suggested revision
 
-    [How the plan should be revised to fix the structural issue]
+    [How the plan should change to fix the structural issue]
     ```
 
-    **Only B can write escalation files.**
+    **Only B can write bail files.**

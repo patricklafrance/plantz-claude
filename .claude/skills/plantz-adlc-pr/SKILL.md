@@ -12,14 +12,14 @@ Commit, push, and open a PR.
 
 ## Inputs (provided by orchestrator)
 
-| Input       | Description                                                                                                                                                             |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `run-uuid`  | Run folder identifier                                                                                                                                                   |
-| Branch name | The branch created in the orchestrator step 2                                                                                                                           |
-| Commit type | Conventional commit prefix: `feat`, `fix`, `chore`, `docs`, or `refactor`                                                                                               |
-| Plan path   | `.adlc/[run-uuid]/plan.md` — needed for acceptance criteria                                                                                                             |
-| Iteration   | The final iteration number. Read `changes-[Iteration].md` for the `## Verification results` section.                                                                    |
-| `--revise`  | Optional. When set, the PR already exists — edit the body instead of creating a new PR. Append a `## Revision [N]` section and update the footer with the new run UUID. |
+| Input          | Description                                                                                                                                                             |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `run-uuid`     | Run folder identifier                                                                                                                                                   |
+| Branch name    | The branch created in the orchestrator step 2                                                                                                                           |
+| Commit type    | Conventional commit prefix: `feat`, `fix`, `chore`, `docs`, or `refactor`                                                                                               |
+| Plan path      | `.adlc/[run-uuid]/plan.md` — needed for acceptance criteria                                                                                                             |
+| Code iteration | The final code-test iteration number. Read `verification-results-[Code iteration].md` for acceptance criteria results.                                                  |
+| `--revise`     | Optional. When set, the PR already exists — edit the body instead of creating a new PR. Append a `## Revision [N]` section and update the footer with the new run UUID. |
 
 ## Step 1 — Commit
 
@@ -53,7 +53,7 @@ If a PR already exists for this branch and `--revise` is NOT set, skip creation.
 [same format, updated for this revision's results]
 ```
 
-Also update the footer's revise command to use the new run UUID.
+Also update the footer's `--previous-run-uuid` value to the current run's UUID (so the next revise reads this run's plan).
 
 Update the PR body.
 
@@ -61,23 +61,21 @@ Update the PR body.
 
 **Override the default PR body template entirely with the following format.**
 
-**Section 1 — `## Summary`:** One bullet per logical change. Derive bullets from `changes-*.md` files.
+**Section 1 — `## Summary`:** One bullet per logical change. Derive bullets by aggregating all `changes-*.md` files (iterations 1 through final). Deduplicate across iterations — if iteration 2 fixed something iteration 1 introduced, use the final state.
 
-**Section 2 — `## Quality checks`:** Copy these checkboxes. To determine pass/fail: read `.adlc/[run-uuid]/test-issues-[Iteration].md`. If the file doesn't exist, all checks passed — mark all `[x]`. If it exists, check each section: mark `[x]` only for sections that say "Pass".
+**Section 2 — `## Quality checks`:** Copy these checkboxes. To determine pass/fail: read `.adlc/[run-uuid]/test-issues-[Code iteration].md`. If the file doesn't exist, all checks passed — mark all `[x]`. If it exists, check each section: mark `[x]` only for sections that say "Pass".
 
 ```
-- [ ] Lint
+- [ ] Lint (includes typecheck + syncpack)
+- [ ] Bundle size
 - [ ] Module validation
-- [ ] Accessibility
-- [ ] Visual/interactive verification
+- [ ] Dead code (Knip)
+- [ ] Accessibility (code-level)
+- [ ] Browser verification
 - [ ] Storybook a11y
 ```
 
-**Section 3 — `## Verified acceptance criteria`:** Read `plan.md` for acceptance criteria and the latest `changes-*.md` for the `## Verification results` section.
-
-- For `[visual]` and `[interactive]` criteria: copy the pass/fail result from `## Verification results`.
-- For `[static]` criteria: mark as ✅ if the final test phase had no static failures.
-- If the plan has no acceptance criteria or no verification results, write "No acceptance criteria defined."
+**Section 3 — `## Verified acceptance criteria`:** Read `.adlc/[run-uuid]/verification-results-[Code iteration].md`. Copy all criteria (static, visual, and interactive) with their pass/fail results directly from that file. If the plan has no acceptance criteria or the file doesn't exist, write "No acceptance criteria defined."
 
 Format each criterion as:
 
@@ -88,7 +86,7 @@ Format each criterion as:
 
 **Section 4 (conditional) — `## Budget increase`:** Only include this section if any `changes-*.md` file mentions a size-limit budget increase in its Notes section. List: which app, how much (KB gzipped), and why. See `agent-docs/references/bundle-size-budget.md` for the full policy.
 
-**Section 5 (conditional) — `## Exceptions`:** Only include this section if the latest `changes-[Iteration].md` has an `## Exceptions` section that is not "None." Copy the entries directly:
+**Section 5 (conditional) — `## Exceptions`:** Only include this section if the latest `changes-[Code iteration].md` has an `## Exceptions` section that is not "None." Copy the entries directly:
 
 ```
 - **oxlint-disable** `{rule}` in `path/file.tsx:{line}` — {justification}
@@ -114,10 +112,12 @@ Create the PR with title `{prefix}: {description}`. The body must match this exa
 
 ## Quality checks
 
-- [x] Lint
+- [x] Lint (includes typecheck + syncpack)
+- [x] Bundle size
 - [x] Module validation
-- [x] Accessibility
-- [ ] Visual/interactive verification
+- [x] Dead code (Knip)
+- [x] Accessibility (code-level)
+- [ ] Browser verification
 - [x] Storybook a11y
 
 ## Verified acceptance criteria
@@ -153,7 +153,7 @@ If PR creation fails, return failure.
 
 ## Hard Constraints
 
-- **The PR body MUST have three mandatory sections: `## Summary`, `## Quality checks`, `## Verified acceptance criteria`.** The only allowed additional sections are `## Budget increase` (conditional — only when a budget was increased), `## Exceptions` (conditional — only when policy suppressions or escalation rejections exist), and `## Revision [N]` (added by revise runs via `--revise`).
+- **The PR body MUST have three mandatory sections: `## Summary`, `## Quality checks`, `## Verified acceptance criteria`.** The only allowed additional sections are `## Budget increase` (conditional — only when a budget was increased), `## Exceptions` (conditional — only when policy suppressions exist), and `## Revision [N]` (added by revise runs via `--revise`).
 
 ## Subagent Pattern
 

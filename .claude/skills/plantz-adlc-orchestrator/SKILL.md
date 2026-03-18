@@ -104,8 +104,8 @@ Pass: `run-uuid`, `iteration=1`, plan path (`.adlc/[run-uuid]/plan.md`), previou
     - Update `orchestrator-state.md` `Current step: 7-test`.
     - Spawn new `plantz-adlc-test` subagents. Pass: `run-uuid`, `iteration` = `Test iteration`, plan path, previous issues path (`test-issues-[test iteration - 1].md`).
     - Repeat until no issues or max reached.
-- **Completion check:** Verify `changes-[test iteration].md` contains `<!-- test-complete -->`. If absent, the test subagent crashed — follow failure handling (note in `failure-summary.md` whether the issues file exists, indicating static checks ran but browser verification did not).
-- If no issues file exists and the marker is present, proceed.
+- **Completion check:** Verify `changes-[test iteration].md` contains a `## Verification results` section. If absent, the test subagent crashed or skipped browser verification — follow failure handling (note in `failure-summary.md` whether the issues file exists, indicating static checks ran but browser verification did not).
+- If no issues file exists and the verification results section is present, proceed.
 
 ### Step 8 — Document
 
@@ -136,9 +136,9 @@ The PR subagent returns in one of two ways:
     - **Escalation check:** After the code subagent returns, follow the escalation check procedure (see "Escalation Check").
     - Update `orchestrator-state.md` `Current step: 9-ci-test`.
     - Spawn new `plantz-adlc-test` subagents. Pass: `run-uuid`, `iteration` = `Test iteration` + `CI iteration`, plan path, previous issues path = `null`.
-    - **Completion check:** Verify `changes-[iteration].md` contains `<!-- test-complete -->`. If absent, the test subagent crashed — follow failure handling.
+    - **Completion check:** Verify `changes-[iteration].md` contains a `## Verification results` section. If absent, the test subagent crashed or skipped browser verification — follow failure handling.
     - If `test-issues-[iteration].md` exists (test failed): treat as a CI failure — return to the top of the CI failure flow above. The test failure consumes one attempt from the shared budget.
-    - If no issues file exists and the marker is present (test passed): spawn a new PR subagent with `Iteration` = `Test iteration` + `CI iteration`, and the current `CI iteration`. On success, the run is complete. On CI failure, return to the top of the CI failure flow above.
+    - If no issues file exists and the verification results section is present (test passed): spawn a new PR subagent with `Iteration` = `Test iteration` + `CI iteration`, and the current `CI iteration`. On success, the run is complete. On CI failure, return to the top of the CI failure flow above.
 
 ## State Persistence
 

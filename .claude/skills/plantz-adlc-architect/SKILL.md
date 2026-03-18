@@ -28,8 +28,10 @@ A **deep module** (John Ousterhout, "A Philosophy of Software Design") has a sma
     - Understanding one concept requires bouncing between many small files
     - Existing interfaces are shallow (props/params nearly as complex as the implementation)
     - Data flows are tangled (a component reaches through multiple layers to get what it needs)
+    - A component stores a query/collection object in `useState` rather than storing just the ID and deriving the object from the reactive source — the stored object goes stale after mutations that update the source
     - Storybook stories require elaborate setup that reveals a leaking abstraction
     - Per-story MSW handler overrides are frequent (stories need custom `parameters.msw.handlers` to control state rather than driving state through props — the component is leaking its data-fetching seam)
+    - A component's props mirror another component's internal state shape rather than representing a domain concept — the interface couples the two components to each other instead of to the domain model
 5. **Check for infrastructure patterns.** If the plan touches routing, module registration, Squide federation config, or Turborepo task graph, expand exploration to include the relevant host/infrastructure files.
 6. **Design interface contracts and classify boundaries.** Skip this step entirely if no cross-file boundaries exist. For each cross-file boundary the plan introduces, specify:
     - The concrete export: function/component/hook name, signature (params → return type), and the named type for any data shape
@@ -40,6 +42,7 @@ A **deep module** (John Ousterhout, "A Philosophy of Software Design") has a sma
         - **Local-substitutable**: has a test stand-in (e.g., MSW-intercepted fetch — the MSW handler IS the boundary). Note whether a new MSW handler is required and which module owns it.
         - **Remote but owned / True external**: rare in this codebase — if applicable, note the category and mock strategy at the boundary
     - A usage example showing how callers consume it
+    - The coupling: what the consumer must know beyond the typed signature — must it render inside a specific provider, call in a specific order, co-exist with a sibling component, or share state through a parent? If the typed signature is the complete contract, state "self-contained." May be omitted when the testability seam is "pure function." Coupling that goes beyond standard infrastructure (QueryClient, collection context, Squide runtime) suggests the interface may not be deep enough — consider whether the coupling can be internalized.
 7. **Assess module depth.** Skip this step entirely if the plan introduces no new modules or component clusters. For each new module, package, or component cluster the plan introduces, evaluate: is the proposed boundary deep (small interface hiding large implementation) or shallow (interface complexity rivals implementation)? If shallow, recommend what to absorb or restructure to deepen it. Use story setup complexity as a proxy — if rendering a component in Storybook would require more than the standard MSW + QueryClient setup, the interface is leaking.
 8. Write `.adlc/[run-uuid]/architecture-review.md`. If no cross-file boundaries exist in the plan and exploration surfaced no friction in the affected code, write a minimal review with all section headers and the prescribed fallback text for each (see Output Format). Do not invent concerns — a clean result is a valid result.
 
@@ -51,7 +54,7 @@ The file `architecture-review.md` must contain these sections in order:
 
 **`## Codebase friction`** — Issues in the existing code around affected packages that the implementation should be aware of. Friction encountered during exploration — not a checklist, but what actually stood out. Or "None observed."
 
-**`## Interface contracts`** — For each cross-file boundary, a subsection with the export name and file path as heading. Each subsection must include: **Signature** (typed params → return type), **Testability seam** (pure function / hook / component), **Hides** (what complexity is behind the interface), **Boundary** (dependency category and testing implication), and **Usage** (a code example showing how callers consume it). Or "None — all new code is internal to existing components."
+**`## Interface contracts`** — For each cross-file boundary, a subsection with the export name and file path as heading. Each subsection must include: **Signature** (typed params → return type), **Testability seam** (pure function / hook / component), **Hides** (what complexity is behind the interface), **Boundary** (dependency category and testing implication), **Usage** (a code example showing how callers consume it), and **Coupling** (what the consumer must know beyond the typed signature — "self-contained" if the signature is the complete contract; may be omitted for pure functions). Or "None — all new code is internal to existing components."
 
 Example — pure function contract:
 
@@ -83,6 +86,23 @@ Example — hook contract with MSW boundary:
     if (isLoading) return <Skeleton />;
     return <InventoryList items={items} />;
     ```
+- **Coupling**: self-contained
+````
+
+Example — component contract with state-synchronization coupling:
+
+````markdown
+### `StatusEditor` (`src/StatusEditor.tsx`)
+
+- **Signature**: `(props: { itemId: string; currentValue: number; onSaved: () => void }) => JSX.Element`
+- **Testability seam**: component
+- **Hides**: TanStack Query subscription for item data, mutation to POST endpoint, query invalidation of own queries after mutation
+- **Boundary**: local-substitutable — MSW handlers at `/api/items/:itemId/status`, owned by module
+- **Usage**:
+    ```tsx
+    <StatusEditor itemId={item.id} currentValue={item.score} onSaved={() => collection.utils.refetch()} />
+    ```
+- **Coupling**: `currentValue` is caller-supplied. After `onSaved` fires, the underlying collection updates, but if the caller derived this value from a `useState` snapshot rather than the live collection, the prop remains stale — the component will query with outdated parameters, silently producing incorrect results.
 ````
 
 **`## Depth assessment`** — For each new module/package/component cluster: deep or shallow? If shallow, what would deepen it? Use story setup complexity as the proxy — would this component need more than the standard MSW + QueryClient Storybook setup to render? Or "No new modules or component clusters."

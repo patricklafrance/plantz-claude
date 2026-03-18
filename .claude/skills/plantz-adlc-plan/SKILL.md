@@ -87,6 +87,7 @@ RULES (apply to every criterion below):
 3. UI/UX changes MUST have mostly [visual] and [interactive] criteria.
 4. [visual] and [interactive] criteria MUST be specific enough for an agent with Chrome DevTools to verify (e.g., "dialog has readable text on dark background" NOT "dark mode looks good").
 5. When a feature adds, removes, or modifies columns/rows in a grid or table layout, include a [visual] criterion that explicitly compares header column positions to body column positions (e.g., "each header label's left edge is directly above the corresponding body value's left edge with no visible horizontal offset").
+6. Every `[interactive]` criterion that triggers a mutation (create, update, delete, accept, dismiss) MUST have companion criteria for: (a) the trigger element's disabled or loading state while the async operation is in flight, and (b) every UI element outside the trigger that should visibly change as a consequence (list refreshes, counter updates, sibling section appears). Omitting these produces features where the action succeeds but the UI appears frozen or stale. Bad: a single criterion "Clicking Delete removes the plant." Good: three criteria — "Clicking Delete removes the plant from the list," "Delete button shows a loading state while the request is in flight," "Plant count in the header updates after deletion."
 
 Tag definitions:
 

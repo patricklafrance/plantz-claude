@@ -30,7 +30,7 @@ The single validation gate for all code quality. Runs static checks (lint, modul
 7. **Browser verification**: Read `plan.md` and extract all `[visual]` and `[interactive]` acceptance criteria. If any exist, follow the browser verification procedure (below) to verify them. Record pass/fail for each criterion.
 8. **Workspace tests**: Run `pnpm test` from the workspace root. This runs all workspace test tasks (including Storybook a11y). See the workspace tests procedure (below). This step runs **unconditionally** — it is not gated by `[visual]`/`[interactive]` criteria.
 9. **Regression check** (iteration > 1 only): If a previous issues path was provided and that file exists, compare the current iteration's issues with the previous iteration's issues. Any issue in the current run that was NOT present in the previous iteration is a regression introduced by the fix cycle. Prefix these with `⚠️ REGRESSION:` in the issues file so the code skill knows to revert the offending change rather than pile on more fixes. If the previous issues file doesn't exist (previous iteration passed), treat all current issues as regressions.
-10. **Always** write the final `## Verification results` section into the latest `changes-[iteration].md` file (add it after `## Notes`), regardless of whether checks passed or failed. The PR skill needs this section to populate the PR. End the section with the completion marker `<!-- test-complete -->` as the very last line — this is how the orchestrator distinguishes "all checks passed" from "subagent crashed." Use this format:
+10. **Always** write the final `## Verification results` section into the latest `changes-[iteration].md` file (add it after `## Notes`), regardless of whether checks passed or failed. The PR skill needs this section to populate the PR. The presence of this section is how the orchestrator distinguishes "all checks passed" from "subagent crashed" — never skip it. Use this format:
 
     ```markdown
     ## Verification results
@@ -40,8 +40,6 @@ The single validation gate for all code quality. Runs static checks (lint, modul
     - ❌ `[visual]` criterion text — what was observed
     - ✅ `[interactive]` criterion text
     - ❌ `[interactive]` criterion text — what was observed
-
-    <!-- test-complete -->
     ```
 
 ### Browser verification procedure
@@ -65,7 +63,17 @@ Navigate to each relevant page, screenshot, and assess pass/fail. For alignment 
 
 **Phase 2 — `[interactive]` criteria:**
 
-Navigate to each relevant page, perform the interaction, screenshot the result, and assess pass/fail. Record results only — do NOT fix code.
+For each `[interactive]` criterion, verify the full action-to-outcome chain — not just that the action can be triggered:
+
+1. Navigate to the relevant page and screenshot the **before** state.
+2. Perform the interaction (click, submit, etc.).
+3. Wait for the UI to settle — target the expected DOM change (element appearing, disappearing, or value updating) with a reasonable timeout.
+4. Screenshot the **after** state.
+5. Assess pass/fail by comparing before and after: the specific outcome described in the criterion must be visible in the after screenshot. If the criterion says "removes the suggestion from view," the suggestion must be gone. If it says "dialog reflects the updated frequency," the new value must be visible. If it says "without closing the dialog," the dialog must still be open.
+
+A single post-action screenshot cannot prove the action caused the change — the before/after pair is the minimum evidence. Never mark a criterion as passing because the action triggered without error; the described outcome must be confirmed in the after screenshot. An action that fires but produces no visible UI change is a failure.
+
+Record results only — do NOT fix code.
 
 **Phase 3 — Cleanup:**
 
@@ -89,7 +97,7 @@ Run all workspace tests as a gate check. This includes Storybook a11y tests (axe
 
 ## Output
 
-- If **all checks pass** (static, browser, and workspace tests): do NOT create an issues file. The orchestrator uses the `<!-- test-complete -->` marker in `changes-[iteration].md` (written in step 10) to confirm the test ran to completion.
+- If **all checks pass** (static, browser, and workspace tests): do NOT create an issues file. The orchestrator uses the `## Verification results` section in `changes-[iteration].md` (written in step 10) to confirm the test ran to completion.
 - If **any check fails**: write the issues to `.adlc/[run-uuid]/test-issues-[iteration].md` with this format:
 
 ```markdown
@@ -137,4 +145,4 @@ Run all workspace tests as a gate check. This includes Storybook a11y tests (axe
 
 3. **Workspace tests.** Follow the workspace tests procedure (above) to run `pnpm test`. This runs unconditionally — not gated by `[visual]`/`[interactive]` criteria. Record results in the test issues file under `## Storybook a11y` (for a11y violations) or the appropriate section for other test failures. B owns this step.
 
-4. **Write the completion marker.** B **always** writes the final `## Verification results` section (including the `<!-- test-complete -->` marker) into `changes-[iteration].md` — even if there were no `[visual]`/`[interactive]` criteria to verify. This is how the orchestrator confirms B completed normally.
+4. **Write the verification results.** B **always** writes the final `## Verification results` section into `changes-[iteration].md` — even if there were no `[visual]`/`[interactive]` criteria to verify. This section is how the orchestrator confirms B completed normally — never skip it.

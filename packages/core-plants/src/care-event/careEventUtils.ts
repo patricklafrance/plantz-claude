@@ -1,13 +1,8 @@
+import { MS_PER_DAY, getWateredEventsByDateAsc } from "./careEventHelpers.ts";
 import type { CareEvent, CareInsight } from "./careEventTypes.ts";
-
-const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 function sortByDateDesc(events: CareEvent[]): CareEvent[] {
     return events.toSorted((a, b) => b.eventDate.getTime() - a.eventDate.getTime());
-}
-
-function getWateredEventsByDateAsc(events: CareEvent[]): CareEvent[] {
-    return events.filter((e) => e.eventType === "watered").toSorted((a, b) => a.eventDate.getTime() - b.eventDate.getTime());
 }
 
 export function getLastWateredDate(events: CareEvent[]): Date | null {

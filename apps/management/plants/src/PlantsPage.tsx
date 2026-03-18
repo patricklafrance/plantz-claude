@@ -116,6 +116,8 @@ export function PlantsPage() {
             try {
                 await createCareEvent(plant.id, "watered");
                 await collection.utils.refetch();
+                setEditOpen(false);
+                setEditPlant(null);
             } catch {
                 // Silently handle — the user can retry.
             }

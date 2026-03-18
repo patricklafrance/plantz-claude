@@ -86,7 +86,7 @@ export function PlantDetailDialog({ plant, open, onOpenChange, careSection, onMa
                 </div>
                 <DialogFooter showCloseButton>
                     {onMarkWatered && (
-                        <Button variant="default" onClick={onMarkWatered}>
+                        <Button variant="default" className="sm:mr-auto" onClick={onMarkWatered}>
                             <Droplets data-icon="inline-start" aria-hidden="true" />
                             Mark as Watered
                         </Button>

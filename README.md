@@ -95,7 +95,7 @@ flowchart TD
 | `plantz-adlc-orchestrator` | Entry point. Generates a run UUID, creates a branch, and runs steps 1-9 sequentially                           |
 | `plantz-adlc-plan`         | Drafts a structured technical plan with tagged acceptance criteria (`[static]`, `[visual]`, `[interactive]`)   |
 | `plantz-adlc-architect`    | Explores codebase for friction, enriches plan with inline contracts and constraints, or requests plan revision |
-| `plantz-adlc-code`         | Implements the plan or fixes issues. Uses Chrome DevTools MCP for visual feedback while coding                 |
+| `plantz-adlc-code`         | Implements the plan or fixes issues. Uses agent-browser for visual feedback while coding                       |
 | `plantz-adlc-test`         | Single validation gate — static checks (lint, modules, accessibility) and browser verification of all criteria |
 | `plantz-adlc-document`     | Audits agent-docs and CLAUDE.md for drift, creates ADRs/ODRs if new decisions were made                        |
 | `plantz-adlc-pr`           | Commits, pushes, and opens a PR. Returns the PR number for the monitor skill                                   |
@@ -106,7 +106,7 @@ Key design decisions:
 - **Shared references**: Tech-stack rules (Tailwind, Storybook, shadcn, MSW, color mode) live in `agent-docs/references/` as a single source of truth. Each ADLC skill explicitly lists which references it reads — no duplication, no drift.
 - **Subagent protocol**: Every multi-agent step uses a drafter/reviewer pair (A drafts, B reviews and improves). The orchestrator spawns both — subagents never spawn further subagents.
 - **File-based coordination**: All inter-step communication goes through files in `.adlc/[uuid]/`. This makes handoffs explicit and debuggable (see "Run folder artifacts" below).
-- **Test as the single gate**: The test skill owns all verification — both static (lint, modules, accessibility) and visual/interactive (browser screenshots via Chrome DevTools MCP). The code skill writes code; the test skill validates it.
+- **Test as the single gate**: The test skill owns all verification — both static (lint, modules, accessibility) and visual/interactive (browser verification via agent-browser). The code skill writes code; the test skill validates it.
 - **Acceptance criteria flow**: Plan tags each criterion. Test verifies them and writes results to `changes-*.md`. The PR skill reads results and populates the PR with pass/fail status. See [Acceptance criteria flow](#acceptance-criteria-flow) below.
 
 #### Acceptance criteria flow
@@ -121,7 +121,7 @@ Every PR carries a machine-verified checklist proving the change works — visib
 | `[visual]`      | Launching the app and inspecting a screenshot  |
 | `[interactive]` | Clicking, typing, or navigating in the browser |
 
-Criteria must be specific enough for an agent with Chrome DevTools to verify (e.g., "dialog has readable text on dark background", not "dark mode looks good").
+Criteria must be specific enough for an agent with agent-browser to verify (e.g., "dialog has readable text on dark background", not "dark mode looks good").
 
 **2. Test** — The test skill runs static checks first, then opens a browser to verify `[visual]` and `[interactive]` criteria via screenshots and interaction. If anything fails, the orchestrator loops back to the code skill (up to 5 iterations) until all criteria pass.
 

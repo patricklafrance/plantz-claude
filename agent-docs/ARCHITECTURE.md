@@ -107,6 +107,7 @@ For exact versions, read the root `package.json` (`engines`, `packageManager`, `
 | TanStack Query      | Server state management — syncs TanStack DB collections via `queryCollectionOptions` |
 | TanStack Virtual    | List virtualization (`@tanstack/react-virtual`)                                      |
 | Zod                 | Schema validation                                                                    |
+| agent-browser       | Browser automation CLI for verifying UI changes                                      |
 
 ## Script conventions
 

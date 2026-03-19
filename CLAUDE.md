@@ -25,6 +25,7 @@
 - [references/writing-agent-instructions.md](agent-docs/references/writing-agent-instructions.md) — principles for writing instructions agents actually follow
 - [references/static-analysis.md](agent-docs/references/static-analysis.md) — lint tools overview, suppression policy (fix code > adjust config > suppress as last resort)
 - [references/bundle-size-budget.md](agent-docs/references/bundle-size-budget.md) — size-limit budget rules (when to optimize vs. bump, limits, PR requirements)
+- [references/agent-browser.md](agent-docs/references/agent-browser.md) — browser verification CLI: when to use, when to skip
 
 ### Decisions
 

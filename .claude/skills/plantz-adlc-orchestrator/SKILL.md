@@ -36,7 +36,7 @@ Context is passed between subagents via files in `.adlc/[run-uuid]/`. Always spa
 
 ## Port Cleanup Between Subagents
 
-**After every code or test subagent returns**, kill any processes listening on ports 8080 and 6006 before spawning the next subagent.
+**After every code or test subagent returns** — whether proceeding to the next step, handling a bail, or entering failure handling — kill any processes listening on ports 8080 and 6006.
 
 ## Failure Handling
 
@@ -57,7 +57,7 @@ If a subagent fails to produce its expected output file, or if a command fails u
 
 **New feature (default):** Verify the working tree is clean. If there are uncommitted changes, stop and ask the user to resolve them. Pull latest `main` and create a branch. Branch format: `{type}/{short-description}` (kebab-case). Use the commit type matching the feature intent: `feat`, `fix`, `chore`, `docs`, `refactor`. Example: `feat/add-watering-schedules`.
 
-**Revise mode (when `--revise` is provided):** Skip branch creation. Use the current branch. Pull latest — if merge conflicts occur, attempt to resolve them automatically; if resolution fails, stop and ask the user to resolve conflicts before running `--revise` again.
+**Revise mode (when `--revise` is provided):** Verify the current branch is not `main` — if it is, stop with an error asking the user to checkout the feature branch first. Skip branch creation. Use the current branch. Pull latest — if merge conflicts occur, attempt to resolve them automatically; if resolution fails, stop and ask the user to resolve conflicts before running `--revise` again.
 
 ### Step 3 — Plan-Architect Loop (max 3 plan-iterations)
 
@@ -101,7 +101,7 @@ When done, verify `.adlc/[run-uuid]/changes-1.md` exists. If not, fail the run.
 
 ### Step 5 — Simplify
 
-Spawn **one** subagent with the `simplify` skill. If it crashes or returns no output, log a warning and continue.
+Spawn **one** subagent with the `simplify` skill. Simplify is best-effort — its absence does not block the pipeline. If it crashes or returns no output, **output a warning to the console** so the user sees it immediately, then continue.
 
 ### Step 6 — Test and iterate
 

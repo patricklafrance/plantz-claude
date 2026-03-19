@@ -45,14 +45,14 @@ Triggered when any monitored workflow fails. The monitor has a budget of **5 fix
 
 ## Workflow reference
 
-| Workflow                         | Reports via      | Notes                                                 |
-| -------------------------------- | ---------------- | ----------------------------------------------------- |
-| `CI` (ci.yml)                    | Check run status | Phase 1                                               |
-| `Code review` (code-review.yml)  | Check run status | Phase 1                                               |
-| `Smoke tests` (smoke-tests.yml)  | PR comment       | Phase 1 — scan bot comments for failure indicators    |
-| `Lighthouse CI` (lighthouse.yml) | Check run status | Phase 1                                               |
-| `Chromatic` (chromatic.yml)      | Check run status | Phase 2 — label-gated, monitored after label is added |
-| `Claude` (claude.yml)            | —                | Excluded — triggered by `@claude` mentions, not CI    |
+| Workflow                         | Reports via      | Notes                                                                                                                                                                                   |
+| -------------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CI` (ci.yml)                    | Check run status | Phase 1                                                                                                                                                                                 |
+| `Code review` (code-review.yml)  | Check run status | Phase 1                                                                                                                                                                                 |
+| `Smoke tests` (smoke-tests.yml)  | PR comment       | Phase 1 — scan bot comments for failure indicators                                                                                                                                      |
+| `Lighthouse CI` (lighthouse.yml) | Check run status | Phase 1                                                                                                                                                                                 |
+| `Chromatic` (chromatic.yml)      | Check run status | Phase 2 — label-gated (see `agent-docs/references/ci-cd.md` and `agent-docs/odr/index.md` ODR-0003 for rationale). The label is consumed by the workflow — re-add after every fix push. |
+| `Claude` (claude.yml)            | —                | Excluded — triggered by `@claude` mentions, not CI                                                                                                                                      |
 
 ## Polling channels
 
@@ -66,7 +66,7 @@ Query workflow runs for the branch. In Phase 1, filter out `Chromatic` and `Clau
 
 Scan PR comments **only from known bot authors** (`claude[bot]`, `github-actions[bot]`) for failure indicators: lines containing "❌", or lines where "failed", "FAIL", or "error:" appear in a context indicating an actual failure (not a zero-count like "0 failed"). When in doubt, read the full comment body. **Ignore user comments** — those are code review feedback, not CI results.
 
-**Workflow startup timeout:** If a phase workflow has no runs for the branch's HEAD commit after 3 poll cycles (3 minutes), log a warning in the CI Validation comment as "not triggered." After 5 minutes with no run appearing, treat it as a soft pass with a warning ("workflow did not trigger — verify manually") and proceed. Do not let a missing workflow consume the 30-minute timeout.
+**Workflow startup timeout:** If a phase workflow has no runs for the branch's HEAD commit after 3 poll cycles (3 minutes), log a warning in the CI Validation comment as "not triggered." After 5 minutes with no run appearing, post the CI Validation comment with "⚠️ Workflow `X` did not trigger — manual verification required" and **return failure**. The orchestrator's failure summary will include which workflow did not trigger so the user can investigate and re-run the monitor after verifying the workflow configuration.
 
 **Stabilization check:** After all workflows in the current phase complete, run **one additional poll cycle** (60 seconds) before declaring that phase "all green."
 

@@ -75,7 +75,11 @@ Format: `**Contract**: signature | testability-seam | boundary-classification`. 
 
 - **Plan-pass 1**: Standard rigor. Request revision for structural unsoundness, cross-module dependency, shallow interfaces, or unmet contract prerequisites.
 - **Plan-pass 2**: Assume Plan addressed plan-iteration 1 feedback. Re-check. Request revision only for new issues or unaddressed feedback.
-- **Plan-pass 3**: Final check. Prefer enrichment with workarounds over revision request. Request revision only if the plan is still broken (not merely suboptimal).
+- **Plan-pass 3**: Final check. Prefer enrichment with workarounds over revision request. Request revision only if the plan is still broken (not merely suboptimal). Workaround examples:
+    - Plan decomposes a dialog into two components, but the inner one needs provider setup in stories → add `ARCHITECT CONSTRAINT: Use QueryDecorator in stories for InnerComponent` rather than requesting restructuring.
+    - Plan creates a hook returning a complex object, but a simpler signature would be better → narrow the contract in the `**Contract**:` line rather than requesting plan revision.
+    - Plan's component tree makes a particular testability seam awkward → add an `Implementation notes` entry with the recommended pattern instead of requesting a decomposition change.
+    - **Still request revision** when no enrichment can fix the issue: module boundary forces cross-module import, data flow requires a fundamentally different component tree, or the plan contradicts an ADR.
 
 ## Procedure
 
@@ -107,7 +111,8 @@ Format: `**Contract**: signature | testability-seam | boundary-classification`. 
     For each pair of interface contracts where one component consumes another:
     - Verify the consumer's expected input types align with the producer's output types without requiring a transformation/wrapper layer — flag abstraction mismatches.
 
-8. **Decision gate**: Can the plan be enriched to make it implementable?
+8. **ADR cross-check.** Before deciding approve or revise, scan `agent-docs/adr/index.md` for ADRs relevant to the plan's affected packages. For each relevant ADR, read its Decision and Consequences sections and verify the plan does not violate them. If a violation is found, include it as a required change in the revision request. This check is lightweight (2-3 minutes) — focus on the decision statements, not the full rationale.
+9. **Decision gate**: Can the plan be enriched to make it implementable and ADR-compliant?
     - **YES** → Enrich `plan.md` directly: add compact contracts and `ARCHITECT CONSTRAINT:` blocks in File Changes; append to Hard Constraints, Decisions, and Implementation Notes as needed.
     - **NO** → Write `.adlc/[run-uuid]/architect-revision-[plan-iteration].md`. Do NOT modify `plan.md`.
 
@@ -131,8 +136,8 @@ Format: `**Contract**: signature | testability-seam | boundary-classification`. 
 
 3. **Pre-flight verification.** For each MSW-dependent contract, verify the handler exists in the module's `mocks/` directory or that File Changes includes creating one. For each component contract, verify it renders inside the required provider boundary per the plan's component tree. Fix issues directly.
 
-4. **Structural soundness check.** If the enriched plan has a defect that enrichment cannot fix (e.g., module boundary forces cross-module import), write `architect-revision-[plan-iteration].md`. Only B can write revision request files.
+4. **Structural soundness check.** If the enriched plan has a defect that enrichment cannot fix (e.g., module boundary forces cross-module import), write `architect-revision-[plan-iteration].md` and **stop — do not proceed to step 5**. Include the issues found in steps 1-3 as additional required changes in the revision request. Only B can write revision request files.
 
-5. **Edit plan.md directly** for all fixes in steps 1-3. Do not modify Objective, Affected packages, Scaffolding required, New dependencies, or Acceptance criteria.
+5. **Edit plan.md directly** for all fixes in steps 1-3. This step runs only if step 4 did not produce a revision request. Do not modify Objective, Affected packages, Scaffolding required, New dependencies, or Acceptance criteria.
 
 B edits `plan.md` directly. B does not append concerns — it rewrites sections that need improvement.

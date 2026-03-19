@@ -12,28 +12,27 @@ Draft the technical approach for a feature and output it to a plan file.
 
 ## Inputs (provided by orchestrator)
 
-| Input               | Description                                                                                                        |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `run-uuid`          | Run folder identifier                                                                                              |
-| `mode`              | `draft` or `revision`                                                                                              |
-| Feature description | What the user wants built                                                                                          |
-| Escalation path     | `null` except in `revision` mode: path to `escalation-[iteration].md` — explains what the previous plan got wrong. |
-| Existing plan path  | `null` in `draft` mode. In `revision` mode: path to the previous `plan.md`.                                        |
+| Input                 | Description                                                                                 |
+| --------------------- | ------------------------------------------------------------------------------------------- |
+| `run-uuid`            | Run folder identifier                                                                       |
+| `mode`                | `draft` or `revision`                                                                       |
+| `feature-description` | What the user wants built                                                                   |
+| `revision-path`       | `null` in `draft` mode. In `revision` mode: path to the architect revision file to address. |
 
 ## Mode
 
 This skill runs in one of two modes, determined by the `mode` input:
 
 - **Draft**: Create a plan from scratch based on the feature description.
-- **Revision**: Revise the existing plan. The revision is driven by either the escalation file or the feature description — whichever is provided.
+- **Revision**: Revise the existing plan based on an architect revision request (structured with `## Problem`, `## Evidence`, `## Required changes` sections). Address the Required changes specifically.
 
 ## Procedure
 
 1. Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, `agent-docs/odr/index.md`, and these reference files: `agent-docs/references/domains.md`, `agent-docs/references/msw-tanstack-query.md`, `agent-docs/references/storybook.md`, `agent-docs/references/tailwind-postcss.md`, `agent-docs/references/shadcn.md`, `agent-docs/references/color-mode.md`, `agent-docs/references/bundle-size-budget.md`.
 2. Always load the `accessibility`, `frontend-design`, `workleap-react-best-practices`, and `workleap-squide` skills. Load each of the following whose description matches the feature's affected packages — do not skip a skill you are unsure about: `shadcn`, `workleap-web-configs`, `workleap-logging`, `pnpm`.
 3. **Draft mode:** Analyze the feature requirements and determine which packages/modules are affected.
-   **Revision mode:** Read the existing plan (at the existing plan path input) and the escalation file (at the escalation path input) if provided. Understand what was attempted, what failed structurally, and the proposed alternative. Focus the revision on the structural issue — don't rewrite sections that aren't affected.
-4. If a new module or storybook needs to be scaffolded, note it in the plan. Do NOT scaffold during planning — that happens during the coding phase.
+   **Revision mode:** Read `.adlc/[run-uuid]/plan.md` and the architect revision file (at the architect revision path input). Focus the revision on the architect's required changes — don't rewrite sections that aren't affected.
+4. If a new module or storybook needs to be scaffolded, note it in the plan. Before proposing a new module, check `agent-docs/references/domains.md` for module granularity criteria — prefer adding to an existing module unless the criteria are clearly met. Do NOT scaffold during planning — that happens during the coding phase.
 5. Draft, revise, or validate and improve the plan following the **plan output format** below.
 6. Write the plan to `.adlc/[run-uuid]/plan.md`.
 
@@ -67,6 +66,16 @@ When a new file should follow an existing file's pattern, include a "reference:"
 
 [Any new npm packages to install, in which workspace package, or "None"]
 
+## Bundle size impact
+
+[For each affected app: whether new dependencies, large new modules, or removed
+code-splitting boundaries are expected to increase bundle size. If a budget
+increase may be needed, note which app and the rough magnitude (e.g., "+5-10 KB
+gzipped from new charting library"). See agent-docs/references/bundle-size-budget.md
+for thresholds.]
+[Or "No significant impact expected." if no new dependencies and changes are
+within existing code-split boundaries]
+
 ## Decisions
 
 [Key choices where alternatives existed. Each entry: what was decided, what was
@@ -84,9 +93,10 @@ RULES (apply to every criterion below):
 
 1. Every criterion MUST have exactly one tag: [static], [visual], or [interactive].
 2. There MUST be at least one criterion per planned file change.
-3. UI/UX changes MUST have mostly [visual] and [interactive] criteria.
-4. [visual] and [interactive] criteria MUST be specific enough for an agent with Chrome DevTools to verify (e.g., "dialog has readable text on dark background" NOT "dark mode looks good").
+3. UI/UX changes MUST have more [visual] and [interactive] criteria than [static] criteria.
+4. [visual] and [interactive] criteria MUST be specific enough for an agent with agent-browser to verify (e.g., "dialog has readable text on dark background" NOT "dark mode looks good").
 5. When a feature adds, removes, or modifies columns/rows in a grid or table layout, include a [visual] criterion that explicitly compares header column positions to body column positions (e.g., "each header label's left edge is directly above the corresponding body value's left edge with no visible horizontal offset").
+6. Every `[interactive]` criterion that triggers a mutation (create, update, delete, accept, dismiss) MUST have companion criteria for: (a) the trigger element's disabled or loading state while the async operation is in flight, and (b) every UI element outside the trigger that should visibly change as a consequence (list refreshes, counter updates, sibling section appears). Omitting these produces features where the action succeeds but the UI appears frozen or stale. Bad: a single criterion "Clicking Delete removes the plant." Good: three criteria — "Clicking Delete removes the plant from the list," "Delete button shows a loading state while the request is in flight," "Plant count in the header updates after deletion."
 
 Tag definitions:
 
@@ -101,17 +111,20 @@ Criteria:
 - [interactive] Clicking a row opens the detail dialog
 ```
 
-## Hard Constraints
+### Architect enrichments
 
-- **Modules MUST NOT import from each other.** No direct imports, no subpath exports, no re-exports, no workarounds. This is absolute — no exceptions.
-- When two modules need shared code: prefer duplication if the surface area is small; extract to a package under `packages/` when it's large enough to justify the indirection. Check `packages/` for an existing `@packages/<domain>-core` package before creating a new one.
+File Changes entries may contain `**Contract**:` lines and `**ARCHITECT CONSTRAINT:**`
+blocks added by the Architect skill during a previous plan-iteration. These are
+regenerated by the Architect after every plan revision — you may freely modify
+or remove them during revision. They will be re-added by the Architect in the
+next plan-iteration.
 
 ## Subagent Pattern
 
-In **draft mode**, Subagent A drafts the plan from scratch and writes `plan.md`. In **revision mode**, A reads the existing plan and the escalation file (if provided), then revises `plan.md` to address the structural issue — keeping sections that aren't affected.
+In **draft mode**, Subagent A drafts the plan from scratch and writes `plan.md`. In **revision mode**, A reads the existing plan, then revises `plan.md` to address the architect's required changes — keeping sections that aren't affected.
 
-In **revision mode**, Subagent B reviews A's revisions — challenges the revised approach, validates that the structural issue from the escalation file is genuinely addressed (not just papered over), and validates acceptance criteria. B should verify that the revised plan doesn't introduce new cross-module dependencies or contradict existing ADRs.
+In **both modes**, Subagent B reviews A's output. B reads the plan, challenges it — checking for missing affected packages, unrealistic scope, incorrect patterns, missing stories, accessibility gaps, shallow decompositions (where a component's props would mirror its internal state instead of hiding complexity), and testability gaps (components or hooks that cannot be rendered in a Storybook story without an elaborate multi-provider setup) — and edits `plan.md` directly to improve it. B does not append concerns; it rewrites sections that need improvement.
 
-Subagent B reads the plan, challenges it — checking for missing affected packages, unrealistic scope, incorrect patterns, missing stories, accessibility gaps, shallow decompositions (where a component's props would mirror its internal state instead of hiding complexity), and testability gaps (components or hooks that cannot be rendered in a Storybook story without an elaborate multi-provider setup) — and edits `plan.md` directly to improve it. B does not append concerns; it rewrites sections that need improvement.
+In **revision mode**, B additionally validates that the architect's required changes are genuinely addressed in A's revisions.
 
 **B MUST validate acceptance criteria against the RULES in the plan output format.** If any rule is violated, B fixes the criteria directly. After editing, B must also verify that every acceptance criterion references a capability present in the plan's File Changes section — remove or revise orphaned criteria that reference files or features dropped during edits.

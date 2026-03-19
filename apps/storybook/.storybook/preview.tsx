@@ -3,7 +3,7 @@ import { withThemeByClassName } from "@storybook/addon-themes";
 import type { Preview } from "@storybook/react-vite";
 import { initialize, mswLoader } from "msw-storybook-addon";
 
-initialize({ onUnhandledRequest: "bypass" });
+initialize({ onUnhandledRequest: "bypass", quiet: true });
 
 const preview: Preview = {
     initialGlobals: {

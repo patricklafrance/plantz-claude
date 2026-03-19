@@ -1,6 +1,6 @@
 # plantz-claude
 
-A plants watering app used as a proof-of-concept for a **Claude Code agent harness** — a structured setup that lets AI agents scaffold sfeatures.
+A plants watering app used as a proof-of-concept for a **Claude Code agent harness** — a structured setup that lets AI agents scaffold features.
 
 :point_right: App: https://plantz-claude-storybook.netlify.app/
 
@@ -21,13 +21,14 @@ apps/
     storybook/                 # Management domain Storybook + Chromatic
   today/
     landing-page/              # Today domain module
+    vacation-planner/          # Vacation planner module
     storybook/                 # Today domain Storybook + Chromatic
-  storybook/                   # Packages-layer Storybook
+  storybook/                   # Unified Storybook — all stories
 packages/
   components/                  # Shared UI — shadcn/ui (Base UI) + Tailwind v4
   core-module/                 # Cross-module infrastructure — session, auth, app shell
   core-plants/                 # Shared plants data layer (MSW handlers, TanStack DB, seed data)
-  storybook/                   # Shared Storybook config
+  storybook/                   # Packages-layer Storybook
 ```
 
 Each domain is fully isolated — modules never import from each other. Each has its own Storybook and Chromatic token for independent visual regression testing.
@@ -44,21 +45,13 @@ Four pillars make this repo fully agent-driven. Each section links to the implem
 
 ### 1. ADLC skills — end-to-end feature development
 
-Seven skills that form a complete Agent Development Life Cycle (ADLC). Two flows:
-
-**New feature** — run the orchestrator locally with a feature request. It creates a branch, spawns subagents for each phase (plan, architect, code, test, document), opens a PR, and monitors CI.
+Eight skills that form a complete Agent Development Life Cycle (ADLC). Run the orchestrator locally with a feature request. It creates a branch, spawns subagents for each phase (plan, architect, code, simplify, test, document, PR, monitor), opens a PR, and monitors CI.
 
 ```
 /plantz-adlc-orchestrator Add a vacation planner page with date picker and delegation support
 ```
 
-**Revise a feature** — on the PR branch, run the orchestrator with `--revise` to apply feedback through the full ADLC pipeline (plan revision, code, test, document, push).
-
-```
-/plantz-adlc-orchestrator --revise "restructure the data layer to use TanStack DB" --previous-run-uuid abc123
-```
-
-The `--previous-run-uuid` is shown in the PR description footer. For lightweight fixes, comment `@claude /fix <feedback>` directly on the PR instead — the Claude workflow applies the fix, runs tests, and pushes.
+For lightweight fixes on an existing PR, comment `@claude /fix <feedback>` directly on the PR — the Claude workflow applies the fix, runs tests, and pushes.
 
 All inter-step coordination goes through files in `.adlc/[uuid]/`.
 
@@ -69,17 +62,20 @@ flowchart TD
     subgraph Orch["Orchestrator"]
         direction TB
         Plan["<b>Plan</b><br/>A drafts · B reviews"] -- "plan.md" -->
-        Architect["<b>Architect</b><br/>A explores · B reviews"] -- "architecture-review.md" -->
+        Architect["<b>Architect</b><br/>A explores · B reviews"]
+        Architect -- "revision request" --> Plan
+        Architect -- "approved · enriched plan.md" -->
         Code["<b>Code</b><br/>A implements · B reviews"] -- "changes.md" -->
         Simplify["<b>Simplify</b>"] -->
         Test["<b>Test</b><br/>A validates · B reviews"]
         Test -- "issues found" --> Code
         Test -- "all passed" -->
         Document["<b>Document</b><br/>A audits · B reviews"] -->
-        PR["<b>PR</b><br/>commit, push, CI"]
+        PR["<b>PR</b><br/>commit, push"] -->
+        Monitor["<b>Monitor</b><br/>CI watch, auto-fix"]
     end
 
-    PR --> Done([PR ready])
+    Monitor --> Done([PR ready])
 
     style Start fill:#4ade80,stroke:#16a34a,color:#000
     style Done fill:#4ade80,stroke:#16a34a,color:#000
@@ -90,19 +86,20 @@ flowchart TD
 | -------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | `plantz-adlc-orchestrator` | Entry point. Generates a run UUID, creates a branch, and runs steps 1-9 sequentially                           |
 | `plantz-adlc-plan`         | Drafts a structured technical plan with tagged acceptance criteria (`[static]`, `[visual]`, `[interactive]`)   |
-| `plantz-adlc-architect`    | Explores codebase for friction, designs interface contracts, classifies dependency boundaries, assesses depth  |
-| `plantz-adlc-code`         | Implements the plan or fixes issues. Uses Chrome DevTools MCP for visual feedback while coding                 |
+| `plantz-adlc-architect`    | Explores codebase for friction, enriches plan with inline contracts and constraints, or requests plan revision |
+| `plantz-adlc-code`         | Implements the plan or fixes issues. Uses agent-browser for visual feedback while coding                       |
 | `plantz-adlc-test`         | Single validation gate — static checks (lint, modules, accessibility) and browser verification of all criteria |
 | `plantz-adlc-document`     | Audits agent-docs and CLAUDE.md for drift, creates ADRs/ODRs if new decisions were made                        |
-| `plantz-adlc-pr`           | Commits, pushes, opens a PR, monitors CI. Returns control on failures                                          |
+| `plantz-adlc-pr`           | Commits, pushes, and opens a PR. Returns the PR number for the monitor skill                                   |
+| `plantz-adlc-monitor`      | Monitors CI workflows (Phase 1 core + Phase 2 Chromatic), auto-fixes failures, adds `run chromatic` label      |
 
 Key design decisions:
 
 - **Shared references**: Tech-stack rules (Tailwind, Storybook, shadcn, MSW, color mode) live in `agent-docs/references/` as a single source of truth. Each ADLC skill explicitly lists which references it reads — no duplication, no drift.
 - **Subagent protocol**: Every multi-agent step uses a drafter/reviewer pair (A drafts, B reviews and improves). The orchestrator spawns both — subagents never spawn further subagents.
 - **File-based coordination**: All inter-step communication goes through files in `.adlc/[uuid]/`. This makes handoffs explicit and debuggable (see "Run folder artifacts" below).
-- **Test as the single gate**: The test skill owns all verification — both static (lint, modules, accessibility) and visual/interactive (browser screenshots via Chrome DevTools MCP). The code skill writes code; the test skill validates it.
-- **Acceptance criteria flow**: Plan tags each criterion. Test verifies them and writes results to `changes-*.md`. Merge reads results and populates the PR with pass/fail status. See [Acceptance criteria flow](#acceptance-criteria-flow) below.
+- **Test as the single gate**: The test skill owns all verification — both static (lint, modules, accessibility) and visual/interactive (browser verification via agent-browser). The code skill writes code; the test skill validates it.
+- **Acceptance criteria flow**: Plan tags each criterion. Test verifies them and writes results to `changes-*.md`. The PR skill reads results and populates the PR with pass/fail status. See [Acceptance criteria flow](#acceptance-criteria-flow) below.
 
 #### Acceptance criteria flow
 
@@ -116,11 +113,11 @@ Every PR carries a machine-verified checklist proving the change works — visib
 | `[visual]`      | Launching the app and inspecting a screenshot  |
 | `[interactive]` | Clicking, typing, or navigating in the browser |
 
-Criteria must be specific enough for an agent with Chrome DevTools to verify (e.g., "dialog has readable text on dark background", not "dark mode looks good").
+Criteria must be specific enough for an agent with agent-browser to verify (e.g., "dialog has readable text on dark background", not "dark mode looks good").
 
 **2. Test** — The test skill runs static checks first, then opens a browser to verify `[visual]` and `[interactive]` criteria via screenshots and interaction. If anything fails, the orchestrator loops back to the code skill (up to 5 iterations) until all criteria pass.
 
-**3. Merge** — The merge skill publishes the final pass/fail results into the PR body:
+**3. PR** — The PR skill publishes the final pass/fail results into the PR body:
 
 ```markdown
 ## Verified acceptance criteria
@@ -130,13 +127,11 @@ Criteria must be specific enough for an agent with Chrome DevTools to verify (e.
 - ✅ `[interactive]` Pressing Escape closes the modal
 ```
 
-#### Escalation process
+#### Bail process
 
-Sometimes a plan's approach is structurally wrong — no amount of code iteration can fix it. The escalation process handles this.
+Sometimes a plan's approach is structurally wrong — no amount of code iteration can fix it. The bail process handles this.
 
-Only the reviewing subagent (B) can escalate — never the drafter. This separation prevents the agent that wrote the code from vetoing its own plan. B writes an escalation file describing the problem, evidence, and a proposed alternative. The orchestrator then judges whether the issue is genuinely structural or whether the reviewer is being overly cautious. If justified, the plan is revised and implementation restarts from scratch. If rejected, the run continues normally and the rejected escalation is carried forward as context to prevent the same concern from resurfacing.
-
-A maximum of one plan revision is allowed per run — the system fails fast rather than entering an endless redesign loop.
+Only the reviewing subagent (B) can bail — never the drafter. This separation prevents the agent that wrote the code from vetoing its own plan. B writes a bail file describing the problem, evidence, and a proposed alternative. The orchestrator then resets the working tree to the merge-base with `main` and stops the run with a failure summary — it fails fast rather than attempting to revise and restart.
 
 #### Run folder artifacts
 
@@ -144,15 +139,14 @@ Every ADLC run produces files in `.adlc/[uuid]/` that flow between subagents:
 
 ```
 .adlc/[uuid]/
-  ├─ orchestrator-state.md    # Orchestrator writes after each step
-  ├─ plan.md                  # Plan skill writes → Architect, Code, Test, Merge read
-  ├─ architecture-review.md   # Architect writes → Code reads for interface contracts
-  ├─ changes-1.md             # Code writes → Test appends verification results → Merge reads for PR
-  ├─ changes-2.md             # (iteration 2, if test found issues)
-  ├─ test-issues-1.md         # Test writes (only if failures) → Code reads on next fix iteration
-  ├─ escalation-1.md          # Code B writes (only if structural) → Orchestrator judges
-  ├─ ci-issues-1.md           # Merge writes (only if CI fails) → Code reads for fix
-  └─ failure-summary.md       # Orchestrator writes on unrecoverable failure
+  ├─ plan.md                       # Plan writes → Architect enriches → Code, Test, PR read
+  ├─ plan-iteration-1.md           # Backup of plan before architect-triggered revision (audit trail)
+  ├─ architect-revision-1.md       # Architect writes (only if plan is structurally wrong) → Plan revises
+  ├─ changes-1.md                  # Code writes → Test appends verification results → PR skill reads
+  ├─ changes-2.md                  # (iteration 2, if test found issues)
+  ├─ test-issues-1.md              # Test writes (only if failures) → Code reads on next fix iteration
+  ├─ bail.md                       # Code B writes (only if structural) → Orchestrator halts run
+  └─ failure-summary.md            # Orchestrator writes on unrecoverable failure
 ```
 
 **Files:** [`.claude/skills/plantz-adlc-*/`](.claude/skills/)
@@ -210,16 +204,17 @@ pnpm test           # Runs all workspace tests (including Storybook a11y) via Tu
 
 #### CI/CD
 
-Seven GitHub Actions workflows, four of which involve Claude Code:
+Seven GitHub Actions workflows, five of which involve Claude Code:
 
-| Workflow          | Trigger                   | Purpose                                                                               |
-| ----------------- | ------------------------- | ------------------------------------------------------------------------------------- |
-| `ci.yml`          | Push to main, PRs         | Secret scan, build, size-limit, lint (oxlint, oxfmt, typecheck, syncpack, knip), test |
-| `lighthouse.yml`  | Push to main, PRs         | Lighthouse CI — performance gate (error below 0.5, 3 runs, median)                    |
-| `chromatic.yml`   | Push to main, labeled PRs | Visual regression testing — only affected Storybooks                                  |
-| `claude.yml`      | `@claude` in issues/PRs   | Claude Code agent — general assistance and `/fix` iteration                           |
-| `code-review.yml` | PRs opened/updated        | Automated code review by Claude (read-only tools)                                     |
-| `smoke-tests.yml` | PRs to main               | Smoke-tests all apps via Claude (scoped Bash, artifact upload on failure)             |
+| Workflow               | Trigger                      | Purpose                                                                               |
+| ---------------------- | ---------------------------- | ------------------------------------------------------------------------------------- |
+| `ci.yml`               | Push to main, PRs            | Secret scan, build, size-limit, lint (oxlint, oxfmt, typecheck, syncpack, knip), test |
+| `lighthouse.yml`       | Push to main, PRs            | Lighthouse CI — performance gate (error below 0.5, 3 runs, median)                    |
+| `chromatic.yml`        | Push to main, labeled PRs    | Visual regression testing — only affected Storybooks                                  |
+| `claude.yml`           | `@claude` in issues/PRs      | Claude Code agent — general assistance and `/fix` iteration                           |
+| `code-review.yml`      | PRs opened/updated           | Automated code review by Claude (read-only tools)                                     |
+| `smoke-tests.yml`      | PRs to main                  | Smoke-tests all apps via Claude (scoped Bash, artifact upload on failure)             |
+| `audit-agent-docs.yml` | Weekly (Sunday midnight UTC) | Audits agent-docs for accuracy and drift via Claude                                   |
 
 **Files:** [`.github/workflows/`](.github/workflows/), [`.github/prompts/`](.github/prompts/)
 
@@ -269,6 +264,7 @@ Formal logs of _why_ decisions were made — not just what was decided. Agents c
 | ODR-0003 | Selective Chromatic runs — only test affected Storybooks        |
 | ODR-0004 | JIT packages — no pre-build needed for dev                      |
 | ODR-0005 | Knip for dead code detection in the lint pipeline               |
+| ODR-0006 | Bundle size budgets via size-limit                              |
 
 **Files:** [`agent-docs/adr/`](agent-docs/adr/), [`agent-docs/odr/`](agent-docs/odr/)
 
@@ -302,9 +298,10 @@ Plant data lives in an MSW in-memory database. Data resets on every reload — n
 ### Run the app
 
 ```bash
-pnpm dev-host                  # Full app — all modules (http://localhost:8080)
-pnpm dev-management-plants     # Just the plants module
-pnpm dev-today-landing-page    # Just the today module
+pnpm dev-host                      # Full app — all modules (http://localhost:8080)
+pnpm dev-management-plants         # Just the plants module
+pnpm dev-today-landing-page        # Just the today landing page module
+pnpm dev-today-vacation-planner    # Just the vacation planner module
 ```
 
 To load specific modules manually:
@@ -316,7 +313,8 @@ cross-env MODULES=management/plants pnpm dev-host
 ### Run Storybooks
 
 ```bash
-pnpm dev-packages-storybook      # Shared components (http://localhost:6006)
+pnpm dev-storybook               # Unified Storybook — all stories (http://localhost:6006)
+pnpm dev-packages-storybook      # Shared components
 pnpm dev-management-storybook    # Management domain
 pnpm dev-today-storybook         # Today domain
 ```

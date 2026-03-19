@@ -13,10 +13,7 @@ chromatic-diagnostics.json
 *.env.local
 .smoke-tests
 
-# ADLC run artifacts — track only files needed for revise mode
-# IMPORTANT: .adlc/*/* must target FILES inside UUID dirs (not the dirs themselves)
-# so git still traverses into them and negation patterns work.
-.adlc/*/*
-!.adlc/*/plan.md
+# ADLC run artifacts
+.adlc/
 
 

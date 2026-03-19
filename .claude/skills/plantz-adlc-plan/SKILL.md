@@ -121,7 +121,6 @@ plan-iteration.
 
 ## Hard Constraints
 
-- **Modules MUST NOT import from each other.** No direct imports, no subpath exports, no re-exports, no workarounds. This is absolute — no exceptions.
 - When two modules need shared code: prefer duplication if the surface area is small; extract to a package under `packages/` when it's large enough to justify the indirection. Check `packages/` for an existing `@packages/<domain>-core` package before creating a new one.
 
 ## Subagent Pattern
@@ -130,6 +129,6 @@ In **draft mode**, Subagent A drafts the plan from scratch and writes `plan.md`.
 
 In **both modes**, Subagent B reviews A's output. B reads the plan, challenges it — checking for missing affected packages, unrealistic scope, incorrect patterns, missing stories, accessibility gaps, shallow decompositions (where a component's props would mirror its internal state instead of hiding complexity), and testability gaps (components or hooks that cannot be rendered in a Storybook story without an elaborate multi-provider setup) — and edits `plan.md` directly to improve it. B does not append concerns; it rewrites sections that need improvement.
 
-In **revision mode**, B additionally validates that the revision input (user feedback or architect revision request) is genuinely addressed in A's revisions, and confirms the revised plan doesn't violate ADRs/ODRs or introduce new cross-module dependencies.
+In **revision mode**, B additionally validates that the revision input (user feedback or architect revision request) is genuinely addressed in A's revisions.
 
 **B MUST validate acceptance criteria against the RULES in the plan output format.** If any rule is violated, B fixes the criteria directly. After editing, B must also verify that every acceptance criterion references a capability present in the plan's File Changes section — remove or revise orphaned criteria that reference files or features dropped during edits.

@@ -51,18 +51,7 @@ jobs:
               run: echo "$PWD/node_modules/.bin" >> $GITHUB_PATH
 
             - name: Install browser
-              # agent-browser uses npx to resolve playwright internally. When the workspace
-              # contains playwright (from storybooks), npx picks up that version instead of
-              # the one matching agent-browser's playwright-core. Install explicitly using
-              # the correct version.
-              run: |
-                  AB_PW=$(node -p "require(require.resolve('playwright-core/package.json',{paths:[require.resolve('agent-browser/package.json')]})).version")
-                  npx -y playwright@${AB_PW} install --with-deps chromium
-
-            - name: Warm up browser
-              run: |
-                  agent-browser open about:blank
-                  agent-browser close
+              run: agent-browser install --with-deps
 
             - name: Restore Turborepo cache
               id: cache-turborepo-restore

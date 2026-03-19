@@ -2,7 +2,7 @@
 
 A plants watering app used as a proof-of-concept for a **Claude Code agent harness** — a structured setup that lets AI agents scaffold features.
 
-:point_right: App: https://plantz-claude-storybook.netlify.app/
+:point_right: App: https://plantz-claude.netlify.app/
 
 :point_right: Storybook: https://plantz-claude-storybook.netlify.app/
 
@@ -236,18 +236,21 @@ Utility skills use a **reference module pattern** — instead of hardcoding depe
 
 **External skills** (symlinked from `.agents/skills/`):
 
-| Skill                           | Loaded by             | Purpose                                  |
-| ------------------------------- | --------------------- | ---------------------------------------- |
-| `workleap-react-best-practices` | plan, code            | React SPA performance patterns           |
-| `accessibility`                 | plan, code            | WCAG 2.1 audit and remediation           |
-| `shadcn`                        | plan, code            | shadcn/ui component management           |
-| `frontend-design`               | plan, code            | Production-grade UI design               |
-| `workleap-squide`               | plan, code, architect | Squide modular shell conventions         |
-| `pnpm`                          | code                  | Workspace dependency management          |
-| `turborepo`                     | code, test            | Monorepo task orchestration              |
-| `vitest`                        | test                  | Unit testing                             |
-| `workleap-web-configs`          | plan, code            | Shared ESLint/TypeScript/Rsbuild configs |
-| `workleap-logging`              | plan, code            | Structured logging                       |
+| Skill                               | Loaded by             | Purpose                                    |
+| ----------------------------------- | --------------------- | ------------------------------------------ |
+| `accessibility`                     | plan, code, architect | WCAG 2.1 audit and remediation             |
+| `agent-browser`                     | code, test            | Browser automation for visual verification |
+| `frontend-design`                   | plan, code            | Production-grade UI design                 |
+| `pnpm`                              | code                  | Workspace dependency management            |
+| `shadcn`                            | plan, code, architect | shadcn/ui component management             |
+| `turborepo`                         | code, test            | Monorepo task orchestration                |
+| `vite`                              | code                  | Build tool configuration                   |
+| `vitest`                            | test                  | Unit testing                               |
+| `workleap-chromatic-best-practices` | monitor               | Chromatic visual regression patterns       |
+| `workleap-logging`                  | plan, code            | Structured logging                         |
+| `workleap-react-best-practices`     | plan, code            | React SPA performance patterns             |
+| `workleap-squide`                   | plan, code, architect | Squide modular shell conventions           |
+| `workleap-web-configs`              | plan, code, architect | Shared ESLint/TypeScript/Rsbuild configs   |
 
 **Files:** [`.claude/skills/`](.claude/skills/), [`.agents/skills/`](.agents/skills/)
 
@@ -255,16 +258,17 @@ Utility skills use a **reference module pattern** — instead of hardcoding depe
 
 Formal logs of _why_ decisions were made — not just what was decided. Agents check these before making changes to prevent contradictory work. The `plantz-adlc-document` skill creates new records when implementation introduces new architectural or operational decisions.
 
-| Record   | Decision                                                        |
-| -------- | --------------------------------------------------------------- |
-| ADR-0001 | Squide federated modules as the application shell               |
-| ADR-0002 | Domain-scoped Storybooks for independent visual testing         |
-| ODR-0001 | pnpm workspaces + Turborepo for package management              |
-| ODR-0002 | Dependency versioning via syncpack (apps pin, packages use `^`) |
-| ODR-0003 | Selective Chromatic runs — only test affected Storybooks        |
-| ODR-0004 | JIT packages — no pre-build needed for dev                      |
-| ODR-0005 | Knip for dead code detection in the lint pipeline               |
-| ODR-0006 | Bundle size budgets via size-limit                              |
+| Record   | Decision                                                                |
+| -------- | ----------------------------------------------------------------------- |
+| ADR-0001 | Squide federated modules as the application shell                       |
+| ADR-0002 | Domain-scoped Storybooks for independent visual testing                 |
+| ADR-0003 | No backend server — MSW + TanStack DB as data layer with BFF-per-module |
+| ODR-0001 | pnpm workspaces + Turborepo for package management                      |
+| ODR-0002 | Dependency versioning via syncpack (apps pin, packages use `^`)         |
+| ODR-0003 | Selective Chromatic runs — only test affected Storybooks                |
+| ODR-0004 | JIT packages — no pre-build needed for dev                              |
+| ODR-0005 | Knip for dead code detection in the lint pipeline                       |
+| ODR-0006 | Bundle size budgets via size-limit                                      |
 
 **Files:** [`agent-docs/adr/`](agent-docs/adr/), [`agent-docs/odr/`](agent-docs/odr/)
 
@@ -300,6 +304,7 @@ Plant data lives in an MSW in-memory database. Data resets on every reload — n
 ```bash
 pnpm dev-host                      # Full app — all modules (http://localhost:8080)
 pnpm dev-management-plants         # Just the plants module
+pnpm dev-management-user           # Just the user profile module
 pnpm dev-today-landing-page        # Just the today landing page module
 pnpm dev-today-vacation-planner    # Just the vacation planner module
 ```

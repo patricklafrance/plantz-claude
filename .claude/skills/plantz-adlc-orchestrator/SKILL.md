@@ -61,6 +61,8 @@ Verify `.adlc/[run-uuid]/plan.md` exists. If not, fail the run.
 
 **Loop:**
 
+Copy `plan.md` to `plan-pre-architect.md` (baseline for revert if B writes a revision request).
+
 Spawn two subagents using the `plantz-adlc-architect` skill.
 Pass: `run-uuid`, `Plan iteration`.
 
@@ -81,7 +83,7 @@ Spawn two subagents using the `plantz-adlc-code` skill.
 Pass: `run-uuid`, `iteration=1`. Issues path and changes path are `null` for iteration 1.
 When done, verify `.adlc/[run-uuid]/changes-1.md` exists. If not, fail the run. **Save the agent IDs of both code subagents (A and B) for resumption in Step 6.**
 
-**Bail check:** After the code subagent returns, check for `.adlc/[run-uuid]/bail.md`. If present: copy `.adlc/[run-uuid]/plan.md` to `.adlc/[run-uuid]/plan-backup.md`, then reset the working tree to the merge-base with `main`. Follow the failure handling procedure — include the bail file's content verbatim in `failure-summary.md`, prefixed with which step and iteration the bail occurred at.
+**Bail check:** After the code subagent returns, check for `.adlc/[run-uuid]/bail.md`. If present: copy `.adlc/[run-uuid]/plan.md` to `.adlc/[run-uuid]/plan-backup.md`. Follow the failure handling procedure — include the bail file's content verbatim in `failure-summary.md`, prefixed with which step and iteration the bail occurred at.
 
 ### Step 5 — Simplify
 
@@ -132,5 +134,6 @@ The monitor skill handles CI monitoring and fixes internally. It returns success
 Referenced from Step 4 and Step 6. After any code subagent returns, check for `.adlc/[run-uuid]/bail.md`. If absent, continue normally (proceed to the next phase — simplify or test depending on context). If present:
 
 1. Copy `.adlc/[run-uuid]/plan.md` to `.adlc/[run-uuid]/plan-backup.md`.
-2. Reset the working tree to the merge-base with `main`.
-3. Follow the failure handling procedure — include the bail file's content verbatim in `failure-summary.md`, prefixed with which step and iteration the bail occurred at.
+2. Follow the failure handling procedure — include the bail file's content verbatim in `failure-summary.md`, prefixed with which step and iteration the bail occurred at.
+
+Do not reset the working tree. The partial implementation is diagnostic evidence of why the plan failed. The user can inspect it or discard the branch.

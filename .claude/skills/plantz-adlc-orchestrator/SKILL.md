@@ -17,11 +17,15 @@ Coordinates the full Agent Development Life Cycle for a feature by spawning spec
 
 The **orchestrator** spawns both subagents directly — subagents never spawn further subagents. Subagent A must complete and produce its expected output file before Subagent B is spawned. They run sequentially, never in parallel.
 
-"Subagents" here means agents spawned to run ADLC skills — built-in tools like the Agent tool (used for codebase exploration) are not subagents and do not violate this constraint.
+"Subagents" here means agents spawned to run ADLC skills (any skill prefixed with `plantz-adlc-`). Built-in tools — such as the Agent tool for codebase exploration — are not ADLC subagents and do not violate this constraint.
 
 The real validation gate is the `plantz-adlc-test` phase — B improves quality before that gate but is not the final check.
 
-Context is passed between subagents via files in `.adlc/[run-uuid]/`. Always spawn new subagents with the relevant file paths.
+Context is passed between phases via files in `.adlc/[run-uuid]/`. Always pass the relevant file paths when spawning or resuming subagents.
+
+### Resuming Code Subagents
+
+In the code-test loop (Step 6), **resume** the code subagents from Step 4 via `SendMessage` instead of spawning new ones. Tell the resumed subagent to compact its context before starting fix work. Test subagents are always spawned fresh.
 
 ## Hard Constraints
 
@@ -64,8 +68,8 @@ Check for `.adlc/[run-uuid]/architect-revision-[plan-iteration].md`:
 
 - **If absent** → architect approved and enriched plan. Break loop, proceed to Step 4 (Code).
 - **If present:**
-    - If plan-iteration ≥ 3 → failure handling. Include ALL revision request files (`architect-revision-1.md` through `architect-revision-[plan-iteration].md`) and ALL plan backups (`plan-iteration-1.md` through `plan-iteration-[plan-iteration].md`) in `failure-summary.md` so the user sees the full progression.
     - Copy `plan.md` to `plan-iteration-[plan-iteration].md` (audit trail).
+    - If plan-iteration ≥ 3 → failure handling. Include ALL revision request files (`architect-revision-1.md` through `architect-revision-[plan-iteration].md`) and ALL plan backups (`plan-iteration-1.md` through `plan-iteration-[plan-iteration].md`) in `failure-summary.md` so the user sees the full progression.
     - Increment plan-iteration.
     - Spawn two subagents using the `plantz-adlc-plan` skill with `mode=revision`, `run-uuid`, feature description (original), architect revision path = `.adlc/[run-uuid]/architect-revision-[plan-iteration - 1].md`.
     - Verify `.adlc/[run-uuid]/plan.md` exists. If not, fail the run.
@@ -75,7 +79,7 @@ Check for `.adlc/[run-uuid]/architect-revision-[plan-iteration].md`:
 
 Spawn two subagents using the `plantz-adlc-code` skill.
 Pass: `run-uuid`, `iteration=1`. Issues path and changes path are `null` for iteration 1.
-When done, verify `.adlc/[run-uuid]/changes-1.md` exists. If not, fail the run.
+When done, verify `.adlc/[run-uuid]/changes-1.md` exists. If not, fail the run. **Save the agent IDs of both code subagents (A and B) for resumption in Step 6.**
 
 **Bail check:** After the code subagent returns, check for `.adlc/[run-uuid]/bail.md`. If present: copy `.adlc/[run-uuid]/plan.md` to `.adlc/[run-uuid]/plan-backup.md`, then reset the working tree to the merge-base with `main`. Follow the failure handling procedure — include the bail file's content verbatim in `failure-summary.md`, prefixed with which step and iteration the bail occurred at.
 
@@ -93,7 +97,7 @@ Pass: `run-uuid`, `iteration=1`.
 - If `.adlc/[run-uuid]/test-issues-[code-iteration].md` is produced with issues:
     - If code-iteration ≥ 5, follow the failure handling procedure (maximum 5 code-test iterations).
     - Increment code-iteration.
-    - Spawn new `plantz-adlc-code` subagents. Pass: `run-uuid`, `iteration=code-iteration`, the previous iteration's issues file path (`.adlc/[run-uuid]/test-issues-[code-iteration - 1].md`), the previous iteration's changes file path (`.adlc/[run-uuid]/changes-[code-iteration - 1].md`). They produce `changes-[code-iteration].md`.
+    - Resume the code subagents saved in Step 4 via `SendMessage` (resume A first, wait for completion, then resume B — same sequential protocol). In the message, pass: `iteration=code-iteration`, issues path = `.adlc/[run-uuid]/test-issues-[code-iteration - 1].md`, changes path = `.adlc/[run-uuid]/changes-[code-iteration - 1].md`. Also tell the subagent that dev servers were killed and must be restarted. They produce `changes-[code-iteration].md`.
     - Verify `.adlc/[run-uuid]/changes-[code-iteration].md` exists. If not, fail the run.
     - **Bail check:** After the code subagent returns, check for `.adlc/[run-uuid]/bail.md`. If present, follow the same bail procedure as Step 4.
     - Spawn new `plantz-adlc-test` subagents. Pass: `run-uuid`, `iteration=code-iteration`.

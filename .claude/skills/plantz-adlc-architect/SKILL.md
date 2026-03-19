@@ -135,7 +135,7 @@ Format: `**Contract**: signature | testability-seam | boundary-classification`. 
 
 3. **Pre-flight verification.** For each MSW-dependent contract, verify the handler exists in the module's `mocks/` directory or that File Changes includes creating one. For each component contract, verify it renders inside the required provider boundary per the plan's component tree. Fix issues directly.
 
-4. **Structural soundness check.** If the enriched plan has a defect that enrichment cannot fix (e.g., module boundary forces cross-module import), write `architect-revision-[plan-iteration].md` and **stop — do not proceed to step 5**. Include the issues found in steps 1-3 as additional required changes in the revision request. Only B can write revision request files.
+4. **Structural soundness check.** If the enriched plan has a defect that enrichment cannot fix (e.g., module boundary forces cross-module import), first revert A's changes to `plan.md` (`git checkout -- .adlc/[run-uuid]/plan.md`), then write `architect-revision-[plan-iteration].md` and **stop — do not proceed to step 5**. The revert preserves mutual exclusivity: a revision request MUST NOT coexist with enrichments. Include the issues found in steps 1-3 as additional required changes in the revision request. Only B can write revision request files.
 
 5. **Edit plan.md directly** for all fixes in steps 1-3. This step runs only if step 4 did not produce a revision request. Do not modify Objective, Affected packages, Scaffolding required, New dependencies, or Acceptance criteria.
 

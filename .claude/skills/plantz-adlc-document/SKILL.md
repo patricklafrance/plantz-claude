@@ -12,11 +12,11 @@ Audit agent documentation for drift after implementation and fix any issues foun
 
 ## Inputs (provided by orchestrator)
 
-| Input       | Description                                                                    |
-| ----------- | ------------------------------------------------------------------------------ |
-| `run-uuid`  | Run folder identifier                                                          |
-| `iteration` | The latest iteration number (used to know how many `changes-*.md` files exist) |
-| Plan path   | `.adlc/[run-uuid]/plan.md` — needed for the `## Decisions` section             |
+| Input       | Description                                                                             |
+| ----------- | --------------------------------------------------------------------------------------- |
+| `run-uuid`  | Run folder identifier                                                                   |
+| `iteration` | The final code-test iteration number (used to know how many `changes-*.md` files exist) |
+| Plan path   | `.adlc/[run-uuid]/plan.md` — needed for the `## Decisions` section                      |
 
 ## Procedure
 

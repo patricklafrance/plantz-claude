@@ -113,7 +113,7 @@ Pass: `run-uuid`, `iteration=1`, plan path (`.adlc/[run-uuid]/plan.md`).
 - If `.adlc/[run-uuid]/test-issues-[code-iteration].md` is produced with issues:
     - If code-iteration ≥ 5, follow the failure handling procedure (maximum 5 code-test iterations).
     - Increment code-iteration.
-    - Spawn new `plantz-adlc-code` subagents. Pass: `run-uuid`, `iteration=code-iteration`, plan path (`.adlc/[run-uuid]/plan.md`), the previous iteration's issues file path (`test-issues-[code-iteration - 1].md`), the previous iteration's changes file path (`changes-[code-iteration - 1].md`). They produce `changes-[code-iteration].md`.
+    - Spawn new `plantz-adlc-code` subagents. Pass: `run-uuid`, `iteration=code-iteration`, plan path (`.adlc/[run-uuid]/plan.md`), the previous iteration's issues file path (`.adlc/[run-uuid]/test-issues-[code-iteration - 1].md`), the previous iteration's changes file path (`.adlc/[run-uuid]/changes-[code-iteration - 1].md`). They produce `changes-[code-iteration].md`.
     - Verify `.adlc/[run-uuid]/changes-[code-iteration].md` exists. If not, fail the run.
     - **Bail check:** After the code subagent returns, check for `.adlc/[run-uuid]/bail.md`. If present, follow the same bail procedure as Step 4.
     - Spawn new `plantz-adlc-test` subagents. Pass: `run-uuid`, `iteration=code-iteration`, plan path.

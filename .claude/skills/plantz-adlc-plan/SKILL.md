@@ -121,7 +121,7 @@ plan-iteration.
 
 ## Hard Constraints
 
-- When two modules need shared code: prefer duplication if the surface area is small; extract to a package under `packages/` when it's large enough to justify the indirection. Check `packages/` for an existing `@packages/<domain>-core` package before creating a new one.
+- Modules never import from each other. When two modules need shared code: prefer duplication if the surface area is small; extract to a package under `packages/` when it's large enough to justify the indirection. Check `packages/` for an existing `@packages/core-<domain>` package before creating a new one.
 
 ## Subagent Pattern
 

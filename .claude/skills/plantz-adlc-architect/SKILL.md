@@ -31,7 +31,7 @@ Mutual exclusivity is critical: if the architect writes a revision request, it M
 ## Sections the architect MAY modify (on approval only)
 
 - `## File changes` — Add compact inline contracts and `ARCHITECT CONSTRAINT:` blocks per entry
-- `## Hard Constraints` — Append cross-cutting constraints discovered during exploration
+- `## Hard Constraints` — Add cross-cutting constraints discovered during exploration (create the section if absent)
 - `## Decisions` — Append architectural decisions with rationale
 - `## Implementation notes` — Append actionable patterns/gotchas
 

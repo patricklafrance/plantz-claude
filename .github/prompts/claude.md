@@ -62,7 +62,7 @@ Changes were applied but tests failed after 5 attempts. The commit was NOT pushe
 You can:
 
 - Comment `@claude` `` `/fix` `` `<refined feedback>` to try again
-- Run revise mode locally for complex fixes
+- Address the issue manually or re-run the full orchestrator for complex changes
 ```
 
 ## Acknowledgment

@@ -12,20 +12,19 @@ Commit, push, and open a PR.
 
 ## Inputs (provided by orchestrator)
 
-| Input          | Description                                                                                                                                                             |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `run-uuid`     | Run folder identifier                                                                                                                                                   |
-| Branch name    | The branch created in the orchestrator step 2                                                                                                                           |
-| Commit type    | Conventional commit prefix: `feat`, `fix`, `chore`, `docs`, or `refactor`                                                                                               |
-| Plan path      | `.adlc/[run-uuid]/plan.md` — needed for acceptance criteria                                                                                                             |
-| Code iteration | The final code-test iteration number. Read `verification-results-[Code iteration].md` for acceptance criteria results.                                                  |
-| `--revise`     | Optional. When set, the PR already exists — edit the body instead of creating a new PR. Append a `## Revision [N]` section and update the footer with the new run UUID. |
+| Input          | Description                                                                                                            |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `run-uuid`     | Run folder identifier                                                                                                  |
+| Branch name    | The branch created in the orchestrator step 2                                                                          |
+| Commit type    | Conventional commit prefix: `feat`, `fix`, `chore`, `docs`, or `refactor`                                              |
+| Plan path      | `.adlc/[run-uuid]/plan.md` — needed for acceptance criteria                                                            |
+| Code iteration | The final code-test iteration number. Read `verification-results-[Code iteration].md` for acceptance criteria results. |
 
 ## Step 1 — Commit
 
 If the working tree is clean, skip to Step 2.
 
-Stage and commit all changes. The `.gitignore` selectively tracks `.adlc/` — only `plan.md` is committed; all other `.adlc/` artifacts are excluded. Use the commit type provided by the orchestrator. The commit message should be a concise summary derived from aggregating all `.adlc/[run-uuid]/changes-*.md` files. Include the `Co-Authored-By: Claude <noreply@anthropic.com>` trailer.
+Stage and commit all changes. The `.gitignore` excludes the `.adlc/` directory. Use the commit type provided by the orchestrator. The commit message should be a concise summary derived from aggregating all `.adlc/[run-uuid]/changes-*.md` files. Include the `Co-Authored-By: Claude <noreply@anthropic.com>` trailer.
 
 Investigate unexpected files before staging.
 
@@ -33,29 +32,7 @@ Investigate unexpected files before staging.
 
 Push the branch to origin. If push fails, return failure.
 
-If a PR already exists for this branch and `--revise` is NOT set, skip creation.
-
-**When `--revise` is set:** The PR already exists. Do not create a new one. Instead, read the current PR body, count existing `## Revision` sections to determine the revision number N, and append:
-
-```markdown
-## Revision [N]
-
-### Summary
-
-- [bullets derived from changes-*.md files for this run]
-
-### Quality checks
-
-[same checkbox format as the original]
-
-### Verified acceptance criteria
-
-[same format, updated for this revision's results]
-```
-
-Also update the footer's `--previous-run-uuid` value to the current run's UUID (so the next revise reads this run's plan).
-
-Update the PR body.
+If a PR already exists for this branch, skip creation.
 
 ### PR body template
 
@@ -96,8 +73,6 @@ Format each criterion as:
 
 If there are no exceptions, omit this section entirely.
 
-After all sections, add the footer with a visible revise command containing the run UUID.
-
 End with: `🤖 Generated with [Claude Code](https://claude.com/claude-code)`
 
 ### Create the PR
@@ -128,23 +103,11 @@ Create the PR with title `{prefix}: {description}`. The body must match this exa
 
 ---
 
-> **Need changes?** Two options depending on scope:
->
-> **Quick fix** — for small, targeted fixes (typo, style, minor bug). Comment on this PR:
+> **Need changes?** Comment on this PR:
 >
 > ```
 > @claude /fix <your feedback>
 > ```
->
-> Runs in CI with static checks only (lint, tests, size). No browser verification.
->
-> **Full revise** — for broader changes (architecture, multi-file restructuring, new requirements). Run locally:
->
-> ```
-> /plantz-adlc-orchestrator --revise "your feedback" --previous-run-uuid [run-uuid]
-> ```
->
-> Re-runs the full pipeline including browser verification. Multiple fix iterations. Appends a "Revision [N]" section to this PR.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ````
@@ -153,7 +116,7 @@ If PR creation fails, return failure.
 
 ## Hard Constraints
 
-- **The PR body MUST have three mandatory sections: `## Summary`, `## Quality checks`, `## Verified acceptance criteria`.** The only allowed additional sections are `## Budget increase` (conditional — only when a budget was increased), `## Exceptions` (conditional — only when policy suppressions exist), and `## Revision [N]` (added by revise runs via `--revise`).
+- **The PR body MUST have three mandatory sections: `## Summary`, `## Quality checks`, `## Verified acceptance criteria`.** The only allowed additional sections are `## Budget increase` (conditional — only when a budget was increased) and `## Exceptions` (conditional — only when policy suppressions exist).
 
 ## Subagent Pattern
 

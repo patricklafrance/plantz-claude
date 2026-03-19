@@ -27,7 +27,7 @@ Read the YAML files directly for triggers, steps, and concurrency rules.
 
 **Concurrency:** `claude-${{ comment.id || review.id || issue.number || run_id }}` with `cancel-in-progress: true`. Keyed by comment ID (not issue number) so that unrelated comments on the same PR don't cancel in-progress Claude runs.
 
-**Revise mode:** For changes exceeding fix scope, the agent posts a ready-to-paste local command: `/plantz-adlc-orchestrator --revise "<feedback>" --previous-run-uuid <uuid>`. This runs the full ADLC on the existing PR branch with all quality gates.
+**Beyond fix scope:** If the required changes exceed what `/fix` can handle, the agent posts a comment explaining the scope and suggests the user address it manually or re-run the full orchestrator.
 
 ## Chromatic label gate
 

@@ -27,13 +27,6 @@ Context is passed between subagents via files in `.adlc/[run-uuid]/`. Always spa
 
 - **Never edit repository files directly** — only `.adlc/` and git/shell commands. All source code, config, docs, and tests go through subagents. The orchestrator's context window is too scarce to spend on code. If a change seems "too small to delegate," delegate it anyway.
 
-## Inputs (optional — for revise mode)
-
-| Input                 | Description                                                                                                                         |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `--revise`            | The user's change request (feedback text). Presence of this input indicates revise mode — skip `.adlc/` cleanup, use current branch |
-| `--previous-run-uuid` | UUID of the previous run. Required when `--revise` is set. Used to locate `.adlc/[uuid]/plan.md`                                    |
-
 ## Port Cleanup Between Subagents
 
 **After every code or test subagent returns** — whether proceeding to the next step, handling a bail, or entering failure handling — kill any processes listening on ports 8080 and 6006.
@@ -49,33 +42,20 @@ If a subagent fails to produce its expected output file, or if a command fails u
 
 ### Step 1 — Generate run UUID and create run folder
 
-**New feature (default):** Delete any existing `.adlc/` directory (handle both tracked and untracked files). Generate a UUID and create `.adlc/[run-uuid]/`. Pass the UUID to every subagent.
+Delete any existing `.adlc/` directory (handle both tracked and untracked files). Generate a UUID and create `.adlc/[run-uuid]/`. Pass the UUID to every subagent.
 
-**Revise mode (when `--revise` is provided):** Validate that `--previous-run-uuid` is provided and that `.adlc/[--previous-run-uuid value]/plan.md` exists. If either check fails, stop with a clear error message. Do NOT delete `.adlc/`. Generate a new UUID and create `.adlc/[run-uuid]/`.
+### Step 2 — Create a branch from `main`
 
-### Step 2 — Create a branch from `main` (or checkout existing)
-
-**New feature (default):** Verify the working tree is clean. If there are uncommitted changes, stop and ask the user to resolve them. Pull latest `main` and create a branch. Branch format: `{type}/{short-description}` (kebab-case). Use the commit type matching the feature intent: `feat`, `fix`, `chore`, `docs`, `refactor`. Example: `feat/add-watering-schedules`.
-
-**Revise mode (when `--revise` is provided):** Verify the current branch is not `main` — if it is, stop with an error asking the user to checkout the feature branch first. Skip branch creation. Use the current branch. Pull latest — if merge conflicts occur, attempt to resolve them automatically; if resolution fails, stop and ask the user to resolve conflicts before running `--revise` again.
+Verify the working tree is clean. If there are uncommitted changes, stop and ask the user to resolve them. Pull latest `main` and create a branch. Branch format: `{type}/{short-description}` (kebab-case). Use the commit type matching the feature intent: `feat`, `fix`, `chore`, `docs`, `refactor`. Example: `feat/add-watering-schedules`.
 
 ### Step 3 — Plan-Architect Loop (max 3 plan-iterations)
-
-**New feature (default):**
 
 plan-iteration = 1
 
 Spawn two subagents using the `plantz-adlc-plan` skill with `mode=draft`, `run-uuid`, feature description. Existing plan path is `null`.
 Verify `.adlc/[run-uuid]/plan.md` exists. If not, fail the run.
 
-**Revise mode (when `--revise` is provided):**
-
-plan-iteration = 1
-
-Spawn two subagents using the `plantz-adlc-plan` skill with `mode=revision`, `run-uuid`, feature description (the `--revise` text), the previous plan path (`.adlc/[--previous-run-uuid value]/plan.md`).
-Verify `.adlc/[run-uuid]/plan.md` exists. If not, fail the run.
-
-**Loop (both modes):**
+**Loop:**
 
 Spawn two subagents using the `plantz-adlc-architect` skill.
 Pass: `run-uuid`, plan path (`.adlc/[run-uuid]/plan.md`), `plan-iteration`.
@@ -132,8 +112,6 @@ The A/B protocol provides the quality check. No additional output verification i
 
 Spawn **one** subagent using the `plantz-adlc-pr` skill.
 Pass: `run-uuid`, the branch name from step 2, the commit type from step 2, the plan path (`.adlc/[run-uuid]/plan.md`), and the final code-iteration number (as `Code iteration`).
-
-**Revise mode:** Pass `--revise` to the PR subagent when the orchestrator was invoked with `--revise`. The PR subagent appends a `## Revision [N]` section and updates the footer's revise command with the new run UUID.
 
 ### Step 9 — Monitor
 

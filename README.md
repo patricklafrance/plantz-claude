@@ -45,21 +45,13 @@ Four pillars make this repo fully agent-driven. Each section links to the implem
 
 ### 1. ADLC skills — end-to-end feature development
 
-Eight skills that form a complete Agent Development Life Cycle (ADLC). Two flows:
-
-**New feature** — run the orchestrator locally with a feature request. It creates a branch, spawns subagents for each phase (plan, architect, code, simplify, test, document, PR, monitor), opens a PR, and monitors CI.
+Eight skills that form a complete Agent Development Life Cycle (ADLC). Run the orchestrator locally with a feature request. It creates a branch, spawns subagents for each phase (plan, architect, code, simplify, test, document, PR, monitor), opens a PR, and monitors CI.
 
 ```
 /plantz-adlc-orchestrator Add a vacation planner page with date picker and delegation support
 ```
 
-**Revise a feature** — on the PR branch, run the orchestrator with `--revise` to apply feedback through the full ADLC pipeline (plan revision, code, test, document, push).
-
-```
-/plantz-adlc-orchestrator --revise "restructure the data layer to use TanStack DB" --previous-run-uuid abc123
-```
-
-The `--previous-run-uuid` is shown in the PR description footer. For lightweight fixes, comment `@claude /fix <feedback>` directly on the PR instead — the Claude workflow applies the fix, runs tests, and pushes.
+For lightweight fixes on an existing PR, comment `@claude /fix <feedback>` directly on the PR — the Claude workflow applies the fix, runs tests, and pushes.
 
 All inter-step coordination goes through files in `.adlc/[uuid]/`.
 

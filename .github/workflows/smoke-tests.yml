@@ -56,7 +56,7 @@ jobs:
               # the one matching agent-browser's playwright-core. Install explicitly using
               # the correct version.
               run: |
-                  AB_PW=$(node -p "require(require.resolve('playwright-core/package.json',{paths:[require.resolve('agent-browser')]})).version")
+                  AB_PW=$(node -p "require(require.resolve('playwright-core/package.json',{paths:[require.resolve('agent-browser/package.json')]})).version")
                   npx -y playwright@${AB_PW} install --with-deps chromium
 
             - name: Warm up browser

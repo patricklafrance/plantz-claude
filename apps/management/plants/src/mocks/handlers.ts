@@ -1,10 +1,41 @@
 import { http, HttpResponse } from "msw";
 
-import { getUserId } from "@packages/core-module/db";
+import { getUserId, householdDb } from "@packages/core-module/db";
 import type { Plant } from "@packages/core-plants";
 import { plantsDb } from "@packages/core-plants/db";
 
 export const managementPlantHandlers = [
+    // GET /api/management/plants/households — user's households with members (placed BEFORE /:id)
+    http.get("/api/management/plants/households", ({ request }) => {
+        const userId = getUserId(request);
+
+        if (!userId) {
+            return new HttpResponse(null, { status: 401 });
+        }
+
+        const households = householdDb.getHouseholdsForUser(userId);
+        const result = households.map((h) => ({
+            ...h,
+            members: householdDb.getMembers(h.id),
+        }));
+
+        return HttpResponse.json(result);
+    }),
+
+    // GET /api/management/plants/households/:householdId/members — members of a specific household
+    http.get("/api/management/plants/households/:householdId/members", ({ request, params }) => {
+        const userId = getUserId(request);
+
+        if (!userId) {
+            return new HttpResponse(null, { status: 401 });
+        }
+
+        const householdId = params.householdId as string;
+        const members = householdDb.getMembers(householdId);
+
+        return HttpResponse.json(members);
+    }),
+
     http.get("/api/management/plants", ({ request }) => {
         const userId = getUserId(request);
 
@@ -54,7 +85,14 @@ export const managementPlantHandlers = [
     http.put("/api/management/plants/:id", async ({ params, request }) => {
         const { id } = params;
         const body = (await request.json()) as Record<string, unknown>;
-        const plant = plantsDb.update(id as string, body as Partial<Plant>);
+
+        // Convert null values to undefined so optional Plant fields are properly cleared
+        const updates: Record<string, unknown> = {};
+        for (const [key, value] of Object.entries(body)) {
+            updates[key] = value === null ? undefined : value;
+        }
+
+        const plant = plantsDb.update(id as string, updates as Partial<Plant>);
 
         if (!plant) {
             return new HttpResponse(null, { status: 404 });

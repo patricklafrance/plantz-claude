@@ -44,6 +44,7 @@ export function CareHistoryTimeline({ events }: CareHistoryTimelineProps) {
                     {dayEvents.map((event) => (
                         <div key={event.id} className="flex items-center gap-2">
                             <CareEventBadge eventType={event.eventType} />
+                            {event.actorName && <span className="text-muted-foreground text-xs">by {event.actorName}</span>}
                             {event.notes && <span className="text-muted-foreground truncate text-xs">{event.notes}</span>}
                         </div>
                     ))}

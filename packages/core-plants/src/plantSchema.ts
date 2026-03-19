@@ -16,6 +16,11 @@ export const plantSchema = z.object({
     nextWateringDate: z.coerce.date(),
     creationDate: z.coerce.date(),
     lastUpdateDate: z.coerce.date(),
+    householdId: z.string().optional(),
+    responsibilityUserId: z.string().optional(),
+    responsibilityUserName: z.string().optional(),
+    lastWateredByActorName: z.string().optional(),
+    lastWateredDate: z.coerce.date().optional(),
 });
 
 export type Plant = z.infer<typeof plantSchema>;

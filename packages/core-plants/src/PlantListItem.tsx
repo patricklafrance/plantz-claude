@@ -7,6 +7,8 @@ import { locations, wateringTypes } from "./constants.ts";
 import { PLANT_LIST_GRID } from "./plantListLayout.ts";
 import type { Plant } from "./plantSchema.ts";
 import { getOptionLabel, isDueForWatering } from "./plantUtils.ts";
+import { ResponsibilityBadge } from "./ResponsibilityBadge.tsx";
+import { SharedPlantBadge } from "./SharedPlantBadge.tsx";
 
 interface PlantListItemProps {
     plant: Plant;
@@ -46,6 +48,8 @@ export const PlantListItem = memo(function PlantListItem({ plant, selected = fal
                             <span className="sr-only">Due for watering</span>
                         </>
                     )}
+                    {plant.householdId && <SharedPlantBadge />}
+                    {plant.responsibilityUserId && <ResponsibilityBadge assigneeName={plant.responsibilityUserName ?? null} />}
                 </div>
                 <span className="text-muted-foreground w-full truncate text-xs whitespace-nowrap md:hidden">
                     {plant.wateringQuantity} · {getOptionLabel(wateringTypes, plant.wateringType)} · {getOptionLabel(locations, plant.location)}

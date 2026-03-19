@@ -7,6 +7,7 @@ export interface Session {
     id: string;
     name: string;
     email: string;
+    households?: Array<{ id: string; name: string }>;
 }
 
 export function sessionQueryOptions() {

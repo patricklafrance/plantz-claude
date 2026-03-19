@@ -143,5 +143,34 @@ export function generatePlants(count?: number, userId?: string): Plant[] {
     return plants;
 }
 
+// Hardcoded household ID matching the value in @packages/core-module's seedHouseholds.ts.
+// Deliberately duplicated to avoid a circular dependency (core-plants does not depend on core-module).
+const HOUSEHOLD_ID = "household-1";
+
 // Pre-generated stable seed data for consistent dev experience
-export const defaultSeedPlants: Plant[] = generatePlants(125, "user-alice").concat(generatePlants(125, "user-bob"));
+const rawPlants: Plant[] = generatePlants(125, "user-alice").concat(generatePlants(125, "user-bob"));
+
+// Share ~20 plants with the default household and assign responsibility to a subset
+const alicePlants = rawPlants.filter((p) => p.userId === "user-alice");
+const bobPlants = rawPlants.filter((p) => p.userId === "user-bob");
+
+for (let i = 0; i < 10 && i < alicePlants.length; i++) {
+    const plant = alicePlants[i]!;
+    plant.householdId = HOUSEHOLD_ID;
+    // Assign responsibility on some
+    if (i < 5) {
+        plant.responsibilityUserId = "user-bob";
+        plant.responsibilityUserName = "Bob";
+    }
+}
+
+for (let i = 0; i < 10 && i < bobPlants.length; i++) {
+    const plant = bobPlants[i]!;
+    plant.householdId = HOUSEHOLD_ID;
+    if (i < 5) {
+        plant.responsibilityUserId = "user-alice";
+        plant.responsibilityUserName = "Alice";
+    }
+}
+
+export const defaultSeedPlants: Plant[] = rawPlants;

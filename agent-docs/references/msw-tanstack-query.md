@@ -108,13 +108,23 @@ export async function registerManagementPlants(runtime: FireflyRuntime, queryCli
 
 ## MSW Setup
 
-### Shared DB Subpath Export
+### Shared DB Subpath Exports
 
-The shared in-memory database is exposed via `@packages/core-plants/db`:
+Two shared in-memory databases exist:
 
-- `plantsDb` — In-memory database singleton
+**`@packages/core-plants/db`:**
+
+- `plantsDb` — In-memory plant database singleton
 - `defaultSeedPlants` — Pre-generated stable seed data (~250 plants)
 - `generatePlants(count?)` — Generate random plant data
+
+**`@packages/core-module/db`:**
+
+- `householdDb` — In-memory household database singleton (households, members, invitations)
+- `defaultSeedHouseholds`, `defaultSeedHouseholdMembers` — Seed data for dev (one household with Alice + Bob)
+- `DEFAULT_HOUSEHOLD_ID` — Well-known constant `"household-1"` used by both `core-module` and `core-plants` seed data (hardcoded in both to avoid circular dependencies)
+- `usersDb` — In-memory user database singleton
+- `getUserId(request)` — Extracts the current user ID from MSW request auth headers
 
 Care event types, schemas, insight utilities, and adjustment recommendation types/schemas/computation are exposed via `@packages/core-plants/care-event`. Module-local DBs (e.g., `careEventsDb` and `adjustmentsDb` in today-landing-page) stay in the module's `src/mocks/` folder — they are not shared across modules.
 
@@ -122,8 +132,9 @@ Care event types, schemas, insight utilities, and adjustment recommendation type
 
 Each module defines its own MSW handlers in a local `mocks/` folder:
 
-- **Management:** `managementPlantHandlers` in `apps/management/plants/src/mocks/handlers.ts` — 6 routes at `/api/management/plants`
-- **Today Landing:** `todayPlantHandlers` in `apps/today/landing-page/src/mocks/handlers.ts` — 3 routes at `/api/today/plants`; `todayCareEventHandlers` in `apps/today/landing-page/src/mocks/careEventHandlers.ts` — 2 routes at `/api/today/care-events`; `todayAdjustmentHandlers` in `apps/today/landing-page/src/mocks/adjustmentHandlers.ts` — 4 routes at `/api/today/adjustments`
+- **Management Plants:** `managementPlantHandlers` in `apps/management/plants/src/mocks/handlers.ts` — 8 routes at `/api/management/plants`; `managementCareEventHandlers` in `apps/management/plants/src/mocks/careEventHandlers.ts` — 3 routes at `/api/management/care-events`
+- **Management Household:** `managementHouseholdHandlers` in `apps/management/household/src/mocks/handlers.ts` — 11 routes at `/api/management/household`
+- **Today Landing:** `todayPlantHandlers` in `apps/today/landing-page/src/mocks/handlers.ts` — 3 routes at `/api/today/plants`; `todayCareEventHandlers` in `apps/today/landing-page/src/mocks/careEventHandlers.ts` — 3 routes at `/api/today/care-events`; `todayAdjustmentHandlers` in `apps/today/landing-page/src/mocks/adjustmentHandlers.ts` — 4 routes at `/api/today/adjustments`
 - **Today Vacation:** `todayVacationPlannerHandlers` in `apps/today/vacation-planner/src/mocks/handlers.ts` — 5 routes at `/api/today/vacation-planner/`
 
 ## Storybook Setup
@@ -202,26 +213,48 @@ Use `delay("infinite")` for loading state stories.
 
 ## REST API Endpoints
 
-### Management (`/api/management/plants`)
+### Management Plants (`/api/management/plants`, `/api/management/care-events`)
 
-| Method | Path                         | Description                                     |
-| ------ | ---------------------------- | ----------------------------------------------- |
-| GET    | `/api/management/plants`     | List all plants (sorted by name)                |
-| GET    | `/api/management/plants/:id` | Get single plant                                |
-| POST   | `/api/management/plants`     | Create plant (server generates id + timestamps) |
-| PUT    | `/api/management/plants/:id` | Update plant (server updates `lastUpdateDate`)  |
-| DELETE | `/api/management/plants/:id` | Delete single plant                             |
-| DELETE | `/api/management/plants`     | Bulk delete (body: `{ ids: string[] }`)         |
+| Method | Path                                                     | Description                                              |
+| ------ | -------------------------------------------------------- | -------------------------------------------------------- |
+| GET    | `/api/management/plants/households`                      | List current user's households with members              |
+| GET    | `/api/management/plants/households/:householdId/members` | List members of a specific household                     |
+| GET    | `/api/management/plants`                                 | List all plants (sorted by name)                         |
+| GET    | `/api/management/plants/:id`                             | Get single plant                                         |
+| POST   | `/api/management/plants`                                 | Create plant (server generates id + timestamps)          |
+| PUT    | `/api/management/plants/:id`                             | Update plant (server updates `lastUpdateDate`)           |
+| DELETE | `/api/management/plants/:id`                             | Delete single plant                                      |
+| DELETE | `/api/management/plants`                                 | Bulk delete (body: `{ ids: string[] }`)                  |
+| GET    | `/api/management/care-events`                            | List care events for a plant (`?plantId=` query param)   |
+| POST   | `/api/management/care-events`                            | Create a care event (includes `actorId`/`actorName`)     |
+| POST   | `/api/management/care-events/bulk`                       | Bulk create care events (includes `actorId`/`actorName`) |
+
+### Management Household (`/api/management/household`)
+
+| Method | Path                                                       | Description                              |
+| ------ | ---------------------------------------------------------- | ---------------------------------------- |
+| GET    | `/api/management/household`                                | List user's households                   |
+| POST   | `/api/management/household`                                | Create household                         |
+| GET    | `/api/management/household/:id`                            | Get household detail                     |
+| PUT    | `/api/management/household/:id`                            | Update household                         |
+| DELETE | `/api/management/household/:id`                            | Delete household                         |
+| GET    | `/api/management/household/:id/members`                    | List members                             |
+| GET    | `/api/management/household/:id/plants`                     | List plants shared with household        |
+| POST   | `/api/management/household/:id/invitations`                | Create invitation                        |
+| POST   | `/api/management/household/:id/invitations/:invId/accept`  | Accept invitation                        |
+| DELETE | `/api/management/household/:id/members/:userId`            | Remove member                            |
+| PUT    | `/api/management/household/:id/plants/:plantId/assignment` | Set responsibility assignment on a plant |
 
 ### Today Landing (`/api/today/plants`, `/api/today/care-events`, `/api/today/adjustments`)
 
 | Method | Path                                    | Description                                                              |
 | ------ | --------------------------------------- | ------------------------------------------------------------------------ |
-| GET    | `/api/today/plants`                     | List all plants                                                          |
+| GET    | `/api/today/plants`                     | List user's plants (own + shared via household membership)               |
 | DELETE | `/api/today/plants/:id`                 | Delete single plant                                                      |
 | DELETE | `/api/today/plants`                     | Bulk delete (body: `{ ids: string[] }`)                                  |
 | GET    | `/api/today/care-events`                | List care events for a plant (`?plantId=` query param)                   |
-| POST   | `/api/today/care-events`                | Create a new care event (server generates id)                            |
+| POST   | `/api/today/care-events`                | Create a care event (includes `actorId`/`actorName`)                     |
+| POST   | `/api/today/care-events/bulk`           | Bulk create care events (includes `actorId`/`actorName`)                 |
 | GET    | `/api/today/adjustments/recommendation` | Get adjustment recommendation for a plant (`?plantId=&currentInterval=`) |
 | POST   | `/api/today/adjustments`                | Accept an adjustment (updates plant frequency + records event)           |
 | POST   | `/api/today/adjustments/dismiss`        | Dismiss a recommendation for a plant                                     |
@@ -239,4 +272,4 @@ Use `delay("infinite")` for loading state stories.
 
 ## Seed Data
 
-The in-memory DB resets on page reload. For dev, `defaultSeedPlants` provides ~250 plants with realistic data. The today-landing-page module also seeds `careEventsDb` with `defaultSeedCareEvents` (deterministic care events for ~20 plants using fixed absolute dates) and `adjustmentsDb` with `defaultSeedAdjustments` (deterministic adjustment events for the first few plants with care history). Stories use per-story MSW handler overrides with inline `makePlant()` / `makeCareEvent()` / `makeAdjustmentRecommendation()` / `makeAdjustmentEvent()` helpers for focused data sets.
+The in-memory DBs reset on page reload. For dev, the host seeds two shared DBs in `apps/host/src/index.tsx` before `initializeFirefly`: `plantsDb.reset(defaultSeedPlants)` (~250 plants) and `householdDb.reset({ households, members })` (one household with two members). Some seed plants have `householdId = "household-1"` to demonstrate shared-plant UX. The today-landing-page module also seeds `careEventsDb` with `defaultSeedCareEvents` (deterministic care events for ~20 plants using fixed absolute dates, including `actorId`/`actorName` fields) and `adjustmentsDb` with `defaultSeedAdjustments` (deterministic adjustment events for the first few plants with care history). Stories use per-story MSW handler overrides with inline `makePlant()` / `makeCareEvent()` / `makeAdjustmentRecommendation()` / `makeAdjustmentEvent()` helpers for focused data sets.

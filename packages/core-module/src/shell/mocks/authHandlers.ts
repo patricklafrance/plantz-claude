@@ -1,7 +1,7 @@
 import { http, HttpResponse } from "msw";
 
 import { AUTH_TOKEN_KEY } from "../../authTokenKey.ts";
-import { getUserId, usersDb } from "../../msw/index.ts";
+import { getUserId, householdDb, usersDb } from "../../msw/index.ts";
 
 export const authHandlers = [
     http.post("/api/auth/login", async ({ request }) => {
@@ -36,6 +36,8 @@ export const authHandlers = [
             return new HttpResponse(null, { status: 401 });
         }
 
-        return HttpResponse.json({ id: user.id, name: user.name, email: user.email });
+        const households = householdDb.getHouseholdsForUser(userId).map((h) => ({ id: h.id, name: h.name }));
+
+        return HttpResponse.json({ id: user.id, name: user.name, email: user.email, households });
     }),
 ];

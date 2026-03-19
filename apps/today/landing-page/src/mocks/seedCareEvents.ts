@@ -22,12 +22,17 @@ function generateEventsForPlant(plantId: string, plantIndex: number): CareEvent[
         const typeIndex = (plantIndex + i) % 7 === 0 ? 1 : (plantIndex + i) % 11 === 0 ? 2 : 0;
         const eventType = eventTypes[typeIndex]!;
 
+        // Alternate between Alice and Bob for shared plants
+        const isAliceEvent = (plantIndex + i) % 3 !== 0;
+
         events.push({
             id: `care-${plantId}-${i}`,
             plantId,
             eventType,
             eventDate,
             notes: i % 4 === 0 ? "Soil was very dry" : undefined,
+            actorId: isAliceEvent ? "user-alice" : "user-bob",
+            actorName: isAliceEvent ? "Alice" : "Bob",
         });
     }
 

@@ -50,6 +50,7 @@ Consuming apps also use `@source` directives to tell Tailwind where to find util
 @source "../../../../packages/components/src/**/*.{ts,tsx}";
 @source "../../../../packages/core-module/src/shell/**/*.{ts,tsx}";
 @source "../../../../packages/core-plants/src/**/*.{ts,tsx}";
+@source "../../../management/household/src/**/*.{ts,tsx}";
 @source "../../../management/plants/src/**/*.{ts,tsx}";
 @source "../../../management/user/src/**/*.{ts,tsx}";
 @source "../../../today/landing-page/src/**/*.{ts,tsx}";

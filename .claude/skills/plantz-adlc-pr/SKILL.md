@@ -12,13 +12,12 @@ Commit, push, and open a PR.
 
 ## Inputs (provided by orchestrator)
 
-| Input          | Description                                                                                                            |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `run-uuid`     | Run folder identifier                                                                                                  |
-| Branch name    | The branch created in the orchestrator step 2                                                                          |
-| Commit type    | Conventional commit prefix: `feat`, `fix`, `chore`, `docs`, or `refactor`                                              |
-| Plan path      | `.adlc/[run-uuid]/plan.md` — needed for acceptance criteria                                                            |
-| Code iteration | The final code-test iteration number. Read `verification-results-[Code iteration].md` for acceptance criteria results. |
+| Input         | Description                                                                                                       |
+| ------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `run-uuid`    | Run folder identifier                                                                                             |
+| `branch-name` | The branch created in the orchestrator step 2                                                                     |
+| `commit-type` | Conventional commit prefix: `feat`, `fix`, `chore`, `docs`, or `refactor`                                         |
+| `iteration`   | The final code-test iteration number. Read `verification-results-[iteration].md` for acceptance criteria results. |
 
 ## Step 1 — Commit
 
@@ -40,7 +39,7 @@ If a PR already exists for this branch, skip creation.
 
 **Section 1 — `## Summary`:** One bullet per logical change. Derive bullets by aggregating all `changes-*.md` files (iterations 1 through final). Deduplicate across iterations — if iteration 2 fixed something iteration 1 introduced, use the final state.
 
-**Section 2 — `## Quality checks`:** Copy these checkboxes. To determine pass/fail: read `.adlc/[run-uuid]/test-issues-[Code iteration].md`. If the file doesn't exist, all checks passed — mark all `[x]`. If it exists, check each section: mark `[x]` only for sections that say "Pass".
+**Section 2 — `## Quality checks`:** Copy these checkboxes. To determine pass/fail: read `.adlc/[run-uuid]/test-issues-[iteration].md`. If the file doesn't exist, all checks passed — mark all `[x]`. If it exists, check each section: mark `[x]` only for sections that say "Pass".
 
 ```
 - [ ] Lint (includes typecheck + syncpack)
@@ -52,7 +51,7 @@ If a PR already exists for this branch, skip creation.
 - [ ] Storybook a11y
 ```
 
-**Section 3 — `## Verified acceptance criteria`:** Read `.adlc/[run-uuid]/verification-results-[Code iteration].md`. Copy all criteria (static, visual, and interactive) with their pass/fail results directly from that file. If the plan has no acceptance criteria or the file doesn't exist, write "No acceptance criteria defined."
+**Section 3 — `## Verified acceptance criteria`:** Read `.adlc/[run-uuid]/verification-results-[iteration].md`. Copy all criteria (static, visual, and interactive) with their pass/fail results directly from that file. If the plan has no acceptance criteria or the file doesn't exist, write "No acceptance criteria defined."
 
 Format each criterion as:
 
@@ -63,7 +62,7 @@ Format each criterion as:
 
 **Section 4 (conditional) — `## Budget increase`:** Only include this section if any `changes-*.md` file mentions a size-limit budget increase in its Notes section. List: which app, how much (KB gzipped), and why. See `agent-docs/references/bundle-size-budget.md` for the full policy.
 
-**Section 5 (conditional) — `## Exceptions`:** Only include this section if the latest `changes-[Code iteration].md` has an `## Exceptions` section that is not "None." Copy the entries directly:
+**Section 5 (conditional) — `## Exceptions`:** Only include this section if the latest `changes-[iteration].md` has an `## Exceptions` section that is not "None." Copy the entries directly:
 
 ```
 - **oxlint-disable** `{rule}` in `path/file.tsx:{line}` — {justification}

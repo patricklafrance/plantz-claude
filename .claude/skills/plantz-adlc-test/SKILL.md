@@ -12,25 +12,23 @@ The single validation gate for all code quality. Runs static checks (lint, modul
 
 ## Inputs (provided by orchestrator)
 
-| Input          | Description                                                 |
-| -------------- | ----------------------------------------------------------- |
-| `run-uuid`     | Run folder identifier                                       |
-| Code iteration | Current code-test iteration number                          |
-| Plan path      | `.adlc/[run-uuid]/plan.md` — needed for acceptance criteria |
+| Input       | Description                        |
+| ----------- | ---------------------------------- |
+| `run-uuid`  | Run folder identifier              |
+| `iteration` | Current code-test iteration number |
 
 ## Procedure
 
 1. Read all `.adlc/[run-uuid]/changes-*.md` files (1 through current iteration) to build the cumulative set of affected files. When a file appears in multiple iterations, use its latest state — if created then deleted, exclude it from the set. This ensures accessibility checks cover the full feature scope, not just the latest fix. If `iteration > 1`, also read the previous iteration's issues file (`.adlc/[run-uuid]/test-issues-[iteration-1].md`) to enable regression classification in the output (see Output section).
 2. Read `agent-docs/references/color-mode.md` (needed for dark mode screenshot assessment).
-3. Run `pnpm lint` from the workspace root. This includes typecheck and syncpack. Record any errors.
+3. Run `pnpm lint` from the workspace root. This includes typecheck, syncpack, oxlint, and Knip. Record any errors (including Knip dead-code findings that overlap with files in the cumulative affected set from step 1 — ignore pre-existing dead code).
 4. Run `pnpm sizecheck` to check bundle budgets. If it fails, record the full size-limit output in the issues file under `## Bundle size`. Do not attempt to fix or increase budgets — that is the code skill's responsibility.
-5. Run `pnpm knip` from the workspace root. If it reports unused exports or dead code introduced by the current changes, record them in the issues file under `## Dead code (Knip)`. Only flag findings that overlap with files in the cumulative affected set (from step 1) — ignore pre-existing dead code.
-6. Load the `plantz-validate-modules` skill and validate all modules. Record any failures.
-7. **Accessibility review** (static): Load the `accessibility` and `agent-browser` skills. Review every changed file for WCAG AA violations that are verifiable by reading source code — focus on semantic HTML, interactive element labelling, form error associations, color-only indicators, and live regions. Do NOT attempt to verify rendering-dependent properties (color contrast, font sizes, focus ring visibility) by reading code — those are covered by Storybook a11y tests via axe-core in step 10. For each failure, include the file path and element reference so the code skill can act on it.
-8. **Static criteria evaluation**: Read all `[static]` acceptance criteria from the plan. For each, determine whether it passed based on the results of steps 3-7 (lint, sizecheck, knip, module validation, accessibility review). Map each criterion to the check that verifies it and record pass/fail. Include results in the verification results file.
-9. **Browser verification**: Read `plan.md` and extract all `[visual]` and `[interactive]` acceptance criteria. If any exist, follow the browser verification procedure (below) to verify them. Record pass/fail for each criterion.
-10. **Workspace tests**: Run `pnpm test` from the workspace root. This runs all workspace test tasks (including Storybook a11y). See the workspace tests procedure (below). This step runs **unconditionally** — it is not gated by `[visual]`/`[interactive]` criteria.
-11. **Always** write `.adlc/[run-uuid]/verification-results-[iteration].md`, regardless of whether checks passed or failed. The PR skill reads this file to populate the PR body. Use this format:
+5. Load the `plantz-validate-modules` skill and validate all modules. Record any failures.
+6. **Accessibility review** (static): Load the `accessibility` and `agent-browser` skills. Review every changed file for WCAG AA violations that are verifiable by reading source code — focus on semantic HTML, interactive element labelling, form error associations, color-only indicators, and live regions. Do NOT attempt to verify rendering-dependent properties (color contrast, font sizes, focus ring visibility) by reading code — those are covered by Storybook a11y tests via axe-core in step 9. For each failure, include the file path and element reference so the code skill can act on it.
+7. **Static criteria evaluation**: Read all `[static]` acceptance criteria from the plan. For each, determine whether it passed based on the results of steps 3-6 (lint, sizecheck, module validation, accessibility review). Map each criterion to the check that verifies it and record pass/fail. Include results in the verification results file.
+8. **Browser verification**: Read `plan.md` and extract all `[visual]` and `[interactive]` acceptance criteria. If any exist, follow the browser verification procedure (below) to verify them. Record pass/fail for each criterion.
+9. **Workspace tests**: Run `pnpm test` from the workspace root. This runs all workspace test tasks (including Storybook a11y). See the workspace tests procedure (below). This step runs **unconditionally** — it is not gated by `[visual]`/`[interactive]` criteria.
+10. **Always** write `.adlc/[run-uuid]/verification-results-[iteration].md`, regardless of whether checks passed or failed. The PR skill reads this file to populate the PR body. Use this format:
 
     ```markdown
     # Verification Results — Iteration [N]
@@ -48,7 +46,7 @@ The single validation gate for all code quality. Runs static checks (lint, modul
 
 **Phase 0 — Server startup and viewport:**
 
-Start the appropriate dev server (Storybook for story criteria, host app for route criteria). Wait for it to be ready (up to 90 seconds). If it fails to start, stop — the orchestrator will detect the missing output and follow failure handling. Set a consistent desktop viewport size before verifying — screenshots vary between runs without one.
+Run `pnpm dev-host` for route criteria, or `pnpm dev-storybook` for story criteria. Wait for it to be ready (up to 90 seconds). If it fails to start, stop — the orchestrator will detect the missing output and follow failure handling. Set a consistent desktop viewport size before verifying — screenshots vary between runs without one.
 
 **Dark mode verification:**
 For dark mode criteria, toggle the `dark` class on the document element via agent-browser, wait 200ms for CSS transitions to settle, then verify the criterion and toggle back.
@@ -108,7 +106,7 @@ On iteration 1, omit tags — all issues are implicitly new.
 ```markdown
 # Test Issues — Iteration [N]
 
-## Lint (includes typecheck + syncpack)
+## Lint (includes typecheck, syncpack, oxlint, Knip)
 
 - [error details, or "Pass"] [persistent|regressed|new]
 
@@ -119,10 +117,6 @@ On iteration 1, omit tags — all issues are implicitly new.
 ## Module validation
 
 - [failures, or "Pass"] [persistent|regressed|new]
-
-## Dead code (Knip)
-
-- [unused exports or dead code in affected files, or "Pass"] [persistent|regressed|new]
 
 ## Accessibility (code-level)
 
@@ -144,14 +138,11 @@ On iteration 1, omit tags — all issues are implicitly new.
 
 ## Subagent Pattern
 
-**Subagent A** runs static checks and static criteria evaluation (steps 1-8) and writes the test issues file with static results. A does NOT run browser verification or workspace tests.
+**Subagent A** runs static checks and static criteria evaluation (steps 1-7) and writes the test issues file with static results. A does NOT run browser verification or workspace tests.
 
 **Subagent B** has four responsibilities, in order:
 
 1. **Static report review.** Spot-check a sample of A's findings against actual file contents — remove false positives, add missed issues, and correct inaccurate descriptions. Edit the test issues file directly.
-
 2. **Browser verification.** If the plan has `[visual]` or `[interactive]` criteria, follow the browser verification procedure (above) — executing Phase 0 through Phase 3 in order. Record results in the test issues file. B owns browser verification — every `[visual]` and `[interactive]` criterion must have a pass/fail result when B is done.
-
 3. **Workspace tests.** Follow the workspace tests procedure (above) to run `pnpm test`. This runs unconditionally — not gated by `[visual]`/`[interactive]` criteria. Record results in the test issues file under `## Storybook a11y` (for a11y violations) or under a new `## Workspace tests (other)` section for non-a11y test failures. B owns this step.
-
 4. **Write the verification results.** B **always** writes `.adlc/[run-uuid]/verification-results-[iteration].md` — even if there were no `[visual]`/`[interactive]` criteria to verify.

@@ -14,11 +14,10 @@ A **deep module** (John Ousterhout, "A Philosophy of Software Design") has a sma
 
 ## Inputs (provided by orchestrator)
 
-| Input            | Description                                                                            |
-| ---------------- | -------------------------------------------------------------------------------------- |
-| `run-uuid`       | Run folder identifier                                                                  |
-| Plan path        | `.adlc/[run-uuid]/plan.md`                                                             |
-| `plan-iteration` | Current plan-iteration number (1, 2, or 3). Used for naming the revision request file. |
+| Input       | Description                                                                            |
+| ----------- | -------------------------------------------------------------------------------------- |
+| `run-uuid`  | Run folder identifier                                                                  |
+| `iteration` | Current plan-iteration number (1, 2, or 3). Used for naming the revision request file. |
 
 ## Outcomes (mutually exclusive)
 

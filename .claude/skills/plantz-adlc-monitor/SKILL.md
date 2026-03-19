@@ -12,11 +12,10 @@ Monitor CI workflows on a PR, fix failures, and report final status.
 
 ## Inputs (provided by orchestrator)
 
-| Input       | Description                                                  |
-| ----------- | ------------------------------------------------------------ |
-| `run-uuid`  | Run folder identifier                                        |
-| Branch name | The feature branch                                           |
-| Plan path   | `.adlc/[run-uuid]/plan.md` — read only when a failure occurs |
+| Input         | Description           |
+| ------------- | --------------------- |
+| `run-uuid`    | Run folder identifier |
+| `branch-name` | The feature branch    |
 
 ## Procedure
 

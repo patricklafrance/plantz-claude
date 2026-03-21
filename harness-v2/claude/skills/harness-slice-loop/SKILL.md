@@ -1,0 +1,28 @@
+---
+name: harness-slice-loop
+description: |
+    Code → verify cycle for a single slice. Spawns the coder, runs browser verification, and loops on failure until the slice passes or the retry limit is hit.
+    Use when asked to "implement a slice", or as part of the harness coordinator's implementation phase.
+license: MIT
+---
+
+# Harness Slice Loop
+
+Cycle: code a slice, verify acceptance criteria, fix on failure. Exit when the slice passes or 5 fix attempts are exhausted.
+
+Never edit application or library source files directly — all code changes go through the coder subagent.
+
+## Inputs
+
+| Input        | Description                                  |
+| ------------ | -------------------------------------------- |
+| `slice-path` | Path to the slice file in `.harness/slices/` |
+
+## Process
+
+1. Spawn `subagent_type: "harness-coder"` with the slice file and `mode: draft`.
+2. Spawn `subagent_type: "harness-reviewer"` pointing at the slice file.
+3. All criteria pass → rename `verification-results.md` to `verification-{slice-filename}.md` (e.g. `verification-01-user-list.md`). Slice complete. Exit.
+4. Read and save the verification content, then delete `verification-results.md`.
+5. Resume the coder via `SendMessage` with `mode: revision` and the saved verification report as `verification-results`.
+6. Go to step 2. Max 5 fix attempts, then print the unresolved failures and stop.

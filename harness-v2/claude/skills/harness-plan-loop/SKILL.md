@@ -1,0 +1,28 @@
+---
+name: harness-plan-loop
+description: |
+    Plan → architect review cycle. Spawns the planner, runs the architect gate, and loops on rejection until the plan passes or the retry limit is hit.
+    Use when asked to "plan and review a feature", or as part of the harness coordinator's planning phase.
+license: MIT
+---
+
+# Harness Plan Loop
+
+Cycle: draft a plan, run the architect gate, revise on rejection. Exit when the plan passes or 5 iterations are exhausted.
+
+Never edit application or library source files.
+
+## Inputs
+
+| Input                 | Description               |
+| --------------------- | ------------------------- |
+| `feature-description` | What the user wants built |
+
+## Process
+
+1. Spawn `subagent_type: "harness-planner"` with the feature description and `mode: draft`.
+2. Spawn `subagent_type: "harness-architect"`.
+3. No `.harness/architect-revision.md` → plan approved. Exit.
+4. Read and save the revision content, then delete the file.
+5. Spawn a fresh `subagent_type: "harness-planner"` with `mode: revision` and the rejection as `revision-note`.
+6. Go to step 3. Max 5 total iterations, then stop and report.

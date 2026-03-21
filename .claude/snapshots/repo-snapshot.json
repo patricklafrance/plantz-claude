@@ -1,0 +1,170 @@
+{
+  "generatedAt": "2026-03-21T01:56:56.954Z",
+  "workspace": {
+    "packageCount": 13,
+    "packages": [
+      {
+        "name": "@apps/host",
+        "scope": "apps"
+      },
+      {
+        "name": "@modules/management-household",
+        "scope": "modules",
+        "domain": "management"
+      },
+      {
+        "name": "@modules/management-plants",
+        "scope": "modules",
+        "domain": "management"
+      },
+      {
+        "name": "@apps/management-storybook",
+        "scope": "apps",
+        "domain": "management"
+      },
+      {
+        "name": "@modules/management-user",
+        "scope": "modules",
+        "domain": "management"
+      },
+      {
+        "name": "@apps/storybook",
+        "scope": "apps"
+      },
+      {
+        "name": "@modules/today-landing-page",
+        "scope": "modules",
+        "domain": "today"
+      },
+      {
+        "name": "@apps/today-storybook",
+        "scope": "apps",
+        "domain": "today"
+      },
+      {
+        "name": "@modules/today-vacation-planner",
+        "scope": "modules",
+        "domain": "today"
+      },
+      {
+        "name": "@packages/components",
+        "scope": "packages"
+      },
+      {
+        "name": "@packages/core-module",
+        "scope": "packages"
+      },
+      {
+        "name": "@packages/core-plants",
+        "scope": "packages"
+      },
+      {
+        "name": "@apps/packages-storybook",
+        "scope": "apps"
+      }
+    ],
+    "domains": {
+      "management": {
+        "modules": [
+          "@modules/management-household",
+          "@modules/management-plants",
+          "@modules/management-user"
+        ],
+        "storybook": "@apps/management-storybook"
+      },
+      "today": {
+        "modules": [
+          "@modules/today-landing-page",
+          "@modules/today-vacation-planner"
+        ],
+        "storybook": "@apps/today-storybook"
+      }
+    }
+  },
+  "scripts": {
+    "dev-host": "turbo run dev --filter=@apps/host",
+    "dev-management-household": "cross-env MODULES=management/household pnpm dev-host",
+    "dev-management-plants": "cross-env MODULES=management/plants pnpm dev-host",
+    "dev-management-user": "cross-env MODULES=management/user pnpm dev-host",
+    "dev-management-storybook": "turbo run dev --filter=@apps/management-storybook",
+    "dev-today-landing-page": "cross-env MODULES=today/landing-page pnpm dev-host",
+    "dev-today-vacation-planner": "cross-env MODULES=today/vacation-planner pnpm dev-host",
+    "dev-today-storybook": "turbo run dev --filter=@apps/today-storybook",
+    "dev-packages-storybook": "turbo run dev --filter=@apps/packages-storybook",
+    "dev-storybook": "turbo run dev --filter=@apps/storybook",
+    "build-host": "turbo run build --filter=@apps/host",
+    "build-storybook": "turbo run build-storybook --filter=@apps/storybook",
+    "sizecheck": "pnpm --filter @apps/host size",
+    "serve-host": "turbo run serve-build --filter=@apps/host",
+    "serve-storybook": "turbo run serve-storybook --filter=@apps/storybook",
+    "test": "turbo run test",
+    "lint": "turbo run lint --continue",
+    "typecheck": "tsgo",
+    "oxlint": "oxlint --react-plugin --import-plugin --jsx-a11y-plugin --react-perf-plugin --promise-plugin --vitest-plugin",
+    "oxfmt": "oxfmt --check",
+    "knip": "knip",
+    "syncpack": "syncpack lint"
+  },
+  "keyVersions": {
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-router": "7.12.0",
+    "@squide/firefly": "16.2.0",
+    "@tanstack/react-query": "5.90.21",
+    "typescript": "5.9.3",
+    "turbo": "2.8.12",
+    "msw": "2.12.10",
+    "@rsbuild/core": "1.7.2",
+    "@rslib/core": "0.19.6",
+    "tailwindcss": "4.2.1",
+    "oxlint": "1.51.0",
+    "oxfmt": "0.36.0",
+    "syncpack": "14.0.0",
+    "knip": "5.86.0",
+    "size-limit": "12.0.1",
+    "agent-browser": "0.21.2"
+  },
+  "infrastructure": {
+    "hookFiles": [
+      "post-edit--format.sh",
+      "post-edit--lint.sh",
+      "post-tool-use--supervise.sh",
+      "pre-bash--enforce-pnpm.sh",
+      "pre-bash--lint-on-commit.sh",
+      "pre-bash--no-file-level-disable-on-commit.sh",
+      "pre-bash--secret-scan.sh",
+      "pre-edit--module-import-guard.sh",
+      "pre-edit--protect-files.sh",
+      "pre-tool-use--supervise.sh",
+      "session-start--repo-snapshot.sh",
+      "stop--verify-completion.sh",
+      "stop--verify-subagent.sh",
+      "subagent-start--inject-snapshot.sh"
+    ],
+    "workflows": [
+      "audit-agent-docs.yml",
+      "chromatic.yml",
+      "ci.yml",
+      "claude.yml",
+      "code-review.yml",
+      "lighthouse.yml",
+      "smoke-tests.yml"
+    ],
+    "skillCount": 14,
+    "agentDocs": {
+      "adrs": 3,
+      "odrs": 6,
+      "references": 13
+    }
+  },
+  "evaluationCriteria": {
+    "lint": "pnpm lint (oxlint + oxfmt + typecheck + syncpack + knip)",
+    "bundleJs": "500 KB gzipped (apps/host)",
+    "bundleCss": "15 KB gzipped (apps/host)",
+    "stories": "Every page and component must have a co-located .stories.tsx file",
+    "a11y": "axe-core via @storybook/addon-vitest in light + dark modes",
+    "layering": "Modules import only from @packages/*; no cross-module imports",
+    "mswOwnership": "Every module owns its own MSW handlers",
+    "ci": "secret scan → build → size-limit → oxlint → typecheck → syncpack → test"
+  }
+}

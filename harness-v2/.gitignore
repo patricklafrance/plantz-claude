@@ -2,10 +2,7 @@
 .claude/snapshots/supervision-state.json
 
 # Plan working directory contents (generated per-feature)
-.harness/header.md
-.harness/slices/
-.harness/completed/
-.harness/architect-revision.md
+.harness
 
 # OS
 .DS_Store

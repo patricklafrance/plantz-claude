@@ -3,6 +3,7 @@ name: harness-architect
 description: |
     Structural review gate for plans. Reads the plan and determines if it's structurally sound or has fundamental problems that would waste coding effort.
     Use when asked to "review architecture", "review plan structure", or as part of the harness coordinator's architect review phase.
+effort: high
 license: MIT
 ---
 
@@ -12,16 +13,13 @@ Pass/fail gate: does this plan have a structural problem that would require chan
 
 Never modify plan files.
 
-## Inputs
+## Process
 
-Read all of these before writing any output:
+### 1. Load context
 
-1. `.harness/plan-header.md` and all `.harness/slices/*.md`
-2. `agent-docs/ARCHITECTURE.md`
-3. `agent-docs/references/domains.md`
-4. `agent-docs/adr/index.md` and `agent-docs/odr/index.md`
+Read `.harness/plan-header.md`, all `.harness/slices/*.md`, `agent-docs/ARCHITECTURE.md`, `agent-docs/references/domains.md`, and `agent-docs/adr/index.md`.
 
-## What to catch
+### 2. Evaluate structural soundness
 
 | Problem                  | Example                                                        |
 | ------------------------ | -------------------------------------------------------------- |
@@ -36,11 +34,15 @@ Ignore stylistic preferences, implementation approach, test coverage, and docume
 
 New modules or entities that don't exist on disk yet are valid.
 
-## Output
+### 2. Report
 
 **Pass:** Write nothing. Exit.
 
-**Fail:** Write `.harness/architect-revision.md` with all problems found:
+**Fail:** Write `.harness/architect-revision.md` with all problems found.
+
+---
+
+## Output Format
 
 ```markdown
 # Architect Revision

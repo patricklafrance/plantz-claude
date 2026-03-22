@@ -22,7 +22,11 @@ Never edit application or library source files directly — all code changes go 
 
 1. Spawn `subagent_type: "harness-coder"` with the slice file and `mode: draft`.
 2. Spawn `subagent_type: "harness-reviewer"` pointing at the slice file.
-3. All criteria pass → rename `verification-results.md` to `verification-{slice-filename}.md` (e.g. `verification-01-user-list.md`). Slice complete. Exit.
+3. All criteria pass:
+    1. Rename `verification-results.md` to `verification-{slice-filename}.md` (e.g. `verification-01-user-list.md`).
+    2. Run `/simplify`.
+    3. Commit the slice changes (no push).
+    4. Exit.
 4. Read and save the verification content, then delete `verification-results.md`.
 5. Resume the coder via `SendMessage` with `mode: revision` and the saved verification report as `verification-results`.
 6. Go to step 2. Max 5 fix attempts, then print the unresolved failures and stop.

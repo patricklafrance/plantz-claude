@@ -3,6 +3,7 @@ name: harness-coder
 description: |
     Implement a single slice from the plan. Reads the plan header and slice file, writes code to the repo.
     Use when asked to "implement a slice", "code a slice", or as part of the harness slice-loop's coding phase.
+effort: high
 license: MIT
 ---
 

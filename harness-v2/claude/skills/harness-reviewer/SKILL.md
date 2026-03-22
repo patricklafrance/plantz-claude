@@ -3,6 +3,7 @@ name: harness-reviewer
 description: |
     Verify a slice's acceptance criteria through browser screenshots and interactions.
     Use when asked to "verify a slice", "check acceptance criteria", or as part of the harness slice-loop's verification phase.
+effort: high
 license: MIT
 ---
 

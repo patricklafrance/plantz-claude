@@ -14,13 +14,15 @@ Never edit application or library source files.
 
 ### 1. Prepare
 
-1. Working tree must be clean. If not, tell the user and stop.
+1. Working tree must be clean. If not, print the issue and stop.
 2. Delete `.harness/` if it exists.
 3. Create `.harness/` with `slices/`.
 
 ### 2. Plan loop
 
 Spawn `subagent_type: "harness-plan-loop"` with the feature description.
+
+If the plan-loop reports a failure, print the failure and stop.
 
 ### 3. Branch
 
@@ -32,7 +34,7 @@ Process each slice in `.harness/slices/` numerically.
 
 For each slice, spawn `subagent_type: "harness-slice-loop"` pointing at the slice file. Each slice commits its own changes.
 
-If the slice-loop reports a failure, stop.
+If the slice-loop reports a failure, print the failure and stop.
 
 ### 5. Wrap up
 

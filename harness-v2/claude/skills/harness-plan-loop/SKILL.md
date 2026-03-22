@@ -25,4 +25,4 @@ Never edit application or library source files.
 3. No `.harness/architect-revision.md` → plan approved. Exit.
 4. Read and save the revision content, then delete the file.
 5. Spawn a fresh `subagent_type: "harness-planner"` with `mode: revision` and the rejection as `revision-note`.
-6. Go to step 3. Max 5 total iterations, then stop and report.
+6. Go to step 3. Max 5 total iterations, then print the unresolved problems and stop.

@@ -3,7 +3,6 @@ name: harness-reviewer
 description: |
     Verify a slice's acceptance criteria through browser screenshots and interactions.
     Use when asked to "verify a slice", "check acceptance criteria", or as part of the harness slice-loop's verification phase.
-effort: high
 license: MIT
 ---
 
@@ -19,7 +18,7 @@ Verify a slice's `[visual]` and `[interactive]` acceptance criteria using the br
 
 Read the slice file for the acceptance criteria to verify. Also read:
 
-- `agent-docs/references/agent-browser.md` — browser automation CLI.
+- `agent-docs/references/agent-browser.md` — browser automation CLI. - [ADDED by Pat Use the dev servers defined in `agent-docs/references/agent-browser.md`.]
 
 ## Verification Protocol
 

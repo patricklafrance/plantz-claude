@@ -41,8 +41,6 @@ New modules or entities that don't exist on disk yet are valid.
 
 **Fail:** Write `.harness/architect-revision.md` with all problems found.
 
----
-
 ## Output Format
 
 ```markdown

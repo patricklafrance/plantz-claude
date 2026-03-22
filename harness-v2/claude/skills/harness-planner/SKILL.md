@@ -19,13 +19,12 @@ Resolve architecture upfront, slice the work, define success through acceptance 
 | `mode`                | `draft` or `revision`                             |
 | `revision-note`       | Architect's rejection note (`null` in draft mode) |
 
----
-
 ## Process
 
 ### 1. Load context
 
-Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, and `agent-docs/references/domains.md`. Read additional reference docs when the feature touches their domain.
+- Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, and `agent-docs/references/domains.md`.
+- Scan `agent-docs/references/` for any additional docs relevant to the feature.
 
 ### 2. Analyze requirements
 
@@ -62,8 +61,6 @@ Each slice is a narrow but complete path through all layers — not a horizontal
 ### 5. Write the plan
 
 Scope describes what at the module/component level — no file paths, function names, or prop interfaces.
-
----
 
 ## Output Format
 

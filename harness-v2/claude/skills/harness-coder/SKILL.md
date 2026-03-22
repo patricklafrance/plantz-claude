@@ -19,30 +19,15 @@ Implement the slice. Every React component gets matching Storybook stories.
 | `mode`                 | `draft` or `revision`                            |
 | `verification-results` | Reviewer's failure report (`null` in draft mode) |
 
----
-
 ## Process
 
 ### 1. Load context
 
-Read `.harness/plan-header.md` and the slice file.
-
-Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, and these references:
-
-- `agent-docs/references/domains.md`
-- `agent-docs/references/msw-tanstack-query.md`
-- `agent-docs/references/storybook.md`
-- `agent-docs/references/tailwind-postcss.md`
-- `agent-docs/references/agent-browser.md`
-
-Read additional references when the slice touches their domain:
-
-- `agent-docs/references/shadcn.md` — using shadcn components
-- `agent-docs/references/color-mode.md` — dark mode support
-
-Load these skills: `accessibility`, `frontend-design`, `workleap-react-best-practices`, `workleap-squide`.
-
-Load each of the following whose description matches the slice's affected packages — do not skip a skill you are unsure about: `shadcn`, `workleap-web-configs`, `workleap-logging`.
+- Read `.harness/plan-header.md`, the slice file, `agent-docs/ARCHITECTURE.md`, and `agent-docs/adr/index.md`.
+- Read references: `domains.md`, `msw-tanstack-query.md`, `storybook.md`, `tailwind-postcss.md`, `agent-browser.md`.
+- Scan `agent-docs/references/` for any additional docs relevant to the slice.
+- Load skills: `accessibility`, `frontend-design`, `workleap-react-best-practices`, `workleap-squide`.
+- Load if relevant to the slice: `shadcn`, `workleap-web-configs`, `workleap-logging`.
 
 ### 2. Scaffold
 

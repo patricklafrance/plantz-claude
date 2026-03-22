@@ -46,7 +46,12 @@ Load each of the following whose description matches the slice's affected packag
 
 ### 2. Scaffold
 
-Run any scaffolding commands listed in the plan header's `Scaffolding` section.
+If the slice scope includes scaffolding:
+
+- New domain → `/scaffold-domain`
+- New module → `/scaffold-domain-module`
+- New domain Storybook → `/scaffold-domain-storybook`
+- New shared package → create directly, use an existing `@packages/*` as reference
 
 ### 3. Implement
 

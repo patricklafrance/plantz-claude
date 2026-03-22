@@ -19,21 +19,15 @@
 
 The **host** is not a domain — it's a thin bootstrap wiring `registerShell` with domain modules.
 
+## Domain Granularity
+
+Each domain is a DDD bounded context — a distinct area of the product with its own ubiquitous language and model. Create a new domain when the feature's language and user intent don't fit any existing domain. When in doubt, prefer existing domains.
+
 ## Module Granularity
 
-**Create a new module when:**
+A module carries significant scaffolding overhead — only justified for a **cohesive feature area** whose scope encompasses multiple related views and operations, not a feature whose entire scope is a single page or form.
 
-- Distinct route or route cluster (e.g., `/management/schedules`)
-- Own data collection and API namespace (`/api/<domain>/<entity>`)
-- Independently loadable via `MODULES` env var
-
-**Keep in existing module when:**
-
-- New component/sub-view within an existing route
-- Shares the same collection and API surface
-- Splitting would create a module with no route
-
-Not every module needs a collection. `management/user` has no TanStack DB collection (simple MSW handler + session refresh). `management/household` uses direct fetch + useState. When in doubt, prefer fewer modules.
+Apply the Common Closure Principle: things that change together belong together. If two features share data bidirectionally or always evolve in lockstep, they belong in one module. When in doubt, prefer fewer modules.
 
 ## MSW Handler Ownership
 

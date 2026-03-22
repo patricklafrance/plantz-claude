@@ -37,10 +37,11 @@ If the feature is too vague to resolve durable decisions, print what's missing a
 
 ### 3. Resolve durable decisions
 
-Resolve all 6 before slicing.
+Resolve all 7 before slicing.
 
 | Decision            | What to decide                                 |
 | ------------------- | ---------------------------------------------- |
+| Domain placement    | Existing domain or new domain                  |
 | Entity placement    | Shared package (`@packages/*`) vs module-local |
 | API namespace       | `/api/<domain>/<entity>` per module            |
 | Module boundary     | New module vs extend existing                  |
@@ -79,27 +80,19 @@ All files written to `.harness/`.
 
 ## Decisions
 
-| Decision           | Choice |
-| ------------------ | ------ |
-| New modules        | ...    |
-| Extended modules   | ...    |
-| Shared pkg changes | ...    |
-| API namespaces     | ...    |
-| Routes             | ...    |
-| Collections        | ...    |
+| Decision            | Choice |
+| ------------------- | ------ |
+| New domains         | ...    |
+| New modules         | ...    |
+| New shared packages | ...    |
+| API namespaces      | ...    |
+| Routes              | ...    |
+| Collections         | ...    |
 
 ## Data Model
 
 {One line per entity, field names and types}
 {Modified entities: `EntityName += { newField? }`}
-
-## Affected Packages
-
-{Comma-separated list}
-
-## Scaffolding
-
-{`/scaffold-domain-module` commands, or "None"}
 ```
 
 ### slices/NN-{title}.md (40-80 lines each)

@@ -23,6 +23,7 @@ Read `.harness/plan-header.md`, all `.harness/slices/*.md`, `agent-docs/ARCHITEC
 
 | Problem                  | Example                                                        |
 | ------------------------ | -------------------------------------------------------------- |
+| Wrong domain placement   | Feature assigned to a domain whose mental model doesn't match  |
 | Wrong module boundary    | Extends a module when a new one is warranted (or vice versa)   |
 | Missing denormalization  | Two modules need the same data via cross-module import         |
 | Wrong entity placement   | Entity is module-local but multiple modules need it            |

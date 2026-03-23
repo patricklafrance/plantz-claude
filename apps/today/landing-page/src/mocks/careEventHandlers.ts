@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 
-import { getUserId } from "@packages/core-module/db";
+import { getUserId, usersDb } from "@packages/core-module/db";
 import { getFrequencyDays } from "@packages/core-plants";
 import type { CareEventType } from "@packages/core-plants/care-event";
 import { careEventsDb, plantsDb } from "@packages/core-plants/db";
@@ -32,7 +32,8 @@ export const todayCareEventHandlers = [
             return new HttpResponse(null, { status: 401 });
         }
 
-        const body = (await request.json()) as { plantId: string; eventType: CareEventType; notes?: string };
+        const body = (await request.json()) as { plantId: string; eventType: CareEventType; notes?: string; actorId?: string; actorName?: string };
+        const user = usersDb.getById(userId);
 
         const event = {
             id: crypto.randomUUID(),
@@ -40,6 +41,8 @@ export const todayCareEventHandlers = [
             eventType: body.eventType,
             eventDate: new Date(),
             notes: body.notes,
+            actorId: body.actorId ?? userId,
+            actorName: body.actorName ?? user?.name ?? "Unknown",
         };
 
         careEventsDb.insert(event);
@@ -51,7 +54,7 @@ export const todayCareEventHandlers = [
                 const days = getFrequencyDays(plant.wateringFrequency);
                 const next = new Date();
                 next.setDate(next.getDate() + Math.ceil(days));
-                plantsDb.update(body.plantId, { nextWateringDate: next });
+                plantsDb.update(body.plantId, { nextWateringDate: next, lastWateredByActorName: event.actorName, lastWateredDate: event.eventDate });
             }
         }
 
@@ -65,7 +68,8 @@ export const todayCareEventHandlers = [
             return new HttpResponse(null, { status: 401 });
         }
 
-        const body = (await request.json()) as { plantIds: string[]; eventType: CareEventType; notes?: string };
+        const body = (await request.json()) as { plantIds: string[]; eventType: CareEventType; notes?: string; actorId?: string; actorName?: string };
+        const user = usersDb.getById(userId);
         const events = [];
 
         for (const plantId of body.plantIds) {
@@ -75,6 +79,8 @@ export const todayCareEventHandlers = [
                 eventType: body.eventType,
                 eventDate: new Date(),
                 notes: body.notes,
+                actorId: body.actorId ?? userId,
+                actorName: body.actorName ?? user?.name ?? "Unknown",
             };
 
             careEventsDb.insert(event);
@@ -86,7 +92,7 @@ export const todayCareEventHandlers = [
                     const days = getFrequencyDays(plant.wateringFrequency);
                     const next = new Date();
                     next.setDate(next.getDate() + Math.ceil(days));
-                    plantsDb.update(plantId, { nextWateringDate: next });
+                    plantsDb.update(plantId, { nextWateringDate: next, lastWateredByActorName: event.actorName, lastWateredDate: event.eventDate });
                 }
             }
         }

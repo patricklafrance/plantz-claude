@@ -3,7 +3,7 @@ import { Droplets } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, Separator } from "@packages/components";
-import { getOptionLabel, locations, luminosities, wateringFrequencies, wateringTypes } from "@packages/core-plants";
+import { getOptionLabel, locations, luminosities, ResponsibilityBadge, SharedPlantBadge, WateredByAttribution, wateringFrequencies, wateringTypes } from "@packages/core-plants";
 import type { Plant } from "@packages/core-plants";
 
 interface PlantDetailDialogProps {
@@ -24,6 +24,13 @@ export function PlantDetailDialog({ plant, open, onOpenChange, careSection, onMa
                     <DialogTitle>{plant.name}</DialogTitle>
                 </DialogHeader>
                 <div className="flex flex-col gap-3">
+                    {(plant.householdId || plant.responsibilityUserId || plant.lastWateredByActorName) && (
+                        <div className="flex flex-wrap items-center gap-2">
+                            {plant.householdId && <SharedPlantBadge />}
+                            {plant.responsibilityUserId && <ResponsibilityBadge assigneeName={plant.responsibilityUserName ?? null} />}
+                            {plant.lastWateredByActorName && plant.lastWateredDate && <WateredByAttribution actorName={plant.lastWateredByActorName} eventDate={plant.lastWateredDate} />}
+                        </div>
+                    )}
                     {plant.description && (
                         <div className="flex flex-col gap-1">
                             <span className="text-muted-foreground text-xs font-medium">Description</span>

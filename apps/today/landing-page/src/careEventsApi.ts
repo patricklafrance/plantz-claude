@@ -1,4 +1,4 @@
-import { getAuthHeaders } from "@packages/core-module";
+import { getAuthHeaders, getCurrentUserId } from "@packages/core-module";
 import { careEventSchema } from "@packages/core-plants/care-event";
 import type { CareEvent, CareEventType } from "@packages/core-plants/care-event";
 
@@ -16,14 +16,14 @@ export async function fetchCareEvents(plantId: string): Promise<CareEvent[]> {
     return data.map((item) => careEventSchema.parse(item));
 }
 
-export async function createCareEvent(plantId: string, eventType: CareEventType, notes?: string): Promise<CareEvent> {
+export async function createCareEvent(plantId: string, eventType: CareEventType, notes?: string, actorName?: string): Promise<CareEvent> {
     const response = await fetch("/api/today/care-events", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             ...getAuthHeaders(),
         },
-        body: JSON.stringify({ plantId, eventType, notes }),
+        body: JSON.stringify({ plantId, eventType, notes, actorId: getCurrentUserId(), actorName }),
     });
 
     if (!response.ok) {
@@ -35,14 +35,14 @@ export async function createCareEvent(plantId: string, eventType: CareEventType,
     return careEventSchema.parse(data);
 }
 
-export async function createBulkCareEvents(plantIds: string[], eventType: CareEventType, notes?: string): Promise<CareEvent[]> {
+export async function createBulkCareEvents(plantIds: string[], eventType: CareEventType, notes?: string, actorName?: string): Promise<CareEvent[]> {
     const response = await fetch("/api/today/care-events/bulk", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             ...getAuthHeaders(),
         },
-        body: JSON.stringify({ plantIds, eventType, notes }),
+        body: JSON.stringify({ plantIds, eventType, notes, actorId: getCurrentUserId(), actorName }),
     });
 
     if (!response.ok) {

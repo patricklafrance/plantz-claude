@@ -12,3 +12,6 @@ export { CareEventBadge } from "./CareEventBadge.tsx";
 export { CareInsightsSummary } from "./CareInsightsSummary.tsx";
 export { AdjustmentSuggestionCard } from "./AdjustmentSuggestionCard.tsx";
 export { AdjustmentHistoryList } from "./AdjustmentHistoryList.tsx";
+export { SharedPlantBadge } from "./SharedPlantBadge.tsx";
+export { ResponsibilityBadge } from "./ResponsibilityBadge.tsx";
+export { WateredByAttribution } from "./WateredByAttribution.tsx";

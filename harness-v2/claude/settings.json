@@ -1,0 +1,70 @@
+{
+    "$schema": "https://json.schemastore.org/claude-code-settings.json",
+    "permissions": {
+        "defaultMode": "bypassPermissions",
+        "allow": ["Edit(.claude/**)", "Write(.claude/**)"]
+    },
+    "hooks": {
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash .claude/hooks/session-start--repo-snapshot.sh",
+                        "timeout": 10000
+                    }
+                ]
+            }
+        ],
+        "PreToolUse": [
+            {
+                "matcher": "Bash",
+                "hooks": [
+                    { "type": "command", "command": "bash .claude/hooks/pre-bash--lint-on-commit.sh" },
+                    { "type": "command", "command": "bash .claude/hooks/pre-bash--no-file-level-disable-on-commit.sh" },
+                    { "type": "command", "command": "bash .claude/hooks/pre-bash--enforce-pnpm.sh" },
+                    { "type": "command", "command": "bash .claude/hooks/pre-bash--secret-scan.sh" }
+                ]
+            },
+            {
+                "matcher": "Edit|Write",
+                "hooks": [
+                    { "type": "command", "command": "bash .claude/hooks/pre-edit--protect-files.sh" },
+                    { "type": "command", "command": "bash .claude/hooks/pre-edit--module-import-guard.sh" }
+                ]
+            },
+            {
+                "matcher": "Edit|Write|Bash",
+                "hooks": [{ "type": "command", "command": "bash .claude/hooks/pre-tool-use--supervise.sh", "timeout": 5000 }]
+            }
+        ],
+        "Stop": [
+            {
+                "hooks": [{ "type": "command", "command": "bash .claude/hooks/stop--verify-completion.sh", "timeout": 120000 }]
+            }
+        ],
+        "SubagentStart": [
+            {
+                "hooks": [{ "type": "command", "command": "bash .claude/hooks/subagent-start--inject-snapshot.sh", "timeout": 5000 }]
+            }
+        ],
+        "SubagentStop": [
+            {
+                "hooks": [{ "type": "command", "command": "bash .claude/hooks/stop--verify-subagent.sh", "timeout": 30000 }]
+            }
+        ],
+        "PostToolUse": [
+            {
+                "matcher": "Edit|Write",
+                "hooks": [
+                    { "type": "command", "command": "bash .claude/hooks/post-edit--format.sh" },
+                    { "type": "command", "command": "bash .claude/hooks/post-edit--lint.sh" }
+                ]
+            },
+            {
+                "matcher": "Edit|Write|Bash",
+                "hooks": [{ "type": "command", "command": "bash .claude/hooks/post-tool-use--supervise.sh", "timeout": 5000 }]
+            }
+        ]
+    }
+}

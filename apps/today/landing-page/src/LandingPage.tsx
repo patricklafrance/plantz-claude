@@ -4,6 +4,7 @@ import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import { useState, useRef, useMemo, useCallback } from "react";
 
 import { Button } from "@packages/components";
+import { useSession } from "@packages/core-module";
 import { applyPlantFilters, FilterBar, isDueForWatering, PlantListHeader, PlantListItem, usePlantFilters } from "@packages/core-plants";
 import type { Plant } from "@packages/core-plants";
 
@@ -13,10 +14,14 @@ import { PlantDetailDialog } from "./PlantDetailDialog.tsx";
 import { useTodayPlantsCollection } from "./TodayPlantsContext.tsx";
 import { VacationPlanBanner } from "./VacationPlanBanner.tsx";
 
+type TaskFilter = "all" | "mine" | "others";
+
 export function LandingPage() {
+    const session = useSession();
     const { filters, updateFilter, clearFilters, hasActiveFilters } = usePlantFilters();
     const [detailPlant, setDetailPlant] = useState<Plant | null>(null);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const [taskFilter, setTaskFilter] = useState<TaskFilter>("all");
     const listRef = useRef<HTMLDivElement>(null);
     const queryClient = useQueryClient();
 
@@ -29,9 +34,20 @@ export function LandingPage() {
         // First sort by name, then filter to only plants due for watering, then apply user filters
         const sorted = allPlants.toSorted((a, b) => a.name.localeCompare(b.name));
         const duePlants = sorted.filter((p) => isDueForWatering(p));
+        const filtered = applyPlantFilters(duePlants, filters);
 
-        return applyPlantFilters(duePlants, filters);
-    }, [allPlants, filters]);
+        // Apply task assignment filter
+        if (taskFilter === "all" || !session?.id) return filtered;
+
+        return filtered.filter((p) => {
+            if (taskFilter === "mine") {
+                return !p.responsibilityUserId || p.responsibilityUserId === session.id;
+            }
+
+            // "others"
+            return p.responsibilityUserId && p.responsibilityUserId !== session.id;
+        });
+    }, [allPlants, filters, taskFilter, session?.id]);
 
     const virtualizer = useWindowVirtualizer({
         count: plants.length,
@@ -128,6 +144,14 @@ export function LandingPage() {
             </div>
 
             <VacationPlanBanner />
+
+            <div className="flex items-center gap-1" role="group" aria-label="Task assignment filter">
+                {(["all", "mine", "others"] as const).map((filter) => (
+                    <Button key={filter} variant={taskFilter === filter ? "default" : "outline"} size="xs" aria-pressed={taskFilter === filter} onClick={() => setTaskFilter(filter)}>
+                        {filter === "all" ? "All" : filter === "mine" ? "My tasks" : "Others"}
+                    </Button>
+                ))}
+            </div>
 
             <FilterBar filters={filters} onFilterChange={updateFilter} onClear={clearFilters} hasActiveFilters={hasActiveFilters} showDueForWatering={false} />
 

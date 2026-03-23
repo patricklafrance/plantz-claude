@@ -16,10 +16,10 @@ If the feature doesn't fit an existing domain, that's a signal to discuss a new 
 
 ## Domains
 
-| Domain         | Mental model                                          | Existing modules                                                                                  |
-| -------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| **management** | Admin and configuration — set things up               | `management/plants` (plant CRUD), `management/user` (profile editing)                             |
-| **today**      | Daily care dashboard — what needs attention right now | `today/landing-page` (daily watering overview), `today/vacation-planner` (vacation care planning) |
+| Domain         | Mental model                                          | Existing modules                                                                                                                   |
+| -------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **management** | Admin and configuration — set things up               | `management/plants` (plant CRUD), `management/user` (profile editing), `management/household` (household setup, member management) |
+| **today**      | Daily care dashboard — what needs attention right now | `today/landing-page` (daily watering overview), `today/vacation-planner` (vacation care planning)                                  |
 
 The **host** (`apps/host/`) is not a domain. It is a thin bootstrap layer that wires `registerShell` (from `@packages/core-module/shell`) with domain modules. Shell components and auth handlers live in core-module, not the host.
 
@@ -39,7 +39,7 @@ A **module** = a Squide registration function that owns routes, an optional coll
 - It shares the same collection and API surface
 - Splitting it would create a module with no route of its own
 
-Not every module needs a collection or data layer. `management/user` has no TanStack DB collection — it owns a simple MSW handler for `PUT /api/management/user/profile` and refreshes the session query after updates.
+Not every module needs a collection or data layer. `management/user` has no TanStack DB collection — it owns a simple MSW handler for `PUT /api/management/user/profile` and refreshes the session query after updates. `management/household` also has no TanStack DB collection — it uses direct fetch + `useState` for its single-page CRUD UI.
 
 When in doubt, prefer adding to an existing module. Too many small modules fragment the codebase and make navigation harder. Only split when the criteria above are clearly met.
 
@@ -47,7 +47,7 @@ When in doubt, prefer adding to an existing module. Too many small modules fragm
 
 Every module must register its own MSW handlers for the API endpoints it uses. A module must never rely on the host or another module for its MSW handlers — even if the handler logic duplicates code elsewhere. Handlers live in the module's `src/mocks/` folder. The host only owns handlers for cross-cutting auth endpoints (`/api/auth/login`, `/api/auth/logout`, `/api/auth/session`). Module endpoints follow the `/api/<domain>/<entity>` pattern (e.g., `/api/management/plants`, `/api/today/plants`, `/api/management/user/profile`).
 
-Handlers share state through DB singletons imported from shared packages (`usersDb` from `@packages/core-module/db`, `plantsDb` from `@packages/core-plants/db`). Duplication applies to the handler registration, not the underlying data store.
+Handlers share state through DB singletons imported from shared packages (`usersDb` and `householdDb` from `@packages/core-module/db`, `plantsDb` from `@packages/core-plants/db`). Duplication applies to the handler registration, not the underlying data store.
 
 This is a hard rule. Without it, modules are not independently loadable via the `MODULES` env var and Storybook stories cannot work in isolation.
 

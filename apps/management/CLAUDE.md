@@ -26,12 +26,11 @@ Story globs in `.storybook/main.ts` must include every module in this domain. Wh
 
 ## Data Layer
 
-Modules in this domain own their API surface under `/api/management/`. Each module has:
+Modules in this domain own their API surface under `/api/management/`. Each module has `src/mocks/` with MSW handlers scoped to `/api/management/<entity>`.
 
-- `src/plantsCollection.ts` — TanStack DB collection factory (`createManagementPlantsCollection`) called during registration + optimistic actions via `createOptimisticAction`. The collection is provided to components via `ManagementPlantsCollectionProvider` React Context.
-- `src/mocks/` — MSW handlers scoped to `/api/management/<entity>`
+**Collection-based modules** (e.g., `management/plants`): `src/plantsCollection.ts` — TanStack DB collection factory called during registration + optimistic actions via `createOptimisticAction`. The collection is provided to components via React Context. Components read with `useLiveQuery` and write with actions from `createManagementPlantActions`.
 
-Components read with `useLiveQuery` and write with actions from `createManagementPlantActions`. No `api/` folder — the collection handles data fetching internally via `queryCollectionOptions`.
+**Simple CRUD modules** (e.g., `management/household`, `management/user`): No TanStack DB collection — use direct fetch + `useState` for single-page UIs that don't need reactive live queries or cross-component data sharing.
 
 See `msw-tanstack-query.md` in `.claude/skills/plantz-adlc-*/references/` for implementation patterns.
 

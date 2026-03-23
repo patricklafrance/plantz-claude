@@ -1,26 +1,49 @@
 import { useLiveQuery } from "@tanstack/react-db";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
-import { Plus } from "lucide-react";
-import { useState, useRef, useMemo, useCallback } from "react";
+import { Plus, Share2 } from "lucide-react";
+import { useState, useRef, useMemo, useCallback, useEffect } from "react";
 
 import { Button } from "@packages/components";
+import { useSession } from "@packages/core-module";
+import type { HouseholdMember } from "@packages/core-module";
 import { applyPlantFilters, DeleteConfirmDialog, FilterBar, PlantListHeader, PlantListItem, usePlantFilters } from "@packages/core-plants";
 import type { Plant } from "@packages/core-plants";
 
 import { createBulkCareEvents, createCareEvent } from "./careEventsApi.ts";
 import { CreatePlantDialog } from "./CreatePlantDialog.tsx";
 import { EditPlantDialog } from "./EditPlantDialog.tsx";
+import { fetchUserHouseholdsWithMembers } from "./householdsApi.ts";
 import { useManagementPlantsCollection } from "./ManagementPlantsContext.tsx";
 import { createManagementPlantActions } from "./plantsCollection.ts";
+import { SharePlantDialog } from "./SharePlantDialog.tsx";
 
 export function PlantsPage() {
+    const session = useSession();
     const { filters, updateFilter, clearFilters, hasActiveFilters } = usePlantFilters();
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [createOpen, setCreateOpen] = useState(false);
     const [editPlant, setEditPlant] = useState<Plant | null>(null);
     const [editOpen, setEditOpen] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState<Plant[] | null>(null);
+    const [sharePlant, setSharePlant] = useState<Plant | null>(null);
+    const [shareOpen, setShareOpen] = useState(false);
+    const [householdData, setHouseholdData] = useState<{ households: Array<{ id: string; name: string }>; members: HouseholdMember[] }>({ households: [], members: [] });
     const listRef = useRef<HTMLDivElement>(null);
+
+    const households = session?.households;
+    const hasHouseholds = (households?.length ?? 0) > 0;
+
+    // Serialize household IDs to a stable string so the effect does not re-fire
+    // when the session object gets a new array reference with the same contents.
+    const householdIdsKey = households?.map((h) => h.id).join(",") ?? "";
+
+    useEffect(() => {
+        if (households && households.length > 0) {
+            fetchUserHouseholdsWithMembers(households)
+                .then(setHouseholdData)
+                .catch(() => {});
+        }
+    }, [householdIdsKey]); // eslint-disable-line react-hooks/exhaustive-deps -- intentionally stable key
 
     const collection = useManagementPlantsCollection();
     const actions = useMemo(() => createManagementPlantActions(collection), [collection]);
@@ -111,6 +134,25 @@ export function PlantsPage() {
         if (!open) setDeleteTarget(null);
     }, []);
 
+    const handleOpenShare = useCallback((plant: Plant) => {
+        setSharePlant(plant);
+        setShareOpen(true);
+    }, []);
+
+    const handleShare = useCallback(
+        (plantId: string, householdId: string, responsibilityUserId: string | null) => {
+            actions.updatePlant({
+                id: plantId,
+                householdId,
+                responsibilityUserId: responsibilityUserId ?? undefined,
+                responsibilityUserName: responsibilityUserId ? householdData.members.find((m) => m.userId === responsibilityUserId)?.userName : undefined,
+            });
+            setShareOpen(false);
+            setSharePlant(null);
+        },
+        [actions, householdData.members],
+    );
+
     const handleMarkWatered = useCallback(
         async (plant: Plant) => {
             try {
@@ -180,6 +222,19 @@ export function PlantsPage() {
                     <Button variant="default" size="xs" onClick={handleBulkMarkWatered}>
                         Mark selected as Watered
                     </Button>
+                    {hasHouseholds && selectedCount === 1 && (
+                        <Button
+                            variant="outline"
+                            size="xs"
+                            onClick={() => {
+                                const plant = plants.find((p) => selectedIds.has(p.id));
+                                if (plant) handleOpenShare(plant);
+                            }}
+                        >
+                            <Share2 data-icon="inline-start" />
+                            Share to Household
+                        </Button>
+                    )}
                     <Button variant="destructive" size="xs" onClick={handleBulkDelete}>
                         Delete selected
                     </Button>
@@ -216,6 +271,7 @@ export function PlantsPage() {
             <CreatePlantDialog open={createOpen} onOpenChange={setCreateOpen} />
             <EditPlantDialog plant={editPlant} open={editOpen} onOpenChange={setEditOpen} onDelete={handleEditFromDialog} onMarkWatered={handleMarkWatered} />
             <DeleteConfirmDialog open={deleteTarget !== null} onOpenChange={handleDeleteDialogOpenChange} plantNames={deleteTargetNames} onConfirm={confirmDelete} />
+            {hasHouseholds && <SharePlantDialog open={shareOpen} onOpenChange={setShareOpen} plant={sharePlant} households={householdData.households} members={householdData.members} onShare={handleShare} />}
         </div>
     );
 }

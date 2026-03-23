@@ -1,0 +1,12 @@
+# Supervision state (transient)
+.claude/snapshots/supervision-state.json
+
+# Plan working directory contents (generated per-feature)
+.harness
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/

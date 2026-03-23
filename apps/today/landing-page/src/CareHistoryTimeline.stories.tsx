@@ -77,3 +77,24 @@ export const LongHistory: Story = {
         }),
     },
 };
+
+export const WithMultipleActors: Story = {
+    args: {
+        events: [
+            makeCareEvent({ eventDate: new Date(2024, 6, 15), eventType: "watered", actorId: "user-alice", actorName: "Alice" }),
+            makeCareEvent({ eventDate: new Date(2024, 6, 10), eventType: "watered", actorId: "user-bob", actorName: "Bob", notes: "Soil was very dry" }),
+            makeCareEvent({ eventDate: new Date(2024, 6, 5), eventType: "skipped", actorId: "user-alice", actorName: "Alice" }),
+            makeCareEvent({ eventDate: new Date(2024, 5, 28), eventType: "watered", actorId: "user-bob", actorName: "Bob" }),
+        ],
+    },
+};
+
+export const SingleActor: Story = {
+    args: {
+        events: [
+            makeCareEvent({ eventDate: new Date(2024, 6, 15), eventType: "watered", actorId: "user-alice", actorName: "Alice" }),
+            makeCareEvent({ eventDate: new Date(2024, 6, 10), eventType: "watered", actorId: "user-alice", actorName: "Alice" }),
+            makeCareEvent({ eventDate: new Date(2024, 6, 5), eventType: "skipped", actorId: "user-alice", actorName: "Alice" }),
+        ],
+    },
+};

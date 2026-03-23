@@ -1,0 +1,1 @@
+{"version":1,"window":[{"tool":"Bash","target":"git diff knip.json","ts":1774059604295},{"tool":"Bash","target":"git checkout -- .claude/settings.json .gitignore knip.json","ts":1774059615893}]}

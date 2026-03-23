@@ -24,31 +24,30 @@ Resolve architecture upfront, slice the work, define success through acceptance 
 ### 1. Load context
 
 - Read `agent-docs/ARCHITECTURE.md`, `agent-docs/adr/index.md`, and `agent-docs/references/domains.md`.
+- Read `.harness/domain-mapping.md`. The Mapping table tells you which features go to which modules and packages — carry these decisions forward, don't re-derive them.
 - Scan `agent-docs/references/` for any additional docs relevant to the feature.
 
 ### 2. Analyze requirements
 
-**Draft:** Determine which domains, modules, and packages the feature affects.
-
-**Revision:** Read the existing plan in `.harness/`. The rejection note is in the `revision-note` input. Revise only what was flagged.
-
-If the feature is too vague to resolve durable decisions, print what's missing and stop.
+- **Draft:** Determine which domains, modules, and packages the feature affects.
+- **Revision:** Read the existing plan in `.harness/`. The rejection note is in the `revision-note` input. Revise only what was flagged.
+- If the feature is too vague to resolve durable decisions, print what's missing and stop.
 
 ### 3. Resolve durable decisions
 
-Resolve all 7 before slicing.
+Resolve all 7 before slicing. The first three (Domains, Modules, Shared packages) come from the domain mapping — carry them forward, don't re-derive them.
 
-| Decision            | What to decide                                 |
-| ------------------- | ---------------------------------------------- |
-| Domain placement    | Existing domain or new domain                  |
-| Entity placement    | Shared package (`@packages/*`) vs module-local |
-| API namespace       | `/api/<domain>/<entity>` per module            |
-| Module boundary     | New module vs extend existing                  |
-| Data model shape    | Entity definitions — field names and types     |
-| Collection strategy | TanStack DB collection vs fetch+useState       |
-| Route structure     | Paths registered with Squide                   |
+| Decision            | What to decide                             |
+| ------------------- | ------------------------------------------ |
+| Domains             | Which domains are affected and how         |
+| Modules             | Which modules are affected and how         |
+| Shared packages     | Which `@packages/*` are affected and how   |
+| API namespace       | `/api/<domain>/<entity>` per module        |
+| Data model shape    | Entity definitions — field names and types |
+| Collection strategy | TanStack DB collection vs fetch+useState   |
+| Route structure     | Paths registered with Squide               |
 
-Follow the module granularity criteria and package boundaries defined in `agent-docs/references/domains.md`.
+Follow the module isolation rule in `agent-docs/references/domains.md`.
 
 ### 4. Slice into vertical tracer bullets
 
@@ -68,6 +67,8 @@ All files written to `.harness/`.
 
 ### plan-header.md (under 40 lines)
 
+<plan-header-template>
+
 ```markdown
 # Plan: {Feature Name}
 
@@ -77,14 +78,14 @@ All files written to `.harness/`.
 
 ## Decisions
 
-| Decision            | Choice |
-| ------------------- | ------ |
-| New domains         | ...    |
-| New modules         | ...    |
-| New shared packages | ...    |
-| API namespaces      | ...    |
-| Routes              | ...    |
-| Collections         | ...    |
+| Decision        | Choice |
+| --------------- | ------ |
+| Domains         | ...    |
+| Modules         | ...    |
+| Shared packages | ...    |
+| API namespaces  | ...    |
+| Routes          | ...    |
+| Collections     | ...    |
 
 ## Data Model
 
@@ -92,7 +93,11 @@ All files written to `.harness/`.
 {Modified entities: `EntityName += { newField? }`}
 ```
 
+</plan-header-template>
+
 ### slices/NN-{title}.md (40-80 lines each)
+
+<slice-template>
 
 ```markdown
 # Slice {N}: {Title}
@@ -128,3 +133,5 @@ Be specific. Two tags only:
 - [ ] {Mutation action} -> {loading state on trigger element}
 - [ ] {After mutation} -> {UI consequence}
 ```
+
+</slice-template>

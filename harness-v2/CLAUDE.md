@@ -34,7 +34,6 @@ One feature at a time. The coordinator cleans `.harness/` before starting. Never
 
 ### References
 
-- [references/browser-verification.md](agent-docs/references/browser-verification.md) — browser verification protocol
 - [references/domains.md](agent-docs/references/domains.md) — domain responsibilities, module granularity
 - [references/msw-tanstack-query.md](agent-docs/references/msw-tanstack-query.md) — data layer patterns
 - [references/storybook.md](agent-docs/references/storybook.md) — Storybook conventions

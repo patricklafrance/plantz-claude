@@ -57,12 +57,12 @@ plantz-claude/
 
 See [ADR-0001](adr/0001-squide-local-modules.md) for rationale.
 
-## Domain isolation
+## Domain Storybooks
 
-Two domain areas, each with independent Storybooks and Chromatic tokens:
+Two domains, each with independent Storybooks and Chromatic tokens:
 
-- **management** — Management features (`apps/management/`)
-- **today** — Daily watering view (`apps/today/`)
+- **management** — Admin and configuration (`apps/management/`)
+- **today** — Daily care dashboard (`apps/today/`)
 
 A packages-layer Storybook (`packages/storybook/`, `@apps/packages-storybook`) is purely a runner for shared package stories — it contains no exported utilities. Storybook infrastructure (MSW via `msw-storybook-addon`, Squide runtime via a `firefly.tsx` in each domain storybook app, collection context) is configured per-domain in each module's `storybook.setup.tsx`. A unified Storybook (`apps/storybook/`) aggregates all stories across the entire repo and is the sole target for browser verification (`pnpm dev-storybook`). Domain storybooks are used for Chromatic visual regression, a11y tests, and developer workflow.
 

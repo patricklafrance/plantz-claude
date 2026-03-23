@@ -27,23 +27,13 @@ Implement the slice. Every React component gets matching Storybook stories.
 - Read references: `domains.md`, `msw-tanstack-query.md`, `storybook.md`, `tailwind-postcss.md`, `agent-browser.md`.
 - Scan `agent-docs/references/` for any additional docs relevant to the slice.
 - Load skills: `accessibility`, `frontend-design`, `workleap-react-best-practices`, `workleap-squide`.
-- Load if relevant to the slice: `shadcn`, `workleap-web-configs`, `workleap-logging`.
+- Load if relevant to the slice: `shadcn`, `workleap-web-configs`, `workleap-logging`, `scaffold-domain`, `scaffold-domain-module`, `scaffold-domain-storybook`.
 
-### 2. Scaffold
-
-If the slice scope includes scaffolding:
-
-- New domain → `/scaffold-domain`
-- New module → `/scaffold-domain-module`
-- New domain Storybook → `/scaffold-domain-storybook`
-- New shared package → create directly, use an existing `@packages/*` as reference
-
-### 3. Implement
+### 2. Implement
 
 Code with a browser open — validate as you go. Use the dev servers defined in `agent-docs/references/agent-browser.md`.
 
-**Draft:** Implement the slice scope to fulfill its acceptance criteria.
-
-**Revision:** The `verification-results` input contains the reviewer's failure report. Fix only what failed.
-
-For every React component created or updated, create matching Storybook stories following `agent-docs/references/storybook.md`. Every `[visual]` and `[interactive]` acceptance criterion in the slice must have a corresponding story.
+- **Draft:** Implement the slice scope to fulfill its acceptance criteria.
+- **Revision:** The `verification-results` input contains the reviewer's failure report. Fix only what failed.
+- Every module owns its complete data layer — no partial data layers. Follow `agent-docs/references/msw-tanstack-query.md`.
+- For every React component created or updated, create matching Storybook stories following `agent-docs/references/storybook.md`. Every `[visual]` and `[interactive]` acceptance criterion must have a corresponding story.

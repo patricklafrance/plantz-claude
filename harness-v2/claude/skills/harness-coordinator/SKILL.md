@@ -18,17 +18,23 @@ Never edit application or library source files.
 2. Delete `.harness/` if it exists.
 3. Create `.harness/` with `slices/`.
 
-### 2. Plan loop
+### 2. Domain mapping
+
+Spawn `subagent_type: "harness-domain-mapper"` with the feature description.
+
+The domain mapper analyzes which modules and domains the feature affects, producing `.harness/domain-mapping.md`. This runs before planning so the planner has module placement decisions to carry forward rather than re-derive.
+
+### 3. Plan loop
 
 Spawn `subagent_type: "harness-plan-loop"` with the feature description.
 
 If the plan-loop reports a failure, print the failure and stop.
 
-### 3. Branch
+### 4. Branch
 
 Pull `main` and create `{type}/{short-description}`. Do not push.
 
-### 4. Slice loop
+### 5. Slice loop
 
 Process each slice in `.harness/slices/` numerically.
 
@@ -36,6 +42,12 @@ For each slice, spawn `subagent_type: "harness-slice-loop"` pointing at the slic
 
 If the slice-loop reports a failure, print the failure and stop.
 
-### 5. Wrap up
+### 6. Doc phase
+
+Spawn `subagent_type: "harness-documenter"` with the domain mapping and domain reference doc paths.
+
+The documenter updates module scope descriptions in the domain reference doc to reflect what modules now encompass. This builds institutional memory that improves the next domain mapping.
+
+### 7. Wrap up
 
 Present slices completed and verifications passed. Wait for user confirmation before pushing.

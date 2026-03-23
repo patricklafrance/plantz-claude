@@ -29,4 +29,6 @@ Read the slice file for the acceptance criteria to verify. Also read:
 
 Write results to `.harness/verification-results.md` with each criterion marked pass or fail and a brief explanation for failures.
 
+Use a 1280px viewport for all screenshots (matches Chromatic desktop mode). For dark mode criteria, toggle the `dark` class on `document.documentElement`, wait 200ms, screenshot, toggle back.
+
 Kill processes on ports 8080 and 6006 before exiting.

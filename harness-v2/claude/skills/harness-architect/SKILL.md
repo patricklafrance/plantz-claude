@@ -17,31 +17,34 @@ Never modify plan files.
 
 ### 1. Load context
 
-Read `.harness/plan-header.md`, all `.harness/slices/*.md`, `agent-docs/ARCHITECTURE.md`, `agent-docs/references/domains.md`, and `agent-docs/adr/index.md`.
+Read `.harness/plan-header.md`, all `.harness/slices/*.md`, `.harness/domain-mapping.md`, `agent-docs/ARCHITECTURE.md`, `agent-docs/references/domains.md`, and `agent-docs/adr/index.md`.
 
 ### 2. Evaluate structural soundness
 
-| Problem                  | Example                                                        |
-| ------------------------ | -------------------------------------------------------------- |
-| Wrong domain placement   | Feature assigned to a domain whose mental model doesn't match  |
-| Wrong module boundary    | Extends a module when a new one is warranted (or vice versa)   |
-| Missing denormalization  | Two modules need the same data via cross-module import         |
-| Wrong entity placement   | Entity is module-local but multiple modules need it            |
-| API namespace collision  | Two modules claim the same endpoint prefix                     |
-| Route conflict           | Routes collide or violate domain path hierarchy                |
-| Weak acceptance criteria | Vague criteria or missing mutation companions across 2+ slices |
+| Problem                      | Example                                                                     |
+| ---------------------------- | --------------------------------------------------------------------------- |
+| Wrong domain placement       | Feature assigned to a domain whose mental model doesn't match               |
+| Wrong module boundary        | Extends a module when a new one is warranted (or vice versa)                |
+| Domain mapping contradiction | Plan assigns a concern to a different module than the domain mapper decided |
+| Missing denormalization      | Two modules need the same data via cross-module import                      |
+| Wrong entity placement       | Entity is module-local but multiple modules need it                         |
+| API namespace collision      | Two modules claim the same endpoint prefix                                  |
+| Route conflict               | Routes collide or violate domain path hierarchy                             |
+| Weak acceptance criteria     | Vague criteria or missing mutation companions across 2+ slices              |
 
 Ignore stylistic preferences, implementation approach, test coverage, and documentation.
 
 New modules or entities that don't exist on disk yet are valid.
 
-### 2. Report
+### 3. Report
 
 **Pass:** Write nothing. Exit.
 
 **Fail:** Write `.harness/architect-revision.md` with all problems found.
 
 ## Output Format
+
+<revision-template>
 
 ```markdown
 # Architect Revision
@@ -59,7 +62,11 @@ New modules or entities that don't exist on disk yet are valid.
 {What the planner must fix}
 ```
 
+</revision-template>
+
 ### Example
+
+<revision-example>
 
 ```markdown
 # Architect Revision
@@ -77,3 +84,5 @@ New modules or entities that don't exist on disk yet are valid.
 
 Move order types to `@packages/core-orders`. Update header "Shared pkg changes."
 ```
+
+</revision-example>

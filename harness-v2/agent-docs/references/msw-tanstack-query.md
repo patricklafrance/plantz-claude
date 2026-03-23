@@ -21,14 +21,6 @@ const collection = createPlantsCollection({
 });
 ```
 
-## Per-Module Collections
-
-Each module has a `plantsCollection.ts` with a factory function:
-
-- **Management** (`apps/management/plants/src/plantsCollection.ts`): `createManagementPlantsCollection(queryClient)` + `createManagementPlantActions(collection)` → `{ insertPlant, updatePlant, deletePlant, deletePlants }`
-- **Today Landing** (`apps/today/landing-page/src/plantsCollection.ts`): `createTodayPlantsCollection(queryClient)`
-- **Today Vacation** (`apps/today/vacation-planner/src/plantsCollection.ts`): `createTodayVacationPlantsCollection(queryClient)` — read-only, no optimistic actions
-
 ## Optimistic Mutations
 
 `createOptimisticAction` returns a `Transaction`, not a `Promise`. Use `tx.isPersisted.promise` for async callbacks.
@@ -66,22 +58,9 @@ export async function registerManagementPlants(runtime: FireflyRuntime, queryCli
 }
 ```
 
-## Shared DB Subpath Exports
-
-**`@packages/core-plants/db`:** `plantsDb`, `defaultSeedPlants` (~250 plants), `generatePlants(count?)`
-
-**`@packages/core-module/db`:** `householdDb` (households, members, invitations), `defaultSeedHouseholds`, `defaultSeedHouseholdMembers`, `DEFAULT_HOUSEHOLD_ID = "household-1"`, `usersDb`, `getUserId(request)`
-
-Care event types/schemas/utilities via `@packages/core-plants/care-event`. Module-local DBs (e.g., `careEventsDb`, `adjustmentsDb` in today-landing-page) stay in the module's `src/mocks/` folder.
-
 ## Module-Specific Handlers
 
-Each module defines handlers in `src/mocks/`. Endpoints follow `/api/<domain>/<entity>`:
-
-- **Management Plants:** `managementPlantHandlers` (8 routes at `/api/management/plants`), `managementCareEventHandlers` (3 routes at `/api/management/care-events`)
-- **Management Household:** `managementHouseholdHandlers` (11 routes at `/api/management/household`)
-- **Today Landing:** `todayPlantHandlers` (3 routes at `/api/today/plants`), `todayCareEventHandlers` (3 routes at `/api/today/care-events`), `todayAdjustmentHandlers` (4 routes at `/api/today/adjustments`)
-- **Today Vacation:** `todayVacationPlannerHandlers` (5 routes at `/api/today/vacation-planner/`)
+Every module registers its own MSW handlers in `src/mocks/`. Never rely on another module's handlers. The host only owns `/api/auth/*`. Module endpoints follow `/api/<domain>/<entity>`. Handlers share state through shared DB singletons (`plantsDb`, `householdDb`, `usersDb`), not through shared handler code. This is a hard rule — without it, modules aren't independently loadable and Storybook stories break.
 
 ## Storybook Setup
 
@@ -93,7 +72,3 @@ Each domain has a `storybook.setup.tsx` providing two decorators:
 - `collectionDecorator` — fresh `QueryClient` + collection context per story
 
 Story files: `decorators: [collectionDecorator, fireflyDecorator]`, `parameters: { msw: { handlers: [...] } }`. Per-story overrides via `parameters.msw.handlers`. Use `delay("infinite")` for loading states. The packages storybook needs none of this (presentational only).
-
-## Seed Data
-
-The host seeds `plantsDb` (~250 plants) and `householdDb` (one household, two members) before `initializeFirefly`. Today-landing-page also seeds `careEventsDb` and `adjustmentsDb`. Stories use per-story MSW handler overrides with `makePlant()` / `makeCareEvent()` / `makeAdjustmentRecommendation()` / `makeAdjustmentEvent()` helpers.

@@ -44,3 +44,7 @@ Orchestrate end-to-end feature development. Never edit application or library so
 ### 7. PR
 
 - Spawn `subagent_type: "harness-pr"` with the feature description.
+
+### 8. Monitor
+
+- Spawn `subagent_type: "harness-monitor"` with the PR number returned by the previous step.

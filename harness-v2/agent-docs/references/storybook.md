@@ -42,11 +42,27 @@ Each domain storybook's `.storybook/storybook.css` must include `@source` direct
 - Extract presentational sub-components (dialogs, cards, sections) so they can be tested with a lighter decorator stack or none at all.
 - `packages/components/` stories use no decorators — purely prop-driven. No MSW, collections, or QueryClient.
 
+## A11y Test Suppression
+
+A11y tests run via `addon-a11y` + `addon-vitest` (`pnpm test` in domain storybooks). To suppress a rule for a specific story or all stories in a file, use `parameters.a11y.config.rules` in the story or meta:
+
+```ts
+// Suppress for all stories in the file
+const meta = {
+    parameters: { a11y: { config: { rules: [{ id: "color-contrast", enabled: false }] } } },
+};
+
+// Suppress for a single story
+export const Example: Story = {
+    parameters: { a11y: { config: { rules: [{ id: "color-contrast", enabled: false }] } } },
+};
+```
+
+Same suppression policy as static analysis — fix the code first, suppress only for genuine false positives.
+
 ## Storybook Roles
 
 | Storybook                                                      | Purpose                                                                                                                       |
 | -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | Domain (`@apps/management-storybook`, `@apps/today-storybook`) | Chromatic visual regression (own token, selective runs), a11y tests (`pnpm test` via vitest + addon-a11y), developer workflow |
 | Packages (`@apps/packages-storybook`)                          | Chromatic for shared components, developer workflow                                                                           |
-
-For browser verification of stories, use the unified storybook (`@apps/storybook`). See [agent-browser.md](agent-browser.md) for dev server commands, ports, and cleanup.

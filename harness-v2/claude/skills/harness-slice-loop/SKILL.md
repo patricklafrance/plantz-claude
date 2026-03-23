@@ -20,7 +20,7 @@ Never edit application or library source files directly — all code changes go 
 
 1. Spawn `subagent_type: "harness-coder"` with the slice file and `mode: draft`.
 2. Spawn `subagent_type: "harness-reviewer"` pointing at the slice file.
-3. All criteria pass:
+3. All criteria pass and no sanity issues:
     1. Rename `verification-results.md` to `verification-{slice-filename}.md` (e.g. `verification-01-user-list.md`).
     2. Run `/simplify`.
     3. Commit the slice changes (no push).

@@ -32,7 +32,7 @@ Implement the slice. Every React component gets matching Storybook stories.
 Code with a browser open — validate as you go. Use the dev servers defined in `agent-docs/references/agent-browser.md`.
 
 - **Draft:** Implement the slice scope to fulfill its acceptance criteria.
-- **Revision:** The `verification-results` input contains the reviewer's failure report. Fix only what failed.
+- **Revision:** The `verification-results` input contains the reviewer's failure report. Fix only what failed. The report may include a "Sanity Issues" section — these are host app integration problems found outside of Storybook stories.
 - When the slice scope requires a new module, domain, or storybook, use the corresponding `scaffold-*` skill.
 - Every module owns its complete data layer — no partial data layers. Follow `agent-docs/references/msw-tanstack-query.md`.
 - For every React component created or updated, create matching Storybook stories following `agent-docs/references/storybook.md`. Every `[visual]` and `[interactive]` acceptance criterion must have a corresponding story.

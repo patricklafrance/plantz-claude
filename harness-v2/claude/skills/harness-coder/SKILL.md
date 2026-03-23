@@ -37,3 +37,13 @@ Code with a browser open — validate as you go. Use the dev servers defined in 
 - **Revision:** The `verification-results` input contains the reviewer's failure report. Fix only what failed.
 - Every module owns its complete data layer — no partial data layers. Follow `agent-docs/references/msw-tanstack-query.md`.
 - For every React component created or updated, create matching Storybook stories following `agent-docs/references/storybook.md`. Every `[visual]` and `[interactive]` acceptance criterion must have a corresponding story.
+
+### 3. Record implementation notes
+
+Append a section to `.harness/implementation-notes.md` (create the file if it doesn't exist). One section per slice — what was created or extended at the module/package level. The documenter uses this to update domain reference docs without re-exploring the codebase.
+
+```markdown
+## Slice {N}: {Title}
+
+- {Extended or created} `{module or package}` — {what changed}
+```

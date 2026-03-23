@@ -38,9 +38,9 @@ Orchestrate end-to-end feature development. Never edit application or library so
 
 ### 6. Doc phase
 
-- Spawn `subagent_type: "harness-documenter"`.
+- Spawn `subagent_type: "harness-document"`.
 - The documenter reads `.harness/` artifacts directly and updates agent-docs to reflect what was implemented.
 
-### 7. Wrap up
+### 7. PR
 
-- Present slices completed and verifications passed. Wait for user confirmation before pushing.
+- Spawn `subagent_type: "harness-pr"` with the feature description.

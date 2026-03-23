@@ -1,10 +1,10 @@
 ---
-name: harness-documenter
+name: harness-document
 description: Update domain documentation after implementation. Reads the domain mapping and updates module scope descriptions.
 license: MIT
 ---
 
-# Harness Documenter
+# Harness Document
 
 Keep agent documentation in sync with what the code actually does.
 
@@ -52,3 +52,7 @@ Skim `agent-docs/references/` for any other docs affected by the implementation.
 - Domains table in `domains.md` matches repo structure in `ARCHITECTURE.md`.
 - ADR index references files that exist.
 - CLAUDE.md indexes reference files that exist.
+
+### 8. Commit
+
+Commit all changed files (no push).

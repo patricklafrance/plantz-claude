@@ -35,19 +35,10 @@ Resolve architecture upfront, slice the work, define success through acceptance 
 
 ### 3. Resolve durable decisions
 
-Resolve all 7 before slicing. The first three (Domains, Modules, Shared packages) come from the domain mapping — carry them forward, don't re-derive them.
+Resolve before slicing. Placement comes from the domain mapping — carry it forward, don't re-derive. API namespaces and routes follow from placement conventions.
 
-| Decision            | What to decide                             |
-| ------------------- | ------------------------------------------ |
-| Domains             | Which domains are affected and how         |
-| Modules             | Which modules are affected and how         |
-| Shared packages     | Which `@packages/*` are affected and how   |
-| API namespace       | `/api/<domain>/<entity>` per module        |
-| Data model shape    | Entity definitions — field names and types |
-| Collection strategy | TanStack DB collection vs fetch+useState   |
-| Route structure     | Paths registered with Squide               |
-
-Follow the module isolation rule in `agent-docs/references/domains.md`.
+- **Data model** — entity definitions, field names and types
+- **Collection strategy** — TanStack DB collection vs fetch+useState
 
 ### 4. Slice into vertical tracer bullets
 
@@ -76,21 +67,14 @@ All files written to `.harness/`.
 
 {1-2 sentences}
 
-## Decisions
-
-| Decision        | Choice |
-| --------------- | ------ |
-| Domains         | ...    |
-| Modules         | ...    |
-| Shared packages | ...    |
-| API namespaces  | ...    |
-| Routes          | ...    |
-| Collections     | ...    |
-
 ## Data Model
 
 {One line per entity, field names and types}
 {Modified entities: `EntityName += { newField? }`}
+
+## Collection Strategy
+
+{TanStack DB collection vs fetch+useState, per module}
 ```
 
 </plan-header-template>
@@ -110,11 +94,7 @@ One sentence: what the user can see or do after this slice ships.
 
 ## Scope
 
-- {Logical unit of work at the module/component level}
-
-## Modules Affected
-
-{Which modules and packages this slice touches}
+- {Target module or package}: {logical unit of work}
 
 ## Acceptance Criteria
 

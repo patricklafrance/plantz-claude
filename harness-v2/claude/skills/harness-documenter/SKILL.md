@@ -41,9 +41,13 @@ Read `agent-docs/adr/index.md`. Skip if the feature only extends existing patter
 
 ### 5. Update CLAUDE.md indexes
 
-If steps 2–4 added new files to `agent-docs/`, add entries to the Index sections of root `CLAUDE.md` and `harness-v2/CLAUDE.md`.
+If previous steps added new files to `agent-docs/`, add entries to the Index section of `CLAUDE.md`. Also check domain-scoped `CLAUDE.md` files for any content that needs updating.
 
-### 6. Verify consistency
+### 6. Scan other references
+
+Skim `agent-docs/references/` for any other docs affected by the implementation. Add, update, or remove content as needed.
+
+### 7. Verify consistency
 
 - Domains table in `domains.md` matches repo structure in `ARCHITECTURE.md`.
 - ADR index references files that exist.

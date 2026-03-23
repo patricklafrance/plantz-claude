@@ -34,9 +34,12 @@ Use a 1280px viewport for all screenshots (matches Chromatic desktop mode).
 
 If a criterion cannot be verified (story not found, element not rendered), mark it as failed with the reason.
 
-### 3. Sanity check the host app
+### 3. Sanity checks
 
-Start the host app dev server defined in `agent-docs/references/agent-browser.md`. Navigate through the pages affected by the slice. Look for obvious breakage — blank pages, console errors, broken layouts. If something is wrong, add it to the Sanity Issues section.
+- Start the host app dev server defined in `agent-docs/references/agent-browser.md`. Navigate through the pages affected by the slice. Look for obvious breakage — blank pages, console errors, broken layouts.
+- Extract the affected module paths from the slice file. Spawn `subagent_type: "validate-modules"` with those paths.
+
+Any issues go to the Sanity Issues section.
 
 ### 4. Write results
 

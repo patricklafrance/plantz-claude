@@ -6,9 +6,7 @@ license: MIT
 
 # Harness Slice Loop
 
-Cycle: code a slice, verify acceptance criteria, fix on failure. Exit when the slice passes or 5 fix attempts are exhausted.
-
-Never edit application or library source files directly — all code changes go through the coder subagent.
+Orchestrate the code → verify cycle for a single slice. Never edit application or library source files.
 
 ## Inputs
 

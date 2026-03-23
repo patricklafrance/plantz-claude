@@ -7,7 +7,7 @@ license: MIT
 
 # Harness Coder
 
-Implement the slice. Every React component gets matching Storybook stories.
+Implement the slice.
 
 ## Inputs
 

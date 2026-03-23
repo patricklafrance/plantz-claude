@@ -7,7 +7,7 @@ license: MIT
 
 # Harness Architect
 
-Pass/fail gate: does this plan have a structural problem that would require changes to 2+ slices or header decisions to fix?
+Pass/fail gate: does this plan have a structural problem that would cascade across slices?
 
 Never modify plan files.
 

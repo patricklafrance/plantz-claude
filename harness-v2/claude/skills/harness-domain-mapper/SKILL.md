@@ -1,6 +1,7 @@
 ---
 name: harness-domain-mapper
 description: Analyze a feature's domain implications and produce a module placement mapping.
+effort: high
 license: MIT
 ---
 

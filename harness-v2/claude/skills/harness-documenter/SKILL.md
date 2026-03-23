@@ -6,43 +6,45 @@ license: MIT
 
 # Harness Documenter
 
-Keep domain documentation in sync with what the code actually does. After all slices are implemented, this skill updates module scope descriptions to reflect the new reality — building institutional memory that improves the next domain mapping.
-
-This is the write-back step in the doc-phase circuit: domain mapper produces a mapping, planner and architect consume it, coder implements it, and the documenter writes updated scope descriptions back into the domain reference doc.
-
-> Living documentation evolves with the code, not separately from it. — Martraire, _Living Documentation_
-
-## Inputs
-
-| Input              | Description                                |
-| ------------------ | ------------------------------------------ |
-| `domain-mapping`   | Path to `.harness/domain-mapping.md`       |
-| `domain-reference` | Path to the project's domain reference doc |
+Keep agent documentation in sync with what the code actually does.
 
 ## Process
 
 ### 1. Load context
 
-Read `.harness/domain-mapping.md` — specifically the "Module Scope Updates" section, which contains the domain mapper's recommended scope descriptions for affected modules.
+- Read `.harness/plan-header.md`.
+- Read `.harness/domain-mapping.md`.
+- Read `.harness/implementation-notes.md` — coder's notes on what was created or extended.
 
-Read the current domain reference doc (e.g. `domains.md`).
+### 2. Update domain reference
 
-### 2. Update module scope descriptions
+Read `agent-docs/references/domains.md`.
 
-For each affected module, update its scope description in the domain reference doc with an **intent-based description** — what the module should own, not just what code is currently there.
+- Module scope expanded → update its Domains table description (one line each).
+- New module created → add to the Domains table.
+- Decision tree no longer routes correctly → fix it.
+- Two modules claim overlapping scope → resolve.
 
-- If a module's scope expanded, update the description to encompass the new responsibility.
-- If a new module was created, add it to the domains table with its scope.
-- Keep descriptions to one line — they serve as quick-reference signals for the domain mapper, not exhaustive inventories.
+### 3. Update architecture doc
 
-### 3. Verify consistency
+Read `agent-docs/ARCHITECTURE.md`. Skip if implementation-notes.md shows only extensions to existing modules.
 
-Check that the updated domain reference doc is internally consistent:
+- New module → add to the repo structure tree and domain isolation section.
+- New shared package or subpath export → add to the shared packages description.
+- New domain → add to the domain isolation section.
 
-- No two modules claim overlapping scope
-- The decision tree still routes correctly given the new scopes
-- Module granularity criteria are still met
+### 4. Update ADR index
 
-## Output
+Read `agent-docs/adr/index.md`. Skip if the feature only extends existing patterns.
 
-Modified domain reference doc with updated scope descriptions. No other files are changed.
+- New architectural pattern → write an ADR following existing format, add to index.
+
+### 5. Update CLAUDE.md indexes
+
+If steps 2–4 added new files to `agent-docs/`, add entries to the Index sections of root `CLAUDE.md` and `harness-v2/CLAUDE.md`.
+
+### 6. Verify consistency
+
+- Domains table in `domains.md` matches repo structure in `ARCHITECTURE.md`.
+- ADR index references files that exist.
+- CLAUDE.md indexes reference files that exist.

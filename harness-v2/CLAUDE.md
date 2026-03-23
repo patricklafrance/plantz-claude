@@ -22,6 +22,8 @@ Harness, not workflow. The plan provides predictability. The implementation is f
 
 - `.harness/plan-header.md` — plan header (durable decisions, data model)
 - `.harness/slices/` — per-slice plan files
+- `.harness/domain-mapping.md` — module placement decisions
+- `.harness/implementation-notes.md` — what the coder created/extended per slice
 - `.harness/verification-results.md` — per-slice verification results
 
 One feature at a time. The coordinator cleans `.harness/` before starting. Never modify `.harness/` contents from a previous feature — stale plan files cause the coder to implement against outdated decisions.

@@ -38,8 +38,8 @@ Orchestrate end-to-end feature development. Never edit application or library so
 
 ### 6. Doc phase
 
-- Spawn `subagent_type: "harness-documenter"` with the domain mapping and domain reference doc paths.
-- The documenter updates module scope descriptions in the domain reference doc to reflect what modules now encompass. This builds institutional memory that improves the next domain mapping.
+- Spawn `subagent_type: "harness-documenter"`.
+- The documenter reads `.harness/` artifacts directly and updates agent-docs to reflect what was implemented.
 
 ### 7. Wrap up
 

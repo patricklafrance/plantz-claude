@@ -17,7 +17,8 @@ Never modify plan files.
 
 ### 1. Load context
 
-Read `.harness/plan-header.md`, all `.harness/slices/*.md`, `.harness/domain-mapping.md`, `agent-docs/ARCHITECTURE.md`, `agent-docs/references/domains.md`, and `agent-docs/adr/index.md`.
+- Read `.harness/plan-header.md`, all `.harness/slices/*.md`, and `.harness/domain-mapping.md`.
+- Read `agent-docs/ARCHITECTURE.md`, `agent-docs/references/domains.md`, and `agent-docs/adr/index.md`.
 
 ### 2. Evaluate structural soundness
 
@@ -28,7 +29,6 @@ Read `.harness/plan-header.md`, all `.harness/slices/*.md`, `.harness/domain-map
 | Domain mapping contradiction | Plan assigns a concern to a different module than the domain mapper decided |
 | Missing denormalization      | Two modules need the same data via cross-module import                      |
 | Wrong entity placement       | Entity is module-local but multiple modules need it                         |
-| API namespace collision      | Two modules claim the same endpoint prefix                                  |
 | Route conflict               | Routes collide or violate domain path hierarchy                             |
 | Weak acceptance criteria     | Vague criteria or missing mutation companions across 2+ slices              |
 
@@ -82,7 +82,7 @@ New modules or entities that don't exist on disk yet are valid.
 
 ## Required Changes
 
-Move order types to `@packages/core-orders`. Update header "Shared pkg changes."
+Move order types to `@packages/core-orders`. Update Data Model in plan-header to reflect shared package placement.
 ```
 
 </revision-example>

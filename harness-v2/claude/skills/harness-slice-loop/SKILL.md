@@ -1,8 +1,6 @@
 ---
 name: harness-slice-loop
-description: |
-    Code → verify cycle for a single slice. Spawns the coder, runs browser verification, and loops on failure until the slice passes or the retry limit is hit.
-    Use when asked to "implement a slice", or as part of the harness coordinator's implementation phase.
+description: Code → verify cycle for a single slice. Spawns the coder, runs browser verification, and loops on failure.
 license: MIT
 ---
 

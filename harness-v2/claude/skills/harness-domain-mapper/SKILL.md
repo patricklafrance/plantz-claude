@@ -1,8 +1,6 @@
 ---
 name: harness-domain-mapper
-description: |
-    Analyze a feature's domain implications and produce a module placement mapping. Runs before the plan loop to resolve where feature concerns belong — extending existing modules by default, creating new ones only with justification.
-    Use when asked to "map domains", "analyze module placement", or as part of the harness coordinator's domain mapping phase.
+description: Analyze a feature's domain implications and produce a module placement mapping.
 license: MIT
 ---
 

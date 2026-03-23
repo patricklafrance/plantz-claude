@@ -1,8 +1,6 @@
 ---
 name: harness-coordinator
-description: |
-    Entry point for end-to-end feature development. Sequences the planning loop, then slice-by-slice implementation, then PR.
-    Use when asked to "build a feature", "develop end-to-end", "implement feature", or any request that requires coordinated planning and implementation.
+description: Entry point for end-to-end feature development. Sequences planning, slice-by-slice implementation, and documentation.
 license: MIT
 ---
 

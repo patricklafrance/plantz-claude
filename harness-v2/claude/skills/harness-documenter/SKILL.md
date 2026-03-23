@@ -1,8 +1,6 @@
 ---
 name: harness-documenter
-description: |
-    Update domain documentation after implementation. Reads the domain mapping and updates module scope descriptions so that future domain analysis benefits from what was learned.
-    Use when asked to "update domain docs", "run doc phase", or as part of the harness coordinator's doc phase.
+description: Update domain documentation after implementation. Reads the domain mapping and updates module scope descriptions.
 license: MIT
 ---
 

@@ -1,8 +1,6 @@
 ---
 name: harness-plan-loop
-description: |
-    Plan → architect review cycle. Spawns the planner, runs the architect gate, and loops on rejection until the plan passes or the retry limit is hit.
-    Use when asked to "plan and review a feature", or as part of the harness coordinator's planning phase.
+description: Plan → architect review cycle. Spawns the planner, runs the architect gate, and loops on rejection.
 license: MIT
 ---
 

@@ -1,8 +1,6 @@
 ---
 name: harness-planner
-description: |
-    Draft a multi-slice technical plan for a feature. Resolves durable architectural decisions, slices work into vertical increments, and writes per-slice acceptance criteria.
-    Use when asked to "plan a feature", "draft a plan", or as part of the harness plan-loop's planning phase.
+description: Draft a multi-slice technical plan for a feature. Resolves data model and collection strategy, slices into vertical increments, writes acceptance criteria.
 effort: high
 license: MIT
 ---

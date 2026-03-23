@@ -1,8 +1,6 @@
 ---
 name: harness-coder
-description: |
-    Implement a single slice from the plan. Reads the plan header and slice file, writes code and Storybook stories to the repo.
-    Use when asked to "implement a slice", "code a slice", or as part of the harness slice-loop's coding phase.
+description: Implement a single slice from the plan. Writes code and Storybook stories to the repo.
 effort: high
 license: MIT
 ---
@@ -35,6 +33,7 @@ Code with a browser open — validate as you go. Use the dev servers defined in 
 
 - **Draft:** Implement the slice scope to fulfill its acceptance criteria.
 - **Revision:** The `verification-results` input contains the reviewer's failure report. Fix only what failed.
+- When the slice scope requires a new module, domain, or storybook, use the corresponding `scaffold-*` skill.
 - Every module owns its complete data layer — no partial data layers. Follow `agent-docs/references/msw-tanstack-query.md`.
 - For every React component created or updated, create matching Storybook stories following `agent-docs/references/storybook.md`. Every `[visual]` and `[interactive]` acceptance criterion must have a corresponding story.
 

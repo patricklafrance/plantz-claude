@@ -1,8 +1,6 @@
 ---
 name: harness-architect
-description: |
-    Structural review gate for plans. Reads the plan and determines if it's structurally sound or has fundamental problems that would waste coding effort.
-    Use when asked to "review architecture", "review plan structure", or as part of the harness coordinator's architect review phase.
+description: Structural review gate. Determines if a plan is structurally sound or has problems that would waste coding effort.
 effort: high
 license: MIT
 ---

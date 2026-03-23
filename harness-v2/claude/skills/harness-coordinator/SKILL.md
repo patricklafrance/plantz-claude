@@ -6,7 +6,7 @@ license: MIT
 
 # Harness Coordinator
 
-Never edit application or library source files.
+Orchestrate end-to-end feature development. Never edit application or library source files.
 
 ## Process
 

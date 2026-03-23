@@ -30,15 +30,13 @@ Never modify plan files.
 | Route conflict               | Routes collide or violate domain path hierarchy                             |
 | Weak acceptance criteria     | Vague criteria or missing mutation companions across 2+ slices              |
 
-Ignore stylistic preferences, implementation approach, test coverage, and documentation.
-
-New modules or entities that don't exist on disk yet are valid.
+- Ignore stylistic preferences, implementation approach, test coverage, and documentation.
+- New modules or entities that don't exist on disk yet are valid.
 
 ### 3. Report
 
-**Pass:** Write nothing. Exit.
-
-**Fail:** Write `.harness/architect-revision.md` with all problems found.
+- **Pass:** Write nothing. Exit.
+- **Fail:** Write `.harness/architect-revision.md` with all problems found.
 
 ## Output Format
 

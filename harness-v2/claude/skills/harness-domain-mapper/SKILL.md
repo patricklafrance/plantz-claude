@@ -6,7 +6,7 @@ license: MIT
 
 # Harness Domain Mapper
 
-Decide where a feature belongs before planning begins. Ground placement decisions in codebase evidence, not module names.
+Decide where a feature belongs before planning begins.
 
 ## Inputs
 

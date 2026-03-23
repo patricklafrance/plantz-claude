@@ -6,9 +6,7 @@ license: MIT
 
 # Harness Plan Loop
 
-Cycle: draft a plan, run the architect gate, revise on rejection. Exit when the plan passes or 5 iterations are exhausted.
-
-Never edit application or library source files.
+Orchestrate the plan → architect review cycle. Never edit application or library source files.
 
 ## Inputs
 

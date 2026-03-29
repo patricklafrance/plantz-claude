@@ -1,6 +1,6 @@
 # Static Analysis
 
-Five tools run on every `pnpm lint` and in CI. All are root-level Turborepo tasks except `typecheck` (per-package).
+Five tools are wired into the `pnpm lint` pipeline. Three also run as individual steps in CI (`ci.yml`): oxlint, typecheck, and syncpack. `oxfmt` and `knip` only run via the `lint` orchestrator task — they are not standalone CI steps. All are root-level Turborepo tasks except `typecheck` (per-package).
 
 | Tool     | Task                         | What it checks                                                |
 | -------- | ---------------------------- | ------------------------------------------------------------- |

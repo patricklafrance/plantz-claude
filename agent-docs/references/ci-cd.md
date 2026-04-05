@@ -23,7 +23,7 @@ Read the YAML files directly for triggers, steps, and concurrency rules.
 
 **Trigger:** `issue_comment`, `pull_request_review_comment`, `pull_request_review`, `issues` (opened/assigned) — all require `@claude` in the comment body.
 
-**Auth gating:** All triggers require OWNER/MEMBER/COLLABORATOR association. Bot comments are excluded to prevent re-trigger loops.
+**Auth gating:** `issue_comment` and `pull_request_review_comment` triggers require OWNER/MEMBER/COLLABORATOR association; `pull_request_review` and `issues` triggers do not. Bot comments are excluded from the `issue_comment` and `pull_request_review_comment` triggers to prevent re-trigger loops.
 
 **Concurrency:** `claude-${{ comment.id || review.id || issue.number || run_id }}` with `cancel-in-progress: true`. Keyed by comment ID (not issue number) so that unrelated comments on the same PR don't cancel in-progress Claude runs.
 
@@ -58,7 +58,7 @@ PRs require the `run chromatic` label to trigger `chromatic.yml`. Without it, th
 
 ## Smoke tests
 
-`smoke-tests.yml` runs on PRs to `main`. It uses `claude-code-action` to load the `plantz-smoke-tests` skill, which starts the host app's dev server, verifies it in a headless browser via `agent-browser`, then stops with port cleanup. Results are posted as a PR comment. 30-minute timeout with concurrency group (`cancel-in-progress`).
+`smoke-tests.yml` runs on PRs to `main`. It uses `claude-code-action` to load the `plantz-smoke-tests` skill, which starts the host app's dev server, verifies it in a headless browser via `agent-browser`, then stops with port cleanup. Results are posted as a PR comment. 15-minute timeout with concurrency group (`cancel-in-progress`).
 
 **Workflow validation caveat:** `claude-code-action` requires the workflow file on the PR branch to match the version on `main`. If the workflow is new or modified in the PR, the action silently no-ops and the job reports success without running the skill. The skill only executes once the workflow file is merged to `main`.
 

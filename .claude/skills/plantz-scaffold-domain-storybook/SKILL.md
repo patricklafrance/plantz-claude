@@ -41,17 +41,18 @@ Module-level values are discovered at runtime:
 
 ## Reference Storybook
 
-`apps/management/storybook/` is the canonical reference. Before creating any file, read these 9 files from the reference:
+`apps/management/storybook/` is the canonical reference. Before creating any file, read these 10 files from the reference:
 
 1. `apps/management/storybook/package.json`
-2. `apps/management/storybook/.storybook/main.ts`
-3. `apps/management/storybook/.storybook/preview.tsx`
-4. `apps/management/storybook/.storybook/storybook.css`
-5. `apps/management/storybook/.storybook/vitest.setup.ts`
-6. `apps/management/storybook/chromatic.config.json`
-7. `apps/management/storybook/tsconfig.json`
-8. `apps/management/storybook/vite.config.ts`
-9. `apps/management/storybook/vitest.config.ts`
+2. `apps/management/storybook/firefly.tsx`
+3. `apps/management/storybook/.storybook/main.ts`
+4. `apps/management/storybook/.storybook/preview.tsx`
+5. `apps/management/storybook/.storybook/storybook.css`
+6. `apps/management/storybook/.storybook/vitest.setup.ts`
+7. `apps/management/storybook/chromatic.config.json`
+8. `apps/management/storybook/tsconfig.json`
+9. `apps/management/storybook/vite.config.ts`
+10. `apps/management/storybook/vitest.config.ts`
 
 Never hardcode dependency versions or config values from memory — your general knowledge of these packages is wrong for this repo. Always read the reference files and replicate them.
 
@@ -66,7 +67,7 @@ Never hardcode dependency versions or config values from memory — your general
 
 ### Step 2 — Create storybook files
 
-Read all 9 reference files listed above, then create 9 files under `apps/{domain}/storybook/`:
+Read all 10 reference files listed above, then create 10 files under `apps/{domain}/storybook/`:
 
 #### `package.json`
 
@@ -76,6 +77,10 @@ Clone the entire reference `package.json`. Change only:
 - `description` -> `Storybook application for the {domain} domain.`
 
 Copy `scripts`, `dependencies`, and `devDependencies` verbatim — do not add, remove, or change any package or version.
+
+#### `firefly.tsx`
+
+Clone entirely from the reference. No substitutions.
 
 #### `.storybook/main.ts`
 
@@ -191,7 +196,7 @@ Run `pnpm install` to link the new workspace package.
 
 ### Step 8 — Verify
 
-1. Confirm all 9 storybook files exist under `apps/{domain}/storybook/` (including `.storybook/storybook.css`, `.storybook/vitest.setup.ts`, and `vitest.config.ts`).
+1. Confirm all 10 storybook files exist under `apps/{domain}/storybook/` (including `firefly.tsx`, `.storybook/storybook.css`, `.storybook/vitest.setup.ts`, and `vitest.config.ts`).
 2. Confirm root `package.json` has the `dev-{domain}-storybook` script.
 3. Confirm `apps/storybook/.storybook/main.ts` includes the new story globs.
 4. Confirm `scripts/getAffectedStorybooks.ts` includes the new `StorybookDependencies` entry.
@@ -207,3 +212,4 @@ Run `pnpm install` to link the new workspace package.
 - Never skip the Chromatic CI step (Step 6) — the storybook will not be tested in CI.
 - Never skip the unified storybook integration (Step 4) — the domain's stories will be missing from the unified Storybook.
 - Never invent a `projectId` in `chromatic.config.json` — remove it and let the user configure it after creating the Chromatic project.
+- Never omit `firefly.tsx` — module `storybook.setup.tsx` files import from it; a storybook without it silently breaks all stories that use `fireflyDecorator`.

@@ -27,8 +27,8 @@ plantz-claude/
   scripts/                         # Build scripts (getAffectedStorybooks.ts)
   agent-docs/                      # Agent documentation (this folder)
   .agents/skills/                  # Shared agent skills (git-commit, etc.)
-  .claude/skills/                  # Claude Code discovery layer — symlinks to .agents/skills/ plus project-specific skills
-  .github/workflows/               # CI, Chromatic, Claude, code-review
+  .claude/skills/                  # Claude Code skills — project-specific skills (plantz-*) plus copies of select shared skills
+  .github/workflows/               # CI, Lighthouse, Chromatic, Claude, code-review, audit-agent-docs, smoke-tests
 ```
 
 ## Package naming conventions

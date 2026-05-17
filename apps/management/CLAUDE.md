@@ -33,8 +33,8 @@ Modules in this domain own their API surface under `/api/management/`. Each modu
 
 Components read with `useLiveQuery` and write with actions from `createManagementPlantActions`. No `api/` folder — the collection handles data fetching internally via `queryCollectionOptions`.
 
-See `msw-tanstack-query.md` in `.claude/skills/plantz-adlc-*/references/` for implementation patterns.
+See `agent-docs/references/msw-tanstack-query.md` for implementation patterns.
 
 ## Adding a Module
 
-Use `/scaffold-domain-module` with `domain=management`. The skill handles host registration, storybook wiring, and affected-detection updates.
+Use the `plantz-scaffold-domain-module` skill with `domain=management`. The skill handles host registration, storybook wiring, and affected-detection updates.

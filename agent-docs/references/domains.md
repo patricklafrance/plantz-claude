@@ -77,4 +77,4 @@ Each domain has its own `CLAUDE.md` with storybook, data-layer, and scaffolding 
 - Management: `apps/management/CLAUDE.md`
 - Today: `apps/today/CLAUDE.md`
 
-To scaffold a new module, use `/scaffold-domain-module` with the appropriate `domain` parameter.
+To scaffold a new module, use the `plantz-scaffold-domain-module` skill with the appropriate `domain` parameter.

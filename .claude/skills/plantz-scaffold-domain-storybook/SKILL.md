@@ -41,7 +41,7 @@ Module-level values are discovered at runtime:
 
 ## Reference Storybook
 
-`apps/management/storybook/` is the canonical reference. Before creating any file, read these 9 files from the reference:
+`apps/management/storybook/` is the canonical reference. Before creating any file, read these 10 files from the reference:
 
 1. `apps/management/storybook/package.json`
 2. `apps/management/storybook/.storybook/main.ts`
@@ -52,6 +52,7 @@ Module-level values are discovered at runtime:
 7. `apps/management/storybook/tsconfig.json`
 8. `apps/management/storybook/vite.config.ts`
 9. `apps/management/storybook/vitest.config.ts`
+10. `apps/management/storybook/firefly.tsx`
 
 Never hardcode dependency versions or config values from memory — your general knowledge of these packages is wrong for this repo. Always read the reference files and replicate them.
 
@@ -66,7 +67,7 @@ Never hardcode dependency versions or config values from memory — your general
 
 ### Step 2 — Create storybook files
 
-Read all 9 reference files listed above, then create 9 files under `apps/{domain}/storybook/`:
+Read all 10 reference files listed above, then create 10 files under `apps/{domain}/storybook/`:
 
 #### `package.json`
 
@@ -131,6 +132,10 @@ Clone from the reference. Change only:
 
 - `test.name` -> `{domain}-storybook`
 
+#### `firefly.tsx`
+
+Clone entirely from the reference. No substitutions. This file provides `initializeFireflyForStorybook` and `withFireflyDecorator`, which every module's `storybook.setup.tsx` imports from `../../storybook/firefly.tsx`. Without it, the storybook cannot render any story that depends on the Squide runtime.
+
 ### Step 3 — Add root dev script
 
 In root `package.json`, add to `scripts`:
@@ -191,7 +196,7 @@ Run `pnpm install` to link the new workspace package.
 
 ### Step 8 — Verify
 
-1. Confirm all 9 storybook files exist under `apps/{domain}/storybook/` (including `.storybook/storybook.css`, `.storybook/vitest.setup.ts`, and `vitest.config.ts`).
+1. Confirm all 10 storybook files exist under `apps/{domain}/storybook/` (including `.storybook/storybook.css`, `.storybook/vitest.setup.ts`, `vitest.config.ts`, and `firefly.tsx`).
 2. Confirm root `package.json` has the `dev-{domain}-storybook` script.
 3. Confirm `apps/storybook/.storybook/main.ts` includes the new story globs.
 4. Confirm `scripts/getAffectedStorybooks.ts` includes the new `StorybookDependencies` entry.

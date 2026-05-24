@@ -28,4 +28,4 @@ This mirrors a real BFF (backend-for-frontend) architecture: each frontend surfa
 - TanStack DB is beta — pin exact versions and monitor for breaking changes.
 - Domain modules need a `storybook.setup.tsx` wiring `initializeFireflyForStorybook` + `withFireflyDecorator` from the domain storybook's `firefly.tsx`, and a `CollectionDecorator` for per-story collection context. MSW is managed globally via `msw-storybook-addon` in preview.tsx.
 
-See `msw-tanstack-query.md` in `.claude/skills/plantz-adlc-*/references/` for all implementation patterns.
+See [references/msw-tanstack-query.md](../references/msw-tanstack-query.md) for all implementation patterns.

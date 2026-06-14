@@ -21,9 +21,9 @@ Read the YAML files directly for triggers, steps, and concurrency rules.
 - **General mode** — triggered by `@claude` mentions on issues, PR comments, and reviews. Responds to questions, suggestions, and code changes.
 - **Fix mode** — triggered by `@claude /fix <feedback>` on PR comments. Applies targeted fixes, runs tests, commits, and posts a structured report.
 
-**Trigger:** `issue_comment`, `pull_request_review_comment`, `pull_request_review`, `issues` (opened/assigned) — all require `@claude` in the comment body.
+**Trigger:** `issue_comment`, `pull_request_review_comment`, `pull_request_review`, `issues` (opened/assigned) — all require `@claude` in the comment/review/issue body (or issue title).
 
-**Auth gating:** All triggers require OWNER/MEMBER/COLLABORATOR association. Bot comments are excluded to prevent re-trigger loops.
+**Auth gating:** The `issue_comment` and `pull_request_review_comment` triggers require OWNER/MEMBER/COLLABORATOR association and exclude bot comments (`user.type != 'Bot'`) to prevent re-trigger loops. The `pull_request_review` and `issues` triggers gate only on the `@claude` mention — no association or bot check.
 
 **Concurrency:** `claude-${{ comment.id || review.id || issue.number || run_id }}` with `cancel-in-progress: true`. Keyed by comment ID (not issue number) so that unrelated comments on the same PR don't cancel in-progress Claude runs.
 

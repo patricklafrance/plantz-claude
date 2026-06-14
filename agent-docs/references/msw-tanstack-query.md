@@ -113,16 +113,17 @@ export async function registerManagementPlants(runtime: FireflyRuntime, queryCli
 The shared in-memory database is exposed via `@packages/core-plants/db`:
 
 - `plantsDb` — In-memory database singleton
+- `careEventsDb` — Shared care-event in-memory database singleton (used by both `management/plants` and `today/landing-page`)
 - `defaultSeedPlants` — Pre-generated stable seed data (~250 plants)
 - `generatePlants(count?)` — Generate random plant data
 
-Care event types, schemas, insight utilities, and adjustment recommendation types/schemas/computation are exposed via `@packages/core-plants/care-event`. Module-local DBs (e.g., `careEventsDb` and `adjustmentsDb` in today-landing-page) stay in the module's `src/mocks/` folder — they are not shared across modules.
+Care event types, schemas, insight utilities, and adjustment recommendation types/schemas/computation are exposed via `@packages/core-plants/care-event`. `careEventsDb` is shared via `@packages/core-plants/db` (the module-local `careEventsDb.ts` in today-landing-page is now a re-export shim). Only `adjustmentsDb` (today-landing-page) remains genuinely module-local in the module's `src/mocks/` folder — promote a module-local DB to a shared package only when a second module needs the same data.
 
 ### Module-Specific Handlers
 
 Each module defines its own MSW handlers in a local `mocks/` folder:
 
-- **Management:** `managementPlantHandlers` in `apps/management/plants/src/mocks/handlers.ts` — 6 routes at `/api/management/plants`
+- **Management:** `managementPlantHandlers` in `apps/management/plants/src/mocks/handlers.ts` — 6 routes at `/api/management/plants`; `managementCareEventHandlers` in `apps/management/plants/src/mocks/careEventHandlers.ts` — 3 routes at `/api/management/care-events` (`GET`, `POST`, and `POST .../bulk`)
 - **Today Landing:** `todayPlantHandlers` in `apps/today/landing-page/src/mocks/handlers.ts` — 3 routes at `/api/today/plants`; `todayCareEventHandlers` in `apps/today/landing-page/src/mocks/careEventHandlers.ts` — 2 routes at `/api/today/care-events`; `todayAdjustmentHandlers` in `apps/today/landing-page/src/mocks/adjustmentHandlers.ts` — 4 routes at `/api/today/adjustments`
 - **Today Vacation:** `todayVacationPlannerHandlers` in `apps/today/vacation-planner/src/mocks/handlers.ts` — 5 routes at `/api/today/vacation-planner/`
 
@@ -202,16 +203,19 @@ Use `delay("infinite")` for loading state stories.
 
 ## REST API Endpoints
 
-### Management (`/api/management/plants`)
+### Management (`/api/management/plants`, `/api/management/care-events`)
 
-| Method | Path                         | Description                                     |
-| ------ | ---------------------------- | ----------------------------------------------- |
-| GET    | `/api/management/plants`     | List all plants (sorted by name)                |
-| GET    | `/api/management/plants/:id` | Get single plant                                |
-| POST   | `/api/management/plants`     | Create plant (server generates id + timestamps) |
-| PUT    | `/api/management/plants/:id` | Update plant (server updates `lastUpdateDate`)  |
-| DELETE | `/api/management/plants/:id` | Delete single plant                             |
-| DELETE | `/api/management/plants`     | Bulk delete (body: `{ ids: string[] }`)         |
+| Method | Path                               | Description                                                  |
+| ------ | ---------------------------------- | ------------------------------------------------------------ |
+| GET    | `/api/management/plants`           | List all plants (sorted by name)                             |
+| GET    | `/api/management/plants/:id`       | Get single plant                                             |
+| POST   | `/api/management/plants`           | Create plant (server generates id + timestamps)              |
+| PUT    | `/api/management/plants/:id`       | Update plant (server updates `lastUpdateDate`)               |
+| DELETE | `/api/management/plants/:id`       | Delete single plant                                          |
+| DELETE | `/api/management/plants`           | Bulk delete (body: `{ ids: string[] }`)                      |
+| GET    | `/api/management/care-events`      | List care events for a plant (`?plantId=` query param)       |
+| POST   | `/api/management/care-events`      | Create a care event (server generates id; reschedules water) |
+| POST   | `/api/management/care-events/bulk` | Bulk-create care events (body: `{ plantIds, eventType }`)    |
 
 ### Today Landing (`/api/today/plants`, `/api/today/care-events`, `/api/today/adjustments`)
 

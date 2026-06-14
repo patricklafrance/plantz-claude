@@ -66,7 +66,7 @@ Create only the files listed below — do not copy domain-specific source files 
 
 1. In `apps/host/src/getActiveModules.tsx`:
     - Add import: `import { {registerFunction} } from "{packageName}";`
-    - Add entry to `ModuleRegistry`: `"{registryKey}": {registerFunction}`
+    - Add entry to `ModuleRegistry`: `"{registryKey}": { register: {registerFunction} }` (entries are `{ register }` objects, not bare functions)
 2. In `apps/host/package.json`:
     - Add `"{packageName}": "workspace:*"` to `dependencies`
 3. In `apps/host/src/styles/globals.css`:

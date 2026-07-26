@@ -24,6 +24,7 @@
 - [references/ci-cd.md](agent-docs/references/ci-cd.md) — CI, Chromatic, Claude, code-review, audit-agent-docs, and smoke-tests GitHub Actions workflows
 - [references/writing-agent-instructions.md](agent-docs/references/writing-agent-instructions.md) — principles for writing instructions agents actually follow
 - [references/static-analysis.md](agent-docs/references/static-analysis.md) — lint tools overview, suppression policy (fix code > adjust config > suppress as last resort)
+- [references/testing.md](agent-docs/references/testing.md) — `pnpm test`: stories as tests, Storybook a11y suites, light/dark runs, Playwright install
 - [references/bundle-size-budget.md](agent-docs/references/bundle-size-budget.md) — size-limit budget rules (when to optimize vs. bump, limits, PR requirements)
 - [references/agent-browser.md](agent-docs/references/agent-browser.md) — browser verification CLI: when to use, when to skip
 

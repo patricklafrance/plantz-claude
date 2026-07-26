@@ -52,7 +52,7 @@ plantz-claude/
     - `@packages/core-plants` — Shared **plant-domain** code: types, DB schema, collection factories, plant-specific utilities and components. Subpath exports include `./collection`, `./db`, `./care-event` (care event types, schemas, insight utilities, and adjustment recommendation types/schemas/computation), `./vacation`, and `./test-utils`. Used by domain modules, not by generic packages like `components`.
     - `@packages/components` — Domain-agnostic **UI** (shadcn/ui + Tailwind v4). Could theoretically be extracted as a standalone design system.
     - If a utility is generic enough to be needed by `@packages/components`, it belongs in a new `core` package (doesn't exist yet), not in `core-module` or `core-plants`.
-- **JIT packages**: Packages under `packages/` expose source directly via `exports` fields (e.g., `"./": "./src/index.ts"`). Consumers compile them at build time through their own bundler — no pre-build step is required. This means the Turborepo `dev` task has no `^dev` dependency; persistent watch builds in packages run in parallel, not as prerequisites. See [ODR-0004](odr/0004-jit-packages.md) for rationale.
+- **JIT packages**: Packages under `packages/` expose source directly via `exports` fields (e.g., `".": "./src/index.ts"`, `"./collection": "./src/collection/index.ts"`). Consumers compile them at build time through their own bundler — no pre-build step is required. This means the Turborepo `dev` task has no `^dev` dependency; persistent watch builds in packages run in parallel, not as prerequisites. See [ODR-0004](odr/0004-jit-packages.md) for rationale.
 
 See [ADR-0001](adr/0001-squide-local-modules.md) for rationale.
 
@@ -79,7 +79,7 @@ Each module owns its full API surface (a "BFF-per-module" model):
 
 Modules never share handlers or collections. If two modules need the same entity, each defines its own handlers, collection, and URL namespace. This mirrors how real BFFs work: each frontend surface has its own backend-for-frontend that shapes data for its needs.
 
-**Auth layer** — The host owns `/api/auth/*` MSW handlers (login, logout, session) as a cross-cutting concern. The login handler stores the auth token in `sessionStorage`; the logout handler clears it. App code never reads or writes `sessionStorage` directly for auth — only transport-layer utilities (`getAuthHeaders()` and `getCurrentUserId()`) from `@packages/core-module` read the token to attach headers or derive the current user ID. Module handlers read this header to scope data per user.
+**Auth layer** — `registerShell` (in `@packages/core-module/shell`) owns the `/api/auth/*` MSW handlers (login, logout, session) as a cross-cutting concern — they live in `packages/core-module/src/shell/mocks/authHandlers.ts`. The host registers no handlers of its own; it only starts the MSW worker with the handlers Squide collected from the shell and the modules. The login handler stores the auth token in `sessionStorage`; the logout handler clears it. App code never reads or writes `sessionStorage` directly for auth — only transport-layer utilities (`getAuthHeaders()` and `getCurrentUserId()`) from `@packages/core-module` read the token to attach headers or derive the current user ID. Module handlers read this header to scope data per user.
 
 See [ADR-0003](adr/0003-msw-tanstack-query-data-layer.md) for rationale. See `agent-docs/references/msw-tanstack-query.md` for implementation details.
 
@@ -93,8 +93,11 @@ For exact versions, read the root `package.json` (`engines`, `packageManager`, `
 | pnpm                | Package manager                                                                      |
 | TypeScript          | Type checking (`@typescript/native-preview` — tsgo)                                  |
 | Squide              | Modular monolith shell (local modules)                                               |
+| Rsbuild             | Application bundler (host app)                                                       |
+| Rslib               | Library bundler (production builds of `@packages/components`)                        |
 | Storybook           | Component development                                                                |
 | Chromatic           | Visual regression testing                                                            |
+| Vitest + Playwright | Storybook a11y/render suites in headless Chromium (`pnpm test`)                      |
 | Tailwind CSS        | Utility-first CSS framework (via `@tailwindcss/postcss`)                             |
 | shadcn/ui (Base UI) | UI component library, base-nova preset (lives in `@packages/components`)             |
 | Turborepo           | Task orchestration and caching                                                       |
@@ -102,6 +105,8 @@ For exact versions, read the root `package.json` (`engines`, `packageManager`, `
 | oxfmt               | Fast code formatter (Prettier-compatible, import sorting, Tailwind sort)             |
 | Knip                | Dead code detection (unused files, deps, exports)                                    |
 | Syncpack            | Dependency version enforcement                                                       |
+| size-limit          | Gzipped bundle budgets per deployable app (`pnpm sizecheck`)                         |
+| Lighthouse CI       | Performance gate on the built host app                                               |
 | MSW                 | Mock Service Worker for API mocking in browser and Storybook                         |
 | TanStack DB         | Embedded client-side database with reactive queries and optimistic mutations         |
 | TanStack Query      | Server state management — syncs TanStack DB collections via `queryCollectionOptions` |

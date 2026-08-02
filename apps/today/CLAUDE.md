@@ -33,8 +33,8 @@ Modules in this domain own their API surface under `/api/today/`. Each module ha
 
 Components read with `useLiveQuery`. Mutations go through MSW handlers (`DELETE /api/today/plants/:id` and `DELETE /api/today/plants`). No `api/` folder — the collection handles data fetching internally via `queryCollectionOptions`.
 
-See `msw-tanstack-query.md` in `.claude/skills/plantz-adlc-*/references/` for implementation patterns.
+See `agent-docs/references/msw-tanstack-query.md` for implementation patterns.
 
 ## Adding a Module
 
-Use `/scaffold-domain-module` with `domain=today`. The skill handles host registration, storybook wiring, and affected-detection updates.
+Use `/plantz-scaffold-domain-module` with `domain=today`. The skill handles host registration, storybook wiring, and affected-detection updates.

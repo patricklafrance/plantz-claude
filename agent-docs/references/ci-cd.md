@@ -23,11 +23,15 @@ Read the YAML files directly for triggers, steps, and concurrency rules.
 
 **Trigger:** `issue_comment`, `pull_request_review_comment`, `pull_request_review`, `issues` (opened/assigned) — all require `@claude` in the comment body.
 
-**Auth gating:** All triggers require OWNER/MEMBER/COLLABORATOR association. Bot comments are excluded to prevent re-trigger loops.
+**Auth gating:** Only the two comment triggers (`issue_comment`, `pull_request_review_comment`) require OWNER/MEMBER/COLLABORATOR association and exclude bot authors (`comment.user.type != 'Bot'`) to prevent re-trigger loops. The `pull_request_review` and `issues` triggers gate on nothing but the presence of `@claude` in the body/title — never assume association checks cover every trigger when reasoning about this workflow.
 
 **Concurrency:** `claude-${{ comment.id || review.id || issue.number || run_id }}` with `cancel-in-progress: true`. Keyed by comment ID (not issue number) so that unrelated comments on the same PR don't cancel in-progress Claude runs.
 
 **Beyond fix scope:** If the required changes exceed what `/fix` can handle, the agent posts a comment explaining the scope and suggests the user address it manually or re-run the full orchestrator.
+
+## Lighthouse performance gate
+
+`lighthouse.yml` runs on every PR and push to `main`. It builds the host with an unfiltered `pnpm build-host` (no affected-package filtering, unlike `ci.yml`) and hands `apps/host/dist` to `treosh/lighthouse-ci-action`. Assertions live in `lighthouserc.json`: performance category only, 3 runs, median aggregation, `error` below a 0.5 score. Reports upload as workflow artifacts and to temporary public storage. See [ODR-0007](../odr/0007-lighthouse-ci-performance-gate.md) for why the threshold is deliberately low.
 
 ## Chromatic label gate
 

@@ -21,7 +21,7 @@
 - [references/color-mode.md](agent-docs/references/color-mode.md) — dark mode via class strategy, theme tokens, color-mode hook
 - [references/turborepo.md](agent-docs/references/turborepo.md) — task definitions, dependsOn, caching, conventions
 - [references/typescript.md](agent-docs/references/typescript.md) — tsconfig, tsgo
-- [references/ci-cd.md](agent-docs/references/ci-cd.md) — CI, Chromatic, Claude, code-review, audit-agent-docs, and smoke-tests GitHub Actions workflows
+- [references/ci-cd.md](agent-docs/references/ci-cd.md) — CI, Lighthouse, Chromatic, Claude, code-review, audit-agent-docs, and smoke-tests GitHub Actions workflows
 - [references/writing-agent-instructions.md](agent-docs/references/writing-agent-instructions.md) — principles for writing instructions agents actually follow
 - [references/static-analysis.md](agent-docs/references/static-analysis.md) — lint tools overview, suppression policy (fix code > adjust config > suppress as last resort)
 - [references/bundle-size-budget.md](agent-docs/references/bundle-size-budget.md) — size-limit budget rules (when to optimize vs. bump, limits, PR requirements)
@@ -30,7 +30,7 @@
 ### Decisions
 
 - [adr/index.md](agent-docs/adr/index.md) — architectural decision log (Squide local modules, domain Storybooks, MSW + TanStack Query data layer, BFF-per-module)
-- [odr/index.md](agent-docs/odr/index.md) — operational decision log (pnpm+Turborepo, syncpack, Chromatic, JIT packages, Knip, size-limit)
+- [odr/index.md](agent-docs/odr/index.md) — operational decision log (pnpm+Turborepo, syncpack, Chromatic, JIT packages, Knip, size-limit, Lighthouse CI)
 
 ## Growth Conventions
 

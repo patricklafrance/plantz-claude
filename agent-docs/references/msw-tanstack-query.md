@@ -110,21 +110,25 @@ export async function registerManagementPlants(runtime: FireflyRuntime, queryCli
 
 ### Shared DB Subpath Export
 
-The shared in-memory database is exposed via `@packages/core-plants/db`:
+The shared in-memory databases are exposed via `@packages/core-plants/db`:
 
-- `plantsDb` — In-memory database singleton
+- `plantsDb` — In-memory plant database singleton
+- `careEventsDb` — In-memory care event database singleton, shared by management-plants and today-landing-page
 - `defaultSeedPlants` — Pre-generated stable seed data (~250 plants)
 - `generatePlants(count?)` — Generate random plant data
 
-Care event types, schemas, insight utilities, and adjustment recommendation types/schemas/computation are exposed via `@packages/core-plants/care-event`. Module-local DBs (e.g., `careEventsDb` and `adjustmentsDb` in today-landing-page) stay in the module's `src/mocks/` folder — they are not shared across modules.
+Care event types, schemas, insight utilities, and adjustment recommendation types/schemas/computation are exposed via `@packages/core-plants/care-event`. Module-local DBs (e.g., `adjustmentsDb` in today-landing-page, `vacationDb` in today-vacation-planner) stay in the module's `src/mocks/` folder — they are not shared across modules. `apps/today/landing-page/src/mocks/careEventsDb.ts` is only a re-export shim for the shared `careEventsDb`; never treat it as a module-local store.
 
 ### Module-Specific Handlers
 
 Each module defines its own MSW handlers in a local `mocks/` folder:
 
-- **Management:** `managementPlantHandlers` in `apps/management/plants/src/mocks/handlers.ts` — 6 routes at `/api/management/plants`
-- **Today Landing:** `todayPlantHandlers` in `apps/today/landing-page/src/mocks/handlers.ts` — 3 routes at `/api/today/plants`; `todayCareEventHandlers` in `apps/today/landing-page/src/mocks/careEventHandlers.ts` — 2 routes at `/api/today/care-events`; `todayAdjustmentHandlers` in `apps/today/landing-page/src/mocks/adjustmentHandlers.ts` — 4 routes at `/api/today/adjustments`
+- **Management Plants:** `managementPlantHandlers` in `apps/management/plants/src/mocks/handlers.ts` — 6 routes at `/api/management/plants`; `managementCareEventHandlers` in `apps/management/plants/src/mocks/careEventHandlers.ts` — 3 routes at `/api/management/care-events`
+- **Management User:** `managementUserHandlers` in `apps/management/user/src/mocks/handlers.ts` — 1 route at `/api/management/user/profile`. This module has no TanStack DB collection; the handler writes to `usersDb` from `@packages/core-module/db`.
+- **Today Landing:** `todayPlantHandlers` in `apps/today/landing-page/src/mocks/handlers.ts` — 3 routes at `/api/today/plants`; `todayCareEventHandlers` in `apps/today/landing-page/src/mocks/careEventHandlers.ts` — 3 routes at `/api/today/care-events`; `todayAdjustmentHandlers` in `apps/today/landing-page/src/mocks/adjustmentHandlers.ts` — 4 routes at `/api/today/adjustments`
 - **Today Vacation:** `todayVacationPlannerHandlers` in `apps/today/vacation-planner/src/mocks/handlers.ts` — 5 routes at `/api/today/vacation-planner/`
+
+Every module with a collection also has a `mocks/createHandlers.ts` (plus `createCareEventHandlers.ts` / `createAdjustmentHandlers.ts` in today-landing-page) exporting factories that build handlers over caller-supplied fixtures — e.g. `createManagementPlantHandlers(data)`. Stories use these instead of the live DB-backed handlers. `management/user` has no factory: it has no collection and a single handler.
 
 ## Storybook Setup
 
@@ -202,16 +206,25 @@ Use `delay("infinite")` for loading state stories.
 
 ## REST API Endpoints
 
-### Management (`/api/management/plants`)
+### Management Plants (`/api/management/plants`, `/api/management/care-events`)
 
-| Method | Path                         | Description                                     |
-| ------ | ---------------------------- | ----------------------------------------------- |
-| GET    | `/api/management/plants`     | List all plants (sorted by name)                |
-| GET    | `/api/management/plants/:id` | Get single plant                                |
-| POST   | `/api/management/plants`     | Create plant (server generates id + timestamps) |
-| PUT    | `/api/management/plants/:id` | Update plant (server updates `lastUpdateDate`)  |
-| DELETE | `/api/management/plants/:id` | Delete single plant                             |
-| DELETE | `/api/management/plants`     | Bulk delete (body: `{ ids: string[] }`)         |
+| Method | Path                               | Description                                                            |
+| ------ | ---------------------------------- | ---------------------------------------------------------------------- |
+| GET    | `/api/management/plants`           | List all plants (sorted by name)                                       |
+| GET    | `/api/management/plants/:id`       | Get single plant                                                       |
+| POST   | `/api/management/plants`           | Create plant (server generates id + timestamps)                        |
+| PUT    | `/api/management/plants/:id`       | Update plant (server updates `lastUpdateDate`)                         |
+| DELETE | `/api/management/plants/:id`       | Delete single plant                                                    |
+| DELETE | `/api/management/plants`           | Bulk delete (body: `{ ids: string[] }`)                                |
+| GET    | `/api/management/care-events`      | List care events for a plant (`?plantId=` query param)                 |
+| POST   | `/api/management/care-events`      | Create a care event; a `watered` event advances `nextWateringDate`      |
+| POST   | `/api/management/care-events/bulk` | Create one event per `plantIds` entry (body: `{ plantIds, eventType }`) |
+
+### Management User (`/api/management/user`)
+
+| Method | Path                           | Description                                |
+| ------ | ------------------------------ | ------------------------------------------ |
+| PUT    | `/api/management/user/profile` | Update the current user's name in `usersDb` |
 
 ### Today Landing (`/api/today/plants`, `/api/today/care-events`, `/api/today/adjustments`)
 
@@ -222,6 +235,7 @@ Use `delay("infinite")` for loading state stories.
 | DELETE | `/api/today/plants`                     | Bulk delete (body: `{ ids: string[] }`)                                  |
 | GET    | `/api/today/care-events`                | List care events for a plant (`?plantId=` query param)                   |
 | POST   | `/api/today/care-events`                | Create a new care event (server generates id)                            |
+| POST   | `/api/today/care-events/bulk`           | Create one event per `plantIds` entry (body: `{ plantIds, eventType }`)  |
 | GET    | `/api/today/adjustments/recommendation` | Get adjustment recommendation for a plant (`?plantId=&currentInterval=`) |
 | POST   | `/api/today/adjustments`                | Accept an adjustment (updates plant frequency + records event)           |
 | POST   | `/api/today/adjustments/dismiss`        | Dismiss a recommendation for a plant                                     |
@@ -239,4 +253,4 @@ Use `delay("infinite")` for loading state stories.
 
 ## Seed Data
 
-The in-memory DB resets on page reload. For dev, `defaultSeedPlants` provides ~250 plants with realistic data. The today-landing-page module also seeds `careEventsDb` with `defaultSeedCareEvents` (deterministic care events for ~20 plants using fixed absolute dates) and `adjustmentsDb` with `defaultSeedAdjustments` (deterministic adjustment events for the first few plants with care history). Stories use per-story MSW handler overrides with inline `makePlant()` / `makeCareEvent()` / `makeAdjustmentRecommendation()` / `makeAdjustmentEvent()` helpers for focused data sets.
+The in-memory DB resets on page reload. For dev, `defaultSeedPlants` provides ~250 plants with realistic data. The today-landing-page module is the only seeder of the shared `careEventsDb` (`defaultSeedCareEvents` — deterministic care events for ~20 plants using fixed absolute dates) and of its module-local `adjustmentsDb` (`defaultSeedAdjustments` — deterministic adjustment events for the first few plants with care history). Because seeding happens in `registerTodayLandingPage`, running the host with `MODULES=management/plants` alone yields an empty care-event history. Stories use per-story MSW handler overrides with inline `makePlant()` / `makeCareEvent()` / `makeAdjustmentRecommendation()` / `makeAdjustmentEvent()` helpers for focused data sets.

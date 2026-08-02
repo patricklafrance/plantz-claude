@@ -24,11 +24,11 @@ plantz-claude/
     core-module/                   # Cross-module infrastructure — session, auth, app shell (@packages/core-module)
     core-plants/                   # Shared plant domain types, utilities, and components (@packages/core-plants)
     storybook/                     # Packages-layer Storybook runner for shared package stories (@apps/packages-storybook)
-  scripts/                         # Build scripts (getAffectedStorybooks.ts)
+  scripts/                         # Build scripts (getAffectedStorybooks.ts, install-playwright.ts)
   agent-docs/                      # Agent documentation (this folder)
   .agents/skills/                  # Shared agent skills (git-commit, etc.)
-  .claude/skills/                  # Claude Code discovery layer — symlinks to .agents/skills/ plus project-specific skills
-  .github/workflows/               # CI, Chromatic, Claude, code-review
+  .claude/skills/                  # Claude Code discovery layer — checked-in copies of most .agents/skills/ entries plus project-specific plantz-* skills
+  .github/workflows/               # CI, Lighthouse, Chromatic, Claude, code-review, audit-agent-docs, smoke-tests
 ```
 
 ## Package naming conventions
@@ -75,11 +75,11 @@ Each module owns its full API surface (a "BFF-per-module" model):
 
 - **Collection** — Each module creates a TanStack DB collection during Squide registration via a factory from `@packages/core-plants/collection` and provides it to components via React Context. The host passes `QueryClient` to module registration functions. Components read data with `useLiveQuery` and write with `createOptimisticAction`.
 - **Handlers** — MSW request handlers live in the module's `mocks/` folder, scoped to `/api/<domain>/<entity>` URLs (e.g., `/api/management/plants`, `/api/today/plants`, `/api/management/user/profile`). Every module must own the MSW handlers for the endpoints it uses — never rely on the host or another module for handlers.
-- **Shared DB** — All modules read/write the same in-memory plant store, exposed via `@packages/core-plants/db`. This is the only shared data dependency. Cross-module visibility works through the shared DB, not shared client-side collections. Modules may also own **module-local** in-memory DBs for entities that only one module consumes (e.g., `careEventsDb` in today-landing-page, `adjustmentsDb` in today-landing-page, `vacationDb` in today-vacation-planner). These are not shared — promote to a shared package only when a second module needs the same data.
+- **Shared DB** — All modules read/write the same in-memory stores exposed via `@packages/core-plants/db` (`plantsDb`, `careEventsDb`). Cross-module visibility works through these shared stores, not shared client-side collections. Modules may also own **module-local** in-memory DBs for entities that only one module consumes (e.g., `adjustmentsDb` in today-landing-page, `vacationDb` in today-vacation-planner). These stay in the module's `src/mocks/` folder — promote to `@packages/core-plants/db` only when a second module needs the same data (as happened with `careEventsDb`, now consumed by both management-plants and today-landing-page).
 
 Modules never share handlers or collections. If two modules need the same entity, each defines its own handlers, collection, and URL namespace. This mirrors how real BFFs work: each frontend surface has its own backend-for-frontend that shapes data for its needs.
 
-**Auth layer** — The host owns `/api/auth/*` MSW handlers (login, logout, session) as a cross-cutting concern. The login handler stores the auth token in `sessionStorage`; the logout handler clears it. App code never reads or writes `sessionStorage` directly for auth — only transport-layer utilities (`getAuthHeaders()` and `getCurrentUserId()`) from `@packages/core-module` read the token to attach headers or derive the current user ID. Module handlers read this header to scope data per user.
+**Auth layer** — `registerShell` in `@packages/core-module/shell` owns the `/api/auth/*` MSW handlers (login, logout, session) as a cross-cutting concern — they live in `packages/core-module/src/shell/mocks/authHandlers.ts`, not in the host. The login handler stores the auth token in `sessionStorage`; the logout handler clears it. App code never reads or writes `sessionStorage` directly for auth — only transport-layer utilities (`getAuthHeaders()` and `getCurrentUserId()`) from `@packages/core-module` read the token to attach headers or derive the current user ID. Module handlers read this header to scope data per user.
 
 See [ADR-0003](adr/0003-msw-tanstack-query-data-layer.md) for rationale. See `agent-docs/references/msw-tanstack-query.md` for implementation details.
 

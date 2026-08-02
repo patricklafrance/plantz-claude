@@ -1,14 +1,16 @@
 # Static Analysis
 
-Five tools run on every `pnpm lint` and in CI. All are root-level Turborepo tasks except `typecheck` (per-package).
+Five tools run on every `pnpm lint`. All are root-level Turborepo tasks except `typecheck` (per-package).
 
-| Tool     | Task                         | What it checks                                                |
-| -------- | ---------------------------- | ------------------------------------------------------------- |
-| oxlint   | `//#oxlint`                  | JS/TS bugs, accessibility, perf anti-patterns                 |
-| oxfmt    | `//#oxfmt`                   | Code formatting (Prettier-compatible, Tailwind class sorting) |
-| tsgo     | `typecheck` + `//#typecheck` | Type safety across all packages                               |
-| syncpack | `//#syncpack`                | Dependency version consistency (apps pin, packages use `^`)   |
-| knip     | `//#knip`                    | Unused files, dependencies, and exports                       |
+| Tool     | Task                         | What it checks                                                | Runs in CI |
+| -------- | ---------------------------- | ------------------------------------------------------------- | ---------- |
+| oxlint   | `//#oxlint`                  | JS/TS bugs, accessibility, perf anti-patterns                 | yes        |
+| oxfmt    | `//#oxfmt`                   | Code formatting (Prettier-compatible, Tailwind class sorting) | no         |
+| tsgo     | `typecheck` + `//#typecheck` | Type safety across all packages                               | yes        |
+| syncpack | `//#syncpack`                | Dependency version consistency (apps pin, packages use `^`)   | yes        |
+| knip     | `//#knip`                    | Unused files, dependencies, and exports                       | no         |
+
+`ci.yml` invokes `oxlint`, `typecheck`, and `syncpack` as individual Turbo tasks — it never runs `pnpm lint`. Nothing in CI enforces `oxfmt` or `knip`, so never rely on CI to catch formatting or dead code: run `pnpm lint` locally before opening a PR.
 
 ## Suppression policy
 

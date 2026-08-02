@@ -45,9 +45,9 @@ When in doubt, prefer adding to an existing module. Too many small modules fragm
 
 ## MSW Handler Ownership
 
-Every module must register its own MSW handlers for the API endpoints it uses. A module must never rely on the host or another module for its MSW handlers — even if the handler logic duplicates code elsewhere. Handlers live in the module's `src/mocks/` folder. The host only owns handlers for cross-cutting auth endpoints (`/api/auth/login`, `/api/auth/logout`, `/api/auth/session`). Module endpoints follow the `/api/<domain>/<entity>` pattern (e.g., `/api/management/plants`, `/api/today/plants`, `/api/management/user/profile`).
+Every module must register its own MSW handlers for the API endpoints it uses. A module must never rely on the host or another module for its MSW handlers — even if the handler logic duplicates code elsewhere. Handlers live in the module's `src/mocks/` folder. The only handlers not owned by a module are the cross-cutting auth endpoints (`/api/auth/login`, `/api/auth/logout`, `/api/auth/session`), registered by `registerShell` from `@packages/core-module/shell` — not by the host. Module endpoints follow the `/api/<domain>/<entity>` pattern (e.g., `/api/management/plants`, `/api/today/plants`, `/api/management/user/profile`).
 
-Handlers share state through DB singletons imported from shared packages (`usersDb` from `@packages/core-module/db`, `plantsDb` from `@packages/core-plants/db`). Duplication applies to the handler registration, not the underlying data store.
+Handlers share state through DB singletons imported from shared packages (`usersDb` from `@packages/core-module/db`, `plantsDb` and `careEventsDb` from `@packages/core-plants/db`). Duplication applies to the handler registration, not the underlying data store.
 
 This is a hard rule. Without it, modules are not independently loadable via the `MODULES` env var and Storybook stories cannot work in isolation.
 
@@ -77,4 +77,4 @@ Each domain has its own `CLAUDE.md` with storybook, data-layer, and scaffolding 
 - Management: `apps/management/CLAUDE.md`
 - Today: `apps/today/CLAUDE.md`
 
-To scaffold a new module, use `/scaffold-domain-module` with the appropriate `domain` parameter.
+To scaffold a new module, use `/plantz-scaffold-domain-module` with the appropriate `domain` parameter.

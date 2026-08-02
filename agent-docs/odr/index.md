@@ -10,3 +10,4 @@
 | Packages expose source via `exports` (JIT); no pre-build needed for dev                      | [ODR-0004](0004-jit-packages.md)                   |
 | Knip detects unused files, dependencies, and exports; runs as `//#knip` in the lint pipeline | [ODR-0005](0005-knip-dead-code-detection.md)       |
 | Bundle budgets via size-limit; CI gate with agent policy for budget management               | [ODR-0006](0006-bundle-budgets-size-limit.md)      |
+| Lighthouse CI gates runtime performance (median of 3 runs, error below 0.5)                   | [ODR-0007](0007-lighthouse-ci-performance-gate.md) |
